@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Animated, Platform, Pressable, SafeAreaView, Text, View } from "react-native";
+import { ActivityIndicator, Animated, PanResponder, Platform, Pressable, SafeAreaView, Text, View } from "react-native";
 import { zl } from "./src/engine/losuj";
 import { ileKolejek, mojaLiga } from "./src/engine/sezon";
 import type { StanGry } from "./src/engine/types";
@@ -100,7 +100,7 @@ export default function App() {
       {ekran === "gra" && stan && (
         <View style={{ flex: 1 }}>
           <NaglowekKlubu s={stan} onMenu={() => setEkran("menu")} onNowa={() => doMenu(true)} />
-          <PrzejscieTV klucz={zakladka}>
+          <PrzejscieTV klucz={zakladka} onSwipe={(d) => { const i = ZAKLADKI.findIndex(([id]) => id === zakladka); const n = ZAKLADKI[i + d]; if (n) setZakladka(n[0]); }}>
             {zakladka === "pulpit" && <Pulpit s={stan} odswiez={odswiez} pokazMecz={() => setZakladka("mecze")} />}
             {zakladka === "sklad" && <Sklad s={stan} odswiez={odswiez} />}
             {zakladka === "tabela" && <Tabela s={stan} />}
@@ -203,15 +203,21 @@ function PasekZakladek({ zakladka, na, akcent = K.akcent }: { zakladka: Zakladka
 }
 
 // Przejście jak w telewizji (#59): przy zmianie zakładki złota belka „wipe” przelatuje przez ekran, treść wjeżdża z boku.
-function PrzejscieTV({ klucz, children }: { klucz: string; children: React.ReactNode }) {
+function PrzejscieTV({ klucz, children, onSwipe }: { klucz: string; children: React.ReactNode; onSwipe?: (kier: 1 | -1) => void }) {
   const [a] = useState(() => new Animated.Value(1));
   const pierwszy = useRef(true);
   useEffect(() => {
     if (pierwszy.current) { pierwszy.current = false; return; }
     a.setValue(0); Animated.timing(a, { toValue: 1, duration: 380, useNativeDriver: Platform.OS !== "web" }).start();
   }, [klucz]);
+  // gesty (#60): zdecydowane przesunięcie palcem w bok = następna / poprzednia zakładka
+  const sw = useRef(onSwipe); sw.current = onSwipe;
+  const pan = useRef(PanResponder.create({
+    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 30 && Math.abs(g.dx) > Math.abs(g.dy) * 2.5,
+    onPanResponderRelease: (_, g) => { if (Math.abs(g.dx) > 90 && Math.abs(g.vx) > 0.25) sw.current?.(g.dx < 0 ? 1 : -1); },
+  })).current;
   return (
-    <View style={{ flex: 1, overflow: "hidden" }}>
+    <View style={{ flex: 1, overflow: "hidden" }} {...pan.panHandlers}>
       <Animated.View style={{ flex: 1, opacity: a.interpolate({ inputRange: [0, 0.35, 1], outputRange: [0, 0.6, 1] }), transform: [{ translateX: a.interpolate({ inputRange: [0, 1], outputRange: [28, 0] }) }] }}>{children}</Animated.View>
       <Animated.View pointerEvents="none" style={{ position: "absolute", top: 0, bottom: 0, width: 70, backgroundColor: K.akcent, opacity: a.interpolate({ inputRange: [0, 0.8, 1], outputRange: [0.85, 0.5, 0] }), transform: [{ skewX: "-14deg" }, { translateX: a.interpolate({ inputRange: [0, 1], outputRange: [-90, 520] }) }] }} />
     </View>
