@@ -84,6 +84,50 @@ export const TRENERZY: Record<string, TrenerReal> = {
   "Podhale Nowy Targ": { imie: "Tomasz", nazwisko: "Kuźma", od: 2024, historia: [] },
   // Od III ligi w dół (do klasy B, oba województwa) — trenerzy GENEROWANI z generowaną historią (decyzja właściciela).
   // Trenerzy IV ligi ZP/KP 2026/27 (pl.wikipedia)
+  // === III LIGA gr. I, IV liga i okręgówki warmińsko-mazurskie i podlaskie (stan 27.11.2026; pewność wysoka/średnia) ===
+  "KTS Weszło": { imie: "Łukasz", nazwisko: "Ryczkowski" }, // III liga gr. I; en.wikipedia (infobox, rev. 26.11.2026) + superscore.live (skład)
+  "Wigry Suwałki": { imie: "Arkadiusz", nazwisko: "Szczerbowski", od: 2025, odMiesiac: "październik" }, // III liga gr. I; suwalki24.pl / poranny.pl (zmiana za Pawła Cimochowskiego); superscore.live
+  "Świt Nowy Dwór Mazowiecki": { imie: "Michał", nazwisko: "Złotkowski" }, // III liga gr. I; mksswit.pl/kadra/druzyna-i (Trener I zespołu); eostroleka.pl
+  "Mazovia Mińsk Mazowiecki": { imie: "Damian", nazwisko: "Guzek" }, // III liga gr. I; superscore.live (skład) + sofascore
+  "Pelikan Łowicz": { imie: "Piotr", nazwisko: "Kocęba" }, // III liga gr. I; en.wikipedia (infobox) + superscore.live
+  "Ząbkovia Ząbki": { imie: "Michał", nazwisko: "Maliszewski" }, // III liga gr. I; en.wikipedia (infobox) + superscore.live
+  "Wisła II Płock": { imie: "Damian", nazwisko: "Kijek" }, // III liga gr. I; wisla-plock.pl (II zespół; zastąpił Mateusza Lewandowskiego)
+  "Olimpia Zambrów": { imie: "Michał", nazwisko: "Kolanowski", od: 2025, odMiesiac: "listopad" }, // III liga gr. I; poranny.pl (nominacja XI 2025), zambrow.org (relacja 1. kolejki 2026/27)
+  "Jagiellonia II Białystok": { imie: "Daniel", nazwisko: "Rusek", od: 2025, odMiesiac: "styczeń" }, // III liga gr. I; poranny.pl, bialystokonline.pl, jagiellonia.pl (relacje do XI 2026)
+  "Olimpia Elbląg": { imie: "Karol", nazwisko: "Przybyła", od: 2025, odMiesiac: "kwiecień" }, // III liga gr. I; zksolimpia.pl/2-liga (Kadra: Trener Przybyła Karol, Trener Rafał Starzyński); portel.pl
+  "Polonia Lidzbark Warmiński": { imie: "Piotr", nazwisko: "Jacek" }, // III liga gr. I; gazetaolsztynska.pl (Trzecioligowcy zaczynają sezon), wikipedia
+  "KS CK Troszyn": { imie: "Michał", nazwisko: "Hryszko", od: 2025, odMiesiac: "czerwiec" }, // III liga gr. I; sport.eostroleka.pl (KS CK Troszyn ma nowego trenera / sztab); superscore.live
+  "Lechia Tomaszów Mazowiecki": { imie: "Bartosz", nazwisko: "Grzelak", od: 2024, odMiesiac: "styczeń" }, // III liga gr. I; tomaszow-maz.pl (prezentacja 07/2026, zapowiedź meczu 26.09.2026)
+  "Widzew II Łódź": { imie: "Paweł", nazwisko: "Ściebura" }, // III liga gr. I; superscore.live (skład) + sofascore
+  "Mławianka Mława": { imie: "Marek", nazwisko: "Gołębiewski" }, // III liga gr. I; en.wikipedia (infobox) + superscore.live
+  "Stomil Olsztyn": { imie: "Michał", nazwisko: "Kraszewski" }, // IV liga warmińsko-mazurska; stomil.olsztyn.pl (konferencje XI 2026: 'Michał Kraszewski: To była udana runda')
+  "Concordia Elbląg": { imie: "Marcin", nazwisko: "Szweda", od: 2024, odMiesiac: "lipiec" }, // IV liga warmińsko-mazurska; concordia.elblag.pl (Trener: Marcin Szweda od 9.07.2024); stomil.olsztyn.pl; info.elblag.p
+  "Granica Kętrzyn": { imie: "Przemysław", nazwisko: "Łapiński" }, // IV liga warmińsko-mazurska; wmzpn.pl (zapowiedź 1. kolejki 2026/27); superscore.live
+  "Tęcza Biskupiec": { imie: "Maciej", nazwisko: "Szostek" }, // IV liga warmińsko-mazurska; gazetaolsztynska.pl (07/2026); wmzpn.pl 'Podziel się wiedzą' (19.08.2026)
+  "Sokół Ostróda": { imie: "Rafał", nazwisko: "Więckowski", od: 2025, odMiesiac: "maj" }, // IV liga warmińsko-mazurska; ostrodanews.pl, gazetaolsztynska.pl; stomil.olsztyn.pl (konferencja X/XI 2026)
+  "GKS Wikielec": { imie: "Dominik", nazwisko: "Bednarczyk" }, // IV liga warmińsko-mazurska; infoilawa.pl; stomil.olsztyn.pl (konferencja GKS Wikielec - Stomil 1:1)
+  "Pisa Barczewo": { imie: "Piotr", nazwisko: "Wanda" }, // IV liga warmińsko-mazurska; wmzpn.pl (zapowiedź 1. kolejki 2026/27)
+  "DKS Dobre Miasto": { imie: "Piotr", nazwisko: "Gurzęda" }, // IV liga warmińsko-mazurska; olsztyn.com.pl 10.11.2026 ('ekipa Piotra Gurzędy'); wmzpn.pl; stomil.olsztyn.pl
+  "Rominta Gołdap": { imie: "Szymon", nazwisko: "Nałysnyk" }, // IV liga warmińsko-mazurska; stomil.olsztyn.pl (konferencja Rominta - Stomil 0:3, jesień 2026); superscore.live
+  "Start Nidzica": { imie: "Rafał", nazwisko: "Brzozowski", od: 2026, odMiesiac: "październik" }, // IV liga warmińsko-mazurska; stomil.olsztyn.pl (konferencja Stomil - Start 3:1, X 2026); wmzpn.pl (zapowiedź 10. kolejk
+  "MKS Mazur Ełk": { imie: "Patryk", nazwisko: "Gondek" }, // IV liga warmińsko-mazurska; wmzpn.pl (zapowiedź 2. kolejki 2026/27); superscore.live
+  "Znicz Biała Piska": { imie: "Ryszard", nazwisko: "Borkowski" }, // IV liga warmińsko-mazurska; stomil.olsztyn.pl (zapowiedź i konferencja Stomil - Znicz 2:0, XI 2026)
+  "Naki Olsztyn": { imie: "Andrzej", nazwisko: "Nakielski" }, // IV liga warmińsko-mazurska; olsztyn.com.pl 10.11.2026; stomil.olsztyn.pl
+  "Mamry Giżycko": { imie: "Kamil", nazwisko: "Pyczot" }, // IV liga warmińsko-mazurska; stomil.olsztyn.pl (konferencja Stomil - Mamry 7:1, IX 2026); info-ketrzyn24.pl
+  "KS Wasilków": { imie: "Wojciech", nazwisko: "Kobeszko" }, // IV liga podlaska; poranny.pl (zapowiedzi IV ligi, IX 2026: 'podopieczni trenera Wojciecha Kobeszki')
+  "Warmia Grajewo": { imie: "Karol", nazwisko: "Salik" }, // IV liga podlaska; poranny.pl; e-grajewo.pl (05/2026)
+  "ŁKS II Łomża": { imie: "Tomasz", nazwisko: "Staniórski" }, // IV liga podlaska; mylomza.pl (08/2026)
+  "Czarni Czarna Białostocka": { imie: "Mateusz", nazwisko: "Woroniecki" }, // IV liga podlaska; poranny.pl (jesień 2026)
+  "Tur Bielsk Podlaski": { imie: "Krystian", nazwisko: "Kulikowski", od: 2026 }, // IV liga podlaska; poranny.pl (IX 2026)
+  "Promień Mońki": { imie: "Leszek", nazwisko: "Zawadzki" }, // IV liga podlaska; poranny.pl (IX 2026)
+  "Wissa Szczuczyn": { imie: "Dariusz", nazwisko: "Kortkowski", od: 2026, odMiesiac: "październik" }, // IV liga podlaska; e-grajewo.pl 09.10.2026
+  "KS Śniadowo": { imie: "Dariusz", nazwisko: "Narolewski", od: 2026, odMiesiac: "wrzesień" }, // IV liga podlaska; mylomza.pl 03.09.2026
+  "Pomorzanka Sejny": { imie: "Karol", nazwisko: "Piaścik" }, // IV liga podlaska; suwalki24.pl (06/2026 i podsumowanie jesieni 2026)
+  "Pionier Brańsk": { imie: "Przemysław", nazwisko: "Masłowski" }, // IV liga podlaska; bielsk.eu (05/2026 i terminarz 2026/27)
+  "Stomil II Olsztyn": { imie: "Paweł", nazwisko: "Sobotka" }, // klasa okręgowa W-M gr. 1; stomil.olsztyn.pl (IX-X 2026)
+  "Mazur Pisz": { imie: "Dzmitry", nazwisko: "Baiduk" }, // klasa okręgowa W-M gr. 1; stomil.olsztyn.pl 25.09.2026 ('podopieczni Dzmitrego Baiduka')
+  "Olimpia II Elbląg": { imie: "Bartłomiej", nazwisko: "Florek" }, // klasa okręgowa W-M gr. 2; zksolimpia.pl/ii-zespol (Kadra: Trener Florek Bartłomiej)
+  "Puszcza Hajnówka": { imie: "Artur", nazwisko: "Dakowicz" }, // klasa okręgowa podlaska; bielsk.eu (mecz 03.10.2026)
 };
 
 /** Licencja UEFA właściwa dla szczebla (realia PZPN: im wyżej, tym wyższy wymóg). */

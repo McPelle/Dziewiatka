@@ -101,6 +101,15 @@ export interface KalSzczebla { startJesien: [number, number]; startWiosna: [numb
 // Realne terminarze 2026/27 (PZPN B1L/B2L/B3L, ekstraklasa.org, ramowe terminarze K-PZPN i ZZPN; MZPN i Pomorski ZPN —
 // wiosna wg 2025/26). Urlop + przygotowania = przerwa między ostatnią a pierwszą kolejką danej rundy.
 const KAL: { re: RegExp; k: KalSzczebla }[] = [
+  // Warmińsko-Mazurski ZPN — ramowy kalendarz 2026/27 (wmzpn.pl): IV liga i okręgówka 1–2.08 → 14–15.11, wiosna od 6–7.03,
+  // koniec 12–13.06; klasa A 15–16.08 → 14–15.11, wiosna od 20–21.03; klasa B 15–16.08 → 24–25.10, wiosna od 3–4.04.
+  { re: /iv liga warmińsko|okręgowa — warmińsko/i, k: { startJesien: [8, 1], startWiosna: [3, 6], urlopLato: 21, urlopZima: 60, przygLato: 28, przygZima: 51 } },
+  { re: /klasa a — warmińsko/i, k: { startJesien: [8, 15], startWiosna: [3, 20], urlopLato: 35, urlopZima: 77, przygLato: 28, przygZima: 48 } },
+  { re: /klasa b — warmińsko/i, k: { startJesien: [8, 15], startWiosna: [4, 3], urlopLato: 35, urlopZima: 118, przygLato: 28, przygZima: 42 } },
+  // Podlaski ZPN — terminarz jesień 2026 (podlaskizpn.org): IV liga i okręgówka od 8–9.08 do 14–15.11; klasa A od 29–30.08
+  // (wiosna 2027 jeszcze nieopublikowana — przyjęty typowy rytm szczebla).
+  { re: /iv liga podlaska|okręgowa — podlaska/i, k: { startJesien: [8, 8], startWiosna: [3, 7], urlopLato: 26, urlopZima: 60, przygLato: 30, przygZima: 52 } },
+  { re: /klasa a — podlaska/i, k: { startJesien: [8, 29], startWiosna: [3, 21], urlopLato: 50, urlopZima: 76, przygLato: 28, przygZima: 43 } },
   { re: /ekstraklasa/i, k: { startJesien: [7, 25], startWiosna: [1, 30], urlopLato: 27, urlopZima: 21, przygLato: 37, przygZima: 28 } },
   { re: /\b1\.? liga|\bi liga/i, k: { startJesien: [7, 25], startWiosna: [2, 6], urlopLato: 24, urlopZima: 21, przygLato: 33, przygZima: 35 } },
   { re: /\b2\.? liga|\bii liga/i, k: { startJesien: [7, 25], startWiosna: [2, 20], urlopLato: 24, urlopZima: 28, przygLato: 33, przygZima: 49 } },
