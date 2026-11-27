@@ -1,3 +1,5 @@
+import { tydzienSklepu } from "./sklep";
+import { tydzienKart } from "./karty";
 import { wydarzeniaSezonowe } from "./wydarzeniaKlubu";
 import { kwartalZarzadu } from "./budzetZarzadu";
 import { poMeczuWydzial, tydzienWydzialu } from "./wydzialGier";
@@ -1025,6 +1027,8 @@ export function zagrajKolejke(s: StanGry) {
   tydzienWydzialu(s); // Wydział Gier, Kolegium Sędziów, Izba PZPN (zaległości płacowe)
   { const t = tydzienZgod(s, s.kluby[s.mojKlub]); if (t) wiadomosc(s, t); }
   { const t = tydzienLicencji(s); if (t) wiadomosc(s, t); } // kurs UEFA, egzamin, wymogi licencyjne ligi // życie zgód: jubileusze, zerwania, nowe układy
+  { const t = tydzienSklepu(s); if (t) wiadomosc(s, t); } // sklep klubowy: sprzedaż szalików/koszulek
+  for (const w of tydzienKart(s)) if (!/Zawodnik Kolejki/.test(w)) wiadomosc(s, w); // karty kolekcjonerskie (karty ZK bez komunikatów — za dużo)
   { // wędrująca oprawa z orłami — po stadionach scen kibicowskich (przez zgody)
     const kand = Object.values(s.kluby).filter((k) => k.poziom <= 5 && !k.rezerwaDla); // wszystkie kluby od Ekstraklasy do IV ligi
     const t = wedrownaOprawaTydzien(s, kand, (a) => kand.filter((b) => b.id !== a.id && !!zgodaKibicow(s, a, b)));

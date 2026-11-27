@@ -401,6 +401,8 @@ export interface StanGry {
   trudnosc?: string; // poziom trudności: latwy | normalny | trudny | legendarny
   osiagniecia?: Record<string, number>; // id osiągnięcia → sezon odblokowania
   osiagnieciaFlagi?: { trening?: boolean; mowa?: boolean; [k: string]: boolean | undefined };
+  kartyKolekcja?: import("./karty").StanKart; // karty kolekcjonerskie: zdobyte karty specjalne
+  sklepKlubowy?: import("./sklep").StanSklepu; // sklep klubowy: projekt szalika/koszulki, ceny, statystyki sezonów
   budzetSezonu?: import("./budzetZarzadu").BudzetSezonu; // budżet sezonu uzgodniony z zarządem + rozliczenia kwartalne
   wydzial?: import("./wydzialGier").StanWydzialu; // protesty, oceny sędziów, zaległości płacowe / Izba PZPN
   wyzwanie?: import("./wyzwania").StanWyzwania; // tryb Wyzwania: aktywny scenariusz

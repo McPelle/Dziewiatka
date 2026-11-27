@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Osiagniecia } from "./Osiagniecia";
 import { MapaWojewodztwa } from "./MapaWojewodztwa";
 import { DniKlubu } from "./DniKlubu";
+import { Sklep } from "./Sklep";
+import { AlbumKart } from "./AlbumKart";
 import { WydzialGier } from "./WydzialGier";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 import type { StanGry } from "../engine/types";
@@ -34,6 +36,8 @@ const WPISY: Wpis[] = [
   { key: "stroje", ikona: "🎽", nazwa: "Stroje", opis: "Barwy i komplety meczowe", grupa: "Zespół", tryb: "inline" },
   { key: "finanse", ikona: "💰", nazwa: "Finanse", opis: "Budżet, wpływy i koszty", grupa: "Klub", tryb: "modal" },
   { key: "sponsorzy", ikona: "🤝", nazwa: "Sponsorzy", opis: "Umowy, patroni i naming", grupa: "Klub", tryb: "inline" },
+  { key: "sklep", ikona: "🛍", nazwa: "Sklep klubowy", opis: "Szaliki, koszulki, ceny i sprzedaż", grupa: "Klub", tryb: "inline" },
+  { key: "karty", ikona: "🃏", nazwa: "Album kart", opis: "Karty kadry i karty specjalne", grupa: "Zespół", tryb: "inline" },
   { key: "klub", ikona: "🏟", nazwa: "Mój klub", opis: "Stadion, infrastruktura, dane", grupa: "Klub", tryb: "modal" },
   { key: "kariera", ikona: "📈", nazwa: "Kariera trenera", opis: "Historia, trofea i licencja", grupa: "Klub", tryb: "modal" },
   { key: "puchar", ikona: "🏆", nazwa: "Puchar", opis: "Drabinka i wyniki pucharów", grupa: "Rozgrywki", tryb: "inline" },
@@ -55,6 +59,8 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
         <PasekPowrotu tytul={wpis.nazwa} ikona={wpis.ikona} onBack={zamknij} />
         <View style={{ flex: 1 }}>
           {inlineOtwarte === "sponsorzy" && <Sponsorzy s={s} odswiez={odswiez} />}
+          {inlineOtwarte === "sklep" && <Sklep s={s} odswiez={odswiez} />}
+          {inlineOtwarte === "karty" && <AlbumKart s={s} />}
           {inlineOtwarte === "stroje" && <Stroje s={s} klub={s.kluby[s.mojKlub]} />}
           {inlineOtwarte === "puchar" && <PucharEkran s={s} />}
         </View>
