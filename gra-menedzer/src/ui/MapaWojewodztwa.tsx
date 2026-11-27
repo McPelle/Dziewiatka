@@ -9,6 +9,7 @@ import { GRANICE, kontur } from "../data/granice";
 import { MIASTA, odlegloscDrogowa } from "../data/miasta";
 import { RELACJE_KIBICOW } from "../data/relacjeKibicow";
 import { wojKlubu, wojLigi } from "../engine/regiony";
+import { jestDerby } from "../engine/derby";
 import type { Klub, StanGry } from "../engine/types";
 import { Herb, nazwaPierwszejDruzyny } from "./Herb";
 import { SCIEZKI } from "../data/sciezki";
@@ -51,6 +52,7 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
   const [srodek, setSrodek] = useState<[number, number] | null>(null);
   const [wyb, setWyb] = useState<string | null>(null);
   const [szer, setSzer] = useState(360);
+  const [tryb3d, setTryb3d] = useState(false);
 
   // projekcja: kontur województwa → jednostki mapy (W = 1000), z poprawką cos(φ)
   const geo = useMemo(() => {
@@ -87,6 +89,7 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
   }, [geo, woj, s]);
 
   const mojaLiga = s.ligi[moj.poziom - 1]?.nazwa ?? "";
+  const derby = useMemo(() => new Set(kluby.filter((p) => s.kluby[p.k.id] && p.k.id !== s.mojKlub && !!jestDerby(s, s.mojKlub, p.k.id)).map((p) => p.k.id)), [kluby]);
   const H = geo?.H ?? 800, W = geo?.W ?? 1000;
   const vbW = W / zoom, vbH = H / zoom;
   const ja = kluby.find((p) => p.k.id === s.mojKlub);
@@ -162,7 +165,7 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
         {WOJE.map(([w, n]) => chip(woj === w, n, () => { setWoj(w); setZoom(1); setSrodek(null); setWyb(null); setPoziom(null); }))}
       </View>
-      <View onLayout={(e) => setSzer(Math.max(200, e.nativeEvent.layout.width))} style={{ height: wys, borderRadius: 12, overflow: "hidden", backgroundColor: "#151a18", borderWidth: 1, borderColor: K.liniaMocna }} {...pan.panHandlers}>
+      <View onLayout={(e) => setSzer(Math.max(200, e.nativeEvent.layout.width))} style={{ transform: tryb3d ? [{ perspective: 900 }, { rotateX: "38deg" }, { scale: 0.92 }] : [], shadowColor: "#000", shadowOpacity: tryb3d ? 0.6 : 0, shadowRadius: 18, shadowOffset: { width: 0, height: 16 }, height: wys, borderRadius: 12, overflow: "hidden", backgroundColor: "#151a18", borderWidth: 1, borderColor: K.liniaMocna }} {...pan.panHandlers}>
         <Svg width={szer} height={wys} viewBox={`${vx} ${vy} ${vbW} ${vbH}`} style={{ position: "absolute", left: 0, top: 0 }}>
           <Rect x={-W} y={-H} width={W * 3} height={H * 3} fill="#151a18" />
           {geo.morze && <Rect x={geo.morze.x} y={geo.morze.y} width={geo.morze.w} height={geo.morze.h} fill="#0b2a44" />}
@@ -170,12 +173,13 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
           <Path d={geo.d} fill="#1d4a31" stroke="#9be7b0" strokeWidth={2.2 / skala} />
           {geo.inne.map((o) => <SvgText key={`n${o.w}`} x={o.c[0]} y={o.c[1]} fontSize={11 / skala} fill="#6f8a7c" textAnchor="middle" fontStyle="italic">{SKROT[o.w] ?? o.w}</SvgText>)}
           {MORZE[woj] && <SvgText x={geo.xy(...MORZE[woj])[0]} y={geo.xy(...MORZE[woj])[1]} fontSize={13 / skala} fill="#6fa6d6" textAnchor="middle" fontStyle="italic" letterSpacing={3 / skala}>Morze Bałtyckie</SvgText>}
+          {ja && [...derby].map((id) => { const p = kluby.find((q) => q.k.id === id); return p ? <Line key={`d${id}`} x1={ja.x} y1={ja.y} x2={p.x} y2={p.y} stroke="#ff3b30" strokeWidth={1.6 / skala} strokeDasharray={`${4 / skala},${3 / skala}`} opacity={0.7} /> : null; })}
           {linie.map((l, i) => <Line key={i} x1={l.a!.x} y1={l.a!.y} x2={l.b!.x} y2={l.b!.y} stroke={l.r.typ === "kosa" ? "#ff5a5a" : l.r.typ === "uklad" ? "#5aa9ff" : "#3fe08a"} strokeWidth={2.4 / skala} strokeDasharray={l.r.typ === "uklad" ? `${6 / skala},${4 / skala}` : undefined} opacity={0.9} />)}
         </Svg>
         {znaczniki.filter((z) => !z.herb).map((z) => (
-          <Pressable key={z.p.k.id} onPress={() => wybierz(z.p.k.id)} hitSlop={6} style={{ position: "absolute", left: z.sx - z.r, top: z.sy - z.r, width: z.r * 2, height: z.r * 2, borderRadius: z.r, backgroundColor: KOLOR_POZ[Math.min(8, z.p.k.poziom - 1)], borderWidth: 1.2, borderColor: z.p.k.id === wyb ? K.akcent : "#06130d", opacity: z.p.znana ? 1 : 0.7 }} />))}
+          <Pressable key={z.p.k.id} onPress={() => wybierz(z.p.k.id)} hitSlop={6} style={{ position: "absolute", left: z.sx - z.r, top: z.sy - z.r, width: z.r * 2, height: z.r * 2, borderRadius: z.r, backgroundColor: KOLOR_POZ[Math.min(8, z.p.k.poziom - 1)], borderWidth: derby.has(z.p.k.id) ? 2.2 : 1.2, borderColor: z.p.k.id === wyb ? K.akcent : derby.has(z.p.k.id) ? "#ff3b30" : "#06130d", opacity: z.p.znana ? 1 : 0.7 }} />))}
         {znaczniki.filter((z) => z.herb).map((z) => { const mj = z.p.k.id === s.mojKlub, sel = z.p.k.id === wyb; return (
-          <Pressable key={z.p.k.id} onPress={() => wybierz(z.p.k.id)} style={{ position: "absolute", left: z.sx - z.r, top: z.sy - z.r, width: z.r * 2, height: z.r * 2, borderRadius: z.r, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(6,19,13,0.78)", borderWidth: mj || sel ? 2 : 1.5, borderColor: mj ? K.akcent : sel ? "#ffffff" : KOLOR_POZ[Math.min(8, z.p.k.poziom - 1)] }}>
+          <Pressable key={z.p.k.id} onPress={() => wybierz(z.p.k.id)} style={{ position: "absolute", left: z.sx - z.r, top: z.sy - z.r, width: z.r * 2, height: z.r * 2, borderRadius: z.r, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(6,19,13,0.78)", borderWidth: mj || sel ? 2 : 1.5, borderColor: mj ? K.akcent : sel ? "#ffffff" : derby.has(z.p.k.id) ? "#ff3b30" : KOLOR_POZ[Math.min(8, z.p.k.poziom - 1)] }}>
             <Herb klub={z.p.k} rozmiar={z.r * 1.45} />
           </Pressable>); })}
         {podpisy.map(({ z, x, y, t }) => { const mj = z.p.k.id === s.mojKlub; return (
@@ -202,6 +206,7 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
         {chip(poziom == null, "Wszystkie", () => setPoziom(null))}
         {poziomy.map((p) => chip(poziom === p, `${NAZWY_POZ[Math.min(8, p - 1)]}${p === moj.poziom && kluby.some((q) => q.liga === mojaLiga) ? " (Twoja)" : ""}`, () => setPoziom(poziom === p ? null : p), KOLOR_POZ[Math.min(8, p - 1)]))}
         {chip(relacje, "Zgody / kosy", () => setRelacje(!relacje))}
+        {chip(tryb3d, "🏔 Widok 3D", () => setTryb3d(!tryb3d))}
       </View>
 
       {/* karta wybranego klubu (albo Twojego) */}
@@ -213,7 +218,7 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
           {relKlubu(fokus.nazwa).length > 0 && <Text style={[st.maly, { fontSize: 12, marginTop: 2 }]}>{relKlubu(fokus.nazwa).slice(0, 8).map((r) => `${r.typ === "kosa" ? "⚔️" : r.typ === "uklad" ? "🤜🤛" : "🤝"} ${r.a === fokus.nazwa ? r.b : r.a}`).join("  ")}</Text>}
         </View>
       </View>
-      <Text style={[st.maly, { fontSize: 10.5, marginTop: 4 }]}><Text style={{ color: "#3fe08a" }}>━ zgoda</Text>  <Text style={{ color: "#5aa9ff" }}>┅ układ</Text>  <Text style={{ color: "#ff5a5a" }}>━ kosa</Text>  (linie dla wybranego klubu)</Text>
+      <Text style={[st.maly, { fontSize: 10.5, marginTop: 4 }]}><Text style={{ color: "#3fe08a" }}>━ zgoda</Text>  <Text style={{ color: "#5aa9ff" }}>┅ układ</Text>  <Text style={{ color: "#ff5a5a" }}>━ kosa</Text>  (linie dla wybranego klubu)  <Text style={{ color: "#ff3b30" }}>┅ derby Twojego klubu</Text></Text>
 
       {kluby.some((p) => p.liga === mojaLiga && p.k.id !== s.mojKlub) && <Text style={[st.naglowek, { marginTop: 12 }]}>Twoja liga — odległości od stadionu</Text>}
       {kluby.filter((p) => p.liga === mojaLiga && p.k.id !== s.mojKlub).map((p) => ({ p, d: odlegloscDrogowa(moj.miasto, p.k.miasto) })).sort((a, b) => a.d - b.d).map(({ p, d }) => (
