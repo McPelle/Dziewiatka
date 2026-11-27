@@ -3,6 +3,7 @@ import { Osiagniecia } from "./Osiagniecia";
 import { MapaWojewodztwa } from "./MapaWojewodztwa";
 import { SerwisKraj } from "./SerwisKraj";
 import { DniKlubu } from "./DniKlubu";
+import { motywKlubu, ustawMotywKlubu } from "./motyw";
 import { Sklep } from "./Sklep";
 import { Dziennik } from "./Dziennik";
 import { Muzeum } from "./Muzeum";
@@ -172,6 +173,7 @@ function UstawieniaGrafiki() {
   const ls = typeof window !== "undefined" ? window.localStorage : undefined;
   const [g3d, setG3d] = useState(ls?.getItem("dz_3d") !== "0");
   const [lekka, setLekka] = useState(lekkaGrafika());
+  const [mot, setMot] = useState(motywKlubu());
   const Prz = ({ t, opis, on, v }: { t: string; opis: string; on: () => void; v: boolean }) => (
     <Pressable onPress={on} style={[st.wiersz, { paddingVertical: 8, borderTopWidth: 1, borderTopColor: K.linia }]}>
       <View style={{ flex: 1 }}><Text style={st.tekst}>{t}</Text><Text style={st.maly}>{opis}</Text></View>
@@ -183,6 +185,7 @@ function UstawieniaGrafiki() {
       <Text style={st.naglowek}>🎨 Grafika</Text>
       <Prz t="Grafika 3D" opis="Stadion 3D w menu i w zakładce klubu, mecz na żywo w 3D." v={g3d} on={() => { const n = !g3d; ls?.setItem("dz_3d", n ? "1" : "0"); setG3d(n); }} />
       <Text style={[st.maly, { marginTop: 8 }]}>🗣 Polskie głosy w tym urządzeniu: {liczbaGlosow().M} męskie, {liczbaGlosow().K} damskie{liczbaGlosow().inne ? `, ${liczbaGlosow().inne} inne` : ""}. Mężczyźni mówią męskim głosem, kobiety damskim; każda postać ma własny ton. Więcej głosów (iPhone): Ustawienia → Dostępność → Treść mówiona → Głosy → Polski — pobierz wszystkie, gra użyje ich sama.</Text>
+      <Prz t="Motyw w barwach klubu" opis="Pasek klubu i aktywna zakładka w kolorach Twojego klubu (zmiana po powrocie do pulpitu)." v={mot} on={() => { const n = !mot; ustawMotywKlubu(n); setMot(n); }} />
       <Prz t="Lekka grafika" opis="Szybkie materiały, bez cieni i poświaty — grafika 3D startuje od razu i chodzi płynnie (na iPhonie domyślnie włączona)." v={lekka} on={() => { const n = !lekka; ls?.setItem("dz_lekka", n ? "1" : "0"); setLekka(n); }} />
     </View>
   );
