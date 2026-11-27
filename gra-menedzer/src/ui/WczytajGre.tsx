@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 import type { StanGry } from "../engine/types";
-import { listaZapisow, usunSlot, wczytajSlot, type MetaZapisu } from "./zapis";
+import { importujZPliku, listaZapisow, usunSlot, wczytaj as wczytajAuto, wczytajSlot, type MetaZapisu } from "./zapis";
 import { CZCIONKA, K, st } from "./styl";
 
 function kiedyTekst(ms: number): string {
@@ -12,8 +12,10 @@ function kiedyTekst(ms: number): string {
 
 export function WczytajGre({ onWczytaj, onWstecz }: { onWczytaj: (s: StanGry) => void; onWstecz: () => void }) {
   const [lista, setLista] = useState<MetaZapisu[] | null>(null);
+  const [auto, setAuto] = useState<StanGry | null>(null);
   const odswiez = () => listaZapisow().then(setLista);
-  useEffect(() => { odswiez(); }, []);
+  useEffect(() => { odswiez(); wczytajAuto().then(setAuto); }, []);
+  const importuj = () => importujZPliku().then(onWczytaj).catch((e) => { if (Platform.OS === "web") window.alert(e instanceof Error ? e.message : "Błąd importu."); });
 
   const usun = async (m: MetaZapisu) => {
     const ok = Platform.OS === "web" ? window.confirm(`Usunąć zapis „${m.nazwa}"?`) : true;
@@ -37,6 +39,24 @@ export function WczytajGre({ onWczytaj, onWstecz }: { onWczytaj: (s: StanGry) =>
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 12, paddingBottom: 28 }}>
+        {auto && auto.kluby?.[auto.mojKlub] ? (
+          <Pressable onPress={() => onWczytaj(auto)} style={[st.karta, st.wiersz, { marginTop: 8, paddingVertical: 12, borderColor: K.akcent2, borderWidth: 1 }]}>
+            <View style={{ width: 42, height: 42, borderRadius: 11, backgroundColor: K.karta2, alignItems: "center", justifyContent: "center", marginRight: 12 }}><Text style={{ fontSize: 20 }}>⏱</Text></View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: K.akcent2, fontSize: 11, fontWeight: "900", fontFamily: CZCIONKA }}>AUTOZAPIS · OSTATNIA GRA</Text>
+              <Text numberOfLines={1} style={{ color: K.tekst, fontSize: 15.5, fontWeight: "800", fontFamily: CZCIONKA }}>{auto.kluby[auto.mojKlub].nazwa}</Text>
+              <Text style={{ color: K.szary, fontSize: 12, fontFamily: CZCIONKA }}>sezon {auto.sezon}</Text>
+            </View>
+            <Text style={{ color: K.akcent2, fontWeight: "900" }}>Kontynuuj ›</Text>
+          </Pressable>
+        ) : null}
+        {Platform.OS === "web" && (
+          <Pressable onPress={importuj} style={[st.karta, { marginTop: 8, paddingVertical: 12 }]}>
+            <Text style={{ color: K.niebieski, fontWeight: "900", fontFamily: CZCIONKA }}>⬆ Importuj z pliku</Text>
+            <Text style={{ color: K.szary, fontSize: 12, fontFamily: CZCIONKA }}>Wczytaj zapis wyeksportowany wcześniej (np. z innego urządzenia).</Text>
+          </Pressable>
+        )}
+        <Text style={[st.naglowek, { marginTop: 14 }]}>Zapisane gry</Text>
         {lista === null ? null : lista.length === 0 ? (
           <View style={[st.karta, { alignItems: "center", paddingVertical: 30 }]}>
             <Text style={{ fontSize: 34, marginBottom: 8 }}>🗂</Text>
@@ -51,7 +71,7 @@ export function WczytajGre({ onWczytaj, onWstecz }: { onWczytaj: (s: StanGry) =>
               </View>
               <Pressable onPress={() => wczytaj(m)} style={{ flex: 1 }}>
                 <Text numberOfLines={1} style={{ color: K.tekst, fontSize: 15.5, fontWeight: "800", fontFamily: CZCIONKA }}>{m.nazwa}</Text>
-                <Text numberOfLines={1} style={{ color: K.szary, fontSize: 12, marginTop: 1, fontFamily: CZCIONKA }}>{m.liga} · sezon {m.sezon}</Text>
+                <Text numberOfLines={1} style={{ color: K.szary, fontSize: 12, marginTop: 1, fontFamily: CZCIONKA }}>{m.liga} · sezon {m.sezon}{m.trener ? ` · ${m.trener}` : ""}</Text>
                 <Text style={{ color: K.szary, fontSize: 10.5, opacity: 0.8, marginTop: 1, fontFamily: CZCIONKA }}>zapisano {kiedyTekst(m.kiedy)}</Text>
               </Pressable>
               <Pressable onPress={() => wczytaj(m)} style={({ pressed }) => [{ backgroundColor: K.akcent, borderRadius: 11, paddingHorizontal: 13, paddingVertical: 8, marginLeft: 8, opacity: pressed ? 0.9 : 1 }]}>

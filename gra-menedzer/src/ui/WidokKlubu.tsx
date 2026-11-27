@@ -4,8 +4,10 @@ import STADIONY_JSON from "../../assets/stadiony.json";
 import { zl } from "../engine/losuj";
 import { POZYCJE } from "../engine/mecz";
 import {
-  kosztObiektu, kosztRozbudowy, miejscaRozbudowy, OBIEKTY_NAZWY, przychodObiektow, rozbudujObiekt, rozbudujStadion,
+  kosztObiektu, maOswietlenie, MAX_POZIOM_OBIEKTU, OBIEKTY_IKONY, OBIEKTY_NAZWY, OBIEKTY_OPIS, przychodObiektow, rozbudujObiekt, rozbudujStadion,
+  wariantyRozbudowy, wymogObiektu,
 } from "../engine/sezon";
+import { WidokStadionu } from "./WidokStadionu";
 import { tabelaLigi } from "../engine/swiat";
 import type { Obiekty, RolaSztabu, StanGry } from "../engine/types";
 import { NAZWA_ROLI } from "../engine/sztab";
@@ -114,28 +116,49 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
               </View>
               {moj && <View style={{ marginTop: 10 }}><Sponsorzy s={s} odswiez={odswiez} /></View>}
 
+              <View style={{ marginTop: 18 }}>
+                <Text style={st.naglowek}>🏟 Stadion z lotu ptaka</Text>
+                <Text style={[st.maly, { marginBottom: 6 }]}>{klub.pojemnosc.toLocaleString("pl")} miejsc · trybuny i obiekty rosną razem z rozbudową</Text>
+                <WidokStadionu klub={klub} oswietlenie={maOswietlenie(klub)} />
+              </View>
+
               {moj && (
                 <View style={{ marginTop: 18 }}>
-                  <Text style={st.naglowek}>🏟 Zarządzanie stadionem</Text>
-                  <View style={[st.wiersz, { justifyContent: "space-between", paddingVertical: 6 }]}>
-                    <Text style={st.tekst}>Rozbuduj o {miejscaRozbudowy(s)} miejsc</Text>
-                    <Pressable style={st.przyciskMaly} onPress={() => akcja(() => rozbudujStadion(s))}>
-                      <Text style={st.przyciskMalyTekst}>{zl(kosztRozbudowy(s))}</Text>
-                    </Pressable>
-                  </View>
-                  {(Object.keys(OBIEKTY_NAZWY) as (keyof Obiekty)[]).map((typ) => (
-                    <View key={typ} style={[st.wiersz, { justifyContent: "space-between", paddingVertical: 6, borderTopWidth: 1, borderTopColor: K.linia }]}>
-                      <Text style={st.tekst}>{OBIEKTY_NAZWY[typ]} <Text style={st.maly}>(poz. {klub.obiekty[typ] ?? 0}/5)</Text></Text>
-                      {(klub.obiekty[typ] ?? 0) >= 5 ? (
-                        <Text style={st.maly}>max</Text>
-                      ) : (
-                        <Pressable style={st.przyciskMaly} onPress={() => akcja(() => rozbudujObiekt(s, typ))}>
-                          <Text style={st.przyciskMalyTekst}>{zl(kosztObiektu(s, typ))}</Text>
-                        </Pressable>
-                      )}
+                  <Text style={st.naglowek}>🏗 Rozbudowa stadionu</Text>
+                  {wariantyRozbudowy(s).map((w, i) => (
+                    <View key={w.nazwa} style={[st.wiersz, { justifyContent: "space-between", paddingVertical: 6, borderTopWidth: i ? 1 : 0, borderTopColor: K.linia }]}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={st.tekst}>{w.nazwa}</Text>
+                        <Text style={st.maly}>+{w.miejsca.toLocaleString("pl")} miejsc → {(klub.pojemnosc + w.miejsca).toLocaleString("pl")}</Text>
+                      </View>
+                      <Pressable style={st.przyciskMaly} onPress={() => akcja(() => rozbudujStadion(s, i))}>
+                        <Text style={st.przyciskMalyTekst}>{zl(w.koszt)}</Text>
+                      </Pressable>
                     </View>
                   ))}
-                  <Text style={[st.maly, { marginTop: 6 }]}>Obiekty dają przychód w dniu meczu (teraz ~{zl(przychodObiektow(klub.obiekty, Math.min(klub.pojemnosc, 1000)))} przy 1000 widzów).</Text>
+
+                  <Text style={[st.naglowek, { marginTop: 14 }]}>🏘 Obiekty wokół stadionu</Text>
+                  {(Object.keys(OBIEKTY_NAZWY) as (keyof Obiekty)[]).map((typ) => {
+                    const poz = klub.obiekty[typ] ?? 0;
+                    const wym = wymogObiektu(klub, typ);
+                    return (
+                      <View key={typ} style={[st.wiersz, { justifyContent: "space-between", paddingVertical: 7, borderTopWidth: 1, borderTopColor: K.linia, gap: 8 }]}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={st.tekst}>{OBIEKTY_IKONY[typ]} {OBIEKTY_NAZWY[typ]} <Text style={{ color: K.akcent }}>{"●".repeat(poz)}<Text style={{ color: K.szary }}>{"○".repeat(MAX_POZIOM_OBIEKTU - poz)}</Text></Text></Text>
+                          <Text style={st.maly}>{OBIEKTY_OPIS[typ]}</Text>
+                          {wym && poz < MAX_POZIOM_OBIEKTU ? <Text style={[st.maly, { color: K.czerwony }]}>🔒 {wym}</Text> : null}
+                        </View>
+                        {poz >= MAX_POZIOM_OBIEKTU ? (
+                          <Text style={st.maly}>max</Text>
+                        ) : (
+                          <Pressable style={[st.przyciskMaly, wym ? { opacity: 0.4 } : null]} onPress={() => akcja(() => rozbudujObiekt(s, typ))}>
+                            <Text style={st.przyciskMalyTekst}>{poz ? "Rozbuduj" : "Zbuduj"} · {zl(kosztObiektu(s, typ))}</Text>
+                          </Pressable>
+                        )}
+                      </View>
+                    );
+                  })}
+                  <Text style={[st.maly, { marginTop: 6 }]}>Obiekty dają przychód w dniu meczu (teraz ~{zl(przychodObiektow(klub.obiekty, Math.min(klub.pojemnosc, 1000)))} przy 1000 widzów) i podnoszą frekwencję.</Text>
                 </View>
               )}
 

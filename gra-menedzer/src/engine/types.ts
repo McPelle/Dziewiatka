@@ -350,6 +350,7 @@ export interface Europa {
 }
 
 export interface StanGry {
+  slotId?: string; // id slotu zapisu tej kariery („Zapisz grę" nadpisuje ten slot)
   wersja: 1;
   trener: string;
   trenerZdjecie?: string; // wgrane zdjęcie trenera (data URI) — lokalnie

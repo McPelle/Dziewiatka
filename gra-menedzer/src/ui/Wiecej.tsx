@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 import type { StanGry } from "../engine/types";
+import { ZapiszGre } from "./ZapiszGre";
 import { zapiszSlot } from "./zapis";
 import { Finanse } from "./Finanse";
 import { Sztab } from "./Sztab";
@@ -32,6 +33,7 @@ const GRUPY = ["Zespół", "Klub", "Rozgrywki"];
 
 export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
   const [otw, setOtw] = useState<string | null>(null);
+  const [oknoZapisu, setOknoZapisu] = useState(false);
   const zamknij = () => setOtw(null);
 
   // Ekran pełnoekranowy dla widoków typu „inline" (Sponsorzy, Stroje, Puchar) z paskiem powrotu.
@@ -58,13 +60,26 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
           <Text style={st.tytul}>Centrum klubu</Text>
           <Text style={[st.maly, { marginTop: 3 }]}>{klub.nazwa} — wszystkie działy w jednym miejscu.</Text>
         </View>
-        <Pressable
-          onPress={async () => { const m = await zapiszSlot(s); const t = m ? `Zapisano: ${m.nazwa} (sezon ${m.sezon}). Znajdziesz go w „Wczytaj grę".` : "Nie udało się zapisać."; if (Platform.OS === "web") window.alert(t); }}
-          style={({ pressed }) => [{ marginHorizontal: 12, marginTop: 10, backgroundColor: K.akcent, borderRadius: 14, paddingVertical: 14, flexDirection: "row", alignItems: "center", justifyContent: "center", opacity: pressed ? 0.9 : 1, ...cien }]}
-        >
-          <Text style={{ fontSize: 18, marginRight: 8 }}>💾</Text>
-          <Text style={{ color: "#15300c", fontSize: 15.5, fontWeight: "900", fontFamily: CZCIONKA }}>Zapisz grę</Text>
-        </Pressable>
+        <View style={{ flexDirection: "row", gap: 8, marginHorizontal: 12, marginTop: 10 }}>
+          <Pressable
+            onPress={async () => {
+              try { const m = await zapiszSlot(s); const t = `⚡ Zapisano: ${m.nazwa} · sezon ${m.sezon}`; if (Platform.OS === "web") window.alert(t); }
+              catch (e) { if (Platform.OS === "web") window.alert(e instanceof Error ? e.message : "Nie udało się zapisać."); }
+            }}
+            style={({ pressed }) => [{ flex: 1, backgroundColor: K.akcent2, borderRadius: 14, paddingVertical: 14, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.9 : 1, ...cien }]}
+          >
+            <Text style={{ color: "#0c2a18", fontSize: 15, fontWeight: "900", fontFamily: CZCIONKA }}>⚡ Szybki zapis</Text>
+            <Text style={{ color: "#0c2a18", fontSize: 10.5, fontFamily: CZCIONKA }}>{s.slotId ? "nadpisuje zapis tej kariery" : "tworzy zapis tej kariery"}</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setOknoZapisu(true)}
+            style={({ pressed }) => [{ flex: 1, backgroundColor: K.akcent, borderRadius: 14, paddingVertical: 14, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.9 : 1, ...cien }]}
+          >
+            <Text style={{ color: "#15300c", fontSize: 15, fontWeight: "900", fontFamily: CZCIONKA }}>💾 Zapisz jako…</Text>
+            <Text style={{ color: "#15300c", fontSize: 10.5, fontFamily: CZCIONKA }}>wybierz slot / nowy / plik</Text>
+          </Pressable>
+        </View>
+        <ZapiszGre s={s} otwarte={oknoZapisu} onClose={() => setOknoZapisu(false)} />
         {GRUPY.map((grupa) => (
           <View key={grupa} style={{ marginTop: 14 }}>
             <Text style={[st.naglowek, { marginHorizontal: 16, marginBottom: 8 }]}>{grupa}</Text>
