@@ -44,7 +44,7 @@ export function EdytorZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
     setImie(z.imie); setNazwisko(z.nazwisko); setPoz(z.poz); setNoga(z.noga);
     setWiek(String(z.wiek)); setNumer(String(z.numer)); setUmiej(String(Math.round(z.umiej)));
     setPotencjal(String(Math.round(z.potencjal))); setKontraktDo(String(z.kontraktDo));
-    setZdjecie(z.zdjecie); setCechy(z.twarz ?? domyslneCechy(z.imie + z.nazwisko));
+    setZdjecie(z.zdjecie); setCechy(z.twarz ?? domyslneCechy(z.imie + z.nazwisko, z.kraj));
   }, [zawodnikId]);
 
   const krokCechy = (klucz: keyof TwarzCechy, ile: number) => setCechy((c) => ({ ...c, [klucz]: (c[klucz] + 1) % ile }));

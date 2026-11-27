@@ -17,9 +17,9 @@ function teksturaNumeru(nr: number, kolor: string, tlo: string, nazwisko?: strin
 }
 const kontrast = (hex: string) => { const c = new THREE.Color(hex); return c.r * 0.3 + c.g * 0.59 + c.b * 0.11 > 0.55 ? "#111111" : "#ffffff"; };
 
-export function stworzPostac(o: { twarz?: boolean; koszulka: string; dodatek?: string; spodenki: string; getry: string; nr: number; nazwisko?: string; seed: number; sedzia?: boolean; wzor?: "pasy" | "rekaw" | "jednolity" }): Postac {
+export function stworzPostac(o: { skora?: string; wlosy?: string; lysy?: boolean; twarz?: boolean; koszulka: string; dodatek?: string; spodenki: string; getry: string; nr: number; nazwisko?: string; seed: number; sedzia?: boolean; wzor?: "pasy" | "rekaw" | "jednolity" }): Postac {
   const g = new THREE.Group();
-  const skora = new THREE.MeshStandardMaterial({ color: SKORA[o.seed % SKORA.length], roughness: 0.7 });
+  const skora = new THREE.MeshStandardMaterial({ color: o.skora ?? SKORA[o.seed % 3], roughness: 0.7 });
   const kosz = new THREE.MeshStandardMaterial({ color: o.koszulka, roughness: 0.75 });
   const spod = new THREE.MeshStandardMaterial({ color: o.spodenki, roughness: 0.8 });
   const getr = new THREE.MeshStandardMaterial({ color: o.getry, roughness: 0.8 });
@@ -34,8 +34,8 @@ export function stworzPostac(o: { twarz?: boolean; koszulka: string; dodatek?: s
   { const kol = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.018, 6, 14), dod); kol.rotation.x = Math.PI / 2; kol.position.y = 0.68; tulow.add(kol); } // kołnierzyk w kolorze dodatku
   const szyja = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.1), skora); szyja.position.y = 0.72; tulow.add(szyja);
   const glowa = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 12), skora); glowa.position.y = 0.88; glowa.scale.set(0.95, 1.08, 1); glowa.castShadow = true; tulow.add(glowa);
-  const wl = new THREE.Mesh(new THREE.SphereGeometry(0.137, 14, 10, 0, Math.PI * 2, 0, Math.PI * (0.3 + (o.seed % 4) * 0.06)), new THREE.MeshStandardMaterial({ color: WLOSY[(o.seed >> 2) % WLOSY.length], roughness: 0.9 }));
-  wl.position.y = 0.9; wl.rotation.x = -0.25; tulow.add(wl);
+  const wl = new THREE.Mesh(new THREE.SphereGeometry(0.137, 14, 10, 0, Math.PI * 2, 0, Math.PI * (0.3 + (o.seed % 4) * 0.06)), new THREE.MeshStandardMaterial({ color: o.wlosy ?? WLOSY[(o.seed >> 2) % WLOSY.length], roughness: 0.9 }));
+  wl.visible = !o.lysy; wl.position.y = 0.9; wl.rotation.x = -0.25; tulow.add(wl);
   // twarz z mimiką (zbliżenia: rozmowy, konferencje, szatnia)
   let twarz: Twarz3D | undefined;
   if (o.twarz) {
@@ -118,4 +118,13 @@ export function minka(p: Postac, emocja: number, t: number, mowi = false) {
   tw.brwi[0].rotation.z = e < 0 ? -0.35 * -e : 0.1 * e; tw.brwi[1].rotation.z = -tw.brwi[0].rotation.z;
   tw.brwi[0].position.y = tw.brwi[1].position.y = 0.945 + e * 0.008;
   const mrug = (t % 3.7) < 0.12 ? 0.15 : 1; tw.oczy[0].scale.y = tw.oczy[1].scale.y = mrug;
+}
+
+import { domyslneCechy, SKORY, WLOSY as WLOSY_2D } from "../Twarz";
+import type { Zawodnik } from "../../engine/types";
+/** Kolor skóry i włosów 3D zgodny z portretem zawodnika w grze (karnacja wg kraju). */
+export function wyglad3D(z?: Zawodnik): { skora?: string; wlosy?: string; lysy?: boolean } {
+  if (!z) return {};
+  const c = z.twarz ?? domyslneCechy(z.imie + z.nazwisko, z.kraj);
+  return { skora: SKORY[c.skora % SKORY.length], wlosy: WLOSY_2D[c.wlosy % WLOSY_2D.length], lysy: c.stylWlosow === 3 };
 }

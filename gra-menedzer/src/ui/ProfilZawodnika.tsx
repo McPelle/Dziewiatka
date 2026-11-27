@@ -122,7 +122,7 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
           {z && (
             <ScrollView contentContainerStyle={{ padding: 18 }}>
               <View style={[st.wiersz, { justifyContent: "space-between", alignItems: "flex-start", gap: 10 }]}>
-                <Twarz seed={z.imie + z.nazwisko} rozmiar={54} zdjecie={z.zdjecie} cechy={z.twarz} jersey={z.klubId && s.kluby[z.klubId] ? barwyKlubu(s.kluby[z.klubId].nazwa)[0] : "#1f7a43"} />
+                <Twarz seed={z.imie + z.nazwisko} rozmiar={54} zdjecie={z.zdjecie} cechy={z.twarz} kraj={z.kraj} jersey={z.klubId && s.kluby[z.klubId] ? barwyKlubu(s.kluby[z.klubId].nazwa)[0] : "#1f7a43"} />
                 <View style={{ flex: 1 }}>
                   <Text style={st.tytul}>#{z.numer || "—"} {z.imie} {z.nazwisko}</Text>
                   <Text style={[st.maly, { marginTop: 2 }]}>

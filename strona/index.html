@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, shrink-to-fit=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Dziewiątka" />
+<meta name="theme-color" content="#0c5230" />
+<title>Dziewiątka — Menedżer Piłkarski</title>
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/ikona-180.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="/ikona-512.png" />
+<style id="expo-reset">
+  html, body { height: 100%; background: #06130d; }
+  body { overflow: hidden; margin: 0; }
+  #root { display: flex; height: 100%; flex: 1; }
+  #nowa-wersja { position: fixed; left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 99999; display: none;
+    background: #ffce47; color: #15300c; border-radius: 14px; padding: 12px 14px; font: 700 14px -apple-system, system-ui, sans-serif; box-shadow: 0 6px 24px rgba(0,0,0,.45); }
+  #nowa-wersja button { float: right; margin-left: 10px; background: #15300c; color: #ffce47; border: 0; border-radius: 10px; padding: 8px 12px; font: 800 13px -apple-system, system-ui, sans-serif; }
+  #start { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #ffce47; font: 800 22px -apple-system, system-ui, sans-serif; background: #06130d; z-index: 1; }
+</style>
+</head>
+<body>
+<noscript>Włącz JavaScript, aby uruchomić grę.</noscript>
+<div id="start"><img src="/ikona-180.png" width="96" height="96" style="border-radius:22px" alt="" /><div style="margin-top:14px">DZIEWIĄTKA</div><div style="font-size:12px;color:#9fb3a6;margin-top:6px">Ładowanie gry…</div></div>
+<div id="root"></div>
+<div id="nowa-wersja"><button id="nw-ok">Uruchom ponownie</button>⚽ Nowa wersja gry jest gotowa. Zapisz grę i uruchom ponownie — albo włączy się sama przy następnym otwarciu.</div>
+<script>
+  (function () {
+    var start = document.getElementById("start");
+    var obs = new MutationObserver(function () { if (document.getElementById("root").children.length) { start.remove(); obs.disconnect(); } });
+    obs.observe(document.getElementById("root"), { childList: true });
+    if (!("serviceWorker" in navigator)) return;
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js").then(function (reg) {
+        function pokaz(w) {
+          var b = document.getElementById("nowa-wersja"); b.style.display = "block";
+          document.getElementById("nw-ok").onclick = function () { w.postMessage("AKTUALIZUJ"); };
+        }
+        if (reg.waiting && navigator.serviceWorker.controller) pokaz(reg.waiting);
+        reg.addEventListener("updatefound", function () {
+          var w = reg.installing; if (!w) return;
+          w.addEventListener("statechange", function () { if (w.state === "installed" && navigator.serviceWorker.controller) pokaz(w); });
+        });
+        // sprawdzaj aktualizacje przy powrocie do gry (np. po włączeniu internetu)
+        document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") reg.update().catch(function () {}); });
+        window.addEventListener("online", function () { reg.update().catch(function () {}); });
+      }).catch(function () {});
+      var przeladowano = false;
+      navigator.serviceWorker.addEventListener("controllerchange", function () { if (przeladowano) return; przeladowano = true; location.reload(); });
+    });
+  })();
+</script>
+<script src="/app-d4c5cb94e5.js" defer></script>
+</body>
+</html>

@@ -215,7 +215,7 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
                   {gra && <Text style={{ color: "#1a1a1a", fontWeight: "900" }}>✓</Text>}
                 </Pressable>
                 <Pressable onPress={() => setProfil(z.id)} style={{ marginRight: 9 }}>
-                  <Twarz seed={z.imie + z.nazwisko} rozmiar={34} zdjecie={z.zdjecie} cechy={z.twarz} jersey={barwyKlubu(s.kluby[s.mojKlub].nazwa)[0]} />
+                  <Twarz seed={z.imie + z.nazwisko} rozmiar={34} zdjecie={z.zdjecie} cechy={z.twarz} kraj={z.kraj} jersey={barwyKlubu(s.kluby[s.mojKlub].nazwa)[0]} />
                 </Pressable>
                 <Pressable style={{ flex: 1 }} onPress={() => setProfil(z.id)}>
                   <Text style={st.tekst}>#{z.numer || "—"} {z.imie} {z.nazwisko}{jestMlodziezowcem(z) ? " 🟢" : ""}{z.kartki > 0 ? ` · 🟨${z.kartki}` : ""}{z.prosiOTransfer ? " · ✈" : ""}</Text>

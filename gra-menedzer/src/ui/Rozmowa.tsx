@@ -32,7 +32,7 @@ export function Rozmowa({ s, z, widoczny, onClose, odswiez }: { s: StanGry; z: Z
 
   const Dymek = ({ tekst, trenera }: { tekst: string; trenera?: boolean }) => (
     <View style={[st.wiersz, { gap: 8, marginTop: 8, flexDirection: trenera ? "row-reverse" : "row" }]}>
-      {trenera ? <Twarz seed={s.trener} rozmiar={32} zdjecie={s.trenerZdjecie} jersey="#2b2f45" /> : <Twarz seed={z.imie + z.nazwisko} rozmiar={32} zdjecie={z.zdjecie} cechy={z.twarz} />}
+      {trenera ? <Twarz seed={s.trener} rozmiar={32} zdjecie={s.trenerZdjecie} jersey="#2b2f45" /> : <Twarz seed={z.imie + z.nazwisko} rozmiar={32} zdjecie={z.zdjecie} cechy={z.twarz} kraj={z.kraj} />}
       <View style={{ flex: 1, backgroundColor: trenera ? K.karta2 : "rgba(90,169,255,0.14)", borderRadius: 12, padding: 10, maxWidth: "85%" }}>
         <Text style={st.tekst}>{tekst}</Text>
       </View>
@@ -46,7 +46,7 @@ export function Rozmowa({ s, z, widoczny, onClose, odswiez }: { s: StanGry; z: Z
           <ScrollView contentContainerStyle={{ padding: 18 }}>
             {Platform.OS === "web" && grafika3D() && <View style={{ marginBottom: 12 }}><Rozmowa3D klub={s.kluby[s.mojKlub]} z={z} emocja={emocja} mowi={mowi} trofea={0} /></View>}
             <View style={[st.wiersz, { gap: 12 }]}>
-              <Twarz seed={z.imie + z.nazwisko} rozmiar={44} zdjecie={z.zdjecie} cechy={z.twarz} />
+              <Twarz seed={z.imie + z.nazwisko} rozmiar={44} zdjecie={z.zdjecie} cechy={z.twarz} kraj={z.kraj} />
               <View style={{ flex: 1 }}>
                 <Text style={st.tytul}>Rozmowa: {z.imie} {z.nazwisko}</Text>
                 <Text style={st.maly}>morale {Math.round(z.morale)}% · zaufanie do trenera {Math.round(z.relacja ?? 60)}%{z.prosiOTransfer ? " · chce odejść" : ""}{z.obietnica ? ` · 🤞 obietnica: ${z.obietnica.typ === "minuty" ? "minuty" : "kontrakt"}` : ""}</Text>

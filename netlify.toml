@@ -1,0 +1,5 @@
+# Publikacja gry „Dziewiątka" na Netlify (aplikacja webowa).
+# Netlify pobiera gotowy folder „strona" z gałęzi „wydanie" — nic nie buduje, tylko publikuje.
+[build]
+  publish = "strona"
+  command = "echo 'Gotowa wersja w folderze strona'"

@@ -3,13 +3,26 @@ import type { TwarzCechy } from "../engine/types";
 import { hashNazwy } from "./barwy";
 
 // Generowany awatar (oryginalny, deterministyczny z nazwiska) — NIE jest zdjęciem realnej osoby.
-const SKORY = ["#f6d3ab", "#f0c49b", "#e4ac82", "#d49a6a", "#c08457", "#a56a3f", "#8a5230", "#6b3d22"];
-const WLOSY = ["#14110f", "#241a12", "#3b2a1a", "#5a3d22", "#7a5a30", "#a07c3e", "#c8a86a", "#7a7a7a", "#b8b8b8", "#d9c08a"];
+export const SKORY = ["#f6d3ab", "#f0c49b", "#e4ac82", "#d49a6a", "#c08457", "#a56a3f", "#8a5230", "#6b3d22"];
+export const WLOSY = ["#14110f", "#241a12", "#3b2a1a", "#5a3d22", "#7a5a30", "#a07c3e", "#c8a86a", "#7a7a7a", "#b8b8b8", "#d9c08a"];
 
-export function domyslneCechy(seed: string): TwarzCechy {
+// Karnacja wg kraju (realia polskich lig: większość zawodników to Polacy i Europejczycy) — zakres indeksów SKORY.
+const AFRYKA = /Nigeria|Senegal|Ghana|Kamerun|Gwinea|Gambia|Angola|Kongo|Mali|Burkina|Wybrzeże|Uganda|Kenia|Erytrea|Komory|Zielonego|Tomasza|Mauretania|Martynika|Surinam|Dominikana|Honduras|Salwador/;
+const POLUDNIE = /Brazylia|Hiszpania|Portugalia|Argentyna|Kolumbia|Wenezuela|Chile|Włochy|Grecja|Cypr|Albania|Kosowo|Turcja|Tunezja|Irak|Iran|Armenia|Azerbejdżan|Gruzja|Uzbekistan|Japonia/;
+export function zakresSkory(kraj?: string): [number, number] {
+  if (!kraj || kraj === "Polska") return [0, 2];
+  if (AFRYKA.test(kraj)) return [5, 7];
+  if (POLUDNIE.test(kraj)) return [1, 5];
+  if (/Francja|Belgia|Holandia|Anglia|Stany|Kanada|Szwecja|Norwegia|Dania|Niemcy|Szwajcaria|Australia/.test(kraj)) return [0, 7];
+  return [0, 3];
+}
+export function domyslneCechy(seed: string, kraj?: string): TwarzCechy {
   const h = hashNazwy(seed);
+  const [a, b] = zakresSkory(kraj);
+  // w krajach mieszanych (np. Francja) i tak częściej jaśniejsza karnacja — rozkład ważony
+  const sk = b - a >= 6 ? ((h % 10) < 6 ? h % 3 : a + (h % (b - a + 1))) : a + (h % (b - a + 1));
   return {
-    skora: h % SKORY.length,
+    skora: sk,
     wlosy: (h >> 3) % WLOSY.length,
     stylWlosow: (h >> 7) % 5, // 0 krótkie, 1 bardzo krótkie, 2 przedziałek, 3 łysy, 4 kręcone
     zarost: (h >> 11) % 3 === 0 ? 1 : 0, // ~1/3 z brodą
@@ -18,8 +31,8 @@ export function domyslneCechy(seed: string): TwarzCechy {
 
 export const LICZBA = { skory: SKORY.length, wlosy: WLOSY.length, style: 5, zarost: 2 };
 
-export function Twarz({ seed, rozmiar = 48, zdjecie, cechy, jersey = "#1f7a43" }: {
-  seed: string; rozmiar?: number; zdjecie?: string; cechy?: TwarzCechy; jersey?: string;
+export function Twarz({ seed, rozmiar = 48, zdjecie, cechy, jersey = "#1f7a43", kraj }: {
+  seed: string; rozmiar?: number; zdjecie?: string; cechy?: TwarzCechy; jersey?: string; kraj?: string;
 }) {
   const R = rozmiar;
   const ramka = { width: R, height: R, borderRadius: R / 2, borderWidth: Math.max(1, R / 24), borderColor: "rgba(255,255,255,0.15)", overflow: "hidden" as const, backgroundColor: "#24405a" };
@@ -28,7 +41,7 @@ export function Twarz({ seed, rozmiar = 48, zdjecie, cechy, jersey = "#1f7a43" }
     return <Image source={{ uri: zdjecie }} style={{ ...ramka }} resizeMode="cover" />;
   }
 
-  const c = cechy ?? domyslneCechy(seed);
+  const c = cechy ?? domyslneCechy(seed, kraj);
   const skora = SKORY[c.skora % SKORY.length];
   const wlosy = WLOSY[c.wlosy % WLOSY.length];
   const styl = c.stylWlosow % 5;

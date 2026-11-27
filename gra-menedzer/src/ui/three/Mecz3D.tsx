@@ -15,7 +15,7 @@ import type { MeczLive, PunktAkcji } from "../../engine/meczNaZywo";
 import type { PozycjaSzczegolowa, StanGry } from "../../engine/types";
 import type { StrojeMeczu } from "../strojeDane";
 import { DL, SZ, swiatla, zbudujStadion } from "./stadion3d";
-import { animuj, stworzPostac, type Postac } from "./zawodnik3d";
+import { animuj, stworzPostac, wyglad3D, type Postac } from "./zawodnik3d";
 import { gwizdek, kopniecie, napiecie, reakcjaTrybun } from "./dzwiek";
 
 export type Kamera = "auto" | "tv" | "bramka" | "gora" | "blisko";
@@ -91,7 +91,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         const z = s.zawodnicy[id];
         const br = z?.poz === "BR";
         const k = br ? stroje[sd].br : stroje[sd].pole;
-        p = stworzPostac({ koszulka: k.baza, dodatek: k.dodatek, wzor: k.wzor, spodenki: k.wzor === "jednolity" ? k.dodatek : k.dodatek, getry: k.baza, nr: z?.numer ?? 0, nazwisko: z?.nazwisko, seed: [...id].reduce((a, c) => a + c.charCodeAt(0) * 7, 0) });
+        p = stworzPostac({ ...wyglad3D(z), koszulka: k.baza, dodatek: k.dodatek, wzor: k.wzor, spodenki: k.wzor === "jednolity" ? k.dodatek : k.dodatek, getry: k.baza, nr: z?.numer ?? 0, nazwisko: z?.nazwisko, seed: [...id].reduce((a, c) => a + c.charCodeAt(0) * 7, 0) });
         const startX = sd === "dom" ? -6 : 6;
         p.g.position.set(startX, 0, 0); scena.add(p.g); postacie.set(id, p); strona.set(id, sd);
       }

@@ -10,7 +10,7 @@ import type { Klub, Zawodnik } from "../../engine/types";
 import { HERBY } from "../../data/herby";
 import { kluczHerbu } from "../Herb";
 import { kity } from "../strojeDane";
-import { minka, stworzPostac, type Postac } from "./zawodnik3d";
+import { minka, stworzPostac, wyglad3D, type Postac } from "./zawodnik3d";
 import { lekkaGrafika } from "./Stadion3DWidok";
 import { uriObrazka } from "./Konferencja3D";
 
@@ -29,7 +29,7 @@ export function Rozmowa3D({ klub, z, emocja, mowi, trofea }: { klub: Klub; z: Za
     Object.assign(renderer.domElement.style, { width: "100%", height: "100%", display: "block" });
     el.appendChild(renderer.domElement);
     const scena = new THREE.Scene(); scena.background = new THREE.Color(0x2a2520);
-    const kit = kity(klub).pole[0];
+    const kity0 = kity(klub); const kit = z.poz === "BR" ? kity0.bramkarz[0] : kity0.pole[0];
     scena.add(new THREE.HemisphereLight(0xfff4e6, 0x3a2f25, 0.8));
     const okno = new THREE.DirectionalLight(0xfff2dd, 1.3); okno.position.set(-4, 4, 1); okno.castShadow = true; scena.add(okno);
     const lampa = new THREE.PointLight(0xffd9a0, 1.5, 6); lampa.position.set(0.8, 2.1, 0.2); scena.add(lampa);
@@ -67,11 +67,11 @@ export function Rozmowa3D({ klub, z, emocja, mowi, trofea }: { klub: Klub; z: Za
     const krzeslo = (zz: number) => { const k = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 0.5), new THREE.MeshStandardMaterial({ color: 0x222222 })); k.position.set(0, 0.48, zz); scena.add(k); const opar = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.06), new THREE.MeshStandardMaterial({ color: 0x222222 })); opar.position.set(0, 0.8, zz + Math.sign(zz) * 0.25); scena.add(opar); };
     krzeslo(-0.95); krzeslo(0.95);
     // zawodnik (strój treningowy klubu) — siedzi naprzeciw kamery
-    const zaw: Postac = stworzPostac({ twarz: true, koszulka: kit.baza, dodatek: kit.dodatek, wzor: kit.wzor === "pasy" ? "jednolity" : kit.wzor, spodenki: kit.dodatek, getry: kit.baza, nr: z.numer, nazwisko: z.nazwisko, seed: [...z.id].reduce((a, ch) => a + ch.charCodeAt(0) * 7, 0) });
+    const zaw: Postac = stworzPostac({ ...wyglad3D(z), twarz: true, koszulka: kit.baza, dodatek: kit.dodatek, wzor: kit.wzor === "pasy" ? "jednolity" : kit.wzor, spodenki: kit.dodatek, getry: kit.baza, nr: z.numer, nazwisko: z.nazwisko, seed: [...z.id].reduce((a, ch) => a + ch.charCodeAt(0) * 7, 0) });
     zaw.g.position.set(0, -0.38 + 0.3, -0.95); zaw.uda.forEach((u) => (u.rotation.x = -1.45)); zaw.lydki.forEach((l) => (l.rotation.x = 1.45)); scena.add(zaw.g);
     // trener (od tyłu, przy kamerze)
     const trener = stworzPostac({ koszulka: "#1d2536", spodenki: "#1d2536", getry: "#1d2536", nr: 0, seed: 21 });
-    trener.g.position.set(0.15, -0.08, 0.95); trener.g.rotation.y = Math.PI; trener.uda.forEach((u) => (u.rotation.x = -1.45)); trener.lydki.forEach((l) => (l.rotation.x = 1.45)); scena.add(trener.g);
+    trener.g.position.set(0.45, -0.08, 0.95); trener.g.rotation.y = Math.PI; trener.uda.forEach((u) => (u.rotation.x = -1.45)); trener.lydki.forEach((l) => (l.rotation.x = 1.45)); scena.add(trener.g);
     const cam = new THREE.PerspectiveCamera(36, W() / H(), 0.05, 50);
     const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scena, cam)); composer.addPass(new OutputPass());
     let t = 0, ost = performance.now(), raf = 0, emo = 0;
@@ -89,8 +89,8 @@ export function Rozmowa3D({ klub, z, emocja, mowi, trofea }: { klub: Klub; z: Za
       trener.tulow.rotation.y = m === "trener" ? Math.sin(t * 2) * 0.1 : 0; trener.ramiona[0].rotation.x = m === "trener" ? -1.0 - Math.abs(Math.sin(t * 3)) * 0.5 : -0.8;
       // kamera: zza ramienia trenera, przy reakcji zbliżenie na twarz zawodnika
       const blisko = m === "zawodnik" || Math.abs(emo) > 0.5;
-      const pc = blisko ? new THREE.Vector3(0.35, 1.55, 0.3) : new THREE.Vector3(0.9, 1.75, 2.1);
-      cam.position.lerp(pc, 1 - Math.exp(-dt * 1.8)); cam.lookAt(0, 1.45, -0.95);
+      const pc = blisko ? new THREE.Vector3(-0.35, 1.95, 0.55) : new THREE.Vector3(-1.05, 1.95, 2.0);
+      cam.position.lerp(pc, 1 - Math.exp(-dt * 1.8)); cam.lookAt(0, blisko ? 1.9 : 1.6, -0.95);
       composer.render(dt);
     };
     raf = requestAnimationFrame(petla);

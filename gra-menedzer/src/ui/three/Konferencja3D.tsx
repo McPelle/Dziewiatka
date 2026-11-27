@@ -145,9 +145,9 @@ export function Konferencja3D({ klub, sponsorzy, typ, nastroj, nrPytania, nrOdpo
       // kamera: 3 ujęcia jak w transmisji, powolny najazd
       const najazd = Math.min(1, (t % 12) / 12) * 0.6;
       const cele: [THREE.Vector3, THREE.Vector3][] = [
-        [new THREE.Vector3(0, 2.3, 6.5 - najazd), new THREE.Vector3(0, 1.7, -1.6)],
-        [new THREE.Vector3(-0.2, 1.95, 2.6 - najazd * 0.5), new THREE.Vector3(-0.75, 1.75, -1.6)],
-        [new THREE.Vector3(3.2, 2.4, 4.4), new THREE.Vector3(-0.4, 1.6, -1.5)],
+        [new THREE.Vector3(0, 3.1, 7.0 - najazd), new THREE.Vector3(0, 1.5, -1.6)],
+        [new THREE.Vector3(-0.35, 1.9, 1.0 - najazd * 0.4), new THREE.Vector3(-0.75, 1.75, -1.6)],
+        [new THREE.Vector3(3.3, 2.3, 0.7), new THREE.Vector3(-0.5, 1.6, -1.5)],
       ];
       const [pc, lc] = cele[gest > 0 ? 1 : ujecie];
       cam.position.lerp(pc, 1 - Math.exp(-dt * 2)); cam.lookAt(lc);
