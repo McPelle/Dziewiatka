@@ -301,18 +301,17 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
             {!m.koniec && <Btn t="⏭⏭ Dograj do końca" on={() => dograj(false)} />}
           </View>
 
-          {/* przerwa: mowa w szatni */}
+          {/* przerwa: mowa w szatni — jedna scena 3D przez całą przerwę (przed i po mowie), mowa zmienia gesty trenera i reakcje drużyny */}
+          {przerwa(m) && Platform.OS === "web" && grafika3D() && !bez3D && <View style={{ marginVertical: 8 }}><Szatnia3D s={s} klub={s.kluby[s.mojKlub]} zawodnicy={[...moj.naBoisku, ...moj.lawka]} kit={m.moja === "dom" ? stroje.dom.pole : stroje.gosc.pole} kitBr={m.moja === "dom" ? stroje.dom.br : stroje.gosc.br} nastroj={m.mowa ? (m.motMoj - 1) * 18 : (m.moja === "dom" ? m.gd - m.gg : m.gg - m.gd) * 0.3} mowi={!!m.mowa} przerwa mowa={m.mowa ?? null} /></View>}
           {przerwa(m) && !m.mowa && (
             <View style={[st.karta, { marginHorizontal: 0, borderColor: K.akcent, borderWidth: 1 }]}>
               <Text style={st.naglowek}>🗣 Szatnia — przerwa ({m.gd}:{m.gg})</Text>
-              {Platform.OS === "web" && grafika3D() && <View style={{ marginVertical: 8 }}><Szatnia3D s={s} klub={s.kluby[s.mojKlub]} zawodnicy={[...moj.naBoisku, ...moj.lawka]} kit={m.moja === "dom" ? stroje.dom.pole : stroje.gosc.pole} kitBr={m.moja === "dom" ? stroje.dom.br : stroje.gosc.br} nastroj={(m.moja === "dom" ? m.gd - m.gg : m.gg - m.gd) * 0.3} mowi={false} /></View>}
               <Text style={st.maly}>Co powiesz drużynie? Efekt zależy od wyniku i charakteru zespołu.</Text>
               <View style={[st.wiersz, { flexWrap: "wrap", marginTop: 6 }]}>
                 {([["pochwala", "👏 Pochwała"], ["spokoj", "🧘 Spokojne wskazówki"], ["wiara", "💪 „Wierzę w was!”"], ["ochrzan", "😡 Ostra reprymenda"]] as [Mowa, string][]).map(([t, n]) => <Btn key={t} t={n} on={() => { mow({ pochwala: "Panowie, świetna robota. Tak trzymać!", spokoj: "Spokojnie. Trzymamy się planu, róbmy swoje.", wiara: "Wierzę w was! Wychodzimy i odwracamy ten mecz!", ochrzan: "Co to było?! Tak się nie gra! Chcę widzieć walkę!" }[t], "trener", { przerwij: true, kto: s.trener, plec: plecZImienia(s.trener) }); setKom(mowaWPrzerwie(s, m, t)); odswiez(); }} />)}
               </View>
             </View>
           )}
-          {przerwa(m) && m.mowa && Platform.OS === "web" && grafika3D() && <View style={{ marginVertical: 8 }}><Szatnia3D s={s} klub={s.kluby[s.mojKlub]} zawodnicy={[...moj.naBoisku, ...moj.lawka]} kit={m.moja === "dom" ? stroje.dom.pole : stroje.gosc.pole} kitBr={m.moja === "dom" ? stroje.dom.br : stroje.gosc.br} nastroj={(m.motMoj - 1) * 18} mowi /></View>}
           {kom && <Text style={[st.maly, { color: K.akcent, marginVertical: 4 }]}>{kom}</Text>}
 
           {/* zakładki */}

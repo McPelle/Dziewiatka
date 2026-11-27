@@ -11,6 +11,7 @@ import { SzybkiMecz } from "./src/ui/SzybkiMecz";
 import { Wyzwania } from "./src/ui/Wyzwania";
 import { losowaCiekawostka } from "./src/data/ciekawostki";
 import { koloryMotywu } from "./src/ui/motyw";
+import { AnimLiczba } from "./src/ui/KafelkiPulpitu";
 import { metaMenu } from "./src/ui/zapis";
 import { NowaGra } from "./src/ui/NowaGra";
 import { Pulpit } from "./src/ui/Pulpit";
@@ -173,7 +174,7 @@ function NaglowekKlubu({ s, onMenu, onNowa }: { s: StanGry; onMenu: () => void; 
         <Text numberOfLines={1} style={{ color: "rgba(255,255,255,0.72)", fontSize: 11, fontWeight: "700", marginTop: 1, fontFamily: CZCIONKA }}>{liga?.nazwa ?? "Liga"} · kolejka {kol}/{ile} · sezon {s.sezon}</Text>
       </View>
       <View style={{ alignItems: "flex-end", marginRight: 10 }}>
-        <Text style={{ color: K.akcent, fontSize: 14, fontWeight: "900", fontFamily: CZCIONKA }}>{zl(klub.kasa)}</Text>
+        <AnimLiczba wartosc={klub.kasa} format={zl} style={{ color: K.akcent, fontSize: 14, fontWeight: "900", fontFamily: CZCIONKA }} />
         <Text style={{ color: "rgba(255,255,255,0.6)", fontSize: 9.5, fontWeight: "700", letterSpacing: 1, textTransform: "uppercase", fontFamily: CZCIONKA }}>Budżet</Text>
       </View>
       <Pressable onPress={onNowa} style={({ pressed }) => [{ backgroundColor: "rgba(0,0,0,0.22)", borderWidth: 1, borderColor: "rgba(255,255,255,0.22)", borderRadius: 14, paddingHorizontal: 11, paddingVertical: 6, opacity: pressed ? 0.8 : 1 }]}>

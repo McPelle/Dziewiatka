@@ -5,6 +5,7 @@ import { bilansZRywalem } from "../engine/zywySwiat";
 import { Samouczek } from "./Samouczek";
 import { PodsumowanieSezonu } from "./PodsumowanieSezonu";
 import { KartaWyzwania } from "./Wyzwania";
+import { KafelkiPulpitu } from "./KafelkiPulpitu";
 import { nowiWKlubie, Prezentacja } from "./Prezentacja";
 import { prognozaMeczu } from "../engine/pogoda";
 import { useState } from "react";
@@ -330,6 +331,7 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
         </>
       )}
 
+      <KafelkiPulpitu s={s} />
       <View style={[st.karta, st.wiersz, { justifyContent: "space-between" }]}>
         <Stat nazwa="Miejsce" wartosc={`${miejsce}.`} />
         <Stat nazwa="Punkty" wartosc={`${wiersz.pkt}`} />

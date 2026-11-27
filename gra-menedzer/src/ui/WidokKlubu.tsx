@@ -1,4 +1,5 @@
 import { grafika3D, Stadion3DWidok } from "./three/Stadion3DWidok";
+import { BazaTreningowa3D, LegendaBazy } from "./three/BazaTreningowa3D";
 import { Extranet } from "./Extranet";
 import { budowyKlubu, oglosPrzetarg, opisUtrudnien, trwaBudowa } from "../engine/budowy";
 import { PrzetargPanel, TrwajaceBudowy } from "./Budowy";
@@ -52,6 +53,7 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
   const kadra = klub ? [...klub.zawodnicy].map((id) => s.zawodnicy[id]).sort((a, b) => POZYCJE.indexOf(a.poz) - POZYCJE.indexOf(b.poz) || b.umiej - a.umiej) : [];
 
   const [widok3D, setWidok3D] = useState(true);
+  const [baza3D, setBaza3D] = useState(false);
   const akcja = (f: () => string | null) => { const b = f(); odswiez(); if (b) komunikat(b); };
 
   return (
@@ -157,6 +159,13 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
                   ? <Stadion3DWidok s={moj ? s : null} klub={klub} />
                   : <WidokStadionu klub={klub} oswietlenie={maOswietlenie(klub)} budowy={moj ? budowyKlubu(s) : undefined} />}
                 {Platform.OS === "web" && grafika3D() && <Pressable onPress={() => setWidok3D(!widok3D)} style={{ marginTop: 6 }}><Text style={[st.maly, { color: K.akcent }]}>{widok3D ? "🗺 Pokaż plan 2D (z góry)" : "🏟 Pokaż stadion w 3D (obracaj palcem)"}</Text></Pressable>}
+              </View>
+
+              <View style={{ marginTop: 18 }}>
+                <Text style={st.naglowek}>🏋 Baza treningowa</Text>
+                <Text style={[st.maly, { marginBottom: 6 }]}>Boiska, szatnie, siłownia i boisko akademii — rosną z poziomem obiektu „Boiska treningowe” i akademii.</Text>
+                {baza3D && Platform.OS === "web" && grafika3D() ? <BazaTreningowa3D s={s} klub={klub} /> : <LegendaBazy klub={klub} />}
+                {Platform.OS === "web" && grafika3D() && <Pressable onPress={() => setBaza3D(!baza3D)} style={[st.przyciskMaly, { marginTop: 6, alignSelf: "flex-start" }]}><Text style={st.przyciskMalyTekst}>{baza3D ? "✕ Zamknij widok 3D" : "🏋 Baza treningowa 3D"}</Text></Pressable>}
               </View>
 
               {moj && (
