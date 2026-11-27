@@ -979,6 +979,12 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Szansa Reszel": 2017,
   "MKS Jeziorany": 2000,
   "Warmianka Bęsia": 2001,
+  // Warmińsko-mazurskie (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "GKS Grunwald": 2001,
+  "GKS Małdyty": 1959,
+  "GKS Kozłowo": 2004,
+  "Naki Olsztyn": 1996,
+  "UKS Rozwój Iława": 2010,
 };
 
 /** Rok założenia klubu (jeśli znany). */

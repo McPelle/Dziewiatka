@@ -72,6 +72,8 @@ export const PRZYDOMKI: Record<string, string> = {
   "Drwęca Nowe Miasto Lubawskie": "Biało-niebiescy",
   // Warmińsko-mazurskie — przydomki potwierdzone w źródłach
   "Wel Lidzbark": "„Welowcy”",
+  // Warmińsko-mazurskie (runda 2) — przydomki potwierdzone w źródłach
+  "Constract Lubawa": "Konstruktorzy",
 };
 
 export function przydomek(nazwa: string): string | undefined {

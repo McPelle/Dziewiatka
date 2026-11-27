@@ -2216,5 +2216,8 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
  {"a": "Orzeł Kolno", "b": "Tur Bielsk Podlaski", "typ": "kosa"},
  {"a": "Orzeł Kolno", "b": "Olimpia Zambrów", "typ": "kosa"},
  {"a": "Orzeł Kolno", "b": "Ruch Wysokie Mazowieckie", "typ": "kosa"},
- {"a": "Orzeł Kolno", "b": "Sparta Augustów", "typ": "kosa"}
+ {"a": "Orzeł Kolno", "b": "Sparta Augustów", "typ": "kosa"},
+ {"a": "Granica Kętrzyn", "b": "Mazur Ełk", "typ": "kosa"},
+ {"a": "Sokół Ostróda", "b": "Mazur Ełk", "typ": "kosa"},
+ {"a": "Mazur Pisz", "b": "Mazur Ełk", "typ": "kosa"}
 ];

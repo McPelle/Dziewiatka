@@ -3096,7 +3096,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  },
  "MKS Mazur Ełk": {
   "ultras": [
-   "Ultras Mazur Ełk"
+   "Ultras Mazur Ełk",
+   "Młody Mazur"
   ],
   "flagi": [
    "Jedno miasto, jeden klub!",
@@ -3122,7 +3123,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  },
  "Sokół Ostróda": {
   "ultras": [
-   "Ultras'11"
+   "Ultras'11",
+   "Ekipa z Pika"
   ],
   "flagi": [
    "Ekipa z Pika"
@@ -3134,12 +3136,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Drwęca Nowe Miasto Lubawskie",
    "Motor Lubawa",
    "Granica Kętrzyn",
-   "Olimpia Grudziądz"
+   "Olimpia Grudziądz",
+   "Mazur Ełk"
   ]
  },
  "Jeziorak Iława": {
   "ultras": [
-   "UFJ'06 – Ultras Fans Jeziorak"
+   "UFJ'06 – Ultras Fans Jeziorak",
+   "ZNW - Zdecydowani Na Wszystko",
+   "UFJ'06 - Ultras Fans Jeziorak"
   ],
   "flagi": [
    "Jeziorowcy"
@@ -3170,7 +3175,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Warmia Grajewo",
    "Sokół Ostróda",
    "Jeziorak Iława",
-   "Motor Lubawa"
+   "Motor Lubawa",
+   "Mazur Ełk"
   ]
  },
  "Warmia Grajewo": {
@@ -3197,7 +3203,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  "Mazur Pisz": {
   "ultras": [
    "GF – Grupa Fanatyków'04",
-   "Młoda Gwardia"
+   "Młoda Gwardia",
+   "GF - Grupa Fanatyków'04"
   ],
   "zgody": [
    "Mławianka Mława"
@@ -3206,7 +3213,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "MKS Mazur Ełk",
    "Warmia Grajewo",
    "Znicz Biała Piska",
-   "Orlęta Reszel"
+   "Orlęta Reszel",
+   "Mazur Ełk"
   ]
  },
  "Motor Lubawa": {
