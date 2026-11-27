@@ -253,8 +253,19 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
   sek.push({ x: X(los(38, 58)), y: Math.max(5, Math.min(95, yStart + los(-25, 25))), nosnik: nosnik(["POM"]) });
   const okr = okrz(m);
   const mojeAtak = (strona === "dom") === (m.moja === "dom");
+  // ——— pressing (widoczny): wysoki pressing odbiera piłkę wysoko, ale przełamany zostawia dziury z tyłu ———
+  const pressuje = obr.klubId === s.mojKlub ? (s.taktyka.pressing === "wysoki" || okr === "pressing") : obr.nastawienie === "ofensywne";
+  let przerwana = false, dziura = false;
+  if (pressuje && Math.random() < 0.14) {
+    przerwana = true; const odb = wybierzZ(s, obr.naBoisku, (z) => (z.poz === "NAP" ? 3 : z.poz === "POM" ? 2 : 0.3));
+    sek.push({ x: X(los(22, 38)), y: los(15, 85), nosnik: odb?.id });
+    if (Math.random() < 0.45) m.komentarz.unshift({ min: minTxt, typ: "akcja", tekst: `🔥 Pressing ${s.kluby[obr.klubId].nazwa}: ${odb ? nz(s, odb.id) : "napastnik"} doskakuje i odbiera piłkę na połowie rywala!` });
+  } else if (pressuje && Math.random() < 0.28) {
+    dziura = true;
+    if (Math.random() < 0.6) m.komentarz.unshift({ min: minTxt, typ: "akcja", tekst: `⚡ ${s.kluby[atak.klubId].nazwa} wychodzi spod pressingu jednym podaniem — za plecami obrońców pełno miejsca!` });
+  }
   // ——— rzut karny (faul w polu karnym) ———
-  if (Math.random() < lamP * 0.09 / 0.78) {
+  if (!przerwana && Math.random() < lamP * 0.09 / 0.78) {
     const faulujacy = wybierzZ(s, obr.naBoisku, (z) => (z.poz === "OBR" ? 3 : 1));
     const wyk = wykonawca(s, atak, "karne"), gk = bramkarz(s, obr);
     sek.push({ x: X(86), y: los(40, 60), nosnik: nosnik(["NAP"]), zdarzenie: "faul" });
@@ -282,11 +293,11 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
       else if (szansa(0.4)) { m.staty.celne[i]++; m.staty.obrony[1 - i]++; ocena(m, gk?.id, 0.3); sek.push({ x: X(99), y: los(40, 60), h: 1.5, nosnik: gk?.id, zdarzenie: "obrona" }); m.komentarz.unshift({ min: minTxt, typ: "stały", strona, tekst: `Rzut wolny ${nz(s, wyk.id)} — ${gk ? nz(s, gk.id) : "bramkarz"} wybija na róg!` }); m.staty.rozne[i]++; }
       else { sek.push({ x: X(100), y: los(20, 80), h: 3, zdarzenie: "strzal" }); if (szansa(0.5)) m.komentarz.unshift({ min: minTxt, typ: "stały", strona, tekst: `Rzut wolny: ${nz(s, wyk.id)} uderza w mur.` }); }
     }
-  } else if (Math.random() < lamP * 0.86 / SR_XG) {
+  } else if (!przerwana && Math.random() < lamP * 0.86 / SR_XG * (dziura ? 1.9 : 1)) {
     // ——— sytuacja z gry ———
     const r = Math.random(); let acc = 0, syt = SYTUACJE[0];
     for (const t of SYTUACJE) { acc += t[1] * (okr === "skrzydla" && mojeAtak && t[0] === "glowka" ? 1.6 : 1); if (r < acc) { syt = t; break; } }
-    const [rodz, , xgB] = syt;
+    const [rodz, , xgB0] = syt; const xgB = Math.min(0.7, xgB0 * (dziura ? 1.35 : 1));
     const st = wybierzZ(s, atak.naBoisku, (z) => ({ NAP: 5, POM: 2.2, OBR: rodz === "glowka" ? 2 : 0.6, BR: 0.02 })[z.poz] * (z.cechy?.includes("snajper") ? 1.6 : 1) * (1 + 0.5 * pew(z.id)) * Math.max(5, rodz === "glowka" ? at(z, "fiz") : at(z, "str")));
     const gk = bramkarz(s, obr);
     const kandA = atak.naBoisku.filter((x) => x !== st?.id);
