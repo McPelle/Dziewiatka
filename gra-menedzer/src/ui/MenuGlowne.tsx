@@ -39,7 +39,7 @@ export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj, 
         <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>{Platform.OS === "web" ? (stan && biuro ? <Biuro3D s={stan} klub={klub!} /> : <Stadion3DMenu s={stan} klub={stan ? klub! : KLUB_DEMO} />) : <TloStadion />}</View>
         <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(4,12,8,0.35)" }} />
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingTop: Platform.OS === "android" ? 20 : 0 }}>
-          <HerbGry rozmiar={112} />
+          <HerbGry rozmiar={150} />
           <Text style={{ color: "#fff", fontWeight: "900", fontSize: 46, letterSpacing: 2, marginTop: 10, fontFamily: CZCIONKA, textShadowColor: "rgba(0,0,0,0.6)", textShadowOffset: { width: 0, height: 3 }, textShadowRadius: 8 }}>DZIEWIĄTKA</Text>
           <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
             <View style={{ height: 1, width: 26, backgroundColor: K.akcent, opacity: 0.7 }} />

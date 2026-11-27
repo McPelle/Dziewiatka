@@ -120,7 +120,7 @@ function EkranWczytywania() {
   return (
     <View style={{ flex: 1, backgroundColor: K.murawa, alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
       <MurawaTlo pasy={14} mocne />
-      <HerbGry rozmiar={104} />
+      <HerbGry rozmiar={150} />
       <Text style={{ color: "#fff", fontWeight: "900", fontSize: 30, letterSpacing: 2, marginTop: 14, fontFamily: CZCIONKA }}>DZIEWIĄTKA</Text>
       <View style={{ flexDirection: "row", alignItems: "center", marginTop: 16 }}>
         <ActivityIndicator color={K.akcent} />
