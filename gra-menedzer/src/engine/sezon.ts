@@ -1432,6 +1432,24 @@ function wprowadzKlub(s: StanGry, d: { nazwa: string; skrot: string; miasto: str
   nadajNumery(s, k);
   return id;
 }
+const ZALOZENIA = ["AP", "UKS", "LKS", "KS", "GKS", "FC", "Akademia Piłkarska", "Orlik", "Sparta", "Victoria", "Zryw", "Start", "Iskra", "Błękitni", "Olimpia", "Polonia"];
+/** Zakłada nowy klub w najniższej lidze (miejscowość z okręgu, w której nie ma jeszcze klubu o tej nazwie). */
+function zalozNowyKlub(s: StanGry, ost: number): string | null {
+  const miasta = [...new Set(s.ligi.slice(Math.max(0, ost - 2)).flatMap((l) => l.kluby).map((id) => s.kluby[id]?.miasto).filter(Boolean))] as string[];
+  if (!miasta.length) return null;
+  for (let p = 0; p < 10; p++) {
+    const miasto = wybierz(miasta);
+    const rdzen = wybierz(ZALOZENIA);
+    const nazwa = rdzen === "Orlik" ? `UKS Orlik ${miasto}` : `${rdzen} ${miasto}`;
+    if (Object.values(s.kluby).some((k) => k.nazwa === nazwa)) continue;
+    const id = wprowadzKlub(s, { nazwa, skrot: nazwa.split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase(), miasto, stadion: `Boisko w ${miasto}` }, ost + 1);
+    const k = s.kluby[id];
+    k.prawdziwy = false; k.zalozony = s.sezon + 1; k.renoma = 0.05; k.kasa = Math.round(k.kasa * 0.5); k.pojemnosc = 100;
+    wiadomosc(s, `🆕 Nowy klub w ${s.ligi[ost].nazwa}: ${nazwa} (założony ${s.sezon + 1}) — zaczyna od najniższej klasy.`);
+    return id;
+  }
+  return null;
+}
 /** Klub opuszcza symulowaną piramidę (gra dalej w lidze swojego regionu, której gra nie rozgrywa). Zostaje w świecie (zawodnicy, historia). */
 function opuscPiramide(s: StanGry, id: string) {
   const k = s.kluby[id];
@@ -1600,6 +1618,21 @@ export function nowySezon(s: StanGry) {
     if (!klasaZmienna(s.ligi[i].nazwa)) continue;
     const typowa = s.rozmiaryStart[i] ?? tabele[i].length;
     if (nowe[i].length < typowa - 1) nowe[i] = nowe[i].concat(uzupelnijLige(s, i, typowa - 1 - nowe[i].length + (szansa(0.5) ? 1 : 0)));
+  }
+  // Nowo założone kluby: każdy nowy klub w Polsce zaczyna od najniższej klasy (B, a gdzie jest — C). Co sezon w grupie
+  // zgłasza się 0–2 świeżo założone drużyny z miejscowości tego okręgu (orlikowe ekipy, akademie, kluby wiejskie).
+  // Działa w każdym województwie (także dodanym w przyszłości) — tylko na najniższym szczeblu.
+  {
+    const ost = s.ligi.length - 1;
+    if (/klasa (b|c)\b/i.test(s.ligi[ost].nazwa)) {
+      const typowa = s.rozmiaryStart?.[ost] ?? tabele[ost].length;
+      let ile = (szansa(0.45) ? 1 : 0) + (szansa(0.15) ? 1 : 0);
+      ile = Math.min(ile, Math.max(0, typowa + 2 - nowe[ost].length));
+      for (let j = 0; j < ile; j++) {
+        const id = zalozNowyKlub(s, ost);
+        if (id) nowe[ost].push(id);
+      }
+    }
   }
   for (const id of wychodza) opuscPiramide(s, id);
   aktualizujTypyKontraktow(s); // awans: amatorzy → półprofesjonaliści → zawodowcy (wg szczebla, PZPN)
