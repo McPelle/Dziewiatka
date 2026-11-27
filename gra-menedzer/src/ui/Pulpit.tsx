@@ -1,4 +1,5 @@
 import { CoDzisWazne } from "./ZywySwiat";
+import { bilansZRywalem } from "../engine/zywySwiat";
 import { useState } from "react";
 import { Alert, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
@@ -185,6 +186,7 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
             <View style={{ marginLeft: 10, flex: 1 }}>
               <Text style={st.tekst}>{para![0] === s.mojKlub ? "u siebie" : "na wyjeździe"}: {s.kluby[rywalId].nazwa}</Text>
               <Text style={st.maly}>rywal na {tabela.findIndex((w) => w.klubId === rywalId) + 1}. miejscu</Text>
+              {(() => { const b = bilansZRywalem(s, s.kluby[rywalId]?.nazwa ?? ""); return b.mecze ? <Text style={st.maly}>📜 Bilans: {b.w}W {b.r}R {b.p}P{b.ostatni ? ` · ostatnio ${b.ostatni.my}:${b.ostatni.oni}` : ""}</Text> : <Text style={st.maly}>📜 Pierwszy mecz z tym rywalem w Twojej karierze</Text>; })()}
               {jestDerby(s, s.mojKlub, rywalId) ? (
                 <View style={{ marginTop: 5, alignSelf: "flex-start", backgroundColor: "rgba(255,100,112,0.16)", borderWidth: 1, borderColor: K.czerwony, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 }}>
                   <Text style={{ color: K.czerwony, fontWeight: "800", fontSize: 12 }}>⚔ {jestDerby(s, s.mojKlub, rywalId)} · mecz podwyższonego ryzyka</Text>

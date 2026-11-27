@@ -373,6 +373,8 @@ export interface Europa {
 }
 
 export interface StanGry {
+  archiwumMeczow?: import("./zywySwiat").MeczArchiwum[]; // wszystkie mecze Twojego klubu w karierze
+  fetaSezon?: number; // sezon, którego fetę już pokazano
   prasa?: import("./zywySwiat").Artykul[]; // lokalna prasa: artykuły po meczach
   social?: import("./zywySwiat").Wpis[]; // wpisy kibiców w sieci
   kadraOkna?: string[]; // przerwy FIFA już rozegrane („sezon-miesiąc")

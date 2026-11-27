@@ -69,6 +69,9 @@ export function poMeczu(s: StanGry, w: Wynik, derby: string | null) {
     (gwiazda ? ` Najlepszy na boisku: ${nz(s, gwiazda.id)} (nota ${gwiazda.ocenaMeczu?.toFixed(1)}).` : "");
   const art: Artykul = { sezon: s.sezon, kolejka: s.kolejka, gazeta: wybierz(GAZETY(moj.miasto, moj.poziom)), tytul, lead, ocena: Math.max(1, Math.min(10, Math.round(6 + roz * 1.2 + (Math.random() - 0.5) * 2))), gwiazda: gwiazda?.id };
   s.prasa = [art, ...(s.prasa ?? [])].slice(0, 40);
+  // archiwum meczów klubu (bilans z rywalami, rekordy)
+  (s.archiwumMeczow ??= []).push({ sezon: s.sezon, kolejka: s.kolejka, rywal: rywal, dom, my, oni, strzelcy: strzelcy.map((id) => s.zawodnicy[id]?.nazwisko ?? "") });
+  if (s.archiwumMeczow.length > 600) s.archiwumMeczow = s.archiwumMeczow.slice(-600);
   // kibice w sieci
   const NICKI = ["Kibol_od_zawsze", "Ultras1922", "Pani Krysia", "TrenerZKanapy", "BiałoNiebiescy", "Stary_Kibic", "Sektor_C", "Młody_Gniewny", "TatoNaTrybunach", "Ekspert_z_osiedla", "Gosia_kibicuje", "Pan Zdzisław"];
   const posty = roz > 0
@@ -87,4 +90,21 @@ export function dotacjaGminy(s: StanGry) {
   const kwota = Math.round(baza * (0.7 + Math.random() * 0.5) * Math.min(1.3, Math.max(0.6, kibice)) / 500) * 500;
   k.kasa += kwota;
   s.wiadomosci.unshift({ sezon: s.sezon, kolejka: s.kolejka, tekst: `🏛 Rada Gminy przyznała klubowi dotację na sezon: ${kwota.toLocaleString("pl")} zł (wniosek na upowszechnianie sportu). Ocena wniosku zależy od działalności klubu i zaangażowania kibiców.` });
+}
+
+export interface MeczArchiwum { sezon: number; kolejka: number; rywal: string; dom: boolean; my: number; oni: number; strzelcy: string[] }
+/** Bilans meczów z rywalem (wszystkie sezony w karierze). */
+export function bilansZRywalem(s: StanGry, rywal: string) {
+  const m = (s.archiwumMeczow ?? []).filter((x) => x.rywal === rywal);
+  return { mecze: m.length, w: m.filter((x) => x.my > x.oni).length, r: m.filter((x) => x.my === x.oni).length, p: m.filter((x) => x.my < x.oni).length, ostatni: m[m.length - 1] };
+}
+/** Rekordy klubu w Twojej karierze. */
+export function rekordyKlubu(s: StanGry) {
+  const a = s.archiwumMeczow ?? [];
+  const naj = (f: (x: MeczArchiwum) => number) => a.reduce<MeczArchiwum | undefined>((b, x) => (!b || f(x) > f(b) ? x : b), undefined);
+  let seria = 0, maxSeria = 0, bez = 0, maxBez = 0;
+  for (const x of a) { if (x.my > x.oni) { seria++; maxSeria = Math.max(maxSeria, seria); } else seria = 0; if (x.my >= x.oni) { bez++; maxBez = Math.max(maxBez, bez); } else bez = 0; }
+  const strzelcy = new Map<string, number>(); for (const x of a) for (const n of x.strzelcy) if (n) strzelcy.set(n, (strzelcy.get(n) ?? 0) + 1);
+  const krol = [...strzelcy].sort((x, y) => y[1] - x[1])[0];
+  return { mecze: a.length, najwyzszaWygrana: a.some((x) => x.my > x.oni) ? naj((x) => x.my - x.oni) : undefined, najwyzszaPorazka: a.some((x) => x.my < x.oni) ? naj((x) => x.oni - x.my) : undefined, maxSeria, maxBez, krol };
 }
