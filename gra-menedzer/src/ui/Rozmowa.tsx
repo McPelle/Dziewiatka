@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { Rozmowa3D } from "./three/Rozmowa3D";
 import { grafika3D } from "./three/Stadion3DWidok";
-import { mow, zamilknij } from "./three/glos";
+import { mow, plecZImienia, zamilknij } from "./three/glos";
 import { OpcjaRozmowy, TematRozmowy, TON_ETYKIETA, tematyRozmowy, zastosujRozmowe } from "../engine/rozmowy";
 import type { StanGry, Zawodnik } from "../engine/types";
 import { Twarz } from "./Twarz";
@@ -16,16 +16,16 @@ export function Rozmowa({ s, z, widoczny, onClose, odswiez }: { s: StanGry; z: Z
   const [mowi, setMowi] = useState<"trener" | "zawodnik" | null>(null);
   useEffect(() => { if (!widoczny) { setTemat(null); setReakcja(null); setWynik(null); zamilknij(); } }, [widoczny]);
   // zawodnik zaczyna rozmowę na głos
-  useEffect(() => { if (temat && !reakcja) { setMowi("zawodnik"); mow(temat.kwestia, "zawodnik", { przerwij: true }); const t = setTimeout(() => setMowi(null), 3500); return () => clearTimeout(t); } }, [temat?.id]);
+  useEffect(() => { if (temat && !reakcja) { setMowi("zawodnik"); mow(temat.kwestia, "zawodnik", { przerwij: true, kto: z ? z.imie + z.nazwisko : "zawodnik", plec: "M" }); const t = setTimeout(() => setMowi(null), 3500); return () => clearTimeout(t); } }, [temat?.id]);
 
   if (!z) return null;
   const tematy = tematyRozmowy(s, z);
 
   const wybierzOpcje = (o: OpcjaRozmowy) => {
     const r = zastosujRozmowe(s, z, o);
-    setMowi("trener"); mow(o.tekst, "trener", { przerwij: true });
+    setMowi("trener"); mow(o.tekst, "trener", { przerwij: true, kto: s.trener, plec: plecZImienia(s.trener) });
     // odpowiedź zawodnika po wypowiedzi trenera — z emocją wynikającą z rozmowy
-    setTimeout(() => { setReakcja(r.reakcja); setWynik({ delta: r.delta, uwaga: r.uwaga }); setMowi("zawodnik"); mow(r.reakcja, "zawodnik"); setTimeout(() => setMowi(null), 3500); }, Platform.OS === "web" && grafika3D() ? 1800 : 0);
+    setTimeout(() => { setReakcja(r.reakcja); setWynik({ delta: r.delta, uwaga: r.uwaga }); setMowi("zawodnik"); mow(r.reakcja, "zawodnik", { kto: z.imie + z.nazwisko, plec: "M" }); setTimeout(() => setMowi(null), 3500); }, Platform.OS === "web" && grafika3D() ? 1800 : 0);
     odswiez();
   };
   const emocja = wynik ? Math.max(-1, Math.min(1, wynik.delta / 6)) : temat ? ((z.morale ?? 60) - 60) / 60 : 0;

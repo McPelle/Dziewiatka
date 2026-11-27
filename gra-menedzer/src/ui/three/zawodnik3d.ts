@@ -28,7 +28,7 @@ export function stworzPostac(o: { skora?: string; wlosy?: string; lysy?: boolean
   const tulow = new THREE.Group(); tulow.position.y = 1.0; g.add(tulow);
   const korpus = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 0.42, 4, 10), kosz); korpus.position.y = 0.32; korpus.scale.set(1.15, 1, 0.75); korpus.castShadow = true; tulow.add(korpus);
   const numer = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.34), new THREE.MeshStandardMaterial({ map: teksturaNumeru(o.nr, kontrast(o.koszulka), o.koszulka, o.nazwisko), roughness: 0.8 }));
-  numer.position.set(0, 0.36, -0.158); numer.rotation.y = Math.PI; tulow.add(numer);
+  numer.position.set(0, 0.36, -0.158); numer.rotation.y = Math.PI; if (o.nr > 0) tulow.add(numer); // trener, sędziowie, kibice — bez numeru
   const dod = new THREE.MeshStandardMaterial({ color: o.dodatek ?? o.spodenki, roughness: 0.75 });
   if (o.wzor === "pasy") for (let i = -1; i <= 1; i++) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.52, 0.315), dod); p.position.set(i * 0.13, 0.33, 0); tulow.add(p); }
   { const kol = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.018, 6, 14), dod); kol.rotation.x = Math.PI / 2; kol.position.y = 0.68; tulow.add(kol); } // kołnierzyk w kolorze dodatku

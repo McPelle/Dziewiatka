@@ -4,12 +4,12 @@ import { CZCIONKA } from "./styl";
 // Oryginalne logo rozgrywek szczebla centralnego (PKO BP Ekstraklasa, Betclic 1./2./3. Liga) — z Transfermarktu (użytek prywatny).
 // Niższe ligi (IV liga → klasa B) nie mają jednolitych logotypów — prowadzą je wojewódzkie ZPN: pokazujemy plakietkę ligi.
 const LOGA = {
-  ekstraklasa: require("../assets/ligi/ekstraklasa.png"),
-  l1: require("../assets/ligi/1liga.png"),
-  l2: require("../assets/ligi/2liga.png"),
-  l3: require("../assets/ligi/3liga.png"),
-  superpuchar: require("../assets/ligi/superpuchar.png"),
-  pucharpolski: require("../assets/ligi/pucharpolski.png"),
+  ekstraklasa: require("../../assets/ligi/ekstraklasa.png"),
+  l1: require("../../assets/ligi/1liga.png"),
+  l2: require("../../assets/ligi/2liga.png"),
+  l3: require("../../assets/ligi/3liga.png"),
+  superpuchar: require("../../assets/ligi/superpuchar.png"),
+  pucharpolski: require("../../assets/ligi/pucharpolski.png"),
 };
 export function kluczLogoLigi(nazwa: string, poziom?: number): keyof typeof LOGA | null {
   if (/Superpuchar/i.test(nazwa)) return "superpuchar";

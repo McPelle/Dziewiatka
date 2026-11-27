@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { Konferencja3D } from "./three/Konferencja3D";
 import { grafika3D } from "./three/Stadion3DWidok";
-import { glosDostepny, glosWlaczony, mow, ustawGlos, zamilknij } from "./three/glos";
+import { glosDostepny, glosWlaczony, mow, plecZImienia, ustawGlos, zamilknij } from "./three/glos";
 import { odpowiedzKonferencja } from "../engine/sezon";
 import type { StanGry } from "../engine/types";
 import { CZCIONKA, K, st } from "./styl";
@@ -17,14 +17,14 @@ export function KonferencjaEkran({ s, odswiez }: { s: StanGry; odswiez: () => vo
   const [nrOdp, setNrOdp] = useState(0);
   const [glos, setGlos] = useState(glosWlaczony());
   // dziennikarz zadaje pytanie na głos
-  useEffect(() => { if (k) mow(`${k.media ? k.media + ". " : ""}${k.pytanie}`, "dziennikarz", { przerwij: true }); }, [k?.pytanie]);
+  useEffect(() => { if (k) mow(`${k.media ? k.media + ". " : ""}${k.pytanie}`, "dziennikarz", { przerwij: true, kto: `${k.media ?? "media"}-${k.nr ?? 0}` }); }, [k?.pytanie]);
   useEffect(() => () => zamilknij(), []);
   const mojKlub = s.kluby[s.mojKlub];
   const liga = s.ligi[mojKlub.poziom - 1];
   const om = liga?.wyniki.slice(0, s.kolejka).reverse().flat().find((w) => w && (w.dom === s.mojKlub || w.gosc === s.mojKlub));
   const nastroj = !om ? 0 : om.dom === s.mojKlub ? om.gd - om.gg : om.gg - om.gd;
   const odpowiedz = (i: number) => {
-    if (i >= 0 && k) mow(k.opcje[i].tekst, "trener", { przerwij: true });
+    if (i >= 0 && k) mow(k.opcje[i].tekst, "trener", { przerwij: true, kto: s.trener, plec: plecZImienia(s.trener) });
     setNrOdp((n) => n + 1);
     odpowiedzKonferencja(s, i); odswiez();
   };

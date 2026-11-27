@@ -11,8 +11,10 @@ import { LogoLigi } from "./LogoLigi";
 import { CZCIONKA, K, st } from "./styl";
 import { dobierzStroje, dostepneStroje, kity, type Kit } from "./strojeDane";
 import { Mecz3D, type Kamera, type Ustawienia3D } from "./three/Mecz3D";
+import { Szatnia3D } from "./three/Szatnia3D";
+import { grafika3D } from "./three/Stadion3DWidok";
 import { czyWyciszony, gwizdek, startDzwieku, stopDzwieku, wycisz } from "./three/dzwiek";
-import { glosDostepny, glosWlaczony, mow, ustawGlos, zamilknij } from "./three/glos";
+import { glosDostepny, glosWlaczony, mow, plecZImienia, ustawGlos, zamilknij } from "./three/glos";
 
 type Zakl = "relacja" | "staty" | "sklady" | "taktyka" | "zmiany";
 const KAMERY: [Kamera, string][] = [["auto", "🎬 Reżyser"], ["tv", "📺 TV"], ["bramka", "🥅 Zza bramki"], ["gora", "🛰 Z góry"], ["blisko", "🔍 Zbliżenie"]];
@@ -86,11 +88,11 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
     const nowe = m.komentarz.slice(0, Math.max(0, m.komentarz.length - przed)).reverse();
     for (const c of nowe) {
       const wazny = c.typ === "gol" || c.typ === "karny" || c.typ === "var" || (c.typ === "kartka" && c.tekst.includes("🟥")) || (c.typ === "info" && /Koniec|Przerwa/.test(c.tekst));
-      if (wazny || (predkosc <= 2 && (c.typ === "akcja" || c.typ === "kartka") && Math.random() < 0.5)) mow(c.tekst.replace(/\d+:\d+.*$/, ""), "komentator", { emocje: c.typ === "gol" ? 1 : c.typ === "karny" ? 0.6 : 0, przerwij: c.typ === "gol" });
+      if (wazny || (predkosc <= 2 && (c.typ === "akcja" || c.typ === "kartka") && Math.random() < 0.5)) mow(c.tekst.replace(/\d+:\d+.*$/, ""), "komentator", { emocje: c.typ === "gol" ? 1 : c.typ === "karny" ? 0.6 : 0, przerwij: c.typ === "gol", kto: "komentator", plec: "M" });
     }
     if (m.wazne?.typ === "gol" && m.wazne.strona === "dom" && m.wazne.id) {
       const z = s.zawodnicy[m.wazne.id];
-      if (z && m.gole[m.gole.length - 1]?.typ !== "samoboj") setTimeout(() => mow(`Bramkę dla ${kd.nazwa} zdobył zawodnik z numerem ${z.numer}… ${z.imie}… ${z.nazwisko}!`, "spiker"), 3500);
+      if (z && m.gole[m.gole.length - 1]?.typ !== "samoboj") setTimeout(() => mow(`Bramkę dla ${kd.nazwa} zdobył zawodnik z numerem ${z.numer}… ${z.imie}… ${z.nazwisko}!`, "spiker", { kto: `spiker-${kd.nazwa}`, plec: "M" }), 3500);
     }
     const w = m.wazne;
     if (w) {
@@ -200,12 +202,14 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
           {przerwa(m) && !m.mowa && (
             <View style={[st.karta, { marginHorizontal: 0, borderColor: K.akcent, borderWidth: 1 }]}>
               <Text style={st.naglowek}>🗣 Szatnia — przerwa ({m.gd}:{m.gg})</Text>
+              {Platform.OS === "web" && grafika3D() && <View style={{ marginVertical: 8 }}><Szatnia3D s={s} klub={s.kluby[s.mojKlub]} zawodnicy={[...moj.naBoisku, ...moj.lawka]} kit={m.moja === "dom" ? stroje.dom.pole : stroje.gosc.pole} kitBr={m.moja === "dom" ? stroje.dom.br : stroje.gosc.br} nastroj={(m.moja === "dom" ? m.gd - m.gg : m.gg - m.gd) * 0.3} mowi={false} /></View>}
               <Text style={st.maly}>Co powiesz drużynie? Efekt zależy od wyniku i charakteru zespołu.</Text>
               <View style={[st.wiersz, { flexWrap: "wrap", marginTop: 6 }]}>
-                {([["pochwala", "👏 Pochwała"], ["spokoj", "🧘 Spokojne wskazówki"], ["wiara", "💪 „Wierzę w was!”"], ["ochrzan", "😡 Ostra reprymenda"]] as [Mowa, string][]).map(([t, n]) => <Btn key={t} t={n} on={() => { setKom(mowaWPrzerwie(s, m, t)); odswiez(); }} />)}
+                {([["pochwala", "👏 Pochwała"], ["spokoj", "🧘 Spokojne wskazówki"], ["wiara", "💪 „Wierzę w was!”"], ["ochrzan", "😡 Ostra reprymenda"]] as [Mowa, string][]).map(([t, n]) => <Btn key={t} t={n} on={() => { mow({ pochwala: "Panowie, świetna robota. Tak trzymać!", spokoj: "Spokojnie. Trzymamy się planu, róbmy swoje.", wiara: "Wierzę w was! Wychodzimy i odwracamy ten mecz!", ochrzan: "Co to było?! Tak się nie gra! Chcę widzieć walkę!" }[t], "trener", { przerwij: true, kto: s.trener, plec: plecZImienia(s.trener) }); setKom(mowaWPrzerwie(s, m, t)); odswiez(); }} />)}
               </View>
             </View>
           )}
+          {przerwa(m) && m.mowa && Platform.OS === "web" && grafika3D() && <View style={{ marginVertical: 8 }}><Szatnia3D s={s} klub={s.kluby[s.mojKlub]} zawodnicy={[...moj.naBoisku, ...moj.lawka]} kit={m.moja === "dom" ? stroje.dom.pole : stroje.gosc.pole} kitBr={m.moja === "dom" ? stroje.dom.br : stroje.gosc.br} nastroj={(m.motMoj - 1) * 18} mowi /></View>}
           {kom && <Text style={[st.maly, { color: K.akcent, marginVertical: 4 }]}>{kom}</Text>}
 
           {/* zakładki */}
