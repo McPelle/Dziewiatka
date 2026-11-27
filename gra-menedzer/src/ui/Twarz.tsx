@@ -72,6 +72,8 @@ export function Twarz({ seed, rozmiar = 48, zdjecie, cechy, jersey = "#1f7a43", 
         <>
           {/* czupryna na czubku */}
           <View style={{ position: "absolute", left: glowaX - R * 0.02, top: glowaY - (styl === 4 ? R * 0.1 : R * 0.04), width: glowaW + R * 0.04, height: styl === 4 ? glowaH * 0.5 : glowaH * 0.36, borderTopLeftRadius: glowaW, borderTopRightRadius: glowaW, borderBottomLeftRadius: styl === 1 ? glowaW : R * 0.06, borderBottomRightRadius: styl === 1 ? glowaW : R * 0.06, backgroundColor: wlosy }} />
+          {/* loki (kręcone) */}
+          {styl === 4 && [0, 1, 2, 3, 4].map((i) => <View key={`l${i}`} style={{ position: "absolute", left: glowaX - R * 0.04 + i * (glowaW + R * 0.08) / 5, top: glowaY - R * 0.13 + (i % 2) * R * 0.03, width: R * 0.15, height: R * 0.15, borderRadius: R * 0.075, backgroundColor: wlosy }} />)}
           {/* przedziałek */}
           {styl === 2 && <View style={{ position: "absolute", left: glowaX + glowaW * 0.34, top: glowaY - R * 0.02, width: R * 0.03, height: glowaH * 0.2, backgroundColor: skora }} />}
           {/* boki */}

@@ -27,10 +27,9 @@ const BARWY_WOJ: Record<string, [string, string]> = {
 };
 // Oryginalne logo lig (bez generowanych odznak) i kontury województw (prawdziwe granice) zamiast wymyślonych herbów.
 const NAZWY_LOGO = ["PKO BP Ekstraklasa", "Betclic 1. Liga", "Betclic 2. Liga", "Betclic 3. Liga"];
-const crestLigi = (idx: number, r = 38) => (
-  <View style={{ width: r * 1.25, height: r, alignItems: "center", justifyContent: "center" }}>
-    <LogoLigi nazwa={NAZWY_LOGO[Math.min(idx, 3)]} poziom={idx + 1} rozmiar={r * 0.9} znak />
-  </View>);
+const crestLigi = (idx: number, r = 38) => idx === 0
+  ? <View style={{ width: r * 3.4, height: r, justifyContent: "center" }}><LogoLigi nazwa={NAZWY_LOGO[0]} poziom={1} rozmiar={r * 0.68} /></View> // pełne logo PKO BP Ekstraklasy
+  : <View style={{ width: r * 1.25, height: r, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={NAZWY_LOGO[Math.min(idx, 3)]} poziom={idx + 1} rozmiar={r * 0.9} /></View>;
 const KLUCZ_WOJ: Record<string, string> = { "Małopolskie": "małopolskie", "Pomorskie": "pomorskie", "Zachodniopomorskie": "zachodniopomorskie", "Kujawsko-pomorskie": "kujawsko-pomorskie" };
 // województwo = herb jego wojewódzkiego ZPN (oryginalne logo związku, bez tła)
 const crestWoj = (label: string, r = 38) => <View style={{ width: r * 1.15, height: r * 1.15, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={`${label} ZPN`} rozmiar={r * 1.1} /></View>;
