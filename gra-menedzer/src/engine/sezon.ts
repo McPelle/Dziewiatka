@@ -1,4 +1,4 @@
-import { opisWyniku, rozstrzygnij } from "./rozstrzygniecie";
+import { dwumecz, opisWyniku, rozstrzygnij } from "./rozstrzygniecie";
 import { ogloszenieReorganizacji, zastosujReorganizacje } from "./reorganizacja";
 import { zakazTransferow } from "./wydzialGier";
 import { pzpnPoKolejce, pzpnPrzedKolejka, pzpnPrzedSkladem } from "./pzpnCykl";
@@ -697,6 +697,11 @@ function meczBarazowy(s: StanGry, wyzej: string, nizej: string, poziomGorny = 1)
   // mecz rozegrany wcześniej przez gracza (na żywo albo symulowany z ekranu baraży) — liczy się jego wynik
   const z = s.barazeGracza?.mecze.find((m) => m.dom === wyzej && m.gosc === nizej && m.zwyc);
   if (z) { ostatniBaraz = z.wynik ?? ""; return z.zwyc!; }
+  if (poziomGorny >= 5 && zpnSciezki(s.sciezka).barazDwumecz) {
+    // WMZPN / Podlaski ZPN: baraż jako dwumecz — pierwszy mecz u drużyny z niższej ligi, dogrywka i karne na koniec rewanżu
+    const d = dwumecz(silaKlubu(s, nizej), silaKlubu(s, wyzej));
+    ostatniBaraz = d.tekst; return d.zwyciezcaA ? nizej : wyzej;
+  }
   const r = rozstrzygnij(silaKlubu(s, wyzej), silaKlubu(s, nizej), { dogrywka: dogrywkaWBarazu(s, poziomGorny) }); // 90' → (dogrywka) → karne
   ostatniBaraz = r.tekst;
   return r.zwyciezca === "dom" ? wyzej : nizej;

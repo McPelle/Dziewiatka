@@ -26,6 +26,10 @@ const WOJ_MIASTA: Record<string, Woj> = {
   "Stęszew": "wielkopolskie", "Swarzędz": "wielkopolskie", "Szczecin": "zachodniopomorskie", "Tarnobrzeg": "podkarpackie",
   "Toruń": "kujawsko-pomorskie", "Tychy": "śląskie", "Warszawa": "mazowieckie", "Wrocław": "dolnośląskie", "Września": "wielkopolskie",
   "Zabrze": "śląskie", "Zamość": "lubelskie", "Zielona Góra": "lubuskie", "Łódź": "łódzkie", "Łęczna": "lubelskie",
+  // III liga gr. I (2026/27)
+  "Suwałki": "podlaskie", "Zambrów": "podlaskie", "Łomża": "podlaskie", "Elbląg": "warmińsko-mazurskie", "Lidzbark Warmiński": "warmińsko-mazurskie",
+  "Olsztyn": "warmińsko-mazurskie", "Nowy Dwór Mazowiecki": "mazowieckie", "Mińsk Mazowiecki": "mazowieckie", "Ząbki": "mazowieckie", "Troszyn": "mazowieckie",
+  "Mława": "mazowieckie", "Sieradz": "łódzkie", "Łowicz": "łódzkie", "Tomaszów Mazowiecki": "łódzkie",
   "Środa Wielkopolska": "wielkopolskie", "Świdnik": "lubelskie", "Świecie": "kujawsko-pomorskie", "Świnoujście": "zachodniopomorskie",
 };
 // Grupy III ligi (PZPN): województwa przypisane do grup.
