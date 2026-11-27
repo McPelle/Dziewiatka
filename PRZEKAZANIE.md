@@ -70,6 +70,18 @@ Ikona aplikacji: `assets/ikona/` (źródło SVG + PNG 180/512/1024). `build-html
 - Odświeżenie danych w przyszłości: pobrać strony kadr TM → `scripts/dane/kadry-tm-parsuj.py <katalog> parsed.json` →
   `scripts/dane/kadry-tm-zbuduj.py parsed.json <lista id|slug|nazwa> assets/rostery-pelne.json`. Test: `npx tsx scripts/test-realne-sklady.ts`.
 
+
+## ZROBIONE 27.11.2026 — WERSJA 1: MECZ NA ŻYWO + 3D
+- Transfery rozłożone w dniach: `src/engine/transfery.ts` (oferta → klub 1–3 dni → kontrakt/agent → badania → rejestracja; umowy wstępne, wypożyczenia z wykupem, obserwowani, premie za gole/występy). UI: `src/ui/NegocjacjePanel.tsx`.
+- Budowy z przetargiem: `src/engine/budowy.ts` (fikcyjne firmy, czas, opóźnienia, aneksy, usterki, utrudnienia dla kibiców). UI: `src/ui/Budowy.tsx`.
+- Mecz na żywo: silnik `src/engine/meczNaZywo.ts` (minuta po minucie; karne z obronami, wolne, rożne, VAR tylko poziom ≤2, spalone, słupki, kartki, urazy, okrzyki, mowa w przerwie, oceny na żywo, podpowiedzi asystenta). Limity zmian wg PZPN/ZPN w `zasadyZmian`. Wynik rozliczany w kolejce przez `meczZeScenariusza` (mecz.ts), `s.meczLive`. Zapis w trakcie meczu w localStorage (`dz_mecz_live`) i wznowienie.
+- 3D (three.js): `src/ui/three/` — `stadion3d.ts` (stadion z danych klubu), `zawodnik3d.ts` (postacie z przegubami, stroje), `Mecz3D.tsx` (realizacja TV, powtórki, bloom/DOF, pogoda), `Stadion3DWidok.tsx` (menu + zakładka klubu), `dzwiek.ts` (dźwięk Web Audio). Ustawienia: Więcej → Grafika (`dz_3d`, `dz_lekka`).
+- Stroje na mecz wg uchwały PZPN IX/140 § 13: `src/ui/strojeDane.ts` (gość dostosowuje się; kolizja → zmienia gospodarz, karę płaci gość; bramkarz kontrastuje; sędzia w innym kolorze). Wybór kompletu i stroju BR przed meczem.
+- Postacie 3D są proceduralne (bez zewnętrznych modeli) — ewentualna podmiana na modele CC0 z animacjami to dalszy krok.
+
+## PLAN (zatwierdzony przez użytkownika) — 141 punktów
+6 zaległych z pierwszej listy (reprezentacje, 64 herby, logo lig, grafika/stroje, kalendarz miesiąca, dokończenie meczu) + 135 nowych (3D, realizm, żywy świat, przepisy PZPN). Lista zadań: #24–#32 w sesji; robione etapami, po każdym etapie plik index.html dla użytkownika.
+
 ## CO JEST W TOKU
 Nic otwartego — użytkownik ma listę kolejnych poprawek, zapytać o nie.
 

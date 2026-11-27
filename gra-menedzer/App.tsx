@@ -29,27 +29,7 @@ const ZAKLADKI: [Zakladka, string, string][] = [
   ["wiecej", "⋯", "Więcej"],
 ];
 
-// TYMCZASOWY_PODGLAD_START
-import { WidokStadionu as __WS } from "./src/ui/WidokStadionu";
-function __PodgladStadionow() {
-  const baza = { nazwa: "Wisła Kraków", poziom: 1, murawa: "naturalna" } as any;
-  const warianty: [string, number, any, boolean][] = [
-    ["Klasa B · 200", 200, { parking: 0, gastronomia: 0, sklep: 0 }, false],
-    ["Klasa B · 400 + budki", 400, { parking: 1, gastronomia: 1, sklep: 0, toalety: 1 }, false],
-    ["IV liga · 2500", 2500, { parking: 2, gastronomia: 2, sklep: 1, toalety: 2, kasy: 2, loze: 1, zadaszenie: 1 }, true],
-    ["Ekstraklasa · 33 000 max", 33000, { parking: 5, gastronomia: 5, sklep: 5, toalety: 5, kasy: 5, strefaKibica: 5, loze: 5, telebim: 5, zadaszenie: 5, muzeum: 5, hotel: 5, baza: 3 }, true],
-  ];
-  return (
-    <View style={{ backgroundColor: "#06130d", padding: 8, gap: 8 }}>
-      {warianty.map(([t, poj, ob, sw]) => (
-        <View key={t}><Text style={{ color: "#fff" }}>{t}</Text><__WS klub={{ ...baza, pojemnosc: poj, obiekty: ob }} oswietlenie={sw} /></View>
-      ))}
-    </View>
-  );
-}
-// TYMCZASOWY_PODGLAD_END
 export default function App() {
-  if (Platform.OS === "web" && typeof window !== "undefined" && window.location.hash === "#stadiony") return <__PodgladStadionow />; // TYMCZASOWY_PODGLAD
   const [stan, setStan] = useState<StanGry | null>(null);
   const [laduje, setLaduje] = useState(true);
   const [, setWersja] = useState(0);
