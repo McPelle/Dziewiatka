@@ -102,6 +102,8 @@ export interface Zawodnik {
   odsprzedaz?: { klubId: string; proc: number }; // klauzula odsprzedaży: % z przyszłego transferu dla klubu-sprzedawcy
   jun?: { sezon: number; kat: KatJun; m: number; g: number; a: number; oc: number; wyr: number }; // statystyki w lidze juniorów (sezon): mecze, gole, asysty, suma ocen, wyróżnienia
   junKariera?: { sezon: number; kat: KatJun; m: number; g: number; a: number; sr: number }[]; // historia sezonów juniorskich
+  meczeJesien?: number; // mecze rozegrane do końca rundy jesiennej (limity gry w rezerwach liczone per runda)
+  meczeRezerwy?: number; // mecze w niższym zespole klubu w sezonie (zasada >50% po zakończeniu sezonu wyższego zespołu)
   relacja?: number; // zaufanie zawodnika do trenera 0–100 (rozmowy, dotrzymane/złamane obietnice); brak = 60
   ostatniaRozmowa?: number; // sezon*100+kolejka ostatniej rozmowy (druga rozmowa w tygodniu waży mniej)
   obietnica?: { typ: "minuty" | "kontrakt"; doKolejki: number; mecze: number; kontraktDo: number }; // obietnica trenera do rozliczenia
@@ -409,6 +411,7 @@ export interface StanGry {
   xiHistoria?: XIKolejki[]; // archiwum jedenastek kolejek z sezonu
   konferencja?: Konferencja;
   motywacjaMeczu?: number;
+  jesienZapisana?: number; // sezon, w którym zapisano stan meczów po rundzie jesiennej
   dzien?: number; // dzień tygodnia w kalendarzu (0 = poniedziałek … 6 = niedziela); mecz ligowy w sobotę
   treningiDni?: number; // ile dni treningowych tego tygodnia już wykonano (każdy = 1/3 tygodniowego treningu)
   raportyDni?: { data: string; tytul: string; ikona: string; wpisy: string[] }[]; // dziennik kalendarza (ostatnie dni)

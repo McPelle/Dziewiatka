@@ -323,6 +323,11 @@ export function rozpocznijKariere(s: StanGry, klubId: string) {
 
 /** Losuje nieobecności amatorów (klasa okręgowa i niżej) przed kolejką i ustawia skład. */
 export function przygotujKolejke(s: StanGry) {
+  // Liczniki do zasad gry w rezerwach (PZPN IX/140 §4): mecze w rezerwach, stan meczów po rundzie jesiennej.
+  if (s.kolejka === Math.ceil(ileKolejek(s) / 2) && s.jesienZapisana !== s.sezon) {
+    s.jesienZapisana = s.sezon;
+    for (const z of Object.values(s.zawodnicy)) z.meczeJesien = z.mecze;
+  }
   // Powołani z innych zespołów klubu wracają do swoich drużyn po meczu.
   if (s.powolaniKlubowi?.length) { s.taktyka.sklad = s.taktyka.sklad.filter((id) => !s.powolaniKlubowi!.includes(id)); s.powolaniKlubowi = []; }
   sprawdzPropozycjeTrenera(s);
@@ -681,7 +686,10 @@ export function ileKolejek(s: StanGry) {
 export function zagrajKolejke(s: StanGry) {
   if (s.koniecSezonu || s.zwolniony) return;
   const r = s.kolejka;
-  { const mk = s.kluby[s.mojKlub]; if (mk && (mk.rezerwaDla || mk.rezerwaId)) (s.ostatnieSklady ??= {})[s.mojKlub] = [...s.taktyka.sklad]; }
+  { const mk = s.kluby[s.mojKlub]; if (mk && (mk.rezerwaDla || mk.rezerwaId)) {
+    (s.ostatnieSklady ??= {})[s.mojKlub] = [...s.taktyka.sklad];
+    if (mk.rezerwaDla) for (const id of s.taktyka.sklad) { const z = s.zawodnicy[id]; if (z) z.meczeRezerwy = (z.meczeRezerwy ?? 0) + 1; }
+  } }
   // Snapshot rozegranych meczów graczy Twojej ligi — po kolejce policzymy XI kolejki z przyrostu.
   const mojaL = mojaLiga(s);
   const przedMecze = new Map<string, number>();
@@ -1022,7 +1030,10 @@ function autoSkladAI(s: StanGry, klubId: string) {
     ? powolaniaAI(s, klubId, new Set(zespolyKlubu(s, klubId).filter((z) => nrZespolu(z) < nrZespolu(kk)).flatMap((z) => s.ostatnieSklady?.[z.id] ?? [])))
     : undefined;
   const sklad = autoSklad(s, klubId, formacjaAI(klubId), powolani);
-  if (kk.rezerwaDla || kk.rezerwaId) (s.ostatnieSklady ??= {})[klubId] = [...sklad];
+  if (kk.rezerwaDla || kk.rezerwaId) {
+    (s.ostatnieSklady ??= {})[klubId] = [...sklad];
+    if (kk.rezerwaDla) for (const id of sklad) { const z = s.zawodnicy[id]; if (z) z.meczeRezerwy = (z.meczeRezerwy ?? 0) + 1; }
+  }
   if (poziom >= 7 && szansa(0.5)) {
     const kadra = [...s.kluby[klubId].zawodnicy, ...(powolani ?? [])].filter((id) => !sklad.includes(id) && dostepny(s, s.zawodnicy[id]));
     const ile = losInt(1, 2);
@@ -1668,6 +1679,21 @@ export function nowySezon(s: StanGry) {
       }
     }
   }
+  // PZPN IX/140 §2 ust.6–8: dwa zespoły klubu nie mogą grać w tej samej klasie — gdy I zespół spadnie do klasy rezerw
+  // (albo rezerwy by do niej awansowały), zespół rezerw jest automatycznie przesuwany klasę niżej.
+  for (let i = 0; i < s.ligi.length - 1; i++) {
+    for (const id of [...nowe[i]]) {
+      const k = s.kluby[id];
+      if (!k?.rezerwaDla) continue;
+      const pierwszy = s.kluby[k.rezerwaDla];
+      if (pierwszy && nowe[i].includes(pierwszy.id) && id !== s.mojKlub) {
+        nowe[i] = nowe[i].filter((x) => x !== id);
+        nowe[i + 1] = [...nowe[i + 1], id];
+        k.poziom = i + 2;
+        wiadomosc(s, `⚖ ${k.nazwa} przesunięty do ${s.ligi[i + 1].nazwa} — przepis PZPN: dwa zespoły klubu nie mogą grać w jednej klasie.`);
+      }
+    }
+  }
   for (const id of wychodza) opuscPiramide(s, id);
   aktualizujTypyKontraktow(s); // awans: amatorzy → półprofesjonaliści → zawodowcy (wg szczebla, PZPN)
   const nowyPoziom = s.kluby[s.mojKlub].poziom;
@@ -1980,6 +2006,7 @@ export function nowySezon(s: StanGry) {
       z.asysty = 0;
       z.czysteKonta = 0;
       z.mecze = 0;
+      z.meczeJesien = 0; z.meczeRezerwy = 0;
       z.forma = 0;
       z.kondycja = 100;
       z.kontuzja = 0;

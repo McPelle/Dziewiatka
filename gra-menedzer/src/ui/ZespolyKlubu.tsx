@@ -1,5 +1,5 @@
 import { Alert, Platform, Pressable, Text, View } from "react-native";
-import { blokadaPowolania, kandydaciZespolow, LIMIT_STARSZYCH, odeslijDoZespolu, powolajZZespolu } from "../engine/rezerwy";
+import { blokadaPowolania, kandydaciZespolow, odeslijDoZespolu, powolajZZespolu } from "../engine/rezerwy";
 import { jestMlodziezowcem } from "../engine/swiat";
 import type { StanGry } from "../engine/types";
 import { SKROT_POZ } from "../data/pozycje";
@@ -17,7 +17,7 @@ export function ZespolyKlubu({ s, odswiez }: { s: StanGry; odswiez: () => void }
     <View style={[st.karta, { marginHorizontal: 0, marginTop: 12 }]}>
       <Text style={st.naglowek}>🔁 Zespoły klubu — powołania na mecz</Text>
       <Text style={[st.maly, { marginBottom: 6 }]}>
-        Możesz wziąć zawodników z innych zespołów klubu. Z wyższego zespołu: młodzieżowcy (U-21) bez limitu, starszych grających w jego ostatnim meczu — max {LIMIT_STARSZYCH}. W 4 ostatnich kolejkach podstawowi gracze wyższego zespołu nie mogą grać w rezerwach. Powołany nie zagra w tej kolejce w swoim zespole.
+        Zasady PZPN (uchwała IX/140 §4): w górę bez ograniczeń. W dół — klub z drużyną w Ekstraklasie/I/II lidze: do 22 lat bez limitu, starsi do 450 min w rundzie w wyższym zespole; klub z III ligi i niżej: kto rozegrał 2/3 meczów wyższego zespołu, nie zagra w niższym{/^Pomorskie/.test(s.sciezka ?? "") ? " (Pomorski ZPN: do 21 lat zwolnieni)" : ""}. Zasada 48 h: powołany nie zagra w tej kolejce w swoim zespole.
       </Text>
       {grupy.map(({ zespol, zawodnicy }) => (
         <View key={zespol.id} style={{ marginTop: 8 }}>

@@ -1,14 +1,16 @@
-// Zespoły jednego klubu (I, II, III) — wspólna kadra i powołania między zespołami, wzorowane na regulaminach ZPN:
-// • w górę (z rezerw do wyższego zespołu) — bez ograniczeń,
-// • w dół (z wyższego zespołu do rezerw): młodzieżowcy (U-21) bez limitu; starszych, którzy zagrali w ostatnim
-//   meczu wyższego zespołu, najwyżej LIMIT_STARSZYCH w jednym meczu rezerw,
-// • w 4 ostatnich kolejkach zespołu niższego nie może w nim zagrać zawodnik, który rozegrał ponad połowę meczów
-//   wyższego zespołu w sezonie (ochrona przed „wzmacnianiem" rezerw na finisz),
-// • zawodnik gra jeden mecz w kolejce — powołany do innego zespołu jest niedostępny dla swojego.
+// Zespoły jednego klubu (I, II, III) — wspólna kadra i gra w różnych zespołach wg uchwały PZPN IX/140 §4
+// (powtórzonej w regulaminach ZZPN, K-PZPN, Pomorskiego ZPN 2026/27 i MZPN 2025/26):
+// • w GÓRĘ — bez ograniczeń;
+// • zasada 48 h: kto zagrał w kolejce w jednym zespole, nie zagra w tej samej kolejce w innym (bramkarze — też, bo w grze
+//   mecze zespołów jednego klubu odbywają się w tym samym weekendzie);
+// • w DÓŁ — klub z zespołem w Ekstraklasie/I/II lidze: do 22 lat bez limitu, starsi tracą prawo gry w niższym zespole
+//   po 450 minutach (≈5 meczach) w wyższym zespole w danej rundzie;
+// • w DÓŁ — klub, którego najwyższy zespół gra w III lidze lub niżej: po rozegraniu 2/3 meczów wyższego zespołu w sezonie
+//   zawodnik traci prawo gry w niższym (Pomorski ZPN: zawodnicy do 21 lat bez tego limitu);
+// • po zakończeniu sezonu wyższego zespołu w niższym zagra tylko ten, kto rozegrał w nim ponad 50% meczów.
 import { jestMlodziezowcem } from "./swiat";
 import type { Klub, StanGry, Zawodnik } from "./types";
 
-export const LIMIT_STARSZYCH = 3;
 const RE = /\s+(II|III|IV|2|3)(?=\s|\/|$)/;
 const rdzen = (n: string) => n.replace("II/KS", "KS").replace(RE, "").replace(/\s+/g, " ").trim().toLowerCase();
 const numerZespolu = (n: string) => { const m = n.match(RE); return !m ? 1 : m[1] === "II" || m[1] === "2" ? 2 : m[1] === "III" || m[1] === "3" ? 3 : 4; };
@@ -26,24 +28,39 @@ export const nrZespolu = (k: Klub) => numerZespolu(k.nazwa);
 function ostatnioGralW(s: StanGry, z: Zawodnik, zespolId: string): boolean {
   return (s.ostatnieSklady?.[zespolId] ?? []).includes(z.id);
 }
+/** Mecze zawodnika w bieżącej rundzie (jesień / wiosna). */
+function meczeWRundzie(s: StanGry, z: Zawodnik): number {
+  const pol = Math.ceil((s.ligi[0]?.terminarz.length ?? 34) / 2);
+  return s.kolejka < pol ? z.mecze : Math.max(0, z.mecze - (z.meczeJesien ?? 0));
+}
 /** Czy zawodnik `z` (z innego zespołu klubu) może zagrać w najbliższym meczu zespołu `doId`. Zwraca powód odmowy albo null. */
-export function blokadaPowolania(s: StanGry, z: Zawodnik, doId: string, juzPowolani: string[] = []): string | null {
+export function blokadaPowolania(s: StanGry, z: Zawodnik, doId: string, _juz: string[] = []): string | null {
   const zespoly = zespolyKlubu(s, doId);
   const docel = s.kluby[doId];
   const zrodlo = z.klubId ? s.kluby[z.klubId] : undefined;
   if (!zrodlo || !zespoly.some((k) => k.id === zrodlo.id) || zrodlo.id === doId) return "Zawodnik nie należy do innego zespołu tego klubu.";
   if (z.kontuzja > 0 || z.zawieszenie > 0) return "Kontuzjowany albo zawieszony.";
-  const wDol = nrZespolu(zrodlo) < nrZespolu(docel);
-  if (!wDol) return null; // w górę — bez ograniczeń
-  if (!jestMlodziezowcem(z) && ostatnioGralW(s, z, zrodlo.id)) {
-    const ilu = juzPowolani.map((id) => s.zawodnicy[id]).filter((x) => x && x.klubId && nrZespolu(s.kluby[x.klubId]) < nrZespolu(docel) && !jestMlodziezowcem(x) && ostatnioGralW(s, x, x.klubId)).length;
-    if (ilu >= LIMIT_STARSZYCH) return `Limit: najwyżej ${LIMIT_STARSZYCH} zawodników powyżej wieku młodzieżowca, którzy grali w ostatnim meczu wyższego zespołu.`;
+  if (nrZespolu(zrodlo) > nrZespolu(docel)) return null; // w górę — bez ograniczeń (PZPN IX/140 §4)
+  const najwyzszy = Math.min(...zespoly.map((k) => k.poziom));
+  const rok = s.sezon + 1; // rok, w którym kończy się sezon
+  if (najwyzszy <= 3) {
+    // Klub z zespołem w Ekstraklasie/I/II lidze: do 22 lat bez limitu; starsi — max 450 min (≈5 meczów) w rundzie w wyższym zespole.
+    const wiekWRoku = z.wiek + (rok - s.sezon);
+    if (wiekWRoku > 22 && meczeWRundzie(s, z) >= 5) return "PZPN: starszy niż 22 lata, rozegrał w tej rundzie ponad 450 minut w wyższym zespole — nie może zagrać w rezerwach.";
+  } else {
+    // III liga i niżej: po 2/3 meczów wyższego zespołu traci prawo gry w niższym (Pomorski ZPN: do 21 lat zwolnieni).
+    const pomorskie = /^Pomorskie/.test(s.sciezka ?? "");
+    const zwolniony = pomorskie && z.wiek + (rok - s.sezon) <= 21;
+    const meczeWyzszego = s.ligi[zrodlo.poziom - 1]?.wyniki.filter(Boolean).length ?? 0;
+    if (!zwolniony && meczeWyzszego >= 3 && z.mecze >= Math.ceil(meczeWyzszego * 2 / 3))
+      return "PZPN: rozegrał już 2/3 meczów wyższego zespołu w tym sezonie — stracił prawo gry w niższym zespole.";
   }
-  const ligaD = s.ligi[docel.poziom - 1];
-  const zostalo = (ligaD?.terminarz.length ?? 99) - s.kolejka;
-  const meczeWyzszego = s.ligi[zrodlo.poziom - 1]?.wyniki.filter(Boolean).length ?? 0;
-  if (zostalo <= 4 && meczeWyzszego > 0 && z.mecze > meczeWyzszego / 2)
-    return "Ostatnie 4 kolejki: zawodnik, który rozegrał ponad połowę meczów wyższego zespołu, nie może grać w rezerwach.";
+  const ligaG = s.ligi[zrodlo.poziom - 1];
+  if (ligaG && ligaG.wyniki.filter(Boolean).length >= ligaG.terminarz.length) {
+    const ligaD = s.ligi[docel.poziom - 1];
+    const meczeNiz = ligaD?.wyniki.filter(Boolean).length ?? 0;
+    if (meczeNiz > 0 && (z.meczeRezerwy ?? 0) <= meczeNiz / 2) return "PZPN: sezon wyższego zespołu zakończony — w niższym zagrają tylko zawodnicy z ponad 50% jego meczów.";
+  }
   return null;
 }
 /** Kandydaci do powołania z innych zespołów klubu dla Twojego zespołu. */
@@ -80,7 +97,7 @@ export function powolaniaAI(s: StanGry, klubId: string, xiWyzszych: Set<string>)
       .sort((a, b) => (jestMlodziezowcem(b) ? 1 : 0) - (jestMlodziezowcem(a) ? 1 : 0) || b.umiej - a.umiej);
     for (const z of kand) {
       if (out.length >= 5) break;
-      if (!blokadaPowolania(s, z, klubId, out)) out.push(z.id);
+      if (!blokadaPowolania(s, z, klubId)) out.push(z.id);
     }
   }
   return out;
