@@ -72,12 +72,10 @@ function Stadion3DV2({ s, klub, tlo, wysokosc, noc }: { s: StanGry | null; klub:
   return <View ref={host} style={tlo ? { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 } as any : { width: "100%", height: wysokosc ?? 260, borderRadius: 10, overflow: "hidden", backgroundColor: "#0b1226" }} />;
 }
 
-import { useState as useStateM, useEffect as useEffectM } from "react";
 import { TloStadion } from "../TloStadion";
 /** Tło menu: najpierw rysunek 2D (menu od razu klikalne), po ~1 s stadion 3D z wersji 2. */
 export function Stadion3DMenu({ s, klub }: { s: StanGry | null; klub: Klub }) {
-  const [pokaz, setPokaz] = useStateM(false);
-  useEffectM(() => { const t = setTimeout(() => setPokaz(true), 1000); return () => clearTimeout(t); }, []);
-  if (!pokaz || !grafika3DV2()) return <TloStadion />;
+  // stadion 3D od razu (jak w wersji 2) — bez rysunku 2D na starcie
+  if (!grafika3DV2()) return <TloStadion />;
   return <Stadion3DV2 s={s} klub={klub} tlo />;
 }
