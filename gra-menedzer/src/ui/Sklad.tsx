@@ -1,3 +1,4 @@
+import { ZespolyKlubu } from "./ZespolyKlubu";
 import { useState } from "react";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
@@ -24,8 +25,8 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
   const [sfg, setSfg] = useState<"karne" | "wolne" | "rozne" | null>(null);
   const [boisko, setBoisko] = useState(false);
   const t = s.taktyka;
-  const kadra = s.kluby[s.mojKlub].zawodnicy
-    .map((id) => s.zawodnicy[id])
+  const kadra = [...s.kluby[s.mojKlub].zawodnicy, ...(s.powolaniKlubowi ?? [])]
+    .map((id) => s.zawodnicy[id]).filter(Boolean)
     .sort((a, b) => POZYCJE.indexOf(a.poz) - POZYCJE.indexOf(b.poz) || b.umiej - a.umiej);
   const sila = silaSkladu(s, t.sklad, t.formacja, !!t.reczneSloty);
   const maMlodziezowca = t.sklad.some((id) => s.zawodnicy[id] && jestMlodziezowcem(s.zawodnicy[id]));
@@ -196,6 +197,7 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
         {s.kluby[s.mojKlub].rezerwaId && (
           <Text style={[st.maly, { marginTop: 4 }]}>Rezerwy: {s.kluby[s.kluby[s.mojKlub].rezerwaId!].nazwa} — zawodnicy poza składem grają tam (kondycja, rozwój).</Text>
         )}
+        <ZespolyKlubu s={s} odswiez={odswiez} />
       </View>
 
       {POZYCJE.map((poz) => (

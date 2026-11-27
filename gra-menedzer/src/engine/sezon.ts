@@ -2,6 +2,7 @@ import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj"
 import { AFILIACJE, PRZYJAZNIE } from "../data/derby";
 import { klubyLigiZDanych, rodzenstwo, trafiaDo } from "./regiony";
 import { rozliczObietnice } from "./rozmowy";
+import { nrZespolu, powolaniaAI, zespolyKlubu } from "./rezerwy";
 import { konferencjaPo, konferencjaPrzed } from "./konferencje";
 import { autoSklad, raportAsystenta, dostepny, FORMACJE, ileSpozaUE, limitSpozaUE, zagrajMecz } from "./mecz";
 import { pogodaMeczu, gorskie } from "./pogoda";
@@ -322,6 +323,8 @@ export function rozpocznijKariere(s: StanGry, klubId: string) {
 
 /** Losuje nieobecności amatorów (klasa okręgowa i niżej) przed kolejką i ustawia skład. */
 export function przygotujKolejke(s: StanGry) {
+  // Powołani z innych zespołów klubu wracają do swoich drużyn po meczu.
+  if (s.powolaniKlubowi?.length) { s.taktyka.sklad = s.taktyka.sklad.filter((id) => !s.powolaniKlubowi!.includes(id)); s.powolaniKlubowi = []; }
   sprawdzPropozycjeTrenera(s);
   if (s.mojKlub && !s.zwolniony) rozliczObietnice(s, (t) => wiadomosc(s, t));
   konferencjaPrzedKolejka(s);
@@ -678,6 +681,7 @@ export function ileKolejek(s: StanGry) {
 export function zagrajKolejke(s: StanGry) {
   if (s.koniecSezonu || s.zwolniony) return;
   const r = s.kolejka;
+  { const mk = s.kluby[s.mojKlub]; if (mk && (mk.rezerwaDla || mk.rezerwaId)) (s.ostatnieSklady ??= {})[s.mojKlub] = [...s.taktyka.sklad]; }
   // Snapshot rozegranych meczów graczy Twojej ligi — po kolejce policzymy XI kolejki z przyrostu.
   const mojaL = mojaLiga(s);
   const przedMecze = new Map<string, number>();
@@ -1013,8 +1017,12 @@ function autoSkladAI(s: StanGry, klubId: string) {
   // AI też ma nieobecności amatorów (prosto: losowo wypada jeden-dwóch)
   const poziom = s.kluby[klubId].poziom;
   // Rezerwy: dołóż do puli powołanych z pierwszego zespołu (przepis PZPN), zanim wybierzemy XI.
-  const powolani = s.kluby[klubId].rezerwaDla ? powolaniaRezerwy(s, klubId) : undefined;
+  const kk = s.kluby[klubId];
+  const powolani = kk.rezerwaDla && zespolyKlubu(s, klubId).length > 1
+    ? powolaniaAI(s, klubId, new Set(zespolyKlubu(s, klubId).filter((z) => nrZespolu(z) < nrZespolu(kk)).flatMap((z) => s.ostatnieSklady?.[z.id] ?? [])))
+    : undefined;
   const sklad = autoSklad(s, klubId, formacjaAI(klubId), powolani);
+  if (kk.rezerwaDla || kk.rezerwaId) (s.ostatnieSklady ??= {})[klubId] = [...sklad];
   if (poziom >= 7 && szansa(0.5)) {
     const kadra = [...s.kluby[klubId].zawodnicy, ...(powolani ?? [])].filter((id) => !sklad.includes(id) && dostepny(s, s.zawodnicy[id]));
     const ile = losInt(1, 2);

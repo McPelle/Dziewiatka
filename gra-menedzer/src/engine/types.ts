@@ -409,6 +409,8 @@ export interface StanGry {
   xiHistoria?: XIKolejki[]; // archiwum jedenastek kolejek z sezonu
   konferencja?: Konferencja;
   motywacjaMeczu?: number;
+  powolaniKlubowi?: string[]; // zawodnicy z innych zespołów klubu (I/II/III) powołani na najbliższy mecz Twojego zespołu
+  ostatnieSklady?: Record<string, string[]>; // ostatnia XI zespołów klubów wielozespołowych (do limitów powołań)
   rozmiaryStart?: number[];
   meczeJun?: { kat: KatJun; sezon: number; kolejka: number; rywal: string; dom: boolean; moje: number; ich: number; strzelcy: string[]; najlepszy?: string }[]; // ostatnie mecze juniorów Twojego klubu // typowe liczebności lig (z początku kariery) — klasy A/B/C wahają się wokół nich // efekt konferencji przedmeczowej (±) na najbliższy mecz gracza // oczekująca konferencja prasowa (pytanie + opcje odpowiedzi)
   europa?: Europa; // europejska kampania w tym sezonie (jeśli zakwalifikowani)
