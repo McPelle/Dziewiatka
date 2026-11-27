@@ -103,6 +103,8 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
         nm.wsparcie = { dom: wd.map((k) => ({ nazwa: k.nazwa, kolory: barwyKlubu(k.nazwa) })), gosc: wg.map((k) => ({ nazwa: k.nazwa, kolory: barwyKlubu(k.nazwa) })) };
         if (wd.length) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🤝 Na trybunie gospodarzy także kibice ${wd.slice(0, 6).map((k) => k.nazwa).join(", ")}${wd.length > 6 ? ` i inni (${wd.length})` : ""} — zgody i sympatycy przyjechali wesprzeć ${kd0.nazwa}.` });
         if (wg.length) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🤝 W klatce gości obok ${kg0.nazwa} stoją też kibice ${wg.slice(0, 6).map((k) => k.nazwa).join(", ")} — wsparcie zgód${u.derby ? " na derby" : " z okolicy"}.` });
+        if (wg.length) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🧣 W klatce szaliki zgodowe pół na pół (${kg0.nazwa.split(" ")[0]} – ${wg[0].nazwa.split(" ")[0]}), bluzy z herbami obu klubów, wspólna flaga „ZGODA” na płocie.` });
+        if (wd.length) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🧣 Na trybunie gospodarzy obok barw ${kd0.nazwa} widać też szaliki i koszulki ${wd.slice(0, 3).map((k) => k.nazwa).join(", ")} — przed meczem wymiana szali na znak przyjaźni.` });
         if (u.derby && wd.length + wg.length > 3) nm.bezp.ryzyko = Math.min(0.95, nm.bezp.ryzyko * 1.2);
         if (wg.length) nm.momentum -= 0.05 * Math.min(4, wg.length); if (wd.length) nm.momentum += 0.05 * Math.min(4, wd.length);
       }

@@ -218,13 +218,21 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       const n = ust.derby ? 140 : 60;
       const im = new THREE.InstancedMesh(new THREE.BoxGeometry(0.45, 1.05, 0.35), new THREE.MeshLambertMaterial({ color: 0xffffff }), n);
       const c1 = new THREE.Color(stroje.gosc.pole.baza), c2 = new THREE.Color(stroje.gosc.pole.dodatek), mat = new THREE.Matrix4();
-      for (let i = 0; i < n; i++) { mat.setPosition(x0 + 0.6 + Math.random() * (szer - 1.2), 2.2 + Math.floor(i / 35) * 0.7, z0 - 0.8 - Math.floor(i / 35) * 1.6 - Math.random() * 0.8); im.setMatrixAt(i, mat); im.setColorAt(i, i % 3 ? c1 : c2); }
+      const zg = (m.wsparcie?.gosc ?? []).map((w) => [new THREE.Color(w.kolory[0]), new THREE.Color(w.kolory[1])]);
+      for (let i = 0; i < n; i++) { mat.setPosition(x0 + 0.6 + Math.random() * (szer - 1.2), 2.2 + Math.floor(i / 35) * 0.7, z0 - 0.8 - Math.floor(i / 35) * 1.6 - Math.random() * 0.8); im.setMatrixAt(i, mat);
+        const zgoda = zg.length && i % 4 === 3 ? zg[i % zg.length] : null; // co czwarty kibic w barwach zgody (bluzy, koszulki z herbem)
+        im.setColorAt(i, zgoda ? zgoda[i % 2] : i % 3 ? c1 : c2); }
+      // szaliki nad głowami (pół na pół przy zgodach) — unoszone przy dopingu
+      const sz = new THREE.InstancedMesh(new THREE.BoxGeometry(0.9, 0.12, 0.04), new THREE.MeshLambertMaterial({ color: 0xffffff }), n);
+      for (let i = 0; i < n; i++) { mat.setPosition(x0 + 0.6 + (i * 0.37) % (szer - 1.2), 3.05 + Math.floor(i / 35) * 0.7, z0 - 0.8 - Math.floor(i / 35) * 1.6); sz.setMatrixAt(i, mat); sz.setColorAt(i, zg.length && i % 3 === 0 ? zg[i % zg.length][i % 2] : i % 2 ? c1 : c2); }
+      sz.visible = false; scena.add(sz); (im as any).szaliki = sz;
       scena.add(im); return im;
     })();
     // oflagowanie: flagi dzielnic, fanklubów i grup — gospodarze za bramką i wzdłuż trybuny głównej, goście na płocie klatki
-    const flagaMesh = (tekst: string, k1: string, k2: string, w: number) => {
+    const flagaMesh = (tekst: string, k1: string, k2: string, w: number, druga?: [string, string]) => {
       const c = document.createElement("canvas"); c.width = 384; c.height = 96; const g = c.getContext("2d")!;
       g.fillStyle = k1; g.fillRect(0, 0, 384, 96); g.fillStyle = k2; g.fillRect(0, 0, 384, 16); g.fillRect(0, 80, 384, 16);
+      if (druga) { g.fillStyle = druga[0]; g.fillRect(192, 0, 192, 96); g.fillStyle = druga[1]; g.fillRect(192, 0, 192, 16); g.fillRect(192, 80, 192, 16); g.fillStyle = "#ffffff"; g.fillRect(189, 0, 6, 96); } // flaga zgody — pół na pół
       const jasny = new THREE.Color(k1); g.fillStyle = jasny.r * 0.3 + jasny.g * 0.59 + jasny.b * 0.11 > 0.55 ? "#111" : "#fff";
       g.font = `bold ${tekst.length > 16 ? 28 : 38}px Arial`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(tekst.slice(0, 24), 192, 50);
       const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
@@ -234,7 +242,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       const fd = m.kultura.dom.flagi;
       // płot młyna za bramką (2 rzędy po 15) + barierka trybuny głównej (2 rzędy po 20)
       fd.forEach((f, i) => {
-        const fl = flagaMesh(f.tekst, f.kolory[0], f.kolory[1], 3.6);
+        const fl = flagaMesh(f.tekst, f.kolory[0], f.kolory[1], 3.6, f.kolory2);
         const zaBramka = i % 3 !== 2, nr = zaBramka ? Math.floor(i / 3) * 2 + (i % 3) : Math.floor(i / 3);
         if (zaBramka) { const rz = Math.floor(nr / 15), poz = nr % 15; fl.position.set(-DL / 2 - 6.6 - rz * 0.6, 1.2 + rz * 1.15, -28 + poz * 4); fl.rotation.y = Math.PI / 2; }
         else { const rz = Math.floor(nr / 20), poz = nr % 20; fl.position.set(-42 + poz * 4.4, 1.15 + rz * 1.15, SZ / 2 + 6.3 + rz * 0.6); fl.rotation.y = Math.PI; }
@@ -244,7 +252,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       (m.wsparcie?.gosc ?? []).slice(0, 4).forEach((w, i) => { const fl = flagaMesh(w.nazwa.toUpperCase(), w.kolory[0], w.kolory[1], 3); fl.position.set(DL / 2 - 12.5 + i * 3.3, 2.6, -SZ / 2 - 5.5); scena.add(fl); });
       (m.wsparcie?.dom ?? []).slice(0, 8).forEach((w, i) => { const fl = flagaMesh(w.nazwa.toUpperCase(), w.kolory[0], w.kolory[1], 3.4); fl.position.set(-DL / 2 - 6.9, 3.6, -14 + i * 4); fl.rotation.y = Math.PI / 2; scena.add(fl); });
       if (m.komentarz.some((c) => c.tekst.startsWith("🧱"))) [...m.kultura.gosc.flagi.filter((f) => f.typ === "ekipa"), ...m.kultura.gosc.flagi.filter((f) => f.typ !== "ekipa")].slice(0, 4).forEach((f, i) => {
-        const fl = flagaMesh(f.tekst, f.kolory[0], f.kolory[1], 3); fl.position.set(DL / 2 - 12.5 + i * 3.3, 1.5, -SZ / 2 - 5.4); scena.add(fl);
+        const fl = flagaMesh(f.tekst, f.kolory[0], f.kolory[1], 3, f.kolory2); fl.position.set(DL / 2 - 12.5 + i * 3.3, 1.5, -SZ / 2 - 5.4); scena.add(fl);
       });
     }
     // gniazdowi (prowadzący doping): na podeście przodem do młyna, plecami do boiska, z megafonem; drugi w klatce gości
@@ -601,7 +609,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
           else if (e.typ === "balon") e.obj.position.y += dt * (0.8 + (e.t % 1) * 0.6);
           else if (e.typ === "ogien") e.obj.scale.set(1 + Math.sin(e.t * 20) * 0.15, 1 + Math.sin(e.t * 13) * 0.2, 1);
           else if (e.typ === "postac") e.obj.position.y = 15 + Math.abs(Math.sin(e.t * 6)) * 0.3; }
-        if (gosciFani) { gosciFani.position.y = Math.abs(Math.sin(czas * 5)) * 0.18 * (0.4 + emocje); }
+        if (gosciFani) { gosciFani.position.y = Math.abs(Math.sin(czas * 5)) * 0.18 * (0.4 + emocje); const sz = (gosciFani as any).szaliki as THREE.InstancedMesh | undefined; if (sz) { sz.visible = emocje > 0.55 || Math.sin(czas * 0.15) > 0.85; sz.position.y = gosciFani.position.y; } }
         if (strumien && armatka) { armatkaT = Math.max(0, armatkaT - dt); strumien.visible = armatkaT > 0; if (armatkaT > 0) { strumien.scale.set(1, 0.9 + Math.random() * 0.2, 1); (armatka.children[armatka.children.length - 2] as THREE.Object3D).rotation.y = Math.sin(czas * 1.5) * 0.3; } }
         // sędzia techniczny: tablica z doliczonym czasem i numerami przy zmianach
         if (m.zmianyLog.length > ostZmian) { const x = m.zmianyLog[m.zmianyLog.length - 1]; ostZmian = m.zmianyLog.length; rysujTab(String(s.zawodnicy[x.schodzi]?.numer ?? ""), String(s.zawodnicy[x.wchodzi]?.numer ?? "")); tabT = 4.5; }

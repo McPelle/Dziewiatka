@@ -6,6 +6,7 @@ import { MIASTA, odlegloscMiast } from "../data/miasta";
 import type { Klub, StanGry } from "./types";
 import { barwyKlubu } from "../data/barwy";
 import { GRUPY_KIBICOW } from "../data/grupyKibicow";
+import { RELACJE_KIBICOW } from "../data/relacjeKibicow";
 
 export const DZIELNICE: Record<string, string[]> = {
   Gdańsk: ["Wrzeszcz", "Oliwa", "Przymorze", "Zaspa", "Chełm", "Orunia", "Stogi", "Morena", "Siedlce", "Brzeźno", "Nowy Port", "Osowa"],
@@ -26,7 +27,7 @@ function rng(seed: string) { let h = 2166136261; for (const c of seed) h = Math.
 const krot = (k: Klub) => k.nazwa.split(" ").filter((w) => w.length > 2 && !/^(KS|MKS|GKS|LKS|LZS|TS|SKS|KP|MZKS|ZKS|FC|II|III|Sp)$/.test(w))[0] ?? k.nazwa;
 
 export type TypFlagi = "klub" | "ekipa" | "dzielnica" | "fanklub" | "grupa" | "zgoda" | "haslo";
-export interface Flaga { tekst: string; typ: TypFlagi; kolory: [string, string] }
+export interface Flaga { tekst: string; typ: TypFlagi; kolory: [string, string]; kolory2?: [string, string] /* flaga zgody: druga połowa w barwach zgody */ }
 export interface KulturaTrybun { mlyn: string; gniazdowy: boolean; grupy: string[]; flagi: Flaga[]; pirotechnika: number /* 0–1 skłonność */; zgody?: string[]; realne?: boolean }
 
 /** Ile flag / jak „mocna" scena kibicowska wg szczebla i renomy. */
@@ -49,6 +50,11 @@ export function kulturaTrybun(s: StanGry, k: Klub, kolory: [string, string] = ba
   for (const m of okolica.slice(0, Math.ceil(nFlag * 0.35))) flagi.push({ tekst: `FANKLUB ${m.toUpperCase()}`, typ: "fanklub", kolory: [kolory[1], kolory[0]] });
   for (const g of grupy) flagi.push({ tekst: g.toUpperCase(), typ: "grupa", kolory: ["#111111", kolory[0]] });
   if (sl > 0.15) flagi.push({ tekst: pick([`ZAWSZE WIERNI ${K.toUpperCase()}`, `${k.miasto.toUpperCase()} TO MY`, "WIERNI DO KOŃCA", `DUMA ${k.miasto.toUpperCase()}`, `${K.toUpperCase()} PONAD WSZYSTKO`]), typ: "haslo", kolory });
+  // flagi zgód i układów (pół na pół w barwach obu klubów) — wiszą obok flag klubu
+  const flagiZgod: Flaga[] = RELACJE_KIBICOW.filter((r) => r.typ !== "kosa" && (r.a === k.nazwa || r.b === k.nazwa)).slice(0, 4).map((r) => {
+    const inny = r.a === k.nazwa ? r.b : r.a;
+    return { tekst: `${r.typ === "zgoda" ? "ZGODA" : "UKŁAD"} ${krot(k).toUpperCase()} – ${inny.split(" ").filter((w) => w.length > 2)[0]?.toUpperCase() ?? inny.toUpperCase()}`, typ: "zgoda" as TypFlagi, kolory, kolory2: barwyKlubu(inny) };
+  });
   const real = GRUPY_KIBICOW[k.nazwa];
   if (real) {
     // prawdziwe nazwy z danych: trybuna, grupy (ultras + ekipy), fankluby, zgody — flagi na płocie
@@ -61,10 +67,10 @@ export function kulturaTrybun(s: StanGry, k: Klub, kolory: [string, string] = ba
     for (const d of dz) fl.push({ tekst: d.toUpperCase(), typ: "dzielnica", kolory });
     for (const m of okolica.slice(0, 10)) fl.push({ tekst: `FANKLUB ${m.toUpperCase()}`, typ: "fanklub", kolory: [kolory[1], kolory[0]] });
     for (const n of s.noweFlagi?.[k.nazwa] ?? []) fl.push({ tekst: n.tekst, typ: n.typ as TypFlagi, kolory: n.typ === "grupa" ? ["#111111", kolory[0]] : kolory });
-    return { mlyn: real.trybuna?.[0] ? `Młyn — ${real.trybuna[0]}` : mlyn, gniazdowy: true, grupy: gr.length ? gr : grupy, flagi: fl.slice(0, 44), pirotechnika: Math.min(0.9, Math.max(0.35, sl * 1.1)), zgody: real.zgody, realne: true };
+    return { mlyn: real.trybuna?.[0] ? `Młyn — ${real.trybuna[0]}` : mlyn, gniazdowy: true, grupy: gr.length ? gr : grupy, flagi: [...fl.slice(0, 2), ...flagiZgod, ...fl.slice(2)].slice(0, 46), pirotechnika: Math.min(0.9, Math.max(0.35, sl * 1.1)), zgody: real.zgody, realne: true };
   }
   const lista = [...flagi.slice(0, Math.max(1, nFlag + 1)), ...(s.noweFlagi?.[k.nazwa] ?? []).map((n) => ({ tekst: n.tekst, typ: n.typ as TypFlagi, kolory: (n.typ === "grupa" ? ["#111111", kolory[0]] : kolory) as [string, string] }))];
-  return { mlyn, gniazdowy: sl > 0.18, grupy, flagi: lista.slice(0, 44), pirotechnika: Math.min(0.9, sl * 1.1) };
+  return { mlyn, gniazdowy: sl > 0.18, grupy, flagi: [...lista.slice(0, 1), ...flagiZgod, ...lista.slice(1)].slice(0, 46), pirotechnika: Math.min(0.9, sl * 1.1) };
 }
 
 /** Okrzyki młyna w trakcie meczu (do relacji na żywo). */
