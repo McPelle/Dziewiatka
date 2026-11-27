@@ -32,7 +32,7 @@ function Europa({ s }: { s: StanGry }) {
   return (
     <View style={st.karta}>
       <View style={[st.wiersz, { alignItems: "center", gap: 10 }]}>
-        <EmblematRozgrywek rozgrywki={e.rozgrywki} rozmiar={34} />
+        <LogoLigi nazwa={NAZWA_ROZGRYWEK[e.rozgrywki]} rozmiar={42} />
         <Text style={st.naglowek}>{NAZWA_ROZGRYWEK[e.rozgrywki]}</Text>
       </View>
       <Text style={[st.tytul, { color: naglowek, fontSize: 18, marginTop: 4 }]}>{status}</Text>
@@ -170,6 +170,15 @@ export function PucharEkran({ s }: { s: StanGry }) {
 
   return (
     <ScrollView style={st.ekran} contentContainerStyle={{ paddingBottom: 30 }}>
+      {s.superpuchar && (
+        <View style={[st.karta, st.wiersz, { gap: 12, alignItems: "center" }]}>
+          <LogoLigi nazwa="Superpuchar Polski" rozmiar={58} />
+          <View style={{ flex: 1 }}>
+            <Text style={st.naglowek}>Superpuchar Polski {s.superpuchar.sezon}</Text>
+            <Text style={[st.tekst, { fontWeight: "800" }]}>🏆 {s.superpuchar.zwyciezca}</Text>
+            <Text style={st.maly}>{s.superpuchar.zwyciezca} — {s.superpuchar.przegrany}: {s.superpuchar.wynik} · mistrz kontra zdobywca Pucharu Polski, przy remisie od razu rzuty karne</Text>
+          </View>
+        </View>)}
       <Europa s={s} />
       <View style={st.karta}>
         <View style={[st.wiersz, { gap: 12 }]}>

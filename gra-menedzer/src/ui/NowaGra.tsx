@@ -5,7 +5,9 @@ import { nowaGra, silaKlubu } from "../engine/swiat";
 import { rozpocznijKariere } from "../engine/sezon";
 import type { StanGry } from "../engine/types";
 import { Herb } from "./Herb";
-import { HerbGenerowany } from "./HerbGen";
+import { LogoLigi } from "./LogoLigi";
+import Svg, { Path } from "react-native-svg";
+import { kontur } from "../data/granice";
 import { KreatorKlubu } from "./KreatorKlubu";
 import { stworzWlasnyKlub } from "../engine/wlasnyKlub";
 import { CZCIONKA, cien, K, st } from "./styl";
@@ -23,13 +25,20 @@ const BARWY_WOJ: Record<string, [string, string]> = {
   "Zachodniopomorskie": ["#1b4b86", "#e24b4b"],
   "Kujawsko-pomorskie": ["#9c1b1b", "#f0c23a"],
 };
-const crestLigi = (idx: number, r = 38) => {
-  const [nazwa, tlo, akcent] = BARWY_LIGI[Math.min(idx, 3)];
-  return <HerbGenerowany nazwa={nazwa} tlo={tlo} akcent={akcent} rozmiar={r} />;
-};
+// Oryginalne logo lig (bez generowanych odznak) i kontury województw (prawdziwe granice) zamiast wymyślonych herbów.
+const NAZWY_LOGO = ["PKO BP Ekstraklasa", "Betclic 1. Liga", "Betclic 2. Liga", "Betclic 3. Liga"];
+const crestLigi = (idx: number, r = 38) => (
+  <View style={{ width: r * 1.25, height: r, alignItems: "center", justifyContent: "center" }}>
+    <LogoLigi nazwa={NAZWY_LOGO[Math.min(idx, 3)]} poziom={idx + 1} rozmiar={idx === 0 ? r * 0.27 : r * 0.9} />
+  </View>);
+const KLUCZ_WOJ: Record<string, string> = { "Małopolskie": "małopolskie", "Pomorskie": "pomorskie", "Zachodniopomorskie": "zachodniopomorskie", "Kujawsko-pomorskie": "kujawsko-pomorskie" };
 const crestWoj = (label: string, r = 38) => {
   const [tlo, akcent] = BARWY_WOJ[label] ?? ["#1a3a2a", "#ffce47"];
-  return <HerbGenerowany nazwa={label} tlo={tlo} akcent={akcent} rozmiar={r} />;
+  const kt = kontur(KLUCZ_WOJ[label] ?? ""); if (!kt.length) return <LogoLigi nazwa={label} rozmiar={r * 0.8} />;
+  const lo = kt.map((q) => q[0]), la = kt.map((q) => q[1]); const [a, b, c, d] = [Math.min(...lo), Math.max(...lo), Math.min(...la), Math.max(...la)];
+  const cos = Math.cos(((c + d) / 2) * Math.PI / 180), w = (b - a) * cos, h = d - c, sk = 90 / Math.max(w, h);
+  const path = kt.map(([x, y], i) => `${i ? "L" : "M"}${(5 + ((x - a) * cos) * sk + (90 - w * sk) / 2).toFixed(1)},${(5 + (d - y) * sk + (90 - h * sk) / 2).toFixed(1)}`).join("") + "Z";
+  return <Svg width={r * 1.15} height={r * 1.15} viewBox="0 0 100 100"><Path d={path} fill={tlo} stroke={akcent} strokeWidth={4} strokeLinejoin="round" /></Svg>;
 };
 
 // ——— Struktura wyboru: ligi krajowe + województwa (IV liga → klasa B) ———
@@ -217,7 +226,7 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
         <Pasek tytul={woj.label} pod="Wybierz szczebel (IV liga → klasa B)" onBack={() => setWidok({ typ: "root" })} />
         <ScrollView contentContainerStyle={{ padding: 10, paddingBottom: 26 }}>
           {poziomy.map((p) => (
-            <Pozycja key={p.label} herb={crestWoj(woj.label)} tytul={p.label} pod={p.grupy.length > 1 ? `${p.grupy.length} grup` : p.grupy[0].nazwa}
+            <Pozycja key={p.label} herb={<View style={{ width: 46, height: 38, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={p.label} rozmiar={30} /></View>} tytul={p.label} pod={p.grupy.length > 1 ? `${p.grupy.length} grup` : p.grupy[0].nazwa}
               onPress={() => p.grupy.length > 1 ? setWidok({ typ: "wojLevel", wi: widok.wi, label: p.label, grupy: p.grupy }) : otworzKluby(p.grupy[0].sciezkaId, p.grupy[0].idx, p.grupy[0].nazwa, { typ: "woj", wi: widok.wi })} />
           ))}
         </ScrollView>

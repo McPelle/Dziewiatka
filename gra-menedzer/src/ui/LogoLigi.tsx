@@ -10,8 +10,16 @@ const LOGA = {
   l3: require("../../assets/ligi/3liga.png"),
   superpuchar: require("../../assets/ligi/superpuchar.png"),
   pucharpolski: require("../../assets/ligi/pucharpolski.png"),
+  lm: require("../../assets/ligi/ligamistrzow.png"),
+  le: require("../../assets/ligi/ligaeuropy.png"),
+  lk: require("../../assets/ligi/ligakonferencji.png"),
 };
+// proporcje (szerokość / wysokość) wyciętych logo — bez tła, jasne wersje dla ciemnego interfejsu
+const PROP: Record<keyof typeof LOGA, number> = { ekstraklasa: 4.65, l1: 0.92, l2: 0.92, l3: 0.92, superpuchar: 0.835, pucharpolski: 0.575, lm: 1.05, le: 0.685, lk: 1.01 };
 export function kluczLogoLigi(nazwa: string, poziom?: number): keyof typeof LOGA | null {
+  if (/Liga Mistrz|Champions|\bLM\b|UCL/i.test(nazwa)) return "lm";
+  if (/Liga Europy|Europa League|\bLE\b|UEL/i.test(nazwa)) return "le";
+  if (/Liga Konferencji|Conference|\bLK\b|UECL/i.test(nazwa)) return "lk";
   if (/Superpuchar/i.test(nazwa)) return "superpuchar";
   if (/Puchar Polski/i.test(nazwa)) return "pucharpolski";
   if (/Ekstraklasa/i.test(nazwa) || poziom === 1) return "ekstraklasa";
@@ -25,7 +33,7 @@ export function kluczLogoLigi(nazwa: string, poziom?: number): keyof typeof LOGA
 export function LogoLigi({ nazwa, poziom, rozmiar = 28 }: { nazwa: string; poziom?: number; rozmiar?: number }) {
   const k = kluczLogoLigi(nazwa, poziom);
   if (k) {
-    const szer = k === "ekstraklasa" ? rozmiar * 4.5 : k === "pucharpolski" ? rozmiar * 0.58 : rozmiar * 0.92;
+    const szer = rozmiar * PROP[k];
     return <Image source={LOGA[k]} style={{ width: szer, height: rozmiar, resizeMode: "contain" }} />;
   }
   const skrot = /Puchar|PP/i.test(nazwa) ? "🏆" : /IV liga/i.test(nazwa) ? "IV" : /V liga/i.test(nazwa) ? "V" : /okręg/i.test(nazwa) ? "OKR" : /klasa A|A klasa/i.test(nazwa) ? "A" : /klasa B|B klasa/i.test(nazwa) ? "B" : /klasa C|C klasa/i.test(nazwa) ? "C" : "•";
