@@ -14,6 +14,7 @@ import {
 import { etykietaPoz, ETYKIETA_POZ, SKROT_POZ } from "../data/pozycje";
 import { roleDla, rolaZawodnika } from "../data/role";
 import type { AtrybutKlucz } from "../engine/types";
+import { jezykZawodnika, mowiPoAngielskuZamiastOjczystego, NAZWA_JEZYKA, NAZWA_POZIOMU, polski, poziom } from "../engine/jezyki";
 import { narodowoscKraju } from "../data/narodowosci";
 import { barwyKlubu } from "./barwy";
 import { EdytorZawodnika } from "./EdytorZawodnika";
@@ -128,6 +129,12 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
                   <Text style={[st.maly, { marginTop: 2 }]}>
                     <Text style={{ color: KOLOR_POZ[z.poz], fontWeight: "700" }}>{etykietaPoz(z.poz, z.pozS)}</Text>{z.pozycjeDodatkowe?.length ? <Text style={{ color: K.niebieski }}> (też: {z.pozycjeDodatkowe.map((p) => SKROT_POZ[p]).join(", ")})</Text> : null} · {narodowoscKraju(z.kraj)?.flaga ?? "🇵🇱"} {z.kraj ?? "Polska"}{z.kraj && !narodowoscKraju(z.kraj)?.ue ? " (spoza UE)" : ""} · noga {NOGA_NAZWA[z.noga]}
                   </Text>
+                  {z.kraj && z.kraj !== "Polska" && (
+                    <View style={{ marginTop: 4 }}>
+                      <Text style={[st.maly]}>🗣 Język ojczysty: <Text style={{ color: K.tekst, fontWeight: "700" }}>{NAZWA_JEZYKA[jezykZawodnika(z)]}</Text>{mowiPoAngielskuZamiastOjczystego(z) ? " (w szatni po angielsku)" : ""} · polski: <Text style={{ color: polski(z) >= 80 ? K.zielony : polski(z) >= 55 ? K.akcent : K.czerwony, fontWeight: "700" }}>{Math.round(polski(z))}% — {NAZWA_POZIOMU[poziom(polski(z))]}</Text></Text>
+                      <View style={{ height: 4, backgroundColor: "#173126", borderRadius: 2, marginTop: 3, width: 160 }}><View style={{ width: `${Math.round(polski(z))}%`, height: 4, backgroundColor: polski(z) >= 80 ? K.zielony : polski(z) >= 55 ? K.akcent : K.czerwony, borderRadius: 2 }} /></View>
+                    </View>
+                  )}
                   <Text style={[st.maly, { marginTop: 2 }]}>
                     🎂 ur. <Text style={{ fontWeight: "700", color: K.tekst }}>{dataUrodzenia(z, s.sezon)}</Text> ({z.wiek} {z.wiek % 10 >= 2 && z.wiek % 10 <= 4 && (z.wiek % 100 < 12 || z.wiek % 100 > 14) ? "lata" : "lat"}){z.wzrost ? ` · ${z.wzrost} cm` : ""}{z.realny && z.wartoscReal ? ` · realna wycena (start gry): ${z.wartoscReal >= 1e6 ? (z.wartoscReal / 1e6).toLocaleString("pl-PL") + " mln €" : Math.round(z.wartoscReal / 1e3) + " tys. €"}` : ""}
                   </Text>

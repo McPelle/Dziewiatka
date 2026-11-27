@@ -9,6 +9,7 @@ import { KalendarzMiesiac } from "./KalendarzMiesiac";
 import { KartaDnia } from "./KartaDnia";
 import { paraMojegoMeczu } from "../engine/meczNaZywo";
 import { meczPucharuGracza } from "../engine/puchar";
+import { TreningNaZywo } from "./TreningNaZywo";
 
 /** Panel kalendarza na pulpicie: dzisiejszy dzień, plan tygodnia, raport ostatniego dnia, przyciski Dalej / Do meczu. */
 export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => void; pokazMecz: () => void }) {
@@ -16,6 +17,7 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
   const [naZywo, setNaZywo] = useState<[string, string] | null>(null);
   const [pucharLive, setPucharLive] = useState<ReturnType<typeof meczPucharuGracza>>(null);
   const [miesiac, setMiesiac] = useState(false);
+  const [treningLive, setTreningLive] = useState(false);
   const [karta, setKarta] = useState<number | null>(null);
   if (s.okres) return <PanelOkresu s={s} odswiez={odswiez} />;
   const plan = planTygodnia(s);
@@ -59,6 +61,11 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
             <Text style={[st.przyciskMalyTekst, { color: K.akcent }]}>{zapisanyMecz(s, paraMojegoMeczu(s)!) ? `▶ Wznów (${zapisanyMecz(s, paraMojegoMeczu(s)!)!.m.min}')` : "📺 Na żywo"}</Text>
           </Pressable>
         )}
+        {(d.typ === "trening" && (!d.akt || d.akt.rodzaj === "trening")) && (
+          <Pressable style={[st.przyciskMaly, { justifyContent: "center", borderColor: K.akcent }]} onPress={() => setTreningLive(true)}>
+            <Text style={[st.przyciskMalyTekst, { color: K.akcent }]}>📺 Trening na żywo</Text>
+          </Pressable>
+        )}
         {d.typ === "puchar" && !s.meczLivePuchar && meczPucharuGracza(s) && (
           <Pressable style={[st.przyciskMaly, { justifyContent: "center", borderColor: K.akcent }]} onPress={() => setPucharLive(meczPucharuGracza(s))}>
             <Text style={[st.przyciskMalyTekst, { color: K.akcent }]}>{zapisanyMecz(s, meczPucharuGracza(s)!.para) ? "▶ Wznów puchar" : "🏆 Puchar na żywo"}</Text>
@@ -75,6 +82,7 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
         wydarzenia={plan[karta] ? [{ ikona: plan[karta].ikona, tekst: plan[karta].tytul }] : []}
         zablokowany={plan[karta]?.typ === "mecz" ? "Dzień meczu — rozruch i mecz." : plan[karta]?.typ === "puchar" ? "Mecz pucharowy." : karta < d.idx ? "Ten dzień już minął." : null}
         onClose={() => setKarta(null)} />}
+      {treningLive && <TreningNaZywo s={s} dzien={d} onAnuluj={() => setTreningLive(false)} onKoniec={(ses) => { s.treningLive = ses; setTreningLive(false); dalejDzien(s); odswiez(); }} />}
       {pucharLive && <MeczNaZywo s={s} para={pucharLive.para} puchar={pucharLive} onAnuluj={() => setPucharLive(null)} onKoniec={(m) => { s.meczLivePuchar = m; setPucharLive(null); dalejDzien(s); odswiez(); }} />}
       {naZywo && <MeczNaZywo s={s} para={naZywo} onAnuluj={() => setNaZywo(null)} onKoniec={(m) => { s.meczLive = m; setNaZywo(null); const mecz = dalejDzien(s); odswiez(); if (mecz) pokazMecz(); }} />}
     </View>

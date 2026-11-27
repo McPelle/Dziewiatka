@@ -6,6 +6,9 @@
 // • Zachodniopomorski ZPN — IV liga, okręgówka, A klasa 7, B klasa: zmiany powrotne bez limitu;
 // • Kujawsko-Pomorski ZPN — IV liga, okręgówka, A klasa 5, B klasa 7.
 // Po meczu wynik (gole, kartki, urazy, zmiany, kondycja) trafia do zwykłej kolejki jako „scenariusz" meczu.
+import { jezykKraju, PO_JEZYKU } from "./jezyki";
+import { losujIncydent } from "./bezpieczenstwo";
+import { okrzykMlyna } from "./flagi";
 import { los, losInt, szansa, wybierz, wybierzWazone } from "./losuj";
 import { autoSklad, dostepny, efektywna, FORMACJE, silaSkladu } from "./mecz";
 import { formacjaAI } from "./sezon";
@@ -52,6 +55,20 @@ export interface MeczLive {
   dotkniecia: Record<string, number>; // ile razy był przy piłce (heatmapa / aktywność)
   /** Mecz pucharowy: przy remisie dogrywka (2×15) albo od razu rzuty karne — wg regulaminu ZPN / PZPN. */
   puchar?: { nazwa: string; dogrywka: boolean };
+  /** Przedmecz: wybrana mowa w szatni i rozgrzewka (gotowe = można wyjść z tunelu). */
+  przedmecz?: { mowa?: import("./przedmecz").MowaPrzed; rozgrzewka?: import("./przedmecz").Rozgrzewka; gotowe?: boolean };
+  /** Wejście w mecz po rozgrzewce: mnożnik siły ataku mojej drużyny do danej minuty. */
+  rozruch?: { do: number; mn: number };
+  /** Bezpieczeństwo: plan zabezpieczenia (mecz u siebie), ryzyko i incydenty na trybunach. */
+  bezp?: { ryzyko: number; plan?: import("./bezpieczenstwo").Zabezpieczenie; derby: boolean; widzowie: number };
+  incydenty?: import("./bezpieczenstwo").Incydent[];
+  incydentTeraz?: import("./bezpieczenstwo").Incydent;
+  akcjeKibicow?: import("./kibice").AkcjaKibicow[]; akcjeIdx?: number;
+  oprawa?: import("./oprawy").Oprawa; oprawaGosci?: import("./oprawy").Oprawa;
+  oprawyPlan?: import("./oprawy").PokazOprawy[];
+  kultura?: { dom: import("./flagi").KulturaTrybun; gosc: import("./flagi").KulturaTrybun };
+  transparentTeraz?: { tekst: string; sektor: "gospodarzy" | "gosci"; min: number };
+  wizualTeraz?: { typ: "dach" | "dron" | "kukla" | "balony" | "pirotechnika" | "graffiti" | "papier"; sektor: "gospodarzy" | "gosci"; min: number };
   /** Seria rzutów karnych (po 5, potem do pierwszej pomyłki). */
   karne?: { d: boolean[]; g: boolean[]; wykD: string[]; wykG: string[]; zwyciezca?: "dom" | "gosc" };
 }
@@ -89,6 +106,9 @@ export function rozpocznijMeczNaZywo(s: StanGry, domId: string, goscId: string):
   const kd = s.kluby[domId], kg = s.kluby[goscId];
   m.komentarz.unshift({ min: "0'", typ: "info", tekst: `Witamy na ${kd.stadion ?? `stadionie w ${kd.miasto}`}! ${kd.nazwa} podejmuje ${kg.nazwa}. Ustawienia: ${m.dom.formacja} kontra ${m.gosc.formacja}.` });
   m.komentarz.unshift({ min: "1'", typ: "info", tekst: `Sędzia ${m.var ? "(z wozem VAR) " : ""}gwiżdże — zaczynamy! ${poziom >= 7 ? "Kameralna atmosfera, kibice przy barierkach." : poziom <= 3 ? "Trybuny pełne, doping niesie się po stadionie." : "Na trybunach spora grupa miejscowych kibiców."}` });
+  for (const k of [kd, kg]) if (k.trenerKraj && k.id !== s.mojKlub && (k.trenerPolski ?? 0) < 55) {
+    m.komentarz.unshift({ min: "0'", typ: "info", tekst: `🌍 Na ławce ${k.nazwa} trener ${k.trenerImie ?? ""} ${k.trenerNazwisko ?? ""} (${k.trenerKraj}) — wskazówki z ławki płyną ${PO_JEZYKU[jezykKraju(k.trenerKraj)]}, asystent tłumaczy zawodnikom.` });
+  }
   return m;
 }
 
@@ -117,6 +137,7 @@ export function tempoGoli(s: StanGry, m: MeczLive): [number, number] {
   const o = okrz(m);
   const [mojeL, ichL] = o === "naprzod" ? [1.12, 1.06] : o === "spokojnie" ? [0.95, 0.95] : o === "skrzydla" ? [1.04, 1] : o === "pressing" ? [1.05, 0.96] : o === "czas" ? [0.82, 0.88] : [1, 1];
   if (m.moja === "dom") { lamD *= mojeL * m.motMoj; lamG *= ichL; } else { lamG *= mojeL * m.motMoj; lamD *= ichL; }
+  if (m.rozruch && m.min <= m.rozruch.do) { if (m.moja === "dom") lamD *= m.rozruch.mn; else lamG *= m.rozruch.mn; }
   return [lamD / 90 * KALIBRACJA, lamG / 90 * KALIBRACJA];
 }
 
@@ -151,6 +172,28 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
   if (m.min === 91 && m.polowa === 2) m.komentarz.unshift({ min: "90'", typ: "info", tekst: `⏱ Tablica w górze: ${m.dolicz[1]} min doliczonego czasu!` });
   const [lD, lG] = tempoGoli(s, m);
   let gol = false;
+  // trybuny: race, rzucanie przedmiotów, wtargnięcia, bójki — zależnie od ochrony (mecz u siebie) i kibiców
+  m.incydentTeraz = undefined;
+  // doping młyna (co jakiś czas, zależnie od wyniku)
+  if (m.kultura?.dom.gniazdowy && m.bezp && m.bezp.widzowie > 0 && Math.random() < 0.05) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: okrzykMlyna(s.kluby[m.dom.klubId], m.kultura.dom, m.gd - m.gg) });
+  for (const p of m.oprawyPlan ?? []) if (p.min > 1 && p.min === m.min) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: `🎆 ${p.sektor === "gosci" ? "Klatka gości" : "Trybuna gospodarzy"} — kolejna oprawa: ${p.o.opis}` });
+  // zaplanowane akcje kibiców (transparenty, przyśpiewki, flaga, przepychanki przy klatce)
+  while (m.akcjeKibicow && (m.akcjeIdx ?? 0) < m.akcjeKibicow.length && m.akcjeKibicow[m.akcjeIdx ?? 0].min <= m.min) {
+    const a = m.akcjeKibicow[m.akcjeIdx ?? 0]; m.akcjeIdx = (m.akcjeIdx ?? 0) + 1;
+    if (a.min > 0) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: a.tekst });
+    if (a.transparent) m.transparentTeraz = { tekst: a.transparent, sektor: a.sektor, min: m.min };
+    if (a.doping) m.momentum += (a.sektor === "gospodarzy" ? 1 : -1) * a.doping * 0.08;
+    if (a.kara) (m.incydenty ??= []).push({ typ: a.szkody ? "bojka" : a.kara >= 2 ? "race" : "transparent", min: m.min, sektor: a.sektor, opis: a.tekst.replace(/^\S+\s/, ""), opanowany: (a.kara ?? 0) < 3 });
+    if (a.wizual) m.wizualTeraz = { typ: a.wizual, sektor: a.sektor, min: m.min };
+    if (a.opoznienie) { m.dolicz[m.polowa === 1 ? 0 : 1] = Math.min(10, m.dolicz[m.polowa === 1 ? 0 : 1] + a.opoznienie); }
+  }
+  if (m.bezp && m.bezp.widzowie > 0 && m.min > 2 && Math.random() < m.bezp.ryzyko / 85) {
+    const inc = losujIncydent(m.polowa === 1 ? Math.min(45, m.min) : m.min, m.bezp.plan, m.bezp.derby);
+    (m.incydenty ??= []).push(inc); m.incydentTeraz = inc;
+    if (inc.typ === "race") m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: "🥷 Przed odpaleniem grupa w sektorze przebrała się: czarne peleryny, kominiarki, kaptury — kamery widzą tylko ciemną plamę." });
+    m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: `🚨 ${inc.opis} ${inc.opanowany ? "Stewardzi szybko opanowali sytuację." : m.bezp.derby && inc.typ === "bojka" ? "Ochrona nie nadąża — policja wkracza, za stadionem pracuje armatka wodna!" : "Ochrona nie nadąża — wkracza policja, gra przerwana na kilka minut."}` });
+    if (!inc.opanowany && (inc.typ === "race" || inc.typ === "przedmioty")) { m.dolicz[m.polowa === 1 ? 0 : 1] = Math.min(9, m.dolicz[m.polowa === 1 ? 0 : 1] + 2); }
+  }
   m.momentum *= 0.9;
   const pD = Math.max(0.28, Math.min(0.72, 0.5 + (lD - lG) * 22 + m.momentum * 0.08));
   const strona: "dom" | "gosc" = Math.random() < pD ? "dom" : "gosc";

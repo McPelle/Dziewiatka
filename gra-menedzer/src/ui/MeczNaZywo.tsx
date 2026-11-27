@@ -14,6 +14,12 @@ import { CZCIONKA, K, st } from "./styl";
 import { dobierzStroje, dostepneStroje, kity, type Kit } from "./strojeDane";
 import { Mecz3D, type Kamera, type Ustawienia3D } from "./three/Mecz3D";
 import { Szatnia3D } from "./three/Szatnia3D";
+import { PrzedMeczem } from "./PrzedMeczem";
+import { planZabezpieczenia, ryzykoIncydentow } from "../engine/bezpieczenstwo";
+import { akcjeKibicow, sektorGosci } from "../engine/kibice";
+import { kulturaTrybun } from "../engine/flagi";
+import { planOpraw } from "../engine/oprawy";
+import { zgodaKibicow } from "../engine/kibice";
 import { grafika3D, lekkaGrafika } from "./three/Stadion3DWidok";
 import { czyWyciszony, gwizdek, startDzwieku, stopDzwieku, wycisz } from "./three/dzwiek";
 import { glosDostepny, glosWlaczony, mow, plecZImienia, ustawGlos, zamilknij } from "./three/glos";
@@ -60,6 +66,33 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
     const z = zapisanyMecz(s, para);
     if (z) { for (const [id, k] of Object.entries(z.kond)) if (s.zawodnicy[id]) s.zawodnicy[id].kondycja = k; z.m.komentarz.unshift({ min: `${z.m.min}'`, typ: "info", tekst: "▶ Wznowiono zapisany mecz." }); return z.m; }
     const nm = rozpocznijMeczNaZywo(s, para[0], para[1]);
+    { // bezpieczeństwo meczu: plan ochrony (u siebie płaci klub), ryzyko incydentów, oprawa na start
+      const u = warunki(s, para[0], para[1]), kd0 = s.kluby[para[0]], kg0 = s.kluby[para[1]];
+      const plan = para[0] === s.mojKlub ? planZabezpieczenia(s, kd0, u.widzowie, !!u.derby) : undefined;
+      nm.bezp = { ryzyko: ryzykoIncydentow(s, kd0, kg0, u.widzowie, !!u.derby, plan), plan, derby: !!u.derby, widzowie: u.widzowie };
+      // oprawy — kilka w meczu (derby, zgody, wielkie mecze), każda inna, nigdy się nie powtarza
+      const dn = jestDerby(s, para[0], para[1]), zg = zgodaKibicow(s, kd0, kg0);
+      const sg0 = sektorGosci(s, kd0, !!u.derby);
+      const planOp = u.widzowie > 0 ? planOpraw(s, kd0, kg0, { derby: dn, zgoda: zg, puchar: !!puchar, gosci: sg0.zamkniety ? 0 : sg0.miejsca, silaD: kulturaTrybun(s, kd0).pirotechnika, silaG: kulturaTrybun(s, kg0).pirotechnika }) : [];
+      nm.oprawyPlan = planOp; nm.incydenty = [];
+      if (zg) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🤝 ${zg} — na trybunach święto zgody: wspólne przyśpiewki, wymiana szalików i flagi obu klubów obok siebie.` });
+      for (const p of planOp) {
+        nm.incydenty.push({ typ: "oprawa", min: p.min, sektor: p.sektor, opis: `Oprawa ${p.sektor === "gosci" ? "gości" : "gospodarzy"}: ${p.o.opis}`, opanowany: true });
+        if (p.o.obrazliwa) { nm.incydenty.push({ typ: "transparent", min: p.min + 1, sektor: p.sektor, opis: "Obraźliwa oprawa wobec rywala — delegat w protokole.", opanowany: true }); nm.bezp.ryzyko = Math.min(0.95, nm.bezp.ryzyko * 1.3); }
+        if (p.o.pirotechnika) nm.incydenty.push({ typ: "race", min: p.min + 1, sektor: p.sektor, opis: "Pirotechnika podczas oprawy — zamaskowani odpalają race i stroboskopy.", opanowany: true });
+      }
+      nm.oprawa = planOp.find((p) => p.sektor === "gospodarzy" && p.min === 0)?.o; nm.oprawaGosci = planOp.find((p) => p.sektor === "gosci" && p.min <= 1)?.o;
+      for (const p of planOp.filter((x) => x.min <= 1)) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🎆 ${p.sektor === "gosci" ? "Klatka gości" : "Trybuna gospodarzy"}: ${p.o.opis}` });
+      const sg = sektorGosci(s, kd0, !!u.derby);
+      const gosci = u.widzowie > 0 && !sg.zamkniety ? Math.min(sg.miejsca, Math.round(sg.miejsca * (u.derby ? 0.95 : 0.35 + kg0.renoma * 0.5))) : 0;
+      nm.kultura = { dom: kulturaTrybun(s, kd0), gosc: kulturaTrybun(s, kg0) };
+      nm.akcjeKibicow = akcjeKibicow(s, kd0, kg0, !!u.derby, !!u.derby, gosci); nm.akcjeIdx = 0;
+      for (const a of nm.akcjeKibicow.filter((x) => x.min === 0)) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: a.tekst });
+      const a0 = nm.akcjeKibicow.find((x) => x.min === 0 && x.transparent); if (a0) nm.transparentTeraz = { tekst: a0.transparent!, sektor: a0.sektor, min: 0 };
+      nm.akcjeIdx = nm.akcjeKibicow.filter((x) => x.min === 0).length;
+      if (gosci > 0) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🧱 Sektor gości („klatka”, ogrodzenie 2,2 m): ${gosci.toLocaleString("pl")} kibiców ${kg0.nazwa} na ${sg.miejsca.toLocaleString("pl")} miejsc (${Math.round(sg.procent * 100)}% stadionu; PZPN wymaga min. 5%).` });
+      if (plan) nm.komentarz.unshift({ min: "0'", typ: "info", tekst: plan.masowa ? `🛡 Zabezpieczenie: ${plan.ochroniarze} stewardów, ${plan.koordynatorzy} koordynatorów${plan.zgodne ? "" : " (PONIŻEJ minimum z ustawy!)"} · policja z urzędu: ${plan.policja} funkcjonariuszy${plan.podwyzszoneRyzyko ? " — mecz podwyższonego ryzyka" : ""} · karetka na stadionie.` : `🛡 Porządek zapewnia ${plan.ochroniarze} porządkowych klubu (to nie jest impreza masowa).` });
+    }
     if (puchar) {
       nm.puchar = { nazwa: puchar.nazwa, dogrywka: puchar.dogrywka };
       if (puchar.neutralny) nm.atut = 1;
@@ -82,6 +115,7 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
   const [glosno, setGlosno] = useState(!czyWyciszony());
   const [glosKom, setGlosKom] = useState(glosWlaczony());
   const [startTxt, setStartTxt] = useState(() => m.min === 0);
+  const [przed, setPrzed] = useState(() => m.min === 0 && !m.przedmecz?.gotowe);
   const [wyborStroju, setWyborStroju] = useState<[number, number]>(() => { const st0 = dobierzStroje(s.kluby[para[0]], s.kluby[para[1]], para[0] === s.mojKlub ? "dom" : "gosc"); return para[0] === s.mojKlub ? st0.wyborDom : st0.wyborGosc; });
   const stroje = useMemo(() => dobierzStroje(s.kluby[para[0]], s.kluby[para[1]], para[0] === s.mojKlub ? "dom" : "gosc", wyborStroju), [wyborStroju]);
   const kd = s.kluby[m.dom.klubId], kg = s.kluby[m.gosc.klubId];
@@ -182,6 +216,11 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
         <View style={{ flexDirection: "row", height: 4 }}><View style={{ flex: Math.max(0.05, 0.5 + m.momentum * 0.5), backgroundColor: K.akcent }} /><View style={{ flex: Math.max(0.05, 0.5 - m.momentum * 0.5), backgroundColor: K.niebieski }} /></View>
 
         <ScrollView contentContainerStyle={{ padding: 10, paddingBottom: 40 }}>
+          {przed ? (<>
+            <PrzedMeczem s={s} m={m} stroje={stroje} ust={ust} onGotowe={() => { setPrzed(false); zapiszMecz(s, para, m); odswiez(); }}
+              wyborStrojow={<WyborStrojow s={s} para={para} wybor={wyborStroju} setWybor={setWyborStroju} stroje={stroje} />} />
+            <Pressable onPress={() => { for (const [id, k] of Object.entries(m.kondStart)) if (s.zawodnicy[id]) s.zawodnicy[id].kondycja = k; stopDzwieku(); zamilknij(); onAnuluj(); }} style={{ alignItems: "center", marginTop: 10 }}><Text style={[st.maly, { color: K.czerwony }]}>Wróć bez oglądania (mecz zostanie zasymulowany)</Text></Pressable>
+          </>) : (<>
           {/* obraz meczu */}
           <View>
             {!bez3D ? (
@@ -212,7 +251,7 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
             {m.wazne?.typ === "gol" && predkosc > 0 && <View style={{ position: "absolute", top: "38%", alignSelf: "center", backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 18, paddingVertical: 6, borderRadius: 8 }}><Text style={{ color: K.akcent, fontWeight: "900", fontSize: 28, fontFamily: CZCIONKA }}>GOOOL!</Text></View>}
             {startTxt && <Pressable onPress={() => graj(1)} style={{ position: "absolute", inset: 0, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.35)" } as any}><Text style={{ color: "#fff", fontWeight: "900", fontSize: 20 }}>▶ Rozpocznij mecz</Text><Text style={[st.maly, { color: "#ddd" }]}>{m.zasady.opis}</Text></Pressable>}
           </View>
-          {startTxt && <WyborStrojow s={s} para={para} wybor={wyborStroju} setWybor={setWyborStroju} stroje={stroje} />}
+          {startTxt && !m.przedmecz?.gotowe && <WyborStrojow s={s} para={para} wybor={wyborStroju} setWybor={setWyborStroju} stroje={stroje} />}
           {/* sterowanie */}
           <View style={[st.wiersz, { flexWrap: "wrap", marginTop: 8 }]}>
             <Btn t={predkosc > 0 ? "⏸ Pauza" : "▶ Graj"} on={() => (predkosc > 0 ? setPredkosc(0) : graj(ostatniaPr))} akt={predkosc === 0} />
@@ -316,8 +355,9 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
               <Text style={[st.maly, { color: K.niebieski }]}>⏏ Wyjdź — mecz zapisany, dokończysz później („▶ Wznów")</Text>
             </Pressable>
           ) : m.min === 0 ? (
-            <Pressable onPress={() => { stopDzwieku(); onAnuluj(); }} style={{ alignItems: "center", marginTop: 8 }}><Text style={[st.maly, { color: K.czerwony }]}>Wróć bez oglądania (mecz zostanie zasymulowany)</Text></Pressable>
+            <Pressable onPress={() => { for (const [id, k] of Object.entries(m.kondStart)) if (s.zawodnicy[id]) s.zawodnicy[id].kondycja = k; stopDzwieku(); onAnuluj(); }} style={{ alignItems: "center", marginTop: 8 }}><Text style={[st.maly, { color: K.czerwony }]}>Wróć bez oglądania (mecz zostanie zasymulowany)</Text></Pressable>
           ) : null}
+          </>)}
         </ScrollView>
       </View>
     </Modal>

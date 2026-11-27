@@ -15,9 +15,11 @@ import { minka, stworzPostac, wyglad3D, type Postac } from "./zawodnik3d";
 import { lekkaGrafika } from "./Stadion3DWidok";
 import { uriObrazka } from "./Konferencja3D";
 
-export function Szatnia3D({ s, klub, zawodnicy, kit, kitBr, nastroj, mowi }: { s: StanGry; klub: Klub; zawodnicy: string[]; kit: Kit; kitBr: Kit; nastroj: number; mowi: boolean }) {
+/** `przed` — szatnia przed meczem: zawodnicy przychodzą w dresach treningowych i po kolei przebierają się w stroje meczowe.
+ *  `mowiId` — kto teraz mówi (rusza ustami, gestykuluje). */
+export function Szatnia3D({ s, klub, zawodnicy, kit, kitBr, nastroj, mowi, przed, mowiId }: { s: StanGry; klub: Klub; zawodnicy: string[]; kit: Kit; kitBr: Kit; nastroj: number; mowi: boolean; przed?: boolean; mowiId?: string | null }) {
   const host = useRef<any>(null);
-  const stan = useRef({ nastroj, mowi }); stan.current = { nastroj, mowi };
+  const stan = useRef({ nastroj, mowi, mowiId }); stan.current = { nastroj, mowi, mowiId };
   useEffect(() => {
     const el = host.current as HTMLElement | null;
     if (!el || typeof document === "undefined") return;
@@ -51,6 +53,7 @@ export function Szatnia3D({ s, klub, zawodnicy, kit, kitBr, nastroj, mowi }: { s
     for (let i = 0; i < 4; i++) miejsca.push({ x: -4.8, z: -1.8 + i * 1.1, ry: Math.PI / 2 });
     for (let i = 0; i < 4; i++) miejsca.push({ x: 4.8, z: -1.8 + i * 1.1, ry: -Math.PI / 2 });
     const postacie: Postac[] = [];
+    const mapa = new Map<string, { p: Postac; dres?: Postac; kiedy: number }>();
     ids.forEach((id, i) => {
       const z = s.zawodnicy[id]; const m = miejsca[i]; if (!z || !m) return;
       const k = z.poz === "BR" ? kitBr : kit;
@@ -64,9 +67,12 @@ export function Szatnia3D({ s, klub, zawodnicy, kit, kitBr, nastroj, mowi }: { s
       kosz.position.copy(back).add(new THREE.Vector3(Math.sin(m.ry), 0.45, Math.cos(m.ry)).multiplyScalar(1)).setY(1.55); kosz.rotation.y = m.ry; scena.add(kosz);
       const lawka = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.08, 0.45), drewno); lawka.position.set(m.x, 0.46, m.z); lawka.rotation.y = m.ry; scena.add(lawka);
       const p = stworzPostac({ ...wyglad3D(z), twarz: true, koszulka: k.baza, dodatek: k.dodatek, wzor: k.wzor, spodenki: k.dodatek, getry: k.baza, nr: z.numer, nazwisko: z.nazwisko, seed: [...id].reduce((a, ch) => a + ch.charCodeAt(0) * 7, 0) });
-      p.g.position.set(m.x, -0.4 + 0.3, m.z + (m.ry === 0 ? 0.12 : 0)); p.g.rotation.y = m.ry;
-      p.uda.forEach((u) => (u.rotation.x = -1.45)); p.lydki.forEach((l) => (l.rotation.x = 1.45));
-      scena.add(p.g); postacie.push(p);
+      const posadz = (q: Postac) => { q.g.position.set(m.x, -0.4 + 0.3, m.z + (m.ry === 0 ? 0.12 : 0)); q.g.rotation.y = m.ry; q.uda.forEach((u) => (u.rotation.x = -1.45)); q.lydki.forEach((l) => (l.rotation.x = 1.45)); scena.add(q.g); postacie.push(q); };
+      posadz(p);
+      // przed meczem: dres treningowy (ciemny, z wykończeniem w barwach), przebranie po kolei
+      let dres: Postac | undefined;
+      if (przed) { dres = stworzPostac({ ...wyglad3D(z), twarz: true, koszulka: "#262b33", dodatek: kit.baza, wzor: "rekaw", spodenki: "#262b33", getry: "#262b33", nr: 0, seed: [...id].reduce((a, ch) => a + ch.charCodeAt(0) * 7, 0) }); posadz(dres); p.g.visible = false; }
+      mapa.set(id, { p, dres, kiedy: 2 + i * 0.9 });
     });
     // trener na środku
     const trener = stworzPostac({ twarz: true, koszulka: "#1d2536", spodenki: "#1d2536", getry: "#1d2536", nr: 0, seed: 21 });
@@ -75,12 +81,21 @@ export function Szatnia3D({ s, klub, zawodnicy, kit, kitBr, nastroj, mowi }: { s
     const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scena, cam)); composer.addPass(new OutputPass());
     if (lekka) { renderer.shadowMap.enabled = false; uproscMaterialy(scena); }
     let t = 0, ost = performance.now(), raf = 0, emo = 0;
+    const camPoz = new THREE.Vector3(0, 2.6, 4.2), camCel = new THREE.Vector3(0, 1, -1.2), tmpV = new THREE.Vector3();
     const petla = () => {
       raf = requestAnimationFrame(petla);
       const n = performance.now(), dt = Math.min(0.05, (n - ost) / 1000); ost = n; t += dt;
-      const { nastroj: e, mowi: m } = stan.current;
+      const { nastroj: e, mowi: m, mowiId } = stan.current;
+      // przebieranie: zawodnik wstaje, zmienia koszulkę i siada
+      for (const v of mapa.values()) if (v.dres && v.dres.g.visible && t > v.kiedy) {
+        const dt2 = t - v.kiedy; v.dres.g.position.y = Math.min(0.4, dt2 * 1.2) - 0.1; v.dres.uda.forEach((u) => (u.rotation.x = -1.45 + Math.min(1.4, dt2 * 3)));
+        v.dres.ramiona.forEach((r) => (r.rotation.x = -2.8)); if (dt2 > 0.9) { v.dres.g.visible = false; v.p.g.visible = true; }
+      }
       emo += (e - emo) * Math.min(1, dt * 1.5);
+      const mowiacy = mowiId ? mapa.get(mowiId) : undefined;
       postacie.forEach((p, i) => {
+        if (mowiacy && (mowiacy.p === p || mowiacy.dres === p)) { minka(p, Math.max(0.2, emo), t + i, true); p.tulow.rotation.x = -0.05; p.ramiona[0].rotation.x = -1.0 - Math.abs(Math.sin(t * 4)) * 0.6; p.ramiona[1].rotation.x = -0.5; return; }
+        if (p.g.visible && mapa.size && [...mapa.values()].some((v) => v.dres === p && t > v.kiedy)) return;
         minka(p, emo + Math.sin(i * 7.1) * 0.15, t + i);
         // zwieszone głowy przy złym nastroju, kiwanie przy dobrym
         p.tulow.rotation.x = emo < -0.2 ? 0.35 : 0.06 + (emo > 0.3 ? Math.abs(Math.sin(t * 2.5 + i)) * 0.08 : 0);
@@ -92,7 +107,9 @@ export function Szatnia3D({ s, klub, zawodnicy, kit, kitBr, nastroj, mowi }: { s
       minka(trener, m ? (e >= 0 ? 0.3 : -0.6) : 0, t, m);
       trener.ramiona[0].rotation.x = m ? -1.2 - Math.abs(Math.sin(t * 4)) * 0.8 : -0.3; trener.ramiona[1].rotation.x = m ? -0.9 - Math.abs(Math.sin(t * 3 + 1)) * 0.6 : -0.3;
       trener.uda[0].rotation.x = Math.sin(t * 2) * 0.25; trener.uda[1].rotation.x = -Math.sin(t * 2) * 0.25;
-      cam.position.set(Math.sin(t * 0.12) * 1.2, 2.6, 4.2); cam.lookAt(0, 1.0, -1.2);
+      if (mowiacy && (mowiacy.p.g.visible ? mowiacy.p : mowiacy.dres ?? mowiacy.p)) { const g = (mowiacy.p.g.visible ? mowiacy.p : mowiacy.dres ?? mowiacy.p).g; camCel.lerp(tmpV.set(g.position.x, 1.0, g.position.z), Math.min(1, dt * 2)); camPoz.lerp(tmpV.set(g.position.x * 0.5, 2.0, g.position.z + 3.6), Math.min(1, dt * 1.5)); }
+      else { camCel.lerp(tmpV.set(0, 1.0, -1.2), Math.min(1, dt * 2)); camPoz.lerp(tmpV.set(Math.sin(t * 0.12) * 1.2, 2.6, 4.2), Math.min(1, dt * 1.5)); }
+      cam.position.copy(camPoz); cam.lookAt(camCel);
       if (lekka) renderer.render(scena, cam); else composer.render(dt);
     };
     raf = requestAnimationFrame(petla);

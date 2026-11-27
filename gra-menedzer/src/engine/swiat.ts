@@ -31,6 +31,17 @@ export function dataUrodzenia(z: { id: string; wiek: number; dataUr?: string }, 
   const r = sezon - z.wiek - (m > 7 || (m === 7 && d > 1) ? 1 : 0);
   return `${String(d).padStart(2, "0")}.${String(m).padStart(2, "0")}.${r}`;
 }
+/** Data urodzenia osoby (trener, sztab, tłumacz) — stała dla danej osoby, spójna z wiekiem. */
+export function dataUrOsoby(seed: string, wiek: number | undefined, sezon: number): string {
+  if (wiek == null) return "";
+  return dataUrodzenia({ id: seed, wiek }, sezon);
+}
+/** Opis osoby: „ur. 12.03.1978 (48 lat)”. */
+export function urodzony(seed: string, wiek: number | undefined, sezon: number): string {
+  if (wiek == null) return "";
+  const l = wiek % 10 >= 2 && wiek % 10 <= 4 && (wiek % 100 < 12 || wiek % 100 > 14) ? "lata" : "lat";
+  return `ur. ${dataUrOsoby(seed, wiek, sezon)} (${wiek} ${l})`;
+}
 /** Percentyl (0..1) realnej wyceny wśród prawdziwych zawodników danego poziomu (1–3). */
 const _percentyle: Record<number, number[]> = {};
 function percentylWartosci(poziom: number, wart: number): number {

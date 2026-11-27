@@ -35,6 +35,11 @@ export function prowizjaAgenta(pensjaKol: number, dlugosc: number): number {
 import { atutBoiska, frekwencja, jestDerby, jestPrzyjazn } from "./derby";
 import { europaNaKolejke, kwalifikacjaEuropejska, nowaEuropa, rundaEuropy } from "./europa";
 import { moznaPuchar, nowyPuchar, rundaPucharu } from "./puchar";
+import { tydzienJezykow } from "./jezyki";
+import { nalozSankcje, losujIncydent, rozliczBezpieczenstwo, rozliczWyjazd, zuzyjSankcje } from "./bezpieczenstwo";
+import { akcjeKibicow, karaZaAkcje, sektorGosci, szkodyZaAkcje, zgodaKibicow } from "./kibice";
+import { planOpraw } from "./oprawy";
+import { kulturaTrybun } from "./flagi";
 import type { GraczXI, Historia, Klub, Konferencja, Wynik, Liga, Nastawienie, Sponsor, SponsorTyp, StanGry, WlasnoscKlubu, WpisTrenera, Zawodnik } from "./types";
 
 /** Najlepsza jedenastka kolejki w danej lidze (1 BR, 4 OBR, 4 POM, 2 NAP) wg ocen meczu. */
@@ -836,22 +841,53 @@ export function zagrajKolejke(s: StanGry) {
       // Kibice gości (sektor gości): liczba wg renomy/bazy kibiców rywala i odległości (bliżej = więcej, derby = tłumnie),
       // ograniczona sektorem gości (~8% pojemności, 15% na derby) i wolnymi miejscami. Dolicza się do frekwencji i wpływów gospodarza.
       const kg = s.kluby[gosc];
+      // sankcje: stadion bez publiczności / zamknięta trybuna gospodarzy (decyzje wojewody i Komisji Ligi)
+      if (kd.sankcje?.stadionZamkniety && !zakazTeraz) { widzowie = 0; zakazTeraz = true; if (moj) wiadomosc(s, `🏛 Mecz na stadionie ${kd.nazwa} bez publiczności — decyzja wojewody po zadymie.`); }
+      else if (kd.sankcje?.trybunaZamknieta) { widzowie = Math.round(widzowie * 0.65); if (moj) wiadomosc(s, `🚷 Trybuna z gniazdem dopingu ${kd.nazwa} zamknięta (kara Komisji Ligi) — ciszej na stadionie.`); }
+      const sektorZamk = !!kd.sankcje?.sektorGosciZamkniety, zakazWyj = !!kg.sankcje?.zakazWyjazdowy;
+      if (moj && (sektorZamk || zakazWyj)) wiadomosc(s, sektorZamk ? `🧱 Sektor gości na stadionie ${kd.nazwa} zamknięty decyzją wojewody — kibice ${kg.nazwa} zostają w domach.` : `🚫 Kibice ${kg.nazwa} mają zakaz wyjazdowy — sektor gości pusty.`);
       let gosci = 0;
-      if (!zakazTeraz) {
+      if (!zakazTeraz && !sektorZamk && !zakazWyj) {
         const dist = odlegloscDrogowa(kd.miasto, kg.miasto);
         const distMn = dist <= 0 ? 1 : Math.max(0.22, 1 - dist / 600);
         const baza = WIDZOWIE[kd.poziom - 1] * (0.04 + kg.renoma * 0.06) * distMn;
         gosci = Math.round(baza * (derbyNazwa ? 2.3 : przyjaznNazwa ? 1.4 : 1) * pog.frek);
-        const sektor = Math.round(kd.pojemnosc * (derbyNazwa ? 0.15 : 0.08));
+        const sektor = sektorGosci(s, kd, !!derbyNazwa).miejsca; // PZPN: min. 5% miejsc dla zorganizowanej grupy gości
         gosci = Math.max(0, Math.min(gosci, sektor, Math.max(0, kd.pojemnosc - widzowie)));
       }
       widzowie = Math.min(kd.pojemnosc, widzowie + gosci);
       // Głośny sektor gości lekko osłabia atut własnego boiska (do −8%).
       const atutGosci = 1 - Math.min(0.08, (gosci / Math.max(1, widzowie)) * 0.25);
+      zuzyjSankcje(kd, kg); // ten mecz „odbywa" karę (zamknięty sektor / trybuna / zakaz wyjazdowy)
+      // derby innych klubów też bywają gorące — sankcje działają w całym świecie gry (np. zakaz wyjazdowy rywala)
+      if (!moj && derbyNazwa && widzowie > 0 && szansa(0.12)) { const i = losujIncydent(losInt(5, 88), undefined, true); nalozSankcje(s, i.sektor === "gosci" ? kg : kd, kd, [i], true); }
+      const incLive = moj && s.meczLive?.koniec ? s.meczLive.incydenty : undefined;
       const w = zagrajMecz(s, druz(dom, gosc), druz(gosc, dom), moj, { domAtut: atutBoiska(widzowie, kd.pojemnosc, !!derbyNazwa) * pog.atut * atutGosci, derby: !!derbyNazwa, mojTrening: moj ? s.trening : undefined, mojaStrona: dom === s.mojKlub ? "dom" : "gosc", pogoda: pog.gole });
       if (moj) {
         { const bus = wyjazdBusem(s, dom); if (bus) wiadomosc(s, bus); }
         poMeczu(s, w, derbyNazwa ?? null);
+        if (w.dom === s.mojKlub) for (const t of rozliczBezpieczenstwo(s, kd, kg, widzowie, !!derbyNazwa, incLive)) wiadomosc(s, t);
+        else for (const t of rozliczWyjazd(s, kd, s.kluby[s.mojKlub], gosci, !!derbyNazwa)) wiadomosc(s, t); // nasi kibice w klatce gości
+        // oprawy (kilka na derbach / zgodach / wielkich meczach; każda inna, nigdy się nie powtarza)
+        if (!incLive && widzowie > 0) {
+          const zg = zgodaKibicow(s, kd, kg);
+          for (const p of planOpraw(s, kd, kg, { derby: derbyNazwa ?? null, zgoda: zg, gosci, silaD: kulturaTrybun(s, kd).pirotechnika, silaG: kulturaTrybun(s, kg).pirotechnika })) {
+            const kl = p.sektor === "gospodarzy" ? kd : kg;
+            const kara = p.o.obrazliwa || p.o.pirotechnika ? Math.round([30000, 15000, 7000, 3000, 1500, 900, 500, 400, 300][Math.min(8, kd.poziom - 1)] * (p.o.obrazliwa ? 1 : 0.6) / 100) * 100 : 0;
+            if (kara) kl.kasa = Math.max(0, kl.kasa - kara);
+            wiadomosc(s, `🎆 ${p.min >= 46 ? "Po przerwie — " : ""}Oprawa kibiców ${kl.nazwa}: ${p.o.opis}${p.o.pirotechnika ? " Odpalający zamaskowani — nikogo nie zidentyfikowano." : ""}${kara ? ` Kara Komisji Ligi dla ${kl.nazwa}: ${zl(kara)}.` : ""}`);
+          }
+        }
+        // kibice z charakterem (gdy mecz nie był oglądany na żywo — wtedy akcje były w relacji)
+        if (!incLive && widzowie > 0) for (const a of akcjeKibicow(s, kd, kg, !!derbyNazwa, !!derbyNazwa, gosci)) {
+          const winny = a.sektor === "gospodarzy" ? kd : kg; // każdy odpowiada za swoich kibiców
+          const kara = karaZaAkcje(kd, a), szk = szkodyZaAkcje(kd, a);
+          if (kara + szk) winny.kasa = Math.max(0, winny.kasa - kara - szk);
+          if (winny.id !== s.mojKlub && !derbyNazwa && !a.kara && !a.szkody) continue; // u innych tylko ważniejsze wieści
+          wiadomosc(s, `${a.tekst}${a.zatrzymani ? ` Policja zatrzymała ${a.zatrzymani} os.` : ""}${kara ? ` Kara dla ${winny.nazwa}: ${zl(kara)}.` : ""}${szk ? ` Rachunek za zniszczenia dla ${winny.nazwa}: ${zl(szk)}.` : ""}`);
+        }
+        // zamknięty sektor gości bez decyzji służb — kara licencyjna (jak w realiach Ekstraklasy)
+        if (w.dom === s.mojKlub && sektorGosci(s, kd, !!derbyNazwa).zamkniety && kd.poziom <= 4) { const k = [250000, 80000, 30000, 12000][kd.poziom - 1]; kd.kasa -= k; wiadomosc(s, `⚖️ Komisja Licencyjna: zamknięty sektor gości (wymóg PZPN — min. 5% miejsc) — kara ${zl(k)}.`); }
         if (pog.gole < 1) wiadomosc(s, `${pog.ikona} ${pog.nazwa} w ${kd.miasto} — trudne warunki do gry${pog.frek < 0.9 ? ", część kibiców została w domach" : ""}.`);
         if (terminWieczorny && !zakazTeraz) {
           const premia = Math.round((WIDZOWIE[kd.poziom - 1] * 4) / 500) * 500;
@@ -864,17 +900,7 @@ export function zagrajKolejke(s: StanGry) {
           if (w.dom === s.mojKlub && !zakazTeraz) { // oprawa u siebie podkręca drużynę
             wiadomosc(s, wybierz([`🎆 Kibice przygotowali wielką oprawę na ${derbyNazwa} — sektory buzują, drużyna niesiona dopingiem!`, `🔥 Race, flagi i gardłowy doping na ${derbyNazwa} — nasz stadion to dziś kocioł!`]));
             for (const id of s.taktyka.sklad) { const z = s.zawodnicy[id]; if (z) z.morale = Math.min(100, z.morale + 2); }
-            // Ryzyko zadymy/rac na derbach u siebie: grzywna PZPN, a przy poważniejszych incydentach zakaz (mecz przy pustych trybunach).
-            if (szansa(0.16)) {
-              const grzywna = Math.round((WIDZOWIE[kd.poziom - 1] * 6) / 500) * 500;
-              kd.kasa = Math.max(0, kd.kasa - grzywna);
-              const powazne = szansa(0.4);
-              if (powazne) s.zakazTrybun = (s.zakazTrybun ?? 0) + 1;
-              s.zaufanieKibicow = Math.max(0, (s.zaufanieKibicow ?? 60) - 2);
-              wiadomosc(s, powazne
-                ? `🚨 Zadyma i race na ${derbyNazwa} — Komisja Ligi: grzywna ${zl(grzywna)} i zakaz (najbliższy mecz u siebie przy pustych trybunach).`
-                : `🚨 Odpalone race na ${derbyNazwa} — grzywna ${zl(grzywna)} od Komisji Ligi za pirotechnikę.`);
-            }
+            // incydenty (race, zadymy) rozlicza teraz moduł bezpieczeństwa — zależnie od firmy ochroniarskiej i obsady
           }
         }
         else if (przyjaznNazwa) {
@@ -976,6 +1002,7 @@ export function zagrajKolejke(s: StanGry) {
     if (gralem && s.taktyka.sklad.some((id) => s.zawodnicy[id] && jestMlodziezowcem(s.zawodnicy[id]))) s.mlodziezoweWystepy = (s.mlodziezoweWystepy ?? 0) + 1; }
   liczXIKolejki(s, mojaL, przedMecze, r + 1);
   if (moznaPuchar(s)) rundaPucharu(s);
+  for (const w of tydzienJezykow(s)) wiadomosc(s, w); // nauka polskiego cudzoziemców, kurs, tłumacz
   if (europaNaKolejke(s)) rundaEuropy(s);
   tydzien(s);
   s.kolejka++;

@@ -10,6 +10,7 @@ import { ileKolejek, kontekstTreningu, rozwojTreningowy, zagrajKolejke } from ".
 import { ETYKIETA_ATRYB } from "./atrybuty";
 import { dataOkresu, dzienOkresu, nazwaDnia, rozpocznijOkres } from "./okres";
 import { przetworzNegocjacje } from "./transfery";
+import { mnoznikSesji } from "./treningLive";
 import type { StanGry, Zawodnik } from "./types";
 
 export type TypDnia = "regeneracja" | "trening" | "puchar" | "odprawa" | "mecz" | "wolne";
@@ -65,16 +66,22 @@ function treningDnia(s: StanGry, d: Dzien): string[] {
   const kadra = s.kluby[s.mojKlub].zawodnicy.map((id) => s.zawodnicy[id]).filter((z) => z && z.kontuzja === 0);
   const przed = new Map(kadra.map((z) => [z.id, { u: z.umiej, a: { ...(z.atrybuty ?? {}) } as Record<string, number>, k: z.kontuzja }]));
   const komunikaty: string[] = [];
-  for (const z of kadra) rozwojTreningowy(s, z, 1 / 3, kontekstTreningu(s, z), (m) => komunikaty.push(m));
+  // trening obejrzany na żywo (dla chętnych): intensywność, dopasowanie ćwiczeń, wyróżnieni, zdjęci z zajęć
+  const live = s.treningLive && s.treningLive.klucz === kluczDnia(d.data) ? s.treningLive : undefined; s.treningLive = undefined;
+  const mn = live ? mnoznikSesji(s, live) : 1;
+  const stara = s.treningIntensywnosc; if (live) s.treningIntensywnosc = live.intens;
+  for (const z of kadra) { if (live?.zdjeci.includes(z.id)) continue; rozwojTreningowy(s, z, (1 / 3) * mn * (live?.wyroznieni.includes(z.id) ? 1.4 : 1), kontekstTreningu(s, z), (m) => komunikaty.push(m)); }
+  if (live) s.treningIntensywnosc = stara;
   s.treningiDni = (s.treningiDni ?? 0) + 1;
   // lekkie zmęczenie po zajęciach (odrabiane w weekendowej regeneracji silnika)
-  for (const z of kadra) z.kondycja = Math.max(40, z.kondycja - (d.tytul.includes("fizyczne") ? 2 : 1));
+  const zm = live ? (live.intens === "lekki" ? 0.5 : live.intens === "intensywny" ? 2.5 : 1) : 1;
+  for (const z of kadra) z.kondycja = Math.max(40, z.kondycja - (d.tytul.includes("fizyczne") ? 2 : 1) * zm * (live?.zdjeci.includes(z.id) ? 0.3 : 1));
   const zmiany = kadra.map((z) => {
     const p = przed.get(z.id)!;
     const atr = Object.keys(p.a).map((k) => ({ k, d: ((z.atrybuty as unknown as Record<string, number> | undefined)?.[k] ?? 0) - p.a[k] })).filter((x) => x.d >= 0.15).sort((a, b) => b.d - a.d);
     return { z, du: z.umiej - p.u, atr };
   }).filter((x) => x.du > 0.02 || x.atr.length).sort((a, b) => b.du - a.du);
-  const wpisy: string[] = [`Fokus: ${s.trening} · intensywność: ${s.treningIntensywnosc ?? "normalna"} · na zajęciach ${kadra.length} zawodników.`];
+  const wpisy: string[] = [live ? `📺 Byłeś na zajęciach: ${live.bloki.length} ćwiczeń · intensywność ${live.intens} · rozwój ×${mn.toFixed(2)}${live.wyroznieni.length ? ` · indywidualnie: ${live.wyroznieni.map((id) => s.zawodnicy[id]?.nazwisko).join(", ")}` : ""}` : `Fokus: ${s.trening} · intensywność: ${s.treningIntensywnosc ?? "normalna"} · na zajęciach ${kadra.length} zawodników.`, ...(live?.wpisy ?? [])];
   for (const x of zmiany.slice(0, 6)) {
     const atr = x.atr.slice(0, 2).map((a) => `${ETYKIETA_ATRYB[a.k as keyof typeof ETYKIETA_ATRYB] ?? a.k} +${a.d.toFixed(1)}`).join(", ");
     wpisy.push(`📈 ${x.z.imie[0]}. ${x.z.nazwisko}: OVR ${x.z.umiej.toFixed(1)} (+${x.du.toFixed(2)})${atr ? ` · ${atr}` : ""}`);

@@ -11,7 +11,9 @@ import {
   wariantyRozbudowy, wymogObiektu,
 } from "../engine/sezon";
 import { WidokStadionu } from "./WidokStadionu";
-import { tabelaLigi } from "../engine/swiat";
+import { tabelaLigi, urodzony } from "../engine/swiat";
+import { narodowoscKraju } from "../data/narodowosci";
+import { jezykKraju, NAZWA_JEZYKA } from "../engine/jezyki";
 import type { Obiekty, RolaSztabu, StanGry } from "../engine/types";
 import { NAZWA_ROLI } from "../engine/sztab";
 import { EdytorKlubu } from "./EdytorKlubu";
@@ -20,6 +22,9 @@ import { przydomek } from "../data/przydomki";
 import { stazTrenera, trenerKlubu } from "../data/trenerzy";
 import { Twarz } from "./Twarz";
 import { Sponsorzy } from "./Sponsorzy";
+import { Bezpieczenstwo } from "./Bezpieczenstwo";
+import { kulturaTrybun } from "../engine/flagi";
+import { opisSankcji } from "../engine/bezpieczenstwo";
 import { Stroje } from "./Stroje";
 import { K, KOLOR_POZ, st } from "./styl";
 
@@ -84,6 +89,13 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
                     <Text style={st.maly}>
                       {moj ? (s.trenerLicencja ? `Licencja UEFA ${s.trenerLicencja}` : "Trener-menedżer") : [klub.trenerLicencja ? `Licencja UEFA ${klub.trenerLicencja}` : null, klub.trenerOd != null ? `w klubie od ${klub.trenerOd} (${stazTrenera(klub, s.sezon)} sez.)` : null].filter(Boolean).join(" · ")}
                     </Text>
+                    {moj ? (
+                      <Pressable onPress={() => { const v = typeof window !== "undefined" ? window.prompt("Data urodzenia trenera (DD.MM.RRRR):", s.trenerDataUr ?? "") : null; if (v && /^\d{1,2}\.\d{1,2}\.\d{4}$/.test(v.trim())) { s.trenerDataUr = v.trim(); odswiez(); } }}>
+                        <Text style={st.maly}>🎂 {s.trenerDataUr ? `ur. ${s.trenerDataUr} (${s.sezon - Number(s.trenerDataUr.split(".")[2])} lat)` : "data urodzenia — dotknij, aby ustawić"} ✎</Text>
+                      </Pressable>
+                    ) : (
+                      <Text style={st.maly}>🎂 {klub.trenerReal ? "data urodzenia: brak zweryfikowanych danych w grze" : urodzony(`${klub.trenerImie}${klub.trenerNazwisko}`, klub.trenerWiek, s.sezon)}{klub.trenerKraj ? ` · ${narodowoscKraju(klub.trenerKraj)?.flaga ?? "🌍"} ${klub.trenerKraj} · ${NAZWA_JEZYKA[jezykKraju(klub.trenerKraj)]}, polski ${Math.round(klub.trenerPolski ?? 0)}%` : " · 🇵🇱 Polska"}</Text>
+                    )}
                     {!moj && klub.trenerReal ? <Text style={[st.maly, { color: K.zielony }]}>✓ realny szkoleniowiec</Text> : null}
                   </View>
                 </View>
@@ -109,6 +121,7 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
                         <View style={{ flex: 1 }}>
                           <Text style={[st.tekst, { fontSize: 13 }]}>{p.imie} {p.nazwisko}</Text>
                           <Text style={st.maly}>{NAZWA_ROLI[rola]} · {"★".repeat(p.poziom)}{"☆".repeat(5 - p.poziom)}{p.kontraktDo != null ? ` · do ${p.kontraktDo}` : ""}</Text>
+                          <Text style={[st.maly, { fontSize: 11 }]}>🎂 {urodzony(p.id ?? p.imie + p.nazwisko, p.wiek, s.sezon)} · {narodowoscKraju(p.kraj)?.flaga ?? "🇵🇱"} {p.kraj ?? "Polska"}{p.kraj && p.kraj !== "Polska" ? ` · polski ${Math.round(p.polski ?? 0)}%` : ""}</Text>
                         </View>
                       </View>
                     );
@@ -116,10 +129,24 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
                 </View>
               ) : null}
 
+              {(() => { const kt = kulturaTrybun(s, klub); const sank = opisSankcji(klub); return (
+                <View style={[st.karta, { marginHorizontal: 0, marginTop: 14 }]}>
+                  <Text style={st.naglowek}>📣 Kibice</Text>
+                  <Text style={st.maly}>🥁 {kt.mlyn}{kt.gniazdowy ? " · gniazdowy z megafonem, bęben" : ""}</Text>
+                  {kt.grupy.length ? <Text style={st.maly}>👥 Grupy: {kt.grupy.join(" · ")}</Text> : null}
+                  {kt.zgody?.length ? <Text style={st.maly}>🤝 Zgody: {kt.zgody.join(", ")}</Text> : null}
+                  <Text style={[st.maly, { marginTop: 4 }]}>🚩 Flagi na płocie ({kt.flagi.length}):</Text>
+                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 4, marginTop: 3 }}>
+                    {kt.flagi.map((f, i) => <View key={i} style={{ backgroundColor: f.kolory[0], borderColor: f.kolory[1], borderWidth: 2, borderRadius: 3, paddingHorizontal: 6, paddingVertical: 2 }}><Text style={{ color: "#fff", fontSize: 10.5, fontWeight: "800", textShadowColor: "#000", textShadowRadius: 2 }}>{f.tekst}</Text></View>)}
+                  </View>
+                  <Text style={[st.maly, { marginTop: 4 }]}>🎆 Opraw pokazanych przez kibiców: {(s.oprawyUzyte?.[klub.nazwa] ?? []).length} (żadna się nie powtarza)</Text>
+                  {sank.map((t, i) => <Text key={i} style={[st.maly, { color: K.czerwony }]}>{t}</Text>)}
+                </View>); })()}
               <View style={{ marginTop: 16 }}>
                 <Stroje s={s} klub={klub} />
               </View>
               {moj && <View style={{ marginTop: 10 }}><Sponsorzy s={s} odswiez={odswiez} /></View>}
+              {moj && <View style={{ marginTop: 10 }}><Bezpieczenstwo s={s} odswiez={odswiez} /></View>}
 
               <View style={{ marginTop: 18 }}>
                 <Text style={st.naglowek}>🏟 Stadion z lotu ptaka</Text>

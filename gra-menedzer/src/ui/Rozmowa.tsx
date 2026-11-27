@@ -5,6 +5,7 @@ import { grafika3D } from "./three/Stadion3DWidok";
 import { mow, plecZImienia, zamilknij } from "./three/glos";
 import { OpcjaRozmowy, TematRozmowy, TON_ETYKIETA, tematyRozmowy, zastosujRozmowe } from "../engine/rozmowy";
 import type { StanGry, Zawodnik } from "../engine/types";
+import { tlumaczDla, jezykiTrenera, jezykZawodnika, NAZWA_JEZYKA, NAZWA_POZIOMU, PO_JEZYKU, polski, poziom, rozumienie, wypowiedz } from "../engine/jezyki";
 import { Twarz } from "./Twarz";
 import { K, st } from "./styl";
 
@@ -16,16 +17,19 @@ export function Rozmowa({ s, z, widoczny, onClose, odswiez }: { s: StanGry; z: Z
   const [mowi, setMowi] = useState<"trener" | "zawodnik" | null>(null);
   useEffect(() => { if (!widoczny) { setTemat(null); setReakcja(null); setWynik(null); zamilknij(); } }, [widoczny]);
   // zawodnik zaczyna rozmowę na głos
-  useEffect(() => { if (temat && !reakcja) { setMowi("zawodnik"); mow(temat.kwestia, "zawodnik", { przerwij: true, kto: z ? z.imie + z.nazwisko : "zawodnik", plec: "M" }); const t = setTimeout(() => setMowi(null), 3500); return () => clearTimeout(t); } }, [temat?.id]);
+  useEffect(() => { if (temat && !reakcja) { setMowi("zawodnik"); const w = wypowiedz(s, z, temat.kwestia); mow(w.tekst, "zawodnik", { przerwij: true, kto: z ? z.imie + z.nazwisko : "zawodnik", plec: "M", jezyk: w.glos }); const t = setTimeout(() => setMowi(null), 3500); return () => clearTimeout(t); } }, [temat?.id]);
 
   if (!z) return null;
   const tematy = tematyRozmowy(s, z);
 
   const wybierzOpcje = (o: OpcjaRozmowy) => {
     const r = zastosujRozmowe(s, z, o);
+    // cudzoziemiec bez polskiego: część słów trenera do niego nie dociera
+    const roz = rozumienie(s, z, s.kluby[s.mojKlub].zawodnicy.map((id) => s.zawodnicy[id]).filter(Boolean));
+    if (roz < 0.95 && r.delta) { const strata = Math.round(r.delta * (1 - roz)); z.morale = Math.max(0, Math.min(100, z.morale - strata)); r.delta -= strata; r.uwaga = `${r.uwaga ? r.uwaga + " · " : ""}${tlumaczDla(s, jezykZawodnika(z)) ? `tłumaczy ${tlumaczDla(s, jezykZawodnika(z))!.imie} ${tlumaczDla(s, jezykZawodnika(z))!.nazwisko}` : "zrozumiał tylko część"}`; }
     setMowi("trener"); mow(o.tekst, "trener", { przerwij: true, kto: s.trener, plec: plecZImienia(s.trener) });
     // odpowiedź zawodnika po wypowiedzi trenera — z emocją wynikającą z rozmowy
-    setTimeout(() => { setReakcja(r.reakcja); setWynik({ delta: r.delta, uwaga: r.uwaga }); setMowi("zawodnik"); mow(r.reakcja, "zawodnik", { kto: z.imie + z.nazwisko, plec: "M" }); setTimeout(() => setMowi(null), 3500); }, Platform.OS === "web" && grafika3D() ? 1800 : 0);
+    setTimeout(() => { setReakcja(r.reakcja); setWynik({ delta: r.delta, uwaga: r.uwaga }); setMowi("zawodnik"); { const w = wypowiedz(s, z, r.reakcja, { ton: r.delta >= 0 ? "plus" : "minus" }); mow(w.tekst, "zawodnik", { kto: z.imie + z.nazwisko, plec: "M", jezyk: w.glos }); } setTimeout(() => setMowi(null), 3500); }, Platform.OS === "web" && grafika3D() ? 1800 : 0);
     odswiez();
   };
   const emocja = wynik ? Math.max(-1, Math.min(1, wynik.delta / 6)) : temat ? ((z.morale ?? 60) - 60) / 60 : 0;
@@ -34,7 +38,10 @@ export function Rozmowa({ s, z, widoczny, onClose, odswiez }: { s: StanGry; z: Z
     <View style={[st.wiersz, { gap: 8, marginTop: 8, flexDirection: trenera ? "row-reverse" : "row" }]}>
       {trenera ? <Twarz seed={s.trener} rozmiar={32} zdjecie={s.trenerZdjecie} jersey="#2b2f45" /> : <Twarz seed={z.imie + z.nazwisko} rozmiar={32} zdjecie={z.zdjecie} cechy={z.twarz} kraj={z.kraj} />}
       <View style={{ flex: 1, backgroundColor: trenera ? K.karta2 : "rgba(90,169,255,0.14)", borderRadius: 12, padding: 10, maxWidth: "85%" }}>
-        <Text style={st.tekst}>{tekst}</Text>
+        {(() => { if (trenera) return <Text style={st.tekst}>{tekst}</Text>; const w = wypowiedz(s, z, tekst, { ton: tekst === reakcja && wynik ? (wynik.delta >= 0 ? "plus" : "minus") : undefined }); return (<>
+          <Text style={st.tekst}>{w.tekst}</Text>
+          {w.tlumaczenie && <Text style={[st.maly, { fontStyle: "italic", marginTop: 3 }]}>↳ {w.poziom === "podstawy" ? "chodzi mu o to" : w.tlumaczNazwa ? `tłumaczy ${w.tlumaczNazwa}` : NAZWA_JEZYKA[w.jezyk]}: „{w.tlumaczenie}”</Text>}
+        </>); })()}
       </View>
     </View>
   );
@@ -50,6 +57,7 @@ export function Rozmowa({ s, z, widoczny, onClose, odswiez }: { s: StanGry; z: Z
               <View style={{ flex: 1 }}>
                 <Text style={st.tytul}>Rozmowa: {z.imie} {z.nazwisko}</Text>
                 <Text style={st.maly}>morale {Math.round(z.morale)}% · zaufanie do trenera {Math.round(z.relacja ?? 60)}%{z.prosiOTransfer ? " · chce odejść" : ""}{z.obietnica ? ` · 🤞 obietnica: ${z.obietnica.typ === "minuty" ? "minuty" : "kontrakt"}` : ""}</Text>
+                {polski(z) < 100 && <Text style={[st.maly, { color: K.niebieski }]}>🗣 {NAZWA_JEZYKA[jezykZawodnika(z)]} · polski {Math.round(polski(z))}% ({NAZWA_POZIOMU[poziom(polski(z))]}){polski(z) < 55 ? ((jezykiTrenera(s)[jezykZawodnika(z)] ?? 0) >= 30 ? ` · rozmawiasz z nim ${PO_JEZYKU[jezykZawodnika(z)]} (${Math.round(jezykiTrenera(s)[jezykZawodnika(z)] ?? 0)}%)` : tlumaczDla(s, jezykZawodnika(z)) ? ` · tłumaczy ${tlumaczDla(s, jezykZawodnika(z))!.imie} ${tlumaczDla(s, jezykZawodnika(z))!.nazwisko}` : (jezykiTrenera(s).en ?? 0) >= 40 ? " · rozmawiacie po angielsku" : " · bez tłumacza — dogadujecie się z trudem") : ""}</Text>}
               </View>
             </View>
 

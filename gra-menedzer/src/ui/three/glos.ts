@@ -45,7 +45,7 @@ const hash = (t: string) => { let h = 2166136261; for (const c of t) h = Math.im
  * `kto` — stały identyfikator mówiącego (imię i nazwisko / redakcja) → zawsze ten sam głos, wysokość i tempo.
  * `plec` — płeć mówiącego (domyślnie wg roli: dziennikarz losowo wg `kto`, reszta męska).
  */
-export function mow(tekst: string, rola: Rola, o: { przerwij?: boolean; emocje?: number; kto?: string; plec?: Plec } = {}) {
+export function mow(tekst: string, rola: Rola, o: { przerwij?: boolean; emocje?: number; kto?: string; plec?: Plec; jezyk?: string } = {}) {
   if (!glosDostepny() || wylaczony || czyWyciszony()) return;
   const czysty = tekst.replace(/[„"”]/g, "").replace(/[⚽🟨🟥🔄🚑📺🗣📋⏱🏁⏸❗🧤😱🥅📣🎵👕⚠⚖️▶🚩]/gu, "").replace(/\s+/g, " ").trim();
   if (!czysty) return;
@@ -57,8 +57,15 @@ export function mow(tekst: string, rola: Rola, o: { przerwij?: boolean; emocje?:
     const plec: Plec = o.plec ?? (rola === "dziennikarz" ? (h % 3 === 0 ? "K" : "M") : "M");
     const u = new SpeechSynthesisUtterance(czysty);
     u.lang = "pl-PL";
-    const pula = plec === "M" ? glosy.M : glosy.K;
-    const awaryjna = [...glosy.nieznane, ...(plec === "M" ? glosy.K : glosy.M)];
+    let pula = plec === "M" ? glosy.M : glosy.K;
+    let awaryjna = [...glosy.nieznane, ...(plec === "M" ? glosy.K : glosy.M)];
+    // cudzoziemiec: głos w jego języku (też przy łamanym polskim — brzmi z obcym akcentem)
+    if (o.jezyk && !o.jezyk.startsWith("pl")) {
+      u.lang = o.jezyk;
+      const obce = window.speechSynthesis.getVoices().filter((v) => v.lang?.toLowerCase().startsWith(o.jezyk!.slice(0, 2).toLowerCase()));
+      const m = obce.filter((v) => MESKIE.test(v.name) || /daniel|thomas|jorge|diego|luca|yuri|xander|male/i.test(v.name));
+      pula = plec === "M" && m.length ? m : obce; awaryjna = obce;
+    }
     const g = pula.length ? pula[h % pula.length] : awaryjna[h % Math.max(1, awaryjna.length)];
     if (g) u.voice = g;
     // brak głosu tej płci → przestrój dostępny (męski: dużo niżej; damski: wyżej)

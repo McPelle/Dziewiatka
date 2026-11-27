@@ -94,6 +94,7 @@ export interface Zawodnik {
   prosiOTransfer: boolean; // zawodnik chce odejść (niskie morale)
   noga: Noga; // lepsza noga
   kraj?: string; // narodowość (brak = Polska); obcokrajowcy wg przepisów PZPN o cudzoziemcach
+  polski?: number; // znajomość języka polskiego 0–100 (cudzoziemcy uczą się z czasem)
   numer: number; // numer na koszulce
   kariera: WpisKariery[]; // historia kariery (generowana — realne staty amatorów nie istnieją)
   zdjecie?: string; // wgrane zdjęcie (data URI) — wgrywa użytkownik, trzymane lokalnie
@@ -213,6 +214,10 @@ export interface Klub {
   trenerKontraktTyp?: KontraktTyp; // kontrakt trenera z klubem — jak u piłkarzy (zawodowy/półprof./amator wg szczebla)
   trenerKontraktDo?: number; // ostatni sezon umowy trenera (po wygaśnięciu bez przedłużenia — odchodzi)
   trenerWiek?: number;
+  trenerKraj?: string; // narodowość trenera (brak = Polska)
+  /** Sankcje stadionowe (liczba najbliższych meczów): zakaz wyjazdowy kibiców, zamknięty sektor gości / trybuna gospodarzy / stadion. */
+  sankcje?: { zakazWyjazdowy?: number; sektorGosciZamkniety?: number; trybunaZamknieta?: number; stadionZamkniety?: number; zakazyStadionowe?: number };
+  trenerPolski?: number; // znajomość polskiego przez trenera-cudzoziemca 0–100
   trenerPensja?: number; // zł/kolejkę
 }
 
@@ -381,6 +386,19 @@ export interface StanGry {
   social?: import("./zywySwiat").Wpis[]; // wpisy kibiców w sieci
   kadraOkna?: string[]; // przerwy FIFA już rozegrane („sezon-miesiąc")
   kadraMecze?: import("./reprezentacje").MeczKadry[]; // ostatnie mecze reprezentacji
+  tlumacz?: boolean; // tłumacz klubowy (szatnia, konferencje, rozmowy)
+  ochrona?: import("./bezpieczenstwo").UstawieniaOchrony; // firma ochroniarska i obsada meczów u siebie
+  ostatnieZabezpieczenie?: import("./bezpieczenstwo").Zabezpieczenie & { widzowie: number; rywal: string; incydenty: import("./bezpieczenstwo").Incydent[] };
+  sektorGosciProcent?: number; // wielkość sektora gości na Twoim stadionie (min. 5% wg PZPN; 0 = zamknięty)
+  opiniaPolicji?: number;
+  oprawyUzyte?: Record<string, string[]>; // podpisy pokazanych opraw każdego klubu — oprawa nigdy się nie powtarza // opinia policji o organizacji meczów 0–100
+  tlumacze?: Tlumacz[]; // zatrudnieni tłumacze (każdy zna swoje języki)
+  rynekTlumaczy?: Tlumacz[]; // kandydaci na tłumaczy
+  kursPolskiego?: boolean; // kurs języka polskiego dla obcokrajowców opłacany przez klub
+  trenerAngielski?: boolean; // (stare) trener porozumiewa się po angielsku
+  jezykiTrenera?: Record<string, number>; // języki obce trenera gracza: kod → poziom 0–100
+  naukaJezykaTrenera?: string; // język, którego trener gracza aktualnie się uczy (kurs)
+  treningLive?: import("./treningLive").SesjaTreningu; // trening obejrzany na żywo — rozliczany w raporcie dnia
   meczLivePuchar?: import("./meczNaZywo").MeczLive; // mecz pucharowy obejrzany na żywo — rozliczany z rundą pucharu
   meczLive?: import("./meczNaZywo").MeczLive; // mecz obejrzany na żywo — czeka na rozliczenie w kolejce
   przetarg?: import("./budowy").Przetarg; // otwarty przetarg na budowę
@@ -388,6 +406,7 @@ export interface StanGry {
   slotId?: string; // id slotu zapisu tej kariery („Zapisz grę" nadpisuje ten slot)
   wersja: 1;
   trener: string;
+  trenerDataUr?: string; // data urodzenia trenera gracza (DD.MM.RRRR)
   trenerZdjecie?: string; // wgrane zdjęcie trenera (data URI) — lokalnie
   trenerKariera?: WpisTrenera[]; // historia prowadzonych klubów ze statystykami
   treningiTydzien?: number; // wybrana liczba treningów w tygodniu Twojego klubu (domyślnie wg poziomu)
@@ -451,7 +470,7 @@ export interface StanGry {
   rekordy?: Rekordy; // rekordy klubu (najlepsze miejsce, punkty, król strzelców, największa wygrana)
   testRynek?: string[]; // pula kandydatów na testy (niższe ligi) — do przeglądania w oknie transferowym
   sztabWolni?: Pracownik[]; // rynek wolnych specjalistów sztabu (bez klubu) — zatrudniasz stąd, odchodzący tu wracają
-  trenerzyWolni?: { imie: string; nazwisko: string; licencja: "C" | "B" | "A" | "PRO"; wiek?: number; historia: { klub: string; od: number; do: number | null }[] }[]; // rynek wolnych trenerów (zwolnieni/odeszli) — kluby biorą stąd następców
+  trenerzyWolni?: { imie: string; nazwisko: string; licencja: "C" | "B" | "A" | "PRO"; wiek?: number; historia: { klub: string; od: number; do: number | null }[]; kraj?: string; polski?: number }[]; // rynek wolnych trenerów (zwolnieni/odeszli) — kluby biorą stąd następców
   sedziowie?: Sedziowie; // kadra sędziowska świata: realna (szczebel centralny) + generowana regionalna (wg PZPN)
   superpuchar?: { sezon: number; zwyciezca: string; przegrany: string; wynik: string }; // ostatni Superpuchar Polski (mistrz vs zdobywca PP)
   wykonawcy?: { karne?: string; wolne?: string; rozne?: string }; // wyznaczeni wykonawcy stałych fragmentów (id zawodników klubu gracza)
@@ -478,6 +497,9 @@ export interface Sedziowie {
   region: SedziaOsoba[];      // generowani sędziowie regionu gry (III liga→B klasa + puchar wojewódzki)
 }
 
+/** Tłumacz klubowy — osoba z konkretnymi językami, jakością 1–5 i pensją (zł/tydz.). */
+export interface Tlumacz { id: string; imie: string; nazwisko: string; jezyki: string[]; jakosc: number; pensja: number; wiek?: number }
+
 export type RolaSztabu = "asystent" | "bramkarzy" | "fizjo" | "kondycja" | "skaut" | "analityk";
 /** Jeden członek sztabu — działa jak piłkarz: kontrakt (typ + do kiedy), wiek, może być bez klubu (wolny). */
 export interface Pracownik {
@@ -491,6 +513,8 @@ export interface Pracownik {
   kontraktTyp?: KontraktTyp; // zawodowy / półprofesjonalny / amator — wg szczebla klubu
   kontraktDo?: number; // ostatni sezon umowy (jak u piłkarzy); brak = wolny/bezterminowy
   lata?: number; // doświadczenie (sezony w zawodzie) — do opisu/rynku
+  kraj?: string; // narodowość (brak = Polska)
+  polski?: number; // znajomość polskiego 0–100 (cudzoziemiec w sztabie)
 }
 /** Sztab szkoleniowy klubu — po jednym etacie na rolę (pusty = wakat). Każdy klub (Ekstraklasa→B klasa) ma swój. */
 export type Sztab = Partial<Record<RolaSztabu, Pracownik>>;

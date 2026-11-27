@@ -3,8 +3,9 @@ import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
 import { kosztSztabuNaKolejke, poziomSztabu, przedluzSztab, ROLE_SZTABU, rynekSztabu, zatrudnijSztab, zwolnijSztab } from "../engine/sztab";
 import { kosztMisji, REGIONY_SKAUT, sciagnijTalent, wiekMinimalny, wyslijSkauta } from "../engine/skauting";
-import { NAZWA_KONTRAKTU } from "../engine/swiat";
+import { NAZWA_KONTRAKTU, urodzony } from "../engine/swiat";
 import { narodowoscKraju } from "../data/narodowosci";
+import { jezykKraju, JEZYKI_DO_NAUKI, pensjaTlumacza, potrzebneJezyki, rynekTlumaczy, tlumaczDla, tlumaczeKlubu, zatrudnijTlumacza, zwolnijTlumacza, jezykiTrenera, kosztKursu, kosztKursuTrenera, NAZWA_JEZYKA, jezykZawodnika, poziomJezykaTrenera, polski, type Jezyk } from "../engine/jezyki";
 import type { Pracownik, RolaSztabu, StanGry } from "../engine/types";
 import { ProfilZawodnika } from "./ProfilZawodnika";
 import { Twarz } from "./Twarz";
@@ -19,6 +20,7 @@ function gwiazdki(poziom: number) {
 export function Sztab({ s, widoczny, onClose, odswiez }: { s: StanGry; widoczny: boolean; onClose: () => void; odswiez: () => void }) {
   const [rynek, setRynek] = useState<{ rola: RolaSztabu; lista: Pracownik[] } | null>(null);
   const [profil, setProfil] = useState<string | null>(null);
+  const [rynekTl, setRynekTl] = useState(false);
   const klub = s.kluby[s.mojKlub];
   const sztab = klub?.sztab ?? {};
   const koszt = kosztSztabuNaKolejke(s);
@@ -33,6 +35,56 @@ export function Sztab({ s, widoczny, onClose, odswiez }: { s: StanGry; widoczny:
               Specjaliści realnie wpływają na zespół. Łączny koszt: <Text style={{ color: K.akcent, fontWeight: "700" }}>{zl(koszt)}/kolejkę</Text>.
             </Text>
 
+            {/* języki: tłumacz klubowy i kurs polskiego dla obcokrajowców */}
+            {(() => {
+              const k = s.kluby[s.mojKlub];
+              const obcy = k.zawodnicy.map((id) => s.zawodnicy[id]).filter((z) => z && z.kraj && z.kraj !== "Polska");
+              const slabo = obcy.filter((z) => polski(z!) < 55);
+              return (
+                <View style={[st.karta, { marginHorizontal: 0, marginBottom: 10 }]}>
+                  <Text style={st.naglowek}>🗣 Języki w szatni</Text>
+                  <Text style={st.maly}>Obcokrajowców: {obcy.length} · słabo mówiących po polsku: {slabo.length}{slabo.length ? ` (${slabo.slice(0, 4).map((z) => `${z!.nazwisko} — ${NAZWA_JEZYKA[jezykZawodnika(z!)]}, ${Math.round(polski(z!))}%`).join("; ")})` : ""}</Text>
+                  <Text style={[st.naglowek, { marginTop: 8 }]}>👥 Tłumacze klubu</Text>
+                  {potrzebneJezyki(s).length ? <Text style={st.maly}>Szatnia potrzebuje: {potrzebneJezyki(s).map((j) => `${NAZWA_JEZYKA[j]}${tlumaczDla(s, j) ? " ✓" : " ✗"}`).join(", ")}</Text> : <Text style={st.maly}>Wszyscy dogadują się po polsku — tłumacz niepotrzebny.</Text>}
+                  {tlumaczeKlubu(s).map((t) => (
+                    <View key={t.id} style={[st.wiersz, { marginTop: 6, gap: 8 }]}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[st.tekst, { fontSize: 13.5 }]}>{t.imie} {t.nazwisko} · {"★".repeat(t.jakosc)}{"☆".repeat(5 - t.jakosc)}</Text>
+                        <Text style={[st.maly, { fontSize: 11 }]}>🎂 {urodzony(t.id, t.wiek, s.sezon)} · języki: {t.jezyki.map((j) => NAZWA_JEZYKA[j as Jezyk]).join(", ")} · {zl(t.pensja)}/tydz.</Text>
+                      </View>
+                      <Pressable onPress={() => { zwolnijTlumacza(s, t.id); odswiez(); }} style={[st.przyciskMaly, { borderColor: K.czerwony }]}><Text style={[st.przyciskMalyTekst, { color: K.czerwony }]}>Zwolnij</Text></Pressable>
+                    </View>))}
+                  <Pressable onPress={() => { setRynekTl(!rynekTl); if (!rynekTl) rynekTlumaczy(s); }} style={[st.przyciskMaly, { marginTop: 8, alignItems: "flex-start" }]}><Text style={st.przyciskMalyTekst}>{rynekTl ? "▲ Ukryj kandydatów" : "＋ Zatrudnij tłumacza (kandydaci)"}</Text></Pressable>
+                  {rynekTl && (<>
+                    {rynekTlumaczy(s).map((t) => (
+                      <View key={t.id} style={[st.wiersz, { marginTop: 6, gap: 8 }]}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={[st.tekst, { fontSize: 13 }]}>{t.imie} {t.nazwisko} · {"★".repeat(t.jakosc)}{"☆".repeat(5 - t.jakosc)}</Text>
+                          <Text style={[st.maly, { fontSize: 11 }]}>🎂 {urodzony(t.id, t.wiek, s.sezon)} · {t.jezyki.map((j) => `${NAZWA_JEZYKA[j as Jezyk]}${potrzebneJezyki(s).includes(j as Jezyk) ? " ★" : ""}`).join(", ")} · {zl(pensjaTlumacza(t.jakosc, t.jezyki.length, k.poziom))}/tydz.</Text>
+                        </View>
+                        <Pressable onPress={() => { const b = zatrudnijTlumacza(s, t); if (b) info(b); odswiez(); }} style={[st.przyciskMaly, { borderColor: K.zielony }]}><Text style={[st.przyciskMalyTekst, { color: K.zielony }]}>Zatrudnij</Text></Pressable>
+                      </View>))}
+                    <Pressable onPress={() => { rynekTlumaczy(s, true); odswiez(); }} style={{ marginTop: 6 }}><Text style={[st.maly, { color: K.niebieski }]}>⟳ Inni kandydaci</Text></Pressable>
+                  </>)}
+                  <Text style={[st.maly, { fontSize: 10.5, marginTop: 4 }]}>Tłumacz pomaga tylko w swoich językach: w szatni, na odprawach, w rozmowach i na konferencjach. Członek sztabu-cudzoziemiec z tłumaczem pracuje prawie na pełnych obrotach. ★ — język potrzebny Twojej szatni.</Text>
+                  <Pressable onPress={() => { s.kursPolskiego = !s.kursPolskiego; odswiez(); }} style={[st.przyciskMaly, { marginTop: 6, alignItems: "flex-start", borderColor: s.kursPolskiego ? K.zielony : K.linia }]}>
+                    <Text style={st.przyciskMalyTekst}>{s.kursPolskiego ? "✅" : "⬜"} Kurs języka polskiego — {zl(kosztKursu(k.poziom))}/tydz.</Text>
+                    <Text style={[st.maly, { fontSize: 11 }]}>Lektorka 2× w tygodniu po treningu. Nauka ok. 2,5× szybsza (Słowianie i młodzi najszybciej).</Text>
+                  </Pressable>
+                  <Text style={[st.naglowek, { marginTop: 10 }]}>🎓 Twoje języki (trener)</Text>
+                  {Object.entries(jezykiTrenera(s)).filter(([, v]) => (v ?? 0) > 0).map(([j, v]) => (
+                    <View key={j} style={{ marginTop: 4 }}>
+                      <Text style={st.maly}><Text style={{ color: K.tekst, fontWeight: "700" }}>{NAZWA_JEZYKA[j as Jezyk]}</Text> · {Math.round(v ?? 0)}% — {poziomJezykaTrenera(v ?? 0)}{s.naukaJezykaTrenera === j ? " · 📚 trwa kurs" : ""}</Text>
+                      <View style={{ height: 4, backgroundColor: "#173126", borderRadius: 2, marginTop: 2 }}><View style={{ width: `${Math.round(v ?? 0)}%`, height: 4, backgroundColor: K.akcent, borderRadius: 2 }} /></View>
+                    </View>))}
+                  <Text style={[st.maly, { marginTop: 6 }]}>Ucz się języka (kurs {zl(kosztKursuTrenera(k.poziom))}/tydz., szybciej, gdy masz w kadrze zawodników mówiących tym językiem). Im lepiej znasz język zawodnika, tym lepiej rozumie Twoje odprawy i rozmowy.</Text>
+                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
+                    {JEZYKI_DO_NAUKI.map((j) => <Pressable key={j} onPress={() => { s.naukaJezykaTrenera = s.naukaJezykaTrenera === j ? undefined : j; jezykiTrenera(s); odswiez(); }} style={[st.chip, { marginBottom: 0, paddingVertical: 4 }, s.naukaJezykaTrenera === j && st.chipAktywny]}><Text style={{ color: s.naukaJezykaTrenera === j ? "#17310f" : K.tekst, fontSize: 11.5 }}>{NAZWA_JEZYKA[j]}{obcy.some((z) => jezykZawodnika(z!) === j) ? " ★" : ""}</Text></Pressable>)}
+                  </View>
+                  <Text style={[st.maly, { fontSize: 10.5, marginTop: 4 }]}>★ — język, którym mówi ktoś z Twojej kadry. Jeden kurs naraz; dotknij ponownie, by przerwać.</Text>
+                </View>
+              );
+            })()}
             {ROLE_SZTABU.map((r) => {
               const czlonek = sztab[r.rola];
               const otwarty = rynek?.rola === r.rola;
@@ -46,7 +98,8 @@ export function Sztab({ s, widoczny, onClose, odswiez }: { s: StanGry; widoczny:
                         <View style={[st.wiersz, { gap: 8, marginTop: 6, alignItems: "flex-start" }]}>
                           <Twarz seed={`${czlonek.imie} ${czlonek.nazwisko}`} rozmiar={34} jersey="#2a2f3a" />
                           <View style={{ flex: 1 }}>
-                            <Text style={[st.tekst, { fontSize: 14 }]}>{czlonek.imie} {czlonek.nazwisko}{czlonek.wiek ? ` · ${czlonek.wiek} l.` : ""}</Text>
+                            <Text style={[st.tekst, { fontSize: 14 }]}>{narodowoscKraju(czlonek.kraj)?.flaga ?? "🇵🇱"} {czlonek.imie} {czlonek.nazwisko}</Text>
+                            <Text style={[st.maly, { fontSize: 11 }]}>🎂 {urodzony(czlonek.id ?? czlonek.imie + czlonek.nazwisko, czlonek.wiek, s.sezon)}{czlonek.kraj && czlonek.kraj !== "Polska" ? ` · ${czlonek.kraj} · ${NAZWA_JEZYKA[jezykKraju(czlonek.kraj)]}, polski ${Math.round(czlonek.polski ?? 0)}%${(czlonek.polski ?? 0) < 55 ? " — bez tłumacza pracuje słabiej" : ""}` : ""}</Text>
                             <Text style={st.maly}><Text style={{ color: K.akcent }}>{gwiazdki(czlonek.poziom)}</Text> · {zl(czlonek.pensja)}/kol.</Text>
                             <Text style={st.maly}>
                               {NAZWA_KONTRAKTU[czlonek.kontraktTyp ?? "amator"]}{czlonek.kontraktDo != null ? ` · umowa do ${czlonek.kontraktDo}` : ""}
@@ -82,7 +135,8 @@ export function Sztab({ s, widoczny, onClose, odswiez }: { s: StanGry; widoczny:
                           <View style={[st.wiersz, { gap: 8 }]}>
                             <Twarz seed={`${kand.imie} ${kand.nazwisko}`} rozmiar={30} jersey="#2a2f3a" />
                             <View style={{ flex: 1 }}>
-                              <Text style={[st.tekst, { fontSize: 14 }]}>{kand.imie} {kand.nazwisko}{kand.wiek ? ` · ${kand.wiek} l.` : ""}</Text>
+                              <Text style={[st.tekst, { fontSize: 14 }]}>{narodowoscKraju(kand.kraj)?.flaga ?? "🇵🇱"} {kand.imie} {kand.nazwisko}</Text>
+                              <Text style={[st.maly, { fontSize: 11 }]}>🎂 {urodzony(kand.id ?? kand.imie + kand.nazwisko, kand.wiek, s.sezon)}{kand.kraj && kand.kraj !== "Polska" ? ` · ${NAZWA_JEZYKA[jezykKraju(kand.kraj)]}, polski ${Math.round(kand.polski ?? 0)}%` : ""}</Text>
                               <Text style={st.maly}><Text style={{ color: K.akcent }}>{gwiazdki(kand.poziom)}</Text> · {zl(kand.pensja)}/kol. · podpis {zl(kand.pensja * 4)}</Text>
                             </View>
                           </View>

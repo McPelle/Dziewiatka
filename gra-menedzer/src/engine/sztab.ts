@@ -3,6 +3,8 @@
 // Po wygaśnięciu bez przedłużenia odchodzą (wracają na rynek), a klub zatrudnia kogoś nowego.
 import { los, losInt, szansa, wybierz } from "./losuj";
 import { IMIONA, NAZWISKA } from "../data/nazwy";
+import { NARODOWOSCI } from "../data/narodowosci";
+import { jezykKraju } from "./jezyki";
 import type { Klub, KontraktTyp, Pracownik, RolaSztabu, StanGry } from "./types";
 
 // Lokalne odpowiedniki reguł z swiat.ts (świadomie niezależne — sztab nie importuje swiat, by uniknąć cyklu).
@@ -66,6 +68,15 @@ export function nowyPracownik(s: StanGry, rola: RolaSztabu, poziomKlubu: number,
     wiek: losInt(32, 62),
     lata: losInt(1, 25),
   };
+  // cudzoziemiec w sztabie — częściej w Ekstraklasie i I lidze (osoby wygenerowane)
+  const szObcy = opts.wolny ? 0.14 : [0.3, 0.22, 0.15, 0.08, 0.05, 0.03, 0.02, 0.015, 0.01][Math.min(8, poziomKlubu - 1)];
+  if (szansa(szObcy)) {
+    const nisko = poziomKlubu >= 6;
+    const pula = NARODOWOSCI.filter((x) => x.kraj !== "Polska" && (!nisko || ["Ukraina", "Słowacja", "Czechy", "Białoruś"].includes(x.kraj)));
+    const n = pula[Math.floor(Math.random() * pula.length)] ?? NARODOWOSCI[0];
+    p.imie = wybierz(n.imiona); p.nazwisko = wybierz(n.nazwiska); p.kraj = n.kraj;
+    p.polski = nisko ? losInt(50, 95) : ["Ukraina", "Słowacja", "Czechy", "Białoruś"].includes(n.kraj) ? losInt(25, 85) : losInt(0, 45);
+  }
   if (!opts.wolny) {
     p.kontraktTyp = kontraktTyp(poziomKlubu);
     p.kontraktDo = s.sezon + dlugoscKontraktuSztabu(poziomKlubu);
@@ -88,8 +99,17 @@ export function obsadzSztabKlubu(s: StanGry, klub: Klub): void {
 
 /** Poziom specjalisty w danej roli (0 = wakat). Tylko klub gracza. */
 export function poziomSztabu(s: StanGry, rola: RolaSztabu): number {
-  return s.kluby[s.mojKlub]?.sztab?.[rola]?.poziom ?? 0;
+  const p = s.kluby[s.mojKlub]?.sztab?.[rola];
+  if (!p) return 0;
+  // cudzoziemiec słabo mówiący po polsku działa słabiej (chyba że jest tłumacz jego języka); skaut — bez znaczenia
+  if (!p.kraj || p.kraj === "Polska" || rola === "skaut" || (p.polski ?? 0) >= 55) return p.poziom;
+  const tl = (s.tlumacze ?? []).some((t) => t.jezyki.includes(jezykPracownika(p))) || !!s.tlumacz;
+  const f = tl ? 0.9 : 0.55 + ((p.polski ?? 0) / 55) * 0.4;
+  return Math.max(1, Math.round(p.poziom * f));
 }
+/** Język ojczysty członka sztabu (kod). */
+export const jezykPracownika = (p: Pracownik): string => jezykKraju(p.kraj);
+
 
 /** Łączny koszt sztabu na kolejkę (klub gracza). */
 export function kosztSztabuNaKolejke(s: StanGry): number {

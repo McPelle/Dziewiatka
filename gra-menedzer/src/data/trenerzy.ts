@@ -5,6 +5,14 @@
 import { losInt, wybierz } from "../engine/losuj";
 import type { Klub, KontraktTyp, StanGry } from "../engine/types";
 import { IMIONA, MIANA, MIEJSCOWOSCI, NAZWISKA } from "./nazwy";
+import { NARODOWOSCI } from "./narodowosci";
+
+/** Narodowość realnych trenerów-cudzoziemców (pozostali realni — Polacy). Znajomość polskiego — szacunek gry. */
+const KRAJ_TRENERA: Record<string, { kraj: string; polski: number }> = {
+  Frederiksen: { kraj: "Dania", polski: 10 }, "Gašparík": { kraj: "Słowacja", polski: 45 }, Golem: { kraj: "Chorwacja", polski: 20 },
+  "García Junyent": { kraj: "Hiszpania", polski: 5 }, "Vuković": { kraj: "Serbia", polski: 95 }, Carver: { kraj: "Anglia", polski: 3 },
+  Lupashko: { kraj: "Ukraina", polski: 60 }, Jarolim: { kraj: "Czechy", polski: 45 }, "Szatałow": { kraj: "Ukraina", polski: 100 }, "Struhár": { kraj: "Słowacja", polski: 70 },
+};
 
 // Kontrakt trenera z klubem — te same formy co u piłkarzy (bez importu swiat, by uniknąć cyklu).
 function kontraktTypPoziom(poziom: number): KontraktTyp { return poziom <= 3 ? "zawodowy" : poziom <= 6 ? "polprofesjonalny" : "amator"; }
@@ -21,6 +29,7 @@ export interface TrenerReal {
   odMiesiac?: string;
   licencja?: "C" | "B" | "A" | "PRO";
   historia?: WpisHistorii[]; // wcześniejsze kluby, najnowsze pierwsze
+  kraj?: string; // narodowość (brak = Polska)
 }
 
 // Realni trenerzy — klucz = dokładna nazwa klubu (jak w danych ścieżki). Uzupełniane z badań sieciowych.
@@ -115,11 +124,20 @@ export function przypiszTrenera(s: StanGry, klub: Klub): void {
     klub.trenerHistoria = real.historia ? real.historia.map((h) => ({ ...h })) : [];
     klub.trenerWiek = losInt(38, 62);
     klub.trenerKontraktDo = sezon + dlugoscKontraktuTrenera(klub.poziom);
+    const kt = KRAJ_TRENERA[real.nazwisko]; if (kt) { klub.trenerKraj = real.kraj ?? kt.kraj; klub.trenerPolski = kt.polski; } else { delete klub.trenerKraj; delete klub.trenerPolski; }
     return;
   }
   // Wygenerowany szkoleniowiec — wiarygodny, lokalny, z krótką historią.
   klub.trenerImie = wybierz(IMIONA);
   klub.trenerNazwisko = wybierz(NAZWISKA);
+  delete klub.trenerKraj; delete klub.trenerPolski;
+  // wygenerowany cudzoziemiec — częściej na wyższych szczeblach (wygenerowany, nie realny)
+  if (Math.random() < SZANSA_OBCEGO[Math.min(8, klub.poziom - 1)]) {
+    const t = generujObcegoTrenera(klub.poziom, sezon);
+    klub.trenerImie = t.imie; klub.trenerNazwisko = t.nazwisko; klub.trenerKraj = t.kraj; klub.trenerPolski = t.polski; klub.trenerWiek = t.wiek;
+    klub.trenerOd = sezon - losInt(0, 2); klub.trenerHistoria = t.historia; klub.trenerLicencja = licencjaDlaPoziomu(klub.poziom); klub.trenerKontraktDo = sezon + dlugoscKontraktuTrenera(klub.poziom);
+    return;
+  }
   klub.trenerOd = sezon - losInt(0, 3);
   klub.trenerReal = false;
   klub.trenerLicencja = licencjaDlaPoziomu(klub.poziom);
@@ -130,6 +148,33 @@ export function przypiszTrenera(s: StanGry, klub: Klub): void {
 
 const RANGA_LIC = { C: 0, B: 1, A: 2, PRO: 3 } as const;
 
+/** Szansa, że wakat obsadzi trener-cudzoziemiec (wyżej częściej; w klasach A/B rzadko — zwykle ktoś mieszkający w Polsce). */
+const SZANSA_OBCEGO = [0.32, 0.24, 0.16, 0.1, 0.06, 0.04, 0.025, 0.02, 0.015];
+const SASIEDZI = ["Ukraina", "Słowacja", "Czechy", "Białoruś", "Litwa"];
+const PRZYDOMKI = ["FC", "FK", "SK", "CD", "AS", "SV", "NK", "AC", "KF", "IF"];
+/** Wygenerowany trener z zagranicy (nie realna osoba): kraj, imię i nazwisko z tego kraju, znajomość polskiego, historia za granicą. */
+export function generujObcegoTrenera(poziom: number, sezon: number): { imie: string; nazwisko: string; kraj: string; polski: number; wiek: number; historia: WpisHistorii[] } {
+  const nisko = poziom >= 6;
+  const pula = NARODOWOSCI.filter((x) => x.kraj !== "Polska" && (!nisko || SASIEDZI.includes(x.kraj) || Math.random() < 0.15));
+  const n = pula[Math.floor(Math.random() * pula.length)] ?? NARODOWOSCI[0];
+  const polski = nisko ? losInt(45, 95) : SASIEDZI.includes(n.kraj) ? losInt(20, 80) : losInt(0, 35); // w niższych ligach — zwykle osiadli w Polsce
+  const historia: WpisHistorii[] = [];
+  let koniec = sezon;
+  for (let i = 0; i < losInt(1, 4); i++) { const d = losInt(1, 3); historia.push({ klub: `${wybierz(PRZYDOMKI)} ${wybierz(n.nazwiska)} (${n.kraj})`, od: koniec - d, do: koniec }); koniec -= d; }
+  return { imie: wybierz(n.imiona), nazwisko: wybierz(n.nazwiska), kraj: n.kraj, polski, wiek: losInt(36, 62), historia };
+}
+/** Rynek trenerów: co sezon zgłaszają się szkoleniowcy z zagranicy szukający pracy w Polsce. */
+export function zasilRynekTrenerow(s: StanGry): void {
+  s.trenerzyWolni ??= [];
+  const obcych = s.trenerzyWolni.filter((t) => t.kraj).length;
+  for (let i = obcych; i < 14; i++) {
+    const poz = [1, 1, 2, 2, 3, 3, 4, 5, 6, 7][i % 10];
+    const t = generujObcegoTrenera(poz, s.sezon);
+    s.trenerzyWolni.push({ imie: t.imie, nazwisko: t.nazwisko, licencja: licencjaDlaPoziomu(poz), wiek: t.wiek, historia: t.historia, kraj: t.kraj, polski: t.polski });
+  }
+  if (s.trenerzyWolni.length > 60) s.trenerzyWolni = s.trenerzyWolni.slice(-60);
+}
+
 /** Trener bez klubu (zwolniony / odszedł) — czeka na rynku na nowy angaż, z zachowaną historią kariery. */
 export interface TrenerWolny {
   imie: string;
@@ -137,6 +182,7 @@ export interface TrenerWolny {
   licencja: "C" | "B" | "A" | "PRO";
   wiek?: number;
   historia: WpisHistorii[]; // spell w ostatnim klubie na początku
+  kraj?: string; polski?: number; // trener-cudzoziemiec
 }
 
 /** Uwalnia obecnego trenera klubu na rynek (dopisuje jego spell w tym klubie do historii). Nie obsadza wakatu. */
@@ -148,11 +194,12 @@ export function uwolnijTrenera(s: StanGry, klub: Klub): void {
     licencja: klub.trenerLicencja ?? licencjaDlaPoziomu(klub.poziom),
     wiek: klub.trenerWiek,
     historia: [spell, ...(klub.trenerHistoria ?? [])].slice(0, 8),
+    ...(klub.trenerKraj ? { kraj: klub.trenerKraj, polski: klub.trenerPolski } : {}),
   };
   s.trenerzyWolni ??= [];
   // nie trzymamy emerytów ani zbyt długiej listy
   if ((w.wiek ?? 0) < 66) s.trenerzyWolni.push(w);
-  if (s.trenerzyWolni.length > 40) s.trenerzyWolni = s.trenerzyWolni.slice(-40);
+  if (s.trenerzyWolni.length > 60) s.trenerzyWolni = s.trenerzyWolni.slice(-60);
 }
 
 /** Obsadza wakat w klubie: angażuje pasującego trenera z rynku (awans z niższego szczebla) albo generuje nowego. */
@@ -161,13 +208,20 @@ export function obsadzWakat(s: StanGry, klub: Klub): void {
   s.trenerzyWolni ??= [];
   // nie angażuj z powrotem trenera, który WŁAŚNIE odszedł z tego klubu w tym sezonie
   const swiezoZtego = (t: TrenerWolny) => t.historia[0]?.klub === klub.nazwa && t.historia[0]?.do === s.sezon;
-  const i = s.trenerzyWolni.findIndex((t) => RANGA_LIC[t.licencja] >= wymog - 1 && (t.wiek ?? 50) < 64 && !swiezoZtego(t));
+  zasilRynekTrenerow(s);
+  // cudzoziemiec bez polskiego w amatorskim klubie to rzadkość; w Ekstraklasie — codzienność
+  const pasuje = (t: TrenerWolny) => !t.kraj ? Math.random() > SZANSA_OBCEGO[Math.min(8, klub.poziom - 1)] * 1.5 : Math.random() < SZANSA_OBCEGO[Math.min(8, klub.poziom - 1)] * 2.5 && (klub.poziom < 6 || (t.polski ?? 0) >= 40);
+  const i = s.trenerzyWolni.findIndex((t) => RANGA_LIC[t.licencja] >= wymog - 1 && (t.wiek ?? 50) < 64 && !swiezoZtego(t) && pasuje(t));
   let imie: string, nazwisko: string, licencja: "C" | "B" | "A" | "PRO", wiek: number, historia: WpisHistorii[];
+  let kraj: string | undefined, polski: number | undefined;
   if (i >= 0) {
     const t = s.trenerzyWolni.splice(i, 1)[0];
     imie = t.imie; nazwisko = t.nazwisko; wiek = t.wiek ?? losInt(40, 60);
     licencja = RANGA_LIC[t.licencja] >= wymog ? t.licencja : licencjaDlaPoziomu(klub.poziom); // awans bywa z licencją w górę
-    historia = t.historia;
+    historia = t.historia; kraj = t.kraj; polski = t.polski;
+  } else if (Math.random() < SZANSA_OBCEGO[Math.min(8, klub.poziom - 1)]) {
+    const t = generujObcegoTrenera(klub.poziom, s.sezon);
+    imie = t.imie; nazwisko = t.nazwisko; wiek = t.wiek; licencja = licencjaDlaPoziomu(klub.poziom); historia = t.historia; kraj = t.kraj; polski = t.polski;
   } else {
     imie = wybierz(IMIONA); nazwisko = wybierz(NAZWISKA); wiek = losInt(34, 60);
     licencja = licencjaDlaPoziomu(klub.poziom); historia = generujHistorie(s.sezon, klub.poziom);
@@ -181,6 +235,7 @@ export function obsadzWakat(s: StanGry, klub: Klub): void {
   klub.trenerKontraktTyp = kontraktTypPoziom(klub.poziom);
   klub.trenerKontraktDo = s.sezon + dlugoscKontraktuTrenera(klub.poziom);
   klub.trenerHistoria = historia;
+  if (kraj) { klub.trenerKraj = kraj; klub.trenerPolski = polski; } else { delete klub.trenerKraj; delete klub.trenerPolski; }
 }
 
 /** Nowy sezon dla trenerów klubów AI: starzenie, wygaśnięcia, przedłużenia i rotacja (odejścia/zwolnienia). */
@@ -188,6 +243,7 @@ export function trenerzyNowySezon(s: StanGry): void {
   for (const klub of Object.values(s.kluby)) {
     if (klub.id === s.mojKlub) continue; // trenerem klubu gracza jest gracz
     if (klub.trenerWiek != null) klub.trenerWiek++;
+    if (klub.trenerKraj && (klub.trenerPolski ?? 0) < 100) klub.trenerPolski = Math.min(100, (klub.trenerPolski ?? 0) + losInt(8, 22)); // trenerzy z zagranicy uczą się polskiego
     const wygasl = klub.trenerKontraktTyp !== "amator" && klub.trenerKontraktDo != null && klub.trenerKontraktDo < s.sezon;
     const emerytura = (klub.trenerWiek ?? 0) >= 66;
     if (emerytura || (wygasl && Math.random() < 0.35)) {
@@ -212,7 +268,7 @@ export function zwolnijTreneraAI(s: StanGry, klub: Klub): { imie: string; nazwis
 
 /** Pełne imię i nazwisko trenera klubu (do UI). */
 export function trenerKlubu(klub: Klub): string {
-  if (klub.trenerImie || klub.trenerNazwisko) return `${klub.trenerImie ?? ""} ${klub.trenerNazwisko ?? ""}`.trim();
+  if (klub.trenerImie || klub.trenerNazwisko) return `${klub.trenerImie ?? ""} ${klub.trenerNazwisko ?? ""}`.trim() + (klub.trenerKraj ? ` ${NARODOWOSCI.find((n) => n.kraj === klub.trenerKraj)?.flaga ?? "🌍"}` : "");
   return "—";
 }
 
