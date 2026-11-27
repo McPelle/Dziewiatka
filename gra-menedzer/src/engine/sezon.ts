@@ -10,7 +10,7 @@ import { realizujUmowyWstepne, wykupZWypozyczenia } from "./transfery";
 import { nrZespolu, powolaniaAI, zespolyKlubu } from "./rezerwy";
 import { konferencjaPo, konferencjaPrzed } from "./konferencje";
 import { autoSklad, raportAsystenta, dostepny, FORMACJE, ileSpozaUE, limitSpozaUE, zagrajMecz } from "./mecz";
-import { pogodaMeczu, gorskie } from "./pogoda";
+import { pogodaMeczu, pogodaWDniuMeczu, gorskie } from "./pogoda";
 import { rozwinAtrybuty } from "./atrybuty";
 import { bonusRegeneracji, kosztSztabuNaKolejke, modRozwoj, modRozwojBR, sztabNowySezon } from "./sztab";
 import { trenerzyNowySezon, zwolnijTreneraAI } from "../data/trenerzy";
@@ -772,7 +772,8 @@ export function zagrajKolejke(s: StanGry) {
       // Derby / mecz podwyższonego ryzyka ściąga kibiców z całego obozu zgód → komplet; zgoda też pełne trybuny.
       const bonusFrek = derbyNazwa ? 0.85 : przyjaznNazwa ? 0.65 : 0;
       const kd = s.kluby[dom];
-      let pog = pogodaMeczu(kd.miasto, s.kolejka, liga.terminarz.length); // pogoda u gospodarza (nadmorskie + pora sezonu)
+      let pog = moj ? pogodaWDniuMeczu(s, kd.miasto, s.kolejka, liga.terminarz.length) : pogodaMeczu(kd.miasto, s.kolejka, liga.terminarz.length); // Twój mecz: zgodnie z prognozą (czasem się myli)
+      if (moj && s.prognoza?.zmiana) wiadomosc(s, `🌦 Prognoza się nie sprawdziła: zamiast „${s.prognoza.p.nazwa}” w ${kd.miasto} — ${pog.nazwa}.`);
       // Rodzaj murawy gospodarza (fallback wg szczebla dla starszych zapisów).
       const murawa = kd.murawa ?? (kd.poziom <= 2 ? "podgrzewana" : kd.poziom <= 4 ? "naturalna" : "sztuczna");
       const mrozSnieg = pog.nazwa === "Śnieżyca" || pog.nazwa === "Mróz";

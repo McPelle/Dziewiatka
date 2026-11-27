@@ -3,6 +3,7 @@ import { Feta3D } from "./three/Trofea3D";
 import { grafika3D } from "./three/Stadion3DWidok";
 import { bilansZRywalem } from "../engine/zywySwiat";
 import { Samouczek } from "./Samouczek";
+import { prognozaMeczu } from "../engine/pogoda";
 import { useState } from "react";
 import { Alert, Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
@@ -216,7 +217,7 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
                 const forma = (w?: typeof wierszR) => (w?.forma ?? []).slice(-5).join("") || "—";
                 const seriaR = s.kluby[rywalId].seria ?? 0;
                 const gospodarz = para![0];
-                const pog = pogodaMeczu(s.kluby[gospodarz].miasto, s.kolejka, liga.terminarz.length);
+                const prog = prognozaMeczu(s, s.kluby[gospodarz].miasto, s.kolejka, liga.terminarz.length), pog = prog.p;
                 // H2H w tym sezonie
                 const h2h: string[] = [];
                 for (const kol of liga.wyniki) for (const w of kol ?? []) {
@@ -234,7 +235,7 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
                     <Text style={st.maly}>Forma rywala: <Text style={{ color: K.tekst, fontWeight: "700" }}>{forma(wierszR)}</Text> · Twoja: {forma(wierszMoj)}</Text>
                     <Text style={st.maly}>Styl gry rywala: <Text style={{ color: K.tekst, fontWeight: "700" }}>{stylRywala(s, rywalId)}</Text></Text>
                     {seriaR !== 0 && <Text style={[st.maly, { color: seriaR > 0 ? K.zielony : K.czerwony }]}>Passa rywala: {seriaR > 0 ? `🔥 ${seriaR} zwycięstw z rzędu` : `🥶 ${-seriaR} porażek z rzędu`}</Text>}
-                    <Text style={st.maly}>Pogoda u gospodarza ({s.kluby[gospodarz].miasto}): {pog.ikona} {pog.nazwa}{pog.gole < 1 ? " — trudne warunki" : ""}</Text>
+                    <Text style={st.maly}>Prognoza u gospodarza ({s.kluby[gospodarz].miasto}): {pog.ikona} {pog.nazwa}, {prog.temp}°C · pewność {prog.pewnosc}%{pog.gole < 1 ? " — trudne warunki" : ""}</Text>
                     <Text style={st.maly}>Mecze w tym sezonie: {h2h.length ? h2h.join(", ") : "jeszcze nie graliście"}</Text>
                     <Text style={[st.maly, { marginTop: 4 }]}>Kluczowi zawodnicy rywala:</Text>
                     {kluczowi.map((z) => (

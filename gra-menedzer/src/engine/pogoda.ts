@@ -59,6 +59,7 @@ export interface Pogoda {
   gole: number; // mnożnik liczby goli (xG) — <1 = mniej goli
   frek: number; // mnożnik frekwencji — <1 = mniej kibiców
   atut: number; // mnożnik atutu własnego boiska — <1 = pogoda zrównuje szanse
+  kod?: string;
 }
 
 type Kod = "slonce" | "pochmurno" | "wiatr" | "deszcz" | "sztorm" | "snieg" | "mroz" | "mgla" | "upal";
@@ -98,7 +99,7 @@ export function pogodaMeczu(miastoGospodarza: string, kolejka?: number, liczbaKo
   // Zimne okno (późna jesień / wczesna wiosna) w górach = śnieg i mróz.
   const frac = kolejka && liczbaKolejek && liczbaKolejek >= 4 ? kolejka / liczbaKolejek : 0.3;
   // Upał na starcie sezonu (lipiec–sierpień): częstszy w głębi lądu; wybrzeże chłodzi bryza znad Bałtyku.
-  if (frac < 0.18 && !nadmorskie(miastoGospodarza) && los(0, 1) < (gorskie(miastoGospodarza) ? 0.2 : 0.32)) return POGODY.upal;
+  if (frac < 0.18 && !nadmorskie(miastoGospodarza) && los(0, 1) < (gorskie(miastoGospodarza) ? 0.2 : 0.32)) return { ...POGODY.upal, kod: "upal" };
   const zimaGorska = gorskie(miastoGospodarza) && (frac >= 0.4 && frac <= 0.64);
   const mglaJesien = !zimaGorska && (kotlina(miastoGospodarza) || dolina(miastoGospodarza)) && (frac >= 0.2 && frac < 0.5); // jesień: kotliny (małop.) i doliny/pojezierza (KP + śródlądzie ZP)
   const baza = zimaGorska ? WAGI_GORY : mglaJesien ? WAGI_KOTLINA : nadmorskie(miastoGospodarza) ? WAGI_MORZE : WAGI_LAD;
@@ -108,8 +109,27 @@ export function pogodaMeczu(miastoGospodarza: string, kolejka?: number, liczbaKo
   const suma = wagi.reduce((a, [, w]) => a + w, 0);
   let r = los(0, suma);
   for (const [kod, w] of wagi) {
-    if (r < w) return POGODY[kod];
+    if (r < w) return { ...POGODY[kod], kod };
     r -= w;
   }
   return POGODY.pochmurno;
+}
+
+// ——— prognoza pogody (jedna na kolejkę dla Twojego meczu; czasem się nie sprawdza) ———
+import type { StanGry } from "./types";
+const TEMP: Record<string, [number, number]> = { upal: [29, 35], slonce: [14, 26], pochmurno: [8, 18], wiatr: [6, 15], deszcz: [5, 14], sztorm: [3, 11], snieg: [-6, 1], mroz: [-12, -2], mgla: [2, 9] };
+export interface Prognoza { sezon: number; kolejka: number; miasto: string; p: Pogoda; pewnosc: number; temp: number; final?: Pogoda; zmiana?: boolean }
+/** Prognoza na mecz tej kolejki (stała dla tej kolejki i miasta). */
+export function prognozaMeczu(s: StanGry, miasto: string, kolejka: number, liczba: number): Prognoza {
+  const x = s.prognoza;
+  if (x && x.sezon === s.sezon && x.kolejka === kolejka && x.miasto === miasto) return x;
+  const p = pogodaMeczu(miasto, kolejka, liczba); const t = TEMP[p.kod ?? "pochmurno"] ?? [8, 18];
+  s.prognoza = { sezon: s.sezon, kolejka, miasto, p, pewnosc: Math.round(60 + Math.random() * 32), temp: Math.round(t[0] + Math.random() * (t[1] - t[0])) };
+  return s.prognoza;
+}
+/** Pogoda w dniu meczu: zwykle jak w prognozie, czasem prognoza się myli. Ustalona raz (mecz na żywo i wynik spójne). */
+export function pogodaWDniuMeczu(s: StanGry, miasto: string, kolejka: number, liczba: number): Pogoda {
+  const x = prognozaMeczu(s, miasto, kolejka, liczba);
+  if (!x.final) { const traf = Math.random() * 100 < x.pewnosc; x.final = traf ? x.p : pogodaMeczu(miasto, kolejka, liczba); x.zmiana = !traf && x.final.kod !== x.p.kod; }
+  return x.final;
 }

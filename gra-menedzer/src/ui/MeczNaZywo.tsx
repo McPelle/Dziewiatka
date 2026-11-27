@@ -19,6 +19,7 @@ import { planZabezpieczenia, ryzykoIncydentow } from "../engine/bezpieczenstwo";
 import { akcjeKibicow, sektorGosci } from "../engine/kibice";
 import { kulturaTrybun } from "../engine/flagi";
 import { doGlosu } from "../engine/przyspiewki";
+import { pogodaWDniuMeczu } from "../engine/pogoda";
 import { planOpraw } from "../engine/oprawy";
 import { zgodaKibicow } from "../engine/kibice";
 import { grafika3D, lekkaGrafika } from "./three/Stadion3DWidok";
@@ -36,7 +37,9 @@ function warunki(s: StanGry, domId: string, goscId: string, puchar?: boolean): U
   const gm = godzinaMeczu(s, domId, s.kolejka, d);
   const noc = maOswietlenie(k) && gm.wieczor;
   const zima = mies === 12 || mies <= 2, jesien = mies >= 10 && mies <= 11;
-  const pogoda: Ustawienia3D["pogoda"] = zima && h % 3 === 0 ? "snieg" : (jesien || mies === 3 || mies === 4) && h % 4 === 1 ? "deszcz" : jesien && h % 9 === 2 ? "mgla" : h % 11 === 3 ? "deszcz" : "slonce";
+  const pr = (domId === s.mojKlub || goscId === s.mojKlub) ? pogodaWDniuMeczu(s, k.miasto, s.kolejka, s.ligi[k.poziom - 1]?.terminarz.length ?? 30) : undefined; // ta sama pogoda co w prognozie i w wyniku
+  const zPrognozy: Ustawienia3D["pogoda"] | undefined = pr?.kod ? (pr.kod === "snieg" || pr.kod === "mroz" ? "snieg" : pr.kod === "deszcz" || pr.kod === "sztorm" ? "deszcz" : pr.kod === "mgla" ? "mgla" : "slonce") : undefined;
+  const pogoda: Ustawienia3D["pogoda"] = zPrognozy ?? (zima && h % 3 === 0 ? "snieg" : (jesien || mies === 3 || mies === 4) && h % 4 === 1 ? "deszcz" : jesien && h % 9 === 2 ? "mgla" : h % 11 === 3 ? "deszcz" : "slonce");
   const pusto = domId === s.mojKlub && (s.zakazTrybun ?? 0) > 0; // kara ZPN: mecz przy pustych trybunach
   const wielkiPuchar = !!puchar && s.kluby[goscId].poziom < k.poziom; // gość z wyższej ligi w pucharze — komplet
   const widzowie = pusto ? 0 : wielkiPuchar ? Math.round(k.pojemnosc * 0.97) : Math.round(k.pojemnosc * Math.min(0.95, 0.3 + k.renoma * 0.55));
