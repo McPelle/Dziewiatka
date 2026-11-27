@@ -297,8 +297,8 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
     // ——— sytuacja z gry ———
     const r = Math.random(); let acc = 0, syt = SYTUACJE[0];
     for (const t of SYTUACJE) { acc += t[1] * (okr === "skrzydla" && mojeAtak && t[0] === "glowka" ? 1.6 : 1); if (r < acc) { syt = t; break; } }
-    const [rodz, , xgB0] = syt; const xgB = Math.min(0.7, xgB0 * (dziura ? 1.35 : 1));
-    const st = wybierzZ(s, atak.naBoisku, (z) => ({ NAP: 5, POM: 2.2, OBR: rodz === "glowka" ? 2 : 0.6, BR: 0.02 })[z.poz] * (z.cechy?.includes("snajper") ? 1.6 : 1) * (1 + 0.5 * pew(z.id)) * Math.max(5, rodz === "glowka" ? at(z, "fiz") : at(z, "str")));
+    const [rodz, , xgB0] = syt; let xgB = Math.min(0.7, xgB0 * (dziura ? 1.35 : 1));
+    let st = wybierzZ(s, atak.naBoisku, (z) => ({ NAP: 5, POM: 2.2, OBR: rodz === "glowka" ? 2 : 0.6, BR: 0.02 })[z.poz] * (z.cechy?.includes("snajper") ? 1.6 : 1) * (1 + 0.5 * pew(z.id)) * Math.max(5, rodz === "glowka" ? at(z, "fiz") : at(z, "str")));
     const gk = bramkarz(s, obr);
     const kandA = atak.naBoisku.filter((x) => x !== st?.id);
     const asystent = wybierzZ(s, kandA, (z) => ({ NAP: 3, POM: 4, OBR: rodz === "glowka" ? 2.5 : 1.2, BR: 0.05 })[z.poz] * Math.max(5, at(z, "pod")));
@@ -306,6 +306,22 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
     if (rodz === "glowka") sek.push({ x: X(los(82, 92)), y: szansa(0.5) ? los(4, 14) : los(86, 96), nosnik: asystent?.id });
     else if (rodz === "samnasam") sek.push({ x: X(los(68, 76)), y: los(30, 70), nosnik: asystent?.id });
     else sek.push({ x: X(los(66, 78)), y: los(20, 80), nosnik: asystent?.id });
+    // decyzja zawodnika przy piłce (wg atrybutów i obrońcy naprzeciw): strzał, drybling albo podanie do lepiej ustawionego
+    if (st && rodz !== "glowka") {
+      const obronca = wybierzZ(s, obr.naBoisku, (z) => (z.poz === "OBR" ? 3 : z.poz === "POM" ? 1 : 0.1));
+      const dry = at(st, "dry"), pod = at(st, "pod"), strz = at(st, "str"), krycie = at(obronca, "obr");
+      const lepszy = wybierzZ(s, atak.naBoisku.filter((x) => x !== st!.id), (z) => (z.poz === "NAP" ? 3 : 1) * Math.max(5, at(z, "str")));
+      if (rodz === "dalekie" && strz < 55 && pod > strz + 8 && lepszy && at(lepszy, "str") > strz + 5) { // słaby strzelec z dystansu wybiera podanie
+        sek.push({ x: X(los(80, 88)), y: los(30, 70), nosnik: lepszy.id }); xgB = Math.min(0.7, xgB + 0.05);
+        if (Math.random() < 0.5) m.komentarz.unshift({ min: minTxt, typ: "akcja", tekst: `👀 ${nz(s, st.id)} nie ryzykuje strzału z daleka — dogrywa do lepiej ustawionego ${nz(s, lepszy.id)}.` });
+        st = lepszy;
+      } else if (dry > 58 && dry > krycie - 5 && Math.random() < dry / 180) { // drybler idzie na obrońcę
+        const udany = Math.random() < 0.35 + (dry - krycie) / 120;
+        sek.push({ x: X(los(78, 86)), y: los(25, 75), nosnik: st.id });
+        xgB = Math.min(0.7, xgB * (udany ? 1.3 : 0.65));
+        if (Math.random() < 0.5) m.komentarz.unshift({ min: minTxt, typ: "akcja", tekst: udany ? `🕺 ${nz(s, st.id)} zwodem mija ${obronca ? nz(s, obronca.id) : "obrońcę"} i wchodzi w pole karne!` : `${nz(s, st.id)} próbuje minąć ${obronca ? nz(s, obronca.id) : "obrońcę"}, ale ten nie daje się zwieść — strzał w tłoku.` });
+      }
+    }
     const sx = rodz === "dalekie" ? los(68, 78) : rodz === "samnasam" ? los(86, 92) : rodz === "glowka" ? los(89, 95) : los(80, 90);
     const sy = rodz === "dalekie" ? los(25, 75) : los(36, 64);
     sek.push({ x: X(sx), y: sy, h: rodz === "glowka" ? 2.4 : 0, nosnik: st?.id, zdarzenie: "strzal" });
