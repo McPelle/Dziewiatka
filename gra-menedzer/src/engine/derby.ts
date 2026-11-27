@@ -15,6 +15,8 @@ function wrogiePatrony(x: string, y: string): boolean {
 export function jestDerby(s: StanGry, domId: string, goscId: string): string | null {
   const a = s.kluby[domId]?.nazwa, b = s.kluby[goscId]?.nazwa;
   if (!a || !b) return null;
+  const dyn = (s.relacjeDyn ?? []).filter((r) => (r.a === a && r.b === b) || (r.a === b && r.b === a)).slice(-1)[0];
+  if (dyn) return dyn.typ === "kosa" ? `Mecz podwyższonego ryzyka (zerwana zgoda ${a} – ${b})` : null;
   // zgoda / układ wg potwierdzonych relacji ma pierwszeństwo — taki mecz nie jest meczem podwyższonego ryzyka
   if (RELACJE_KIBICOW.some((r) => r.typ !== "kosa" && ((r.a === a && r.b === b) || (r.a === b && r.b === a)))) return null;
   for (const d of DERBY) if ((d.a === a && d.b === b) || (d.a === b && d.b === a)) return d.nazwa;
@@ -39,6 +41,8 @@ export function jestDerby(s: StanGry, domId: string, goscId: string): string | n
 export function jestPrzyjazn(s: StanGry, domId: string, goscId: string): string | null {
   const a = s.kluby[domId]?.nazwa, b = s.kluby[goscId]?.nazwa;
   if (!a || !b) return null;
+  const dyn = (s.relacjeDyn ?? []).filter((r) => (r.a === a && r.b === b) || (r.a === b && r.b === a)).slice(-1)[0];
+  if (dyn) return dyn.typ === "kosa" ? null : `Nowy układ kibicowski ${a} – ${b}`;
   for (const p of PRZYJAZNIE) if ((p.a === a && p.b === b) || (p.a === b && p.b === a)) return p.nazwa;
   for (const r of RELACJE_KIBICOW) if (r.typ !== "kosa" && ((r.a === a && r.b === b) || (r.a === b && r.b === a))) return r.nazwa ?? (r.typ === "zgoda" ? `Zgoda kibicowska ${a} – ${b}` : `Układ kibicowski ${a} – ${b}`);
   // Patronat kibicowski: ten sam obóz (np. oba kluby kibicują Arce) = zgoda kibicowska.

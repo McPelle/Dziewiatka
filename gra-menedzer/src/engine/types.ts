@@ -392,6 +392,7 @@ export interface StanGry {
   sektorGosciProcent?: number; // wielkość sektora gości na Twoim stadionie (min. 5% wg PZPN; 0 = zamknięty)
   opiniaPolicji?: number;
   samouczekZrobiony?: boolean;
+  relacjeDyn?: { a: string; b: string; typ: "zgoda" | "uklad" | "kosa"; od: number }[]; // relacje kibicowskie zmienione w trakcie gry
   znaniZawodnicy?: string[]; // kadra przy ostatniej prezentacji (do wykrywania nowych)
   prognoza?: import("./pogoda").Prognoza; // prognoza pogody na mecz tej kolejki
   wedrujacaOprawa?: import("./oprawy").WedrujacaOprawa; // biało-czerwona oprawa z orłami krążąca po klubach

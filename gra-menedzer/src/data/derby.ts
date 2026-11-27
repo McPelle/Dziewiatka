@@ -160,7 +160,6 @@ export const AFILIACJE: Record<string, string> = {
   // Pomorskie — obóz ARKI GDYNIA (fankluby Arki m.in. w Wejherowie, Kościerzynie, Tczewie)
   "Gryf Wejherowo": "Arka Gdynia",
   "Kaszubia Kościerzyna": "Arka Gdynia",
-  "Gryf Tczew KP": "Arka Gdynia",
   // Pomorskie — obóz LECHII GDAŃSK (FC Lechii m.in. Starogard, Malbork; sympatycy: Gryf Słupsk, Bytovia, Chojniczanka)
   "Gryf Słupsk": "Lechia Gdańsk",
   "Bytovia Bytów": "Lechia Gdańsk",

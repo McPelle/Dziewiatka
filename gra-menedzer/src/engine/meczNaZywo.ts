@@ -69,6 +69,7 @@ export interface MeczLive {
   oprawa?: import("./oprawy").Oprawa; oprawaGosci?: import("./oprawy").Oprawa;
   oprawyPlan?: import("./oprawy").PokazOprawy[];
   zadyma?: import("./zadyma").Zadyma; zadymaPrzerwa?: boolean;
+  wsparcie?: { dom: { nazwa: string; kolory: [string, string] }[]; gosc: { nazwa: string; kolory: [string, string] }[] }; // zgody/układy/obóz na trybunach
   kultura?: { dom: import("./flagi").KulturaTrybun; gosc: import("./flagi").KulturaTrybun };
   transparentTeraz?: { tekst: string; sektor: "gospodarzy" | "gosci"; min: number };
   wizualTeraz?: { typ: "dach" | "dron" | "kukla" | "balony" | "pirotechnika" | "graffiti" | "papier"; sektor: "gospodarzy" | "gosci"; min: number };

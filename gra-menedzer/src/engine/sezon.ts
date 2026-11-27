@@ -38,7 +38,7 @@ import { moznaPuchar, nowyPuchar, rundaPucharu } from "./puchar";
 import { tydzienJezykow } from "./jezyki";
 import { bonusTrudnosci, sprawdzOsiagniecia } from "./osiagniecia";
 import { nalozSankcje, losujIncydent, rozliczBezpieczenstwo, rozliczWyjazd, zuzyjSankcje } from "./bezpieczenstwo";
-import { akcjeKibicow, karaZaAkcje, sektorGosci, szkodyZaAkcje, zgodaKibicow } from "./kibice";
+import { akcjeKibicow, dojazdKibicow, karaZaAkcje, sektorGosci, szkodyZaAkcje, tydzienZgod, wsparcieKibicow, zgodaKibicow } from "./kibice";
 import { planOpraw, wedrownaOprawaTydzien } from "./oprawy";
 import { GRUPY_KIBICOW } from "../data/grupyKibicow";
 import { kulturaTrybun, noweFlagiTydzien } from "./flagi";
@@ -882,6 +882,11 @@ export function zagrajKolejke(s: StanGry) {
             wiadomosc(s, `🎆 ${p.min >= 46 ? "Po przerwie — " : ""}Oprawa kibiców ${kl.nazwa}: ${p.o.opis}${p.o.pirotechnika ? " Odpalający zamaskowani — nikogo nie zidentyfikowano." : ""}${kara ? ` Kara Komisji Ligi dla ${kl.nazwa}: ${zl(kara)}.` : ""}`);
           }
         }
+        if (!incLive && gosci > 0 && (derbyNazwa || w.gosc === s.mojKlub)) { const t = dojazdKibicow(s, kg, kd, gosci, !!derbyNazwa); if (t) wiadomosc(s, t); }
+        if (!incLive && widzowie > 0) { // zgody i obóz na trybunach
+          const wd = wsparcieKibicow(s, kd, kd.miasto, !!derbyNazwa), wg = gosci > 0 ? wsparcieKibicow(s, kg, kd.miasto, !!derbyNazwa) : [];
+          if (wd.length || wg.length) wiadomosc(s, `🤝 Wsparcie na trybunach: ${wd.length ? `z ${kd.nazwa} — ${wd.slice(0, 5).map((k) => k.nazwa).join(", ")}` : ""}${wd.length && wg.length ? "; " : ""}${wg.length ? `w klatce z ${kg.nazwa} — ${wg.slice(0, 5).map((k) => k.nazwa).join(", ")}` : ""}.`);
+        }
         // kibice z charakterem (gdy mecz nie był oglądany na żywo — wtedy akcje były w relacji)
         if (!incLive && widzowie > 0) for (const a of akcjeKibicow(s, kd, kg, !!derbyNazwa, !!derbyNazwa, gosci)) {
           const winny = a.sektor === "gospodarzy" ? kd : kg; // każdy odpowiada za swoich kibiców
@@ -1008,6 +1013,7 @@ export function zagrajKolejke(s: StanGry) {
   if (moznaPuchar(s)) rundaPucharu(s);
   for (const w of tydzienJezykow(s)) wiadomosc(s, w); // nauka polskiego cudzoziemców, kurs, tłumacz
   for (const w of sprawdzOsiagniecia(s)) wiadomosc(s, w); // osiągnięcia trenera
+  { const t = tydzienZgod(s, s.kluby[s.mojKlub]); if (t) wiadomosc(s, t); } // życie zgód: jubileusze, zerwania, nowe układy
   { // wędrująca oprawa z orłami — po stadionach scen kibicowskich (przez zgody)
     const kand = Object.values(s.kluby).filter((k) => k.poziom <= 5 && !k.rezerwaDla); // wszystkie kluby od Ekstraklasy do IV ligi
     const t = wedrownaOprawaTydzien(s, kand, (a) => kand.filter((b) => b.id !== a.id && !!zgodaKibicow(s, a, b)));

@@ -1758,7 +1758,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  "Elana Toruń": {
   "ultras": [
    "Młoda Elana (h)",
-   "Ultras Elana Toruń"
+   "Ultras Elana Toruń",
+   "Zorganizowana Grupa Kibolska"
   ],
   "chuligani": [
    "GTW - Grupa Trzymająca Władzę"
@@ -1777,7 +1778,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Lubicz",
    "FANKLUB Ostaszewo",
    "FANKLUB Obrowo",
-   "FANKLUB Wąbrzeźno"
+   "FANKLUB Wąbrzeźno",
+   "Fan Club Gniewkowo"
+  ],
+  "kosy": [
+   "Apator Toruń",
+   "Zawisza Bydgoszcz",
+   "Lechia Gdańsk",
+   "ŁKS Łódź",
+   "Motor Lublin"
   ]
  },
  "Bałtyk Gdynia": {
@@ -1885,7 +1894,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  },
  "Flota Świnoujście": {
   "ultras": [
-   "Młodzi Fanatycy"
+   "Młodzi Fanatycy",
+   "West Coast",
+   "Wyspiarze on Tour",
+   "Forza Flota",
+   "Piraci z Wyspy Uznam"
   ],
   "chuligani": [
    "Brygada Uznam"
@@ -1899,6 +1912,14 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Międzyzdroje",
    "FANKLUB Rewal",
    "FANKLUB Wolin"
+  ],
+  "kosy": [
+   "Kotwica Kołobrzeg",
+   "Gwardia Koszalin",
+   "Gryf Wejherowo",
+   "Energetyk Gryfino",
+   "Odra Chojna",
+   "Stilon Gorzów Wielkopolski"
   ]
  },
  "Okocimski Brzesko": {
@@ -2189,6 +2210,297 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Spartak Wielkanoc"
+  ]
+ },
+ "KKS 1925 Kalisz": {
+  "ultras": [
+   "Duma Kalisza"
+  ],
+  "zgody": [
+   "Elana Toruń",
+   "Kotwica Kołobrzeg",
+   "Widzew Łódź"
+  ],
+  "kosy": [
+   "Lech Poznań",
+   "Górnik Konin",
+   "Motor Lublin",
+   "Ostrovia Ostrów Wielkopolski",
+   "Astra Krotoszyn"
+  ]
+ },
+ "Bytovia Bytów": {
+  "ultras": [
+   "Bytoviacy",
+   "Ultras Bytovia",
+   "Czarne Wilki"
+  ],
+  "fanklub": [
+   "FANKLUB Studzienice"
+  ],
+  "zgody": [
+   "Czarni Słupsk"
+  ],
+  "kosy": [
+   "Kaszubia Kościerzyna"
+  ]
+ },
+ "Cartusia Kartuzy": {
+  "ultras": [
+   "Kaszubscy Patrioci",
+   "Duma Kaszub"
+  ],
+  "kosy": [
+   "Kaszubia Kościerzyna"
+  ]
+ },
+ "Start Miastko": {
+  "ultras": [
+   "Władcy Powiatu",
+   "Miastko Kocha Start"
+  ],
+  "zgody": [
+   "KS Bytów"
+  ]
+ },
+ "Piast Człuchów": {
+  "zgody": [
+   "Gwardia Koszalin",
+   "Myśliwiec Tuchomie"
+  ],
+  "kosy": [
+   "Gryf Słupsk",
+   "Brda Przechlewo"
+  ]
+ },
+ "Unia Gniewkowo": {
+  "zgody": [
+   "Unia Wąbrzeźno",
+   "Unia Skierniewice"
+  ],
+  "kosy": [
+   "Sparta Brodnica",
+   "Kujawiak Kowal",
+   "Legia Chełmża",
+   "Goplania Inowrocław"
+  ]
+ },
+ "Noteć Czarnków": {
+  "zgody": [
+   "Nielba Wągrowiec",
+   "Polonia Chodzież"
+  ],
+  "kosy": [
+   "Jarota Jarocin"
+  ]
+ },
+ "Błękitni Stargard": {
+  "kosy": [
+   "Energetyk Gryfino",
+   "Kotwica Kołobrzeg"
+  ]
+ },
+ "Iskra Białogard": {
+  "kosy": [
+   "Sokół Karlino"
+  ]
+ },
+ "Sparta Gryfice": {
+  "ultras": [
+   "This is Sparta"
+  ],
+  "zgody": [
+   "Pomorzanin Nowogard"
+  ],
+  "kosy": [
+   "Rega Trzebiatów",
+   "Mewa Resko"
+  ]
+ },
+ "Olimp Złocieniec": {
+  "ultras": [
+   "Młody Olimp",
+   "Fanatycy",
+   "MKS Olimp Złocieniec",
+   "UO"
+  ],
+  "kosy": [
+   "Drawa Drawsko Pomorskie",
+   "Odra Chojna"
+  ]
+ },
+ "Kolejarz Stróże": {
+  "zgody": [
+   "Glinik Gorlice"
+  ],
+  "kosy": [
+   "Grybovia Grybów",
+   "Tarnovia Tarnów"
+  ]
+ },
+ "Limanovia Limanowa": {
+  "kosy": [
+   "Sokół Słopnice"
+  ]
+ },
+ "Chełmianka Chełm": {
+  "chuligani": [
+   "YFC'06 - Young Fighters Clan'06",
+   "Robotnicy",
+   "Spiryt Brigade"
+  ],
+  "zgody": [
+   "Górnik Łęczna"
+  ],
+  "kosy": [
+   "Hetman Zamość",
+   "Avia Świdnik",
+   "Łada Biłgoraj",
+   "Widzew Łódź",
+   "Unia Hrubieszów"
+  ]
+ },
+ "KSZO Ostrowiec Świętokrzyski": {
+  "chuligani": [
+   "Świętokrzyscy Rozbójnicy"
+  ],
+  "zgody": [
+   "Lech Poznań",
+   "Arka Gdynia"
+  ],
+  "kosy": [
+   "Korona Kielce",
+   "Stal Stalowa Wola",
+   "Radomiak Radom",
+   "Hutnik Kraków"
+  ]
+ },
+ "Hetman Zamość": {
+  "ultras": [
+   "Stadionowi Artyści'02"
+  ],
+  "chuligani": [
+   "HWK - Hetman Wielki Koronny"
+  ],
+  "zgody": [
+   "Motor Lublin"
+  ],
+  "kosy": [
+   "Avia Świdnik",
+   "Chełmianka Chełm",
+   "Łada Biłgoraj",
+   "Stal Stalowa Wola"
+  ]
+ },
+ "Czarni Połaniec": {
+  "kosy": [
+   "Pogoń Staszów",
+   "Star Starachowice"
+  ]
+ },
+ "Wisłoka Dębica": {
+  "ultras": [
+   "Ultras Wisłoka"
+  ],
+  "chuligani": [
+   "ŁHE'03 - Łowcy Hordy Edwarda"
+  ],
+  "zgody": [
+   "Górnik Zabrze",
+   "ROW Rybnik",
+   "Siarka Tarnobrzeg"
+  ],
+  "kosy": [
+   "Stal Mielec",
+   "Unia Tarnów",
+   "Stal Rzeszów",
+   "Stal Stalowa Wola",
+   "Igloopol Dębica"
+  ]
+ },
+ "Naprzód Jędrzejów": {
+  "chuligani": [
+   "MG'99 - Młodzi Gniewni",
+   "MW'23 - Młoda Wiara"
+  ],
+  "kosy": [
+   "KSZO Ostrowiec Świętokrzyski",
+   "Star Starachowice",
+   "Granat Skarżysko-Kamienna",
+   "Pogoń Staszów"
+  ]
+ },
+ "Siarka Tarnobrzeg": {
+  "ultras": [
+   "Ultras Group Siarka"
+  ],
+  "chuligani": [
+   "STH - Siarka Tarnobrzeg Hooligans"
+  ],
+  "zgody": [
+   "Wisła Sandomierz",
+   "Wisłoka Dębica"
+  ],
+  "kosy": [
+   "Stal Stalowa Wola",
+   "Stal Mielec",
+   "Stal Rzeszów",
+   "Karpaty Krosno"
+  ]
+ },
+ "Star Starachowice": {
+  "ultras": [
+   "Wiara Stara"
+  ],
+  "chuligani": [
+   "Młody Star"
+  ],
+  "zgody": [
+   "Granat Skarżysko-Kamienna"
+  ],
+  "kosy": [
+   "Korona Kielce",
+   "KSZO Ostrowiec Świętokrzyski",
+   "Wisła Sandomierz"
+  ]
+ },
+ "JKS 1909 Jarosław": {
+  "ultras": [
+   "Black Blue Ultras"
+  ],
+  "chuligani": [
+   "Świrlandia",
+   "Młody JKS"
+  ],
+  "zgody": [
+   "GKS Katowice",
+   "Unia Nowa Sarzyna"
+  ],
+  "kosy": [
+   "Czuwaj Przemyśl",
+   "Wisłoka Dębica",
+   "Stal Rzeszów",
+   "Stal Stalowa Wola",
+   "Stal Mielec",
+   "Polonia Przemyśl"
+  ]
+ },
+ "Podlasie Biała Podlaska": {
+  "chuligani": [
+   "Wschodnie Charaktery"
+  ],
+  "zgody": [
+   "Warszawianka Warszawa",
+   "Pogoń Siedlce"
+  ],
+  "kosy": [
+   "Orlęta Radzyń Podlaski",
+   "Chełmianka Chełm",
+   "Motor Lublin",
+   "Siarka Tarnobrzeg",
+   "Hetman Zamość",
+   "Górnik Łęczna",
+   "Orlęta Łuków"
   ]
  }
 };

@@ -240,6 +240,9 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         else { const rz = Math.floor(nr / 20), poz = nr % 20; fl.position.set(-42 + poz * 4.4, 1.15 + rz * 1.15, SZ / 2 + 6.3 + rz * 0.6); fl.rotation.y = Math.PI; }
         scena.add(fl);
       });
+      // flagi zgód / układów obok flag klubów (klatka gości: na drugim rzędzie płotu; gospodarze: na barierce za bramką)
+      (m.wsparcie?.gosc ?? []).slice(0, 4).forEach((w, i) => { const fl = flagaMesh(w.nazwa.toUpperCase(), w.kolory[0], w.kolory[1], 3); fl.position.set(DL / 2 - 12.5 + i * 3.3, 2.6, -SZ / 2 - 5.5); scena.add(fl); });
+      (m.wsparcie?.dom ?? []).slice(0, 8).forEach((w, i) => { const fl = flagaMesh(w.nazwa.toUpperCase(), w.kolory[0], w.kolory[1], 3.4); fl.position.set(-DL / 2 - 6.9, 3.6, -14 + i * 4); fl.rotation.y = Math.PI / 2; scena.add(fl); });
       if (m.komentarz.some((c) => c.tekst.startsWith("🧱"))) [...m.kultura.gosc.flagi.filter((f) => f.typ === "ekipa"), ...m.kultura.gosc.flagi.filter((f) => f.typ !== "ekipa")].slice(0, 4).forEach((f, i) => {
         const fl = flagaMesh(f.tekst, f.kolory[0], f.kolory[1], 3); fl.position.set(DL / 2 - 12.5 + i * 3.3, 1.5, -SZ / 2 - 5.4); scena.add(fl);
       });
