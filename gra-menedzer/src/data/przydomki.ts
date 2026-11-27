@@ -50,6 +50,28 @@ export const PRZYDOMKI: Record<string, string> = {
   // Przydomki ZP/KP z Wikipedii (zweryfikowane)
   "Olimpia Grudziądz": "Gieksa",
   "Włocłavia Włocławek": "Szlachta Kujaw",
+  // Podlaskie i III liga gr. I — przydomki potwierdzone w źródłach
+  "Wigry Suwałki": "Biało-Niebiescy, Wigierki",
+  "Warta Sieradz": "Biało-zieloni",
+  "Pelikan Łowicz": "Pasiaki",
+  "Ząbkovia Ząbki": "Dolcan",
+  "Olimpia Elbląg": "Żółto-biało-niebiescy, Związkowi, Olimpijczycy",
+  "Lechia Tomaszów Mazowiecki": "Lechiści",
+  "ŁKS Łomża": "eŁKaeSiacy",
+  "MOSP Białystok": "MOSP",
+  // Warmińsko-mazurskie i podlaskie (pl.wikipedia)
+  "Jagiellonia Białystok": "Jaga",
+  "Stomil Olsztyn": "Duma Warmii",
+  "Concordia Elbląg": "Słoniki",
+  "Sokół Ostróda": "Sokoły",
+  "Mamry Giżycko": "GieKSa",
+  "MKS Mazur Ełk": "Mazurek",
+  "Jeziorak Iława": "Jeziorowcy",
+  "Granica Kętrzyn": "KKS",
+  "Warmia Olsztyn": "Duma Zatorza",
+  "Drwęca Nowe Miasto Lubawskie": "Biało-niebiescy",
+  // Warmińsko-mazurskie — przydomki potwierdzone w źródłach
+  "Wel Lidzbark": "„Welowcy”",
 };
 
 export function przydomek(nazwa: string): string | undefined {

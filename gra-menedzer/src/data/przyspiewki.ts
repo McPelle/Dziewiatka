@@ -3378,5 +3378,13 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 "rywal": "Vineta Wolin"
 }
 ]
+},
+"MKS Mazur Ełk": {
+"przyspiewki": [
+{
+"tekst": "Jedno miasto, jeden klub!",
+"typ": "doping"
+}
+]
 }
 };

@@ -2137,5 +2137,22 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
   "b": "Śląsk Wrocław",
   "typ": "kosa",
   "nazwa": "Kosa Zagłębie Lubin – Śląsk Wrocław (Derby Dolnego Śląska)"
- }
+ }, { "a": "Stomil Olsztyn", "b": "Polonia Bydgoszcz", "typ": "zgoda"},
+ { "a": "Stomil Olsztyn", "b": "Wisła Płock", "typ": "zgoda"},
+ { "a": "Stomil Olsztyn", "b": "Lechia Gdańsk", "typ": "uklad"},
+ { "a": "Stomil Olsztyn", "b": "Hutnik Kraków", "typ": "uklad"},
+ { "a": "Stomil Olsztyn", "b": "ŁKS Łomża", "typ": "uklad"},
+ { "a": "Olimpia Elbląg", "b": "Legia Warszawa", "typ": "zgoda"},
+ { "a": "Olimpia Elbląg", "b": "Zagłębie Sosnowiec", "typ": "zgoda"},
+ { "a": "Olimpia Elbląg", "b": "Radomiak Radom", "typ": "uklad"},
+ { "a": "Wigry Suwałki", "b": "Granica Kętrzyn", "typ": "zgoda"},
+ { "a": "MKS Mazur Ełk", "b": "Jagiellonia Białystok", "typ": "zgoda"},
+ { "a": "MKS Mazur Ełk", "b": "Warmia Grajewo", "typ": "zgoda"},
+ { "a": "Wigry Suwałki", "b": "Jagiellonia Białystok", "typ": "kosa"},
+ { "a": "Wigry Suwałki", "b": "ŁKS Łomża", "typ": "kosa"},
+ { "a": "Wigry Suwałki", "b": "Sparta Augustów", "typ": "kosa"},
+ { "a": "Wigry Suwałki", "b": "MKS Mazur Ełk", "typ": "kosa"},
+ { "a": "Olimpia Elbląg", "b": "Stomil Olsztyn", "typ": "kosa"},
+ { "a": "Olimpia Elbląg", "b": "Jeziorak Iława", "typ": "kosa"},
+ { "a": "Olimpia Elbląg", "b": "Arka Gdynia", "typ": "kosa"}
 ];

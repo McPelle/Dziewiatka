@@ -117,6 +117,23 @@ export const DERBY: ParaDerbowa[] = [
   { a: "Elana Toruń", b: "Polonia Bydgoszcz", nazwa: "Derby kujawsko-pomorskie (Toruń–Bydgoszcz)" },
   // Zachodniopomorskie — rywalizacja ponadregionalna (Pogoń)
   { a: "Pogoń Szczecin", b: "Lechia Gdańsk", nazwa: "Derby Pomorza" },
+  // Warmińsko-mazurskie i podlaskie (źródła: pl/en.wikipedia — List of derbies in Poland, artykuły klubów)
+  { a: "Olimpia Elbląg", b: "Stomil Olsztyn", nazwa: "Derby Warmii i Mazur" },
+  { a: "Jeziorak Iława", b: "Stomil Olsztyn", nazwa: "Derby Warmii" },
+  { a: "Olimpia Elbląg", b: "Jeziorak Iława", nazwa: "Derby Warmii i Mazur" },
+  { a: "Olimpia Elbląg", b: "Concordia Elbląg", nazwa: "Derby Elbląga" },
+  { a: "Stomil Olsztyn", b: "Warmia Olsztyn", nazwa: "Derby Olsztyna" },
+  { a: "Jagiellonia Białystok", b: "ŁKS Łomża", nazwa: "Derby Podlasia" },
+  { a: "Jagiellonia Białystok", b: "Warmia Grajewo", nazwa: "Derby Podlasia" },
+  { a: "Wigry Suwałki", b: "Jagiellonia Białystok", nazwa: "Derby Podlasia" },
+  { a: "Wigry Suwałki", b: "ŁKS Łomża", nazwa: "Derby Podlasia" },
+  { a: "Wigry Suwałki", b: "Ruch Wysokie Mazowieckie", nazwa: "Derby Podlasia" },
+  { a: "ŁKS Łomża", b: "Ruch Wysokie Mazowieckie", nazwa: "Derby Podlasia" },
+  { a: "Wigry Suwałki", b: "Sparta Augustów", nazwa: "Derby Podlasia" },
+  { a: "Wigry Suwałki", b: "MKS Mazur Ełk", nazwa: "Derby regionu" },
+  { a: "MKS Mazur Ełk", b: "Mazur Pisz", nazwa: "Derby Mazur" },
+  { a: "MKS Mazur Ełk", b: "Płomień Ełk", nazwa: "Derby Ełku" },
+  { a: "Olimpia Elbląg", b: "GKS Wikielec", nazwa: "Derby Warmii i Mazur" },
 ];
 
 // Mecze przyjaźni (zgody kibicowskie) — kibice się przyjaźnią: świetna atmosfera, komplet, bez podwyższonego ryzyka.

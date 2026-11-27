@@ -2502,5 +2502,54 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Górnik Łęczna",
    "Orlęta Łuków"
   ]
+ },
+ "Stomil Olsztyn": {
+  "ultras": [
+   "Stowarzyszenie Kibiców OKS Stomil Olsztyn",
+   "Stomilowcy Olsztyn"
+  ],
+  "zgody": [
+   "Polonia Bydgoszcz",
+   "Wisła Płock",
+   "Lechia Gdańsk",
+   "Hutnik Kraków",
+   "ŁKS Łomża"
+  ],
+  "kosy": [
+   "Olimpia Elbląg"
+  ]
+ },
+ "Olimpia Elbląg": {
+  "ultras": [
+   "Stowarzyszenie Kibiców Olimpii Elbląg „776 p.n.e.”",
+   "Ultras SMG'06",
+   "EZF '16"
+  ],
+  "zgody": [
+   "Legia Warszawa",
+   "Zagłębie Sosnowiec",
+   "Radomiak Radom"
+  ],
+  "kosy": [
+   "Stomil Olsztyn",
+   "Jeziorak Iława",
+   "Arka Gdynia"
+  ]
+ },
+ "Wigry Suwałki": {
+  "ultras": [
+   "Vis Maior '99",
+   "Blue Boys '22",
+   "Lucyfers '04"
+  ],
+  "zgody": [
+   "Granica Kętrzyn"
+  ],
+  "kosy": [
+   "Jagiellonia Białystok",
+   "ŁKS Łomża",
+   "Sparta Augustów",
+   "MKS Mazur Ełk"
+  ]
  }
 };

@@ -734,6 +734,22 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Bocian Boćki": 200,
   "MKS Mielnik": 260,
   "Cresovia II Siemiatycze": 500,
+  // Podlaskie i III liga gr. I — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "KS Wasilków": 1000,
+  "Promień Mońki": 500,
+  "Supraślanka Supraśl": 1000,
+  "KS II Wasilków": 1000,
+  "Orzeł Kolno": 2000,
+  "Sparta Augustów": 1000,
+  "Sokół Sokółka": 2500,
+  "Husar Nurzec": 300,
+  // Warmińsko-mazurskie — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Polonia Pasłęk": 1096,
+  "Drwęca Nowe Miasto Lubawskie": 700,
+  "Czarni Olecko": 2000,
+  "Stomil II Olsztyn": 250,
+  "Śniardwy Orzysz": 2000,
+  "Granica II Kętrzyn": 1150,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */
