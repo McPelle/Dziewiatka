@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import * as THREE from "three";
+import { uproscMaterialy } from "./stadion3d";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
@@ -74,6 +75,7 @@ export function Rozmowa3D({ klub, z, emocja, mowi, trofea }: { klub: Klub; z: Za
     trener.g.position.set(0.45, -0.08, 0.95); trener.g.rotation.y = Math.PI; trener.uda.forEach((u) => (u.rotation.x = -1.45)); trener.lydki.forEach((l) => (l.rotation.x = 1.45)); scena.add(trener.g);
     const cam = new THREE.PerspectiveCamera(36, W() / H(), 0.05, 50);
     const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scena, cam)); composer.addPass(new OutputPass());
+    if (lekka) { renderer.shadowMap.enabled = false; uproscMaterialy(scena); }
     let t = 0, ost = performance.now(), raf = 0, emo = 0;
     const petla = () => {
       raf = requestAnimationFrame(petla);
@@ -91,7 +93,7 @@ export function Rozmowa3D({ klub, z, emocja, mowi, trofea }: { klub: Klub; z: Za
       const blisko = m === "zawodnik" || Math.abs(emo) > 0.5;
       const pc = blisko ? new THREE.Vector3(-0.35, 1.95, 0.55) : new THREE.Vector3(-1.05, 1.95, 2.0);
       cam.position.lerp(pc, 1 - Math.exp(-dt * 1.8)); cam.lookAt(0, blisko ? 1.9 : 1.6, -0.95);
-      composer.render(dt);
+      if (lekka) renderer.render(scena, cam); else composer.render(dt);
     };
     raf = requestAnimationFrame(petla);
     const resize = () => { renderer.setSize(W(), H()); composer.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); };

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import * as THREE from "three";
+import { uproscMaterialy } from "./stadion3d";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
@@ -72,6 +73,7 @@ export function Szatnia3D({ s, klub, zawodnicy, kit, kitBr, nastroj, mowi }: { s
     trener.g.position.set(0, 0, 0.6); trener.g.rotation.y = Math.PI; scena.add(trener.g);
     const cam = new THREE.PerspectiveCamera(48, W() / H(), 0.1, 60);
     const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scena, cam)); composer.addPass(new OutputPass());
+    if (lekka) { renderer.shadowMap.enabled = false; uproscMaterialy(scena); }
     let t = 0, ost = performance.now(), raf = 0, emo = 0;
     const petla = () => {
       raf = requestAnimationFrame(petla);
@@ -91,7 +93,7 @@ export function Szatnia3D({ s, klub, zawodnicy, kit, kitBr, nastroj, mowi }: { s
       trener.ramiona[0].rotation.x = m ? -1.2 - Math.abs(Math.sin(t * 4)) * 0.8 : -0.3; trener.ramiona[1].rotation.x = m ? -0.9 - Math.abs(Math.sin(t * 3 + 1)) * 0.6 : -0.3;
       trener.uda[0].rotation.x = Math.sin(t * 2) * 0.25; trener.uda[1].rotation.x = -Math.sin(t * 2) * 0.25;
       cam.position.set(Math.sin(t * 0.12) * 1.2, 2.6, 4.2); cam.lookAt(0, 1.0, -1.2);
-      composer.render(dt);
+      if (lekka) renderer.render(scena, cam); else composer.render(dt);
     };
     raf = requestAnimationFrame(petla);
     const resize = () => { renderer.setSize(W(), H()); composer.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); };

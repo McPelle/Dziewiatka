@@ -10,7 +10,7 @@ import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import type { Historia, Klub, StanGry } from "../../engine/types";
 import { kity } from "../strojeDane";
 import { lekkaGrafika } from "./Stadion3DWidok";
-import { swiatla, zbudujStadion } from "./stadion3d";
+import { swiatla, uproscMaterialy, zbudujStadion } from "./stadion3d";
 import { animuj, minka, stworzPostac, wyglad3D, type Postac } from "./zawodnik3d";
 import { reakcjaTrybun, startDzwieku } from "./dzwiek";
 import { mow } from "./glos";
@@ -39,11 +39,12 @@ function uruchomScene(el: HTMLElement, buduj: (scena: THREE.Scene, cam: THREE.Pe
   Object.assign(renderer.domElement.style, { width: "100%", height: "100%", display: "block" }); el.appendChild(renderer.domElement);
   const scena = new THREE.Scene(); const cam = new THREE.PerspectiveCamera(42, W() / H(), 0.1, 900);
   const krok = buduj(scena, cam);
+  if (lekka) { renderer.shadowMap.enabled = false; uproscMaterialy(scena); }
   const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scena, cam));
   if (!lekka && bloom > 0) composer.addPass(new UnrealBloomPass(new THREE.Vector2(W(), H()), bloom, 0.5, 0.8));
   composer.addPass(new OutputPass());
   let raf = 0, t = 0, ost = performance.now(), stop = false;
-  const petla = () => { raf = requestAnimationFrame(petla); const n = performance.now(), dt = Math.min(0.05, (n - ost) / 1000); ost = n; t += dt; krok(t, dt); composer.render(dt); };
+  const petla = () => { raf = requestAnimationFrame(petla); const n = performance.now(), dt = Math.min(0.05, (n - ost) / 1000); ost = n; t += dt; krok(t, dt); if (lekka) renderer.render(scena, cam); else composer.render(dt); };
   const r2 = renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
   const go = () => { if (!stop) raf = requestAnimationFrame(petla); };
   { let ruszyl = false; const raz = () => { if (!ruszyl) { ruszyl = true; go(); } };

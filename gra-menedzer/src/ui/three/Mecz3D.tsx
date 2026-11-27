@@ -14,7 +14,7 @@ import { FORMACJE_SLOTY, przydzielSloty } from "../../engine/mecz";
 import type { MeczLive, PunktAkcji } from "../../engine/meczNaZywo";
 import type { PozycjaSzczegolowa, StanGry } from "../../engine/types";
 import type { StrojeMeczu } from "../strojeDane";
-import { DL, SZ, swiatla, zbudujStadion } from "./stadion3d";
+import { DL, SZ, swiatla, uproscMaterialy, zbudujStadion } from "./stadion3d";
 import { animuj, stworzPostac, wyglad3D, type Postac } from "./zawodnik3d";
 import { gwizdek, kopniecie, napiecie, reakcjaTrybun } from "./dzwiek";
 
@@ -48,7 +48,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     const W = () => el.clientWidth || 360, H = () => el.clientHeight || 220;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, ust.lekka ? 1.25 : 2));
     renderer.setSize(W(), H());
-    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = !ust.lekka; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = ust.noc ? 1.05 : 1.0;
     renderer.domElement.style.width = "100%"; renderer.domElement.style.height = "100%"; renderer.domElement.style.display = "block";
     el.appendChild(renderer.domElement);
@@ -57,6 +57,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     swiatla(scena, ust.noc, ust.pogoda === "mgla", ust.lekka);
     const kd = s.kluby[m.dom.klubId], kg = s.kluby[m.gosc.klubId];
     const stad = zbudujStadion(s, kd, { noc: ust.noc, snieg: ust.pogoda === "snieg", deszcz: ust.pogoda === "deszcz", widzowie: ust.widzowie, lekka: ust.lekka, budowy: m.dom.klubId === s.mojKlub ? s.budowy : undefined });
+    if (ust.lekka) uproscMaterialy(stad.grupa);
     scena.add(stad.grupa);
     // post-processing: bloom (reflektory, bandy LED), głębia ostrości przy zbliżeniach
     const composer = new EffectComposer(renderer);
@@ -102,6 +103,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         const br = z?.poz === "BR";
         const k = br ? stroje[sd].br : stroje[sd].pole;
         p = stworzPostac({ ...wyglad3D(z), koszulka: k.baza, dodatek: k.dodatek, wzor: k.wzor, spodenki: k.wzor === "jednolity" ? k.dodatek : k.dodatek, getry: k.baza, nr: z?.numer ?? 0, nazwisko: z?.nazwisko, seed: [...id].reduce((a, c) => a + c.charCodeAt(0) * 7, 0) });
+        if (ust.lekka) uproscMaterialy(p.g);
         const startX = sd === "dom" ? -6 : 6;
         p.g.position.set(startX, 0, 0); scena.add(p.g); postacie.set(id, p); strona.set(id, sd);
       }
@@ -320,10 +322,11 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       cam.lookAt(celKamery);
       bokeh.enabled = !ust.lekka && (tryb === "blisko" || powtorka > 0);
       if (bokeh.enabled) (bokeh.uniforms as any).focus.value = cam.position.distanceTo(pilka.position);
-      composer.render(dt);
+      if (ust.lekka) renderer.render(scena, cam); else composer.render(dt);
     };
     const wersjaRef = { current: wersja };
     (sterowanie.current as any).wersjaRef = wersjaRef;
+    if (ust.lekka) uproscMaterialy(scena); // sędziowie, ławki, piłka itd.
     // shadery kompilowane w tle (bez zamrażania ekranu przy otwieraniu meczu)
     const r2 = renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
     let anul = false; const go = () => { if (!anul) raf = requestAnimationFrame(petla); };

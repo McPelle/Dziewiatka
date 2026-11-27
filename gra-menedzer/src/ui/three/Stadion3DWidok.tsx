@@ -9,9 +9,11 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import type { Klub, StanGry } from "../../engine/types";
-import { swiatla, zbudujStadion } from "./stadion3d";
+import { swiatla, uproscMaterialy, zbudujStadion } from "./stadion3d";
 
-export const lekkaGrafika = () => typeof window !== "undefined" && window.localStorage?.getItem("dz_lekka") === "1";
+/** Lekka grafika: włączona ręcznie, albo domyślnie na iPhonie/iPadzie (tam ciężkie shadery przygotowują się bardzo długo). */
+export const jestIOS = () => typeof navigator !== "undefined" && (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && (navigator as any).maxTouchPoints > 1));
+export const lekkaGrafika = () => { if (typeof window === "undefined") return false; const v = window.localStorage?.getItem("dz_lekka"); return v === "1" || (v === null && jestIOS()); };
 export const grafika3D = () => typeof window !== "undefined" && !!window.WebGLRenderingContext && window.localStorage?.getItem("dz_3d") !== "0";
 
 export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | null; klub: Klub; tlo?: boolean; wysokosc?: number; noc?: boolean }) {
@@ -57,6 +59,7 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
     etap.current = "budowa stadionu";
     let stad: ReturnType<typeof zbudujStadion>;
     try { stad = zbudujStadion(s, klub, { noc: jestNoc, snieg: mies === 12 || mies <= 2 ? new Date().getDate() % 3 === 0 : false, deszcz: false, widzowie: tlo ? klub.pojemnosc * 0.5 : 0, lekka: lekka || !!tlo, budowy: s?.budowy }); } catch (e) { clearTimeout(straznik); renderer.dispose(); renderer.domElement.remove(); setAwaria("budowa sceny: " + String((e as Error)?.message ?? e).slice(0, 60)); return; }
+    if (lekka) { uproscMaterialy(stad.grupa); renderer.shadowMap.enabled = false; }
     scena.add(stad.grupa);
     const cam = new THREE.PerspectiveCamera(40, W() / H(), 0.5, 1000);
     const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scena, cam));

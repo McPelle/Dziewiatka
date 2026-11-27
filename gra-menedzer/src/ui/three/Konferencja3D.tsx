@@ -4,6 +4,7 @@
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import * as THREE from "three";
+import { uproscMaterialy } from "./stadion3d";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
@@ -118,6 +119,7 @@ export function Konferencja3D({ klub, sponsorzy, typ, nastroj, nrPytania, nrOdpo
     const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scena, cam));
     if (!lekka) composer.addPass(new UnrealBloomPass(new THREE.Vector2(W(), H()), 0.5, 0.4, 0.92));
     composer.addPass(new OutputPass());
+    if (lekka) { renderer.shadowMap.enabled = false; uproscMaterialy(scena); }
     let ostP = -1, ostO = -1, t = 0, gest = 0, flesze = 0, ujecie = 0, ostT = performance.now(), raf = 0;
     const smutek = typeof nastroj === "number" && nastroj < 0;
     const petla = () => {
@@ -151,7 +153,7 @@ export function Konferencja3D({ klub, sponsorzy, typ, nastroj, nrPytania, nrOdpo
       ];
       const [pc, lc] = cele[gest > 0 ? 1 : ujecie];
       cam.position.lerp(pc, 1 - Math.exp(-dt * 2)); cam.lookAt(lc);
-      composer.render(dt);
+      if (lekka) renderer.render(scena, cam); else composer.render(dt);
     };
     raf = requestAnimationFrame(petla);
     const resize = () => { renderer.setSize(W(), H()); composer.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); };

@@ -3,6 +3,7 @@ import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 import type { StanGry } from "../engine/types";
 import { ZapiszGre } from "./ZapiszGre";
 import { liczbaGlosow } from "./three/glos";
+import { lekkaGrafika } from "./three/Stadion3DWidok";
 import { Reprezentacja } from "./Reprezentacja";
 import { PrasaKibice } from "./ZywySwiat";
 import { zapiszSlot } from "./zapis";
@@ -145,7 +146,7 @@ function PasekPowrotu({ tytul, ikona, onBack }: { tytul: string; ikona: string; 
 function UstawieniaGrafiki() {
   const ls = typeof window !== "undefined" ? window.localStorage : undefined;
   const [g3d, setG3d] = useState(ls?.getItem("dz_3d") !== "0");
-  const [lekka, setLekka] = useState(ls?.getItem("dz_lekka") === "1");
+  const [lekka, setLekka] = useState(lekkaGrafika());
   const Prz = ({ t, opis, on, v }: { t: string; opis: string; on: () => void; v: boolean }) => (
     <Pressable onPress={on} style={[st.wiersz, { paddingVertical: 8, borderTopWidth: 1, borderTopColor: K.linia }]}>
       <View style={{ flex: 1 }}><Text style={st.tekst}>{t}</Text><Text style={st.maly}>{opis}</Text></View>
@@ -157,7 +158,7 @@ function UstawieniaGrafiki() {
       <Text style={st.naglowek}>🎨 Grafika</Text>
       <Prz t="Grafika 3D" opis="Stadion 3D w menu i w zakładce klubu, mecz na żywo w 3D." v={g3d} on={() => { const n = !g3d; ls?.setItem("dz_3d", n ? "1" : "0"); setG3d(n); }} />
       <Text style={[st.maly, { marginTop: 8 }]}>🗣 Polskie głosy w tym urządzeniu: {liczbaGlosow().M} męskie, {liczbaGlosow().K} damskie{liczbaGlosow().inne ? `, ${liczbaGlosow().inne} inne` : ""}. Mężczyźni mówią męskim głosem, kobiety damskim; każda postać ma własny ton. Więcej głosów (iPhone): Ustawienia → Dostępność → Treść mówiona → Głosy → Polski — pobierz wszystkie, gra użyje ich sama.</Text>
-      <Prz t="Lekka grafika" opis="Mniej kibiców i detali, bez poświaty i rozmycia — płynniej na starszych telefonach." v={lekka} on={() => { const n = !lekka; ls?.setItem("dz_lekka", n ? "1" : "0"); setLekka(n); }} />
+      <Prz t="Lekka grafika" opis="Szybkie materiały, bez cieni i poświaty — grafika 3D startuje od razu i chodzi płynnie (na iPhonie domyślnie włączona)." v={lekka} on={() => { const n = !lekka; ls?.setItem("dz_lekka", n ? "1" : "0"); setLekka(n); }} />
     </View>
   );
 }

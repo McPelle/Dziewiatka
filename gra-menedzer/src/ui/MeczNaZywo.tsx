@@ -14,7 +14,7 @@ import { CZCIONKA, K, st } from "./styl";
 import { dobierzStroje, dostepneStroje, kity, type Kit } from "./strojeDane";
 import { Mecz3D, type Kamera, type Ustawienia3D } from "./three/Mecz3D";
 import { Szatnia3D } from "./three/Szatnia3D";
-import { grafika3D } from "./three/Stadion3DWidok";
+import { grafika3D, lekkaGrafika } from "./three/Stadion3DWidok";
 import { czyWyciszony, gwizdek, startDzwieku, stopDzwieku, wycisz } from "./three/dzwiek";
 import { glosDostepny, glosWlaczony, mow, plecZImienia, ustawGlos, zamilknij } from "./three/glos";
 
@@ -32,7 +32,7 @@ function warunki(s: StanGry, domId: string, goscId: string): Ustawienia3D {
   const pogoda: Ustawienia3D["pogoda"] = zima && h % 3 === 0 ? "snieg" : (jesien || mies === 3 || mies === 4) && h % 4 === 1 ? "deszcz" : jesien && h % 9 === 2 ? "mgla" : h % 11 === 3 ? "deszcz" : "slonce";
   const pusto = domId === s.mojKlub && (s.zakazTrybun ?? 0) > 0; // kara ZPN: mecz przy pustych trybunach
   const widzowie = pusto ? 0 : Math.round(k.pojemnosc * Math.min(0.95, 0.3 + k.renoma * 0.55));
-  const lekka = typeof window !== "undefined" && (window as any).localStorage?.getItem("dz_lekka") === "1";
+  const lekka = lekkaGrafika();
   return { noc, pogoda, widzowie, lekka, derby: !!jestDerby(s, domId, goscId), pusto, godz: gm.godz };
 }
 

@@ -282,3 +282,15 @@ export function swiatla(scena: THREE.Scene, noc: boolean, mgla: boolean, lekka: 
   scena.add(slonce);
   if (noc) for (const x of [-1, 1]) for (const z of [-1, 1]) { const sp = new THREE.SpotLight(0xfff3d6, 900, 220, 0.75, 0.6, 1.3); sp.position.set(x * (DL / 2 + 16), 34, z * (SZ / 2 + 16)); sp.target.position.set(-x * 8, 0, -z * 6); scena.add(sp, sp.target); }
 }
+
+/** Zamiana ciężkich materiałów (PBR) na lekkie (Lambert) — błyskawiczne przygotowanie grafiki na telefonach. */
+export function uproscMaterialy(obj: THREE.Object3D) {
+  const cache = new Map<THREE.Material, THREE.Material>();
+  obj.traverse((o) => {
+    const mesh = o as THREE.Mesh; const m = mesh.material as THREE.Material | THREE.Material[] | undefined;
+    if (!m || Array.isArray(m) || !(m instanceof THREE.MeshStandardMaterial)) return;
+    let n = cache.get(m);
+    if (!n) { n = new THREE.MeshLambertMaterial({ color: m.color, map: m.map, transparent: m.transparent, opacity: m.opacity, side: m.side, emissive: m.emissive, emissiveIntensity: m.emissiveIntensity, emissiveMap: m.emissiveMap, depthWrite: m.depthWrite }); cache.set(m, n); }
+    mesh.material = n;
+  });
+}
