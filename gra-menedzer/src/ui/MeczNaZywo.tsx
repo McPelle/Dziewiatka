@@ -11,6 +11,7 @@ import { CZCIONKA, K, st } from "./styl";
 import { dobierzStroje, dostepneStroje, kity, type Kit } from "./strojeDane";
 import { Mecz3D, type Kamera, type Ustawienia3D } from "./three/Mecz3D";
 import { czyWyciszony, gwizdek, startDzwieku, stopDzwieku, wycisz } from "./three/dzwiek";
+import { glosDostepny, glosWlaczony, mow, ustawGlos, zamilknij } from "./three/glos";
 
 type Zakl = "relacja" | "staty" | "sklady" | "taktyka" | "zmiany";
 const KAMERY: [Kamera, string][] = [["auto", "🎬 Reżyser"], ["tv", "📺 TV"], ["bramka", "🥅 Zza bramki"], ["gora", "🛰 Z góry"], ["blisko", "🔍 Zbliżenie"]];
@@ -66,6 +67,7 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
   const [schodzi, setSchodzi] = useState<string | null>(null);
   const [kom, setKom] = useState<string | null>(null);
   const [glosno, setGlosno] = useState(!czyWyciszony());
+  const [glosKom, setGlosKom] = useState(glosWlaczony());
   const [startTxt, setStartTxt] = useState(() => m.min === 0);
   const [wyborStroju, setWyborStroju] = useState<[number, number]>(() => { const st0 = dobierzStroje(s.kluby[para[0]], s.kluby[para[1]], para[0] === s.mojKlub ? "dom" : "gosc"); return para[0] === s.mojKlub ? st0.wyborDom : st0.wyborGosc; });
   const stroje = useMemo(() => dobierzStroje(s.kluby[para[0]], s.kluby[para[1]], para[0] === s.mojKlub ? "dom" : "gosc", wyborStroju), [wyborStroju]);
@@ -75,9 +77,20 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
 
   const krok = () => {
     if (m.koniec) return;
+    const przed = m.komentarz.length;
     krokMinuty(s, m);
     if (m.min % 3 === 0 || m.wazne) zapiszMecz(s, para, m); // zapis w trakcie meczu
     if (tylkoAkcje) { let n = 0; while (!m.koniec && !m.wazne && n++ < 12 && !m.sekwencja.some((p) => p.zdarzenie && p.zdarzenie !== "aut")) krokMinuty(s, m); }
+    // komentator na głos: gole, karne, czerwone, VAR, przerwa i koniec; przy wolnym tempie także groźne akcje
+    const nowe = m.komentarz.slice(0, Math.max(0, m.komentarz.length - przed)).reverse();
+    for (const c of nowe) {
+      const wazny = c.typ === "gol" || c.typ === "karny" || c.typ === "var" || (c.typ === "kartka" && c.tekst.includes("🟥")) || (c.typ === "info" && /Koniec|Przerwa/.test(c.tekst));
+      if (wazny || (predkosc <= 2 && (c.typ === "akcja" || c.typ === "kartka") && Math.random() < 0.5)) mow(c.tekst.replace(/\d+:\d+.*$/, ""), "komentator", { emocje: c.typ === "gol" ? 1 : c.typ === "karny" ? 0.6 : 0, przerwij: c.typ === "gol" });
+    }
+    if (m.wazne?.typ === "gol" && m.wazne.strona === "dom" && m.wazne.id) {
+      const z = s.zawodnicy[m.wazne.id];
+      if (z && m.gole[m.gole.length - 1]?.typ !== "samoboj") setTimeout(() => mow(`Bramkę dla ${kd.nazwa} zdobył zawodnik z numerem ${z.numer}… ${z.imie}… ${z.nazwisko}!`, "spiker"), 3500);
+    }
     const w = m.wazne;
     if (w) {
       if (w.typ === "przerwa" || w.typ === "koniec") { gwizdek(true, w.typ === "koniec" ? 3 : 2); setPredkosc(0); }
@@ -170,7 +183,8 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
             {[1, 2, 4, 8].map((v) => <Btn key={v} t={`${v}×`} on={() => graj(v)} akt={predkosc === v} />)}
             <Btn t={tylkoAkcje ? "⚡ Tylko akcje ✓" : "⚡ Tylko akcje"} on={() => setTylkoAkcje(!tylkoAkcje)} akt={tylkoAkcje} />
             <Btn t={autoPauza ? "⏯ Auto-pauza ✓" : "⏯ Auto-pauza"} on={() => setAutoPauza(!autoPauza)} />
-            <Btn t={glosno ? "🔊" : "🔇"} on={() => { wycisz(glosno); setGlosno(!glosno); }} />
+            <Btn t={glosno ? "🔊" : "🔇"} on={() => { wycisz(glosno); setGlosno(!glosno); if (glosno) zamilknij(); }} />
+            {glosDostepny() && <Btn t={glosKom ? "🎙 Komentator ✓" : "🎙 Komentator"} on={() => { ustawGlos(!glosKom); setGlosKom(!glosKom); }} akt={glosKom} />}
             {!bez3D && Platform.OS === "web" && <Btn t="🗺 2D" on={() => setBez3D(true)} />}
             {bez3D && Platform.OS === "web" && <Btn t="🏟 3D" on={() => setBez3D(false)} />}
           </View>
@@ -244,7 +258,7 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
           </View>
 
           {m.koniec ? (
-            <Pressable style={st.przycisk} onPress={() => { stopDzwieku(); usunZapisMeczu(); onKoniec(m); }}><Text style={st.przyciskTekst}>✅ Zakończ i zapisz wynik ({m.gd}:{m.gg})</Text></Pressable>
+            <Pressable style={st.przycisk} onPress={() => { stopDzwieku(); zamilknij(); usunZapisMeczu(); onKoniec(m); }}><Text style={st.przyciskTekst}>✅ Zakończ i zapisz wynik ({m.gd}:{m.gg})</Text></Pressable>
           ) : m.min > 0 ? (
             <Pressable onPress={() => { zapiszMecz(s, para, m); for (const [id, k] of Object.entries(m.kondStart)) if (s.zawodnicy[id]) s.zawodnicy[id].kondycja = k; stopDzwieku(); onAnuluj(); }} style={{ alignItems: "center", marginTop: 8 }}>
               <Text style={[st.maly, { color: K.niebieski }]}>⏏ Wyjdź — mecz zapisany, dokończysz później („▶ Wznów")</Text>
