@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, shrink-to-fit=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <meta name="apple-mobile-web-app-title" content="Dziewiątka" />
 <meta name="theme-color" content="#0c5230" />
 <title>Dziewiątka — Menedżer Piłkarski</title>
@@ -15,7 +15,7 @@
 <style id="expo-reset">
   html, body { height: 100%; background: #06130d; }
   body { overflow: hidden; margin: 0; }
-  #root { display: flex; height: 100%; flex: 1; }
+  #root { display: flex; height: calc(100% - env(safe-area-inset-bottom, 0px)); flex: 1; } /* pasek „home" iPhone'a nie zasłania menu */
   #nowa-wersja { position: fixed; left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 99999; display: none;
     background: #ffce47; color: #15300c; border-radius: 14px; padding: 12px 14px; font: 700 14px -apple-system, system-ui, sans-serif; box-shadow: 0 6px 24px rgba(0,0,0,.45); }
   #nowa-wersja button { float: right; margin-left: 10px; background: #15300c; color: #ffce47; border: 0; border-radius: 10px; padding: 8px 12px; font: 800 13px -apple-system, system-ui, sans-serif; }
@@ -53,6 +53,6 @@
     });
   })();
 </script>
-<script src="./app-cf34cf8976.js" defer></script>
+<script src="./app-909f069955.js" defer></script>
 </body>
 </html>
