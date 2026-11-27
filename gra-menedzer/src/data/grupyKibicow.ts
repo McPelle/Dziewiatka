@@ -3187,7 +3187,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Młoda Warmia"
   ],
   "zgody": [
-   "MKS Mazur Ełk"
+   "MKS Mazur Ełk",
+   "Mazur Ełk"
   ],
   "kosy": [
    "ŁKS Łomża",
@@ -3197,7 +3198,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Sparta 1951 Szepietowo",
    "Sokół Ostróda",
    "Mazur Pisz",
-   "Orzeł Kolno"
+   "Orzeł Kolno",
+   "Sparta Szepietowo"
   ]
  },
  "Mazur Pisz": {

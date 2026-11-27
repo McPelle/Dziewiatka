@@ -1006,6 +1006,17 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Rowokół Smołdzino": 1964,
   "KS Bytów": 2021,
   "Motor Zwartowo": 2025,
+  // Podlaskie (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Pomorzanka Sejny": 1957,
+  "Czarni Czarna Białostocka": 1996,
+  "Turośnianka Turośń Kościelna": 2020,
+  "Klonowa Suwałki": 2023,
+  "GKS 1984 Rutki": 1984,
+  "GKS Miastkowo": 2025,
+  "KS Narewka": 2023,
+  "Znicz Radziłów": 2001,
+  "Kora Korycin": 2001,
+  "Hattrick Białystok": 2017,
 };
 
 /** Rok założenia klubu (jeśli znany). */

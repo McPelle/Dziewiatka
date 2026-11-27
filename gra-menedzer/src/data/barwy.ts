@@ -1262,6 +1262,11 @@ export const BARWY_KLUBOW: Record<string, [string, string]> = {
   // Pomorskie (runda 2) — barwy z regiowyniki.pl / pl.wikipedia (odcienie przybliżone wg opisu barw)
   "Norda Karwia": ["#0000ff", "#ffd300"],
   "Powiśle Pawlice-Rakowiec": ["#d7141a", "#000000"],
+  // Podlaskie (runda 2) — barwy z regiowyniki.pl / pl.wikipedia (odcienie przybliżone wg opisu barw)
+  "Pomorzanka Sejny": ["#ff0000", "#000000"],
+  "MOSP Białystok": ["#ff0000", "#ffff00"],
+  "Narew Choroszcz": ["#6a2c91", "#ffffff"],
+  "GKS Miastkowo": ["#1b8a3a", "#000000"],
 };
 
 // Słowa-kolory w nazwie → barwa (gdy klubu nie ma w słowniku). Sprawdzane po kolei.

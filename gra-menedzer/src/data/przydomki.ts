@@ -83,6 +83,9 @@ export const PRZYDOMKI: Record<string, string> = {
   "Kaszubia Kościerzyna": "Duma Kaszub",
   "Rodło Kwidzyn": "Rodełko",
   "Bytovia Bytów": "Czarne Wilki",
+  // Podlaskie (runda 2) — przydomki potwierdzone w źródłach
+  "Warmia Grajewo": "Wilki",
+  "Biebrza Goniądz": "Niedźwiedzie",
 };
 
 export function przydomek(nazwa: string): string | undefined {
