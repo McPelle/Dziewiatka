@@ -46,7 +46,9 @@ function uruchomScene(el: HTMLElement, buduj: (scena: THREE.Scene, cam: THREE.Pe
   const petla = () => { raf = requestAnimationFrame(petla); const n = performance.now(), dt = Math.min(0.05, (n - ost) / 1000); ost = n; t += dt; krok(t, dt); composer.render(dt); };
   const r2 = renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
   const go = () => { if (!stop) raf = requestAnimationFrame(petla); };
-  if (r2.compileAsync) r2.compileAsync(scena, cam).then(go, go); else go();
+  { let ruszyl = false; const raz = () => { if (!ruszyl) { ruszyl = true; go(); } };
+      setTimeout(raz, 2000); // iPhone: gdy kompilacja w tle się nie kończy — startujemy i tak (jak dawniej)
+      try { if (r2.compileAsync) r2.compileAsync(scena, cam).then(raz, raz); else raz(); } catch { raz(); } }
   const resize = () => { renderer.setSize(W(), H()); composer.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); };
   window.addEventListener("resize", resize); setTimeout(resize, 60);
   return () => { stop = true; cancelAnimationFrame(raf); window.removeEventListener("resize", resize); renderer.dispose(); renderer.domElement.remove(); scena.clear(); };

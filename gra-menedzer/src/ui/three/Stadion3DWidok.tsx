@@ -2,7 +2,7 @@
 // (wolno krążąca kamera, pora dnia wg zegara w telefonie, lekki ruch obrazu przy przechylaniu telefonu).
 import { useEffect, useRef, useState } from "react";
 import { TloStadion } from "../TloStadion";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import * as THREE from "three";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
@@ -16,7 +16,7 @@ export const grafika3D = () => typeof window !== "undefined" && !!window.WebGLRe
 
 export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | null; klub: Klub; tlo?: boolean; wysokosc?: number; noc?: boolean }) {
   const host = useRef<any>(null);
-  const [awaria, setAwaria] = useState(false); // 3D nie ruszyło → rysunek 2D zamiast czarnego tła
+  const [awaria, setAwaria] = useState<false | string>(false); // 3D nie ruszyło → rysunek 2D zamiast czarnego tła
   const [proba, setProba] = useState(0);
   const [start, setStart] = useState(!tlo); // tło menu: start 3D dopiero gdy gra jest już gotowa do klikania
   const [widoczny, setWidoczny] = useState(!tlo);
@@ -31,11 +31,11 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
     if (!el || typeof document === "undefined" || !start) return;
     const lekka = lekkaGrafika();
     let renderer: THREE.WebGLRenderer;
-    try { renderer = new THREE.WebGLRenderer({ antialias: !lekka, failIfMajorPerformanceCaveat: false }); } catch { setAwaria(true); return; }
+    try { renderer = new THREE.WebGLRenderer({ antialias: !lekka, failIfMajorPerformanceCaveat: false }); } catch (e) { setAwaria("brak WebGL: " + String((e as Error)?.message ?? e).slice(0, 60)); return; }
     let klatki = 0, zEfektami = !lekka;
     const strata = (e: Event) => { e.preventDefault(); setTimeout(() => setProba((p) => p + 1), 800); }; // iPhone wyłączył grafikę → start od nowa
     renderer.domElement.addEventListener("webglcontextlost", strata);
-    const straznik = setTimeout(() => { if (klatki === 0) setAwaria(true); }, 15000);
+    const straznik = setTimeout(() => { if (klatki === 0) setAwaria("grafika nie ruszyła w 30 s"); }, 30000);
     const W = () => el.clientWidth || 360, H = () => el.clientHeight || 240;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lekka ? 1 : tlo ? 1.5 : 2)); renderer.setSize(W(), H());
     renderer.shadowMap.enabled = !tlo && !lekka; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -48,7 +48,7 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
     swiatla(scena, jestNoc, false, lekka);
     const mies = new Date().getMonth() + 1;
     let stad: ReturnType<typeof zbudujStadion>;
-    try { stad = zbudujStadion(s, klub, { noc: jestNoc, snieg: mies === 12 || mies <= 2 ? new Date().getDate() % 3 === 0 : false, deszcz: false, widzowie: tlo ? klub.pojemnosc * 0.5 : 0, lekka: lekka || !!tlo, budowy: s?.budowy }); } catch { clearTimeout(straznik); renderer.dispose(); renderer.domElement.remove(); setAwaria(true); return; }
+    try { stad = zbudujStadion(s, klub, { noc: jestNoc, snieg: mies === 12 || mies <= 2 ? new Date().getDate() % 3 === 0 : false, deszcz: false, widzowie: tlo ? klub.pojemnosc * 0.5 : 0, lekka: lekka || !!tlo, budowy: s?.budowy }); } catch (e) { clearTimeout(straznik); renderer.dispose(); renderer.domElement.remove(); setAwaria("budowa sceny: " + String((e as Error)?.message ?? e).slice(0, 60)); return; }
     scena.add(stad.grupa);
     const cam = new THREE.PerspectiveCamera(40, W() / H(), 0.5, 1000);
     const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scena, cam));
@@ -75,12 +75,14 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
       cam.lookAt(0, 2, 0);
       stad.aktualizuj(t, tlo ? 0.15 : 0);
       try { if (zEfektami) composer.render(dt); else renderer.render(scena, cam); klatki++; }
-      catch { if (zEfektami) zEfektami = false; else { cancelAnimationFrame(raf); setAwaria(true); } } // bez poświaty, a gdy i to nie działa — 2D
+      catch (e) { if (zEfektami) zEfektami = false; else { cancelAnimationFrame(raf); setAwaria("rysowanie: " + String((e as Error)?.message ?? e).slice(0, 60)); } } // bez poświaty, a gdy i to nie działa — 2D
     };
     let anulowano = false;
     const uruchom = () => { if (anulowano) return; raf = requestAnimationFrame(petla); setTimeout(() => !anulowano && setWidoczny(true), 120); };
     const r2 = renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
-    if (r2.compileAsync) r2.compileAsync(scena, cam).then(uruchom, uruchom); else uruchom();
+    { let ruszyl = false; const raz = () => { if (!ruszyl) { ruszyl = true; uruchom(); } };
+      setTimeout(raz, 2000); // iPhone: gdy kompilacja w tle się nie kończy — startujemy i tak (jak dawniej)
+      try { if (r2.compileAsync) r2.compileAsync(scena, cam).then(raz, raz); else raz(); } catch { raz(); } }
     const resize = () => { renderer.setSize(W(), H()); composer.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); };
     window.addEventListener("resize", resize); setTimeout(resize, 60);
     return () => {
@@ -90,7 +92,7 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
       renderer.dispose(); renderer.domElement.remove(); scena.clear();
     };
   }, [klub.id, klub.pojemnosc, s?.budowy?.length, noc, tlo, proba, awaria, start]);
-  if (awaria) return tlo ? <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 } as any}><TloStadion /></View> : <View style={{ width: "100%", height: wysokosc ?? 260, borderRadius: 10, overflow: "hidden" }}><TloStadion /></View>;
+  if (awaria) return tlo ? <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 } as any}><TloStadion /><Text style={{ position: "absolute", left: 6, bottom: 4, color: "rgba(255,255,255,0.55)", fontSize: 9 }}>3D: {awaria}</Text></View> : <View style={{ width: "100%", height: wysokosc ?? 260, borderRadius: 10, overflow: "hidden" }}><TloStadion /></View>;
   if (tlo) return (
     <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 } as any}>
       <TloStadion />

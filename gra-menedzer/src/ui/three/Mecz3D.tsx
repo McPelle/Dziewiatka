@@ -327,7 +327,9 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     // shadery kompilowane w tle (bez zamrażania ekranu przy otwieraniu meczu)
     const r2 = renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
     let anul = false; const go = () => { if (!anul) raf = requestAnimationFrame(petla); };
-    if (r2.compileAsync) r2.compileAsync(scena, cam).then(go, go); else go();
+    { let ruszyl = false; const raz = () => { if (!ruszyl) { ruszyl = true; go(); } };
+      setTimeout(raz, 2000); // iPhone: gdy kompilacja w tle się nie kończy — startujemy i tak (jak dawniej)
+      try { if (r2.compileAsync) r2.compileAsync(scena, cam).then(raz, raz); else raz(); } catch { raz(); } }
     const resize = () => { renderer.setSize(W(), H()); composer.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); };
     window.addEventListener("resize", resize); setTimeout(resize, 50);
     gwizdek(false, 1);
