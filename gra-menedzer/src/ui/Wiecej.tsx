@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Osiagniecia } from "./Osiagniecia";
 import { MapaWojewodztwa } from "./MapaWojewodztwa";
+import { DniKlubu } from "./DniKlubu";
 import { WydzialGier } from "./WydzialGier";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 import type { StanGry } from "../engine/types";
@@ -73,6 +74,7 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
         <Osiagniecia s={s} odswiez={odswiez} />
         <MapaWojewodztwa s={s} />
         <WydzialGier s={s} odswiez={odswiez} />
+        <DniKlubu s={s} odswiez={odswiez} />
         <PrasaKibice s={s} />
         <Reprezentacja s={s} />
         <View style={{ flexDirection: "row", gap: 8, marginHorizontal: 12, marginTop: 10 }}>

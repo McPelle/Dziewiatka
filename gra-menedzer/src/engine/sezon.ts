@@ -1,3 +1,4 @@
+import { wydarzeniaSezonowe } from "./wydarzeniaKlubu";
 import { kwartalZarzadu } from "./budzetZarzadu";
 import { poMeczuWydzial, tydzienWydzialu } from "./wydzialGier";
 import { sprawdzWyzwanieKolejka, sprawdzWyzwanieSezon } from "./wyzwania";
@@ -1020,6 +1021,7 @@ export function zagrajKolejke(s: StanGry) {
   for (const w of sprawdzOsiagniecia(s)) wiadomosc(s, w); // osiągnięcia trenera
   { const t = sprawdzWyzwanieKolejka(s); if (t) wiadomosc(s, t); } // tryb Wyzwania
   { const t = kwartalZarzadu(s, ileKolejek(s)); if (t) wiadomosc(s, t); } // budżet sezonu: rozliczenie kwartalne
+  for (const w of wydarzeniaSezonowe(s, r, ileKolejek(s))) wiadomosc(s, w); // opłatek, plebiscyt, gala ZPN
   tydzienWydzialu(s); // Wydział Gier, Kolegium Sędziów, Izba PZPN (zaległości płacowe)
   { const t = tydzienZgod(s, s.kluby[s.mojKlub]); if (t) wiadomosc(s, t); }
   { const t = tydzienLicencji(s); if (t) wiadomosc(s, t); } // kurs UEFA, egzamin, wymogi licencyjne ligi // życie zgód: jubileusze, zerwania, nowe układy
