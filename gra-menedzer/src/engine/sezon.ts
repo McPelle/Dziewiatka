@@ -1231,8 +1231,13 @@ function tydzien(s: StanGry) {
       z.kontuzja = losInt(1, 2);
       wiadomosc(s, `🧎 ${z.imie} ${z.nazwisko} nabawił się urazu z przeciążenia (zmęczenie sezonowe) — pauza ${z.kontuzja} kol. Rozważ rotację składu.`);
     }
-    if (z.kontuzja > 0) z.kontuzja--;
+    if (z.kontuzja > 0) { z.kontuzja--; if (z.kontuzja === 0) { z.forma = Math.max(-5, z.forma - 1.5); z.kondycja = Math.min(z.kondycja, 72); } } // powrót po urazie: brak rytmu meczowego
     if (z.zawieszenie > 0) z.zawieszenie--;
+    { // forma falowa: każdy zawodnik ma własny cykl (szczyt formy i dołek co ~8–14 kolejek)
+      let h = 0; for (let i = 0; i < z.id.length; i++) h = (h * 31 + z.id.charCodeAt(i)) >>> 0;
+      const okres = 8 + (h % 7), faza = (h % 100) / 100 * Math.PI * 2;
+      z.forma = Math.max(-5, Math.min(5, z.forma + 0.22 * Math.cos((s.kolejka / okres) * Math.PI * 2 + faza)));
+    }
     // trening: rozwój ku potencjałowi; fokus klubowy + intensywność działają na Twoją kadrę.
     // Twoja kadra: część tygodnia mogła już zostać wytrenowana dzień po dniu (kalendarz) — tu dokładamy resztę.
     const frac = moj ? Math.max(0, 1 - (s.treningiDni ?? 0) / 3) : 1;
