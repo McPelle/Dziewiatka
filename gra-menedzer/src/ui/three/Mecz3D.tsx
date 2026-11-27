@@ -311,6 +311,22 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         else { g.fillStyle = a; g.fillRect(0, 0, W2, H2); g.fillStyle = b; g.fillRect(0, H2 * 0.25, W2, H2 * 0.5); }
       };
       tlo();
+      if (o.orly) { // „Do boju Polsko!" — orzeł w koronie na biało-czerwonej fladze
+        g.fillStyle = "#ffffff"; g.fillRect(0, 0, W2, H2 / 2); g.fillStyle = "#dc143c"; g.fillRect(0, H2 / 2, W2, H2 / 2);
+        const cx = W2 / 2, cy = H2 * 0.5, R = H2 * 0.42;
+        g.fillStyle = "#f4f4f4"; g.strokeStyle = "#8a8a8a"; g.lineWidth = 3;
+        const skrzydlo = (str: number) => { g.beginPath(); g.moveTo(cx, cy - R * 0.25); for (let i = 0; i <= 5; i++) { const x = cx + str * R * (0.35 + i * 0.28), y = cy - R * (0.55 - i * 0.05) + (i % 2) * R * 0.18; g.lineTo(x, y); } g.lineTo(cx + str * R * 1.6, cy + R * 0.35); g.lineTo(cx + str * R * 0.3, cy + R * 0.2); g.closePath(); g.fill(); g.stroke(); };
+        skrzydlo(1); skrzydlo(-1);
+        g.beginPath(); g.ellipse(cx, cy, R * 0.32, R * 0.55, 0, 0, Math.PI * 2); g.fill(); g.stroke(); // tułów
+        g.beginPath(); g.moveTo(cx - R * 0.3, cy + R * 0.45); g.lineTo(cx, cy + R * 0.95); g.lineTo(cx + R * 0.3, cy + R * 0.45); g.closePath(); g.fill(); g.stroke(); // ogon
+        g.beginPath(); g.arc(cx + R * 0.08, cy - R * 0.62, R * 0.18, 0, Math.PI * 2); g.fill(); g.stroke(); // głowa
+        g.fillStyle = "#f2b705"; g.beginPath(); g.moveTo(cx + R * 0.24, cy - R * 0.64); g.lineTo(cx + R * 0.42, cy - R * 0.56); g.lineTo(cx + R * 0.24, cy - R * 0.52); g.fill(); // dziób
+        g.fillStyle = "#f2c200"; g.beginPath(); const ky = cy - R * 0.82; g.moveTo(cx - R * 0.16, ky); for (let i = 0; i <= 4; i++) { g.lineTo(cx - R * 0.16 + i * R * 0.08, ky - (i % 2 ? R * 0.08 : R * 0.2)); } g.lineTo(cx + R * 0.16, ky); g.closePath(); g.fill(); // korona
+        g.fillStyle = "#ffffff"; g.font = `bold ${Math.round(H2 * 0.16)}px Arial`; g.textAlign = "center"; g.textBaseline = "middle";
+        g.fillText("DO BOJU", W2 * 0.18, H2 * 0.78); g.fillText("POLSKO!", W2 * 0.82, H2 * 0.78);
+        const t0 = new THREE.CanvasTexture(c); t0.colorSpace = THREE.SRGBColorSpace;
+        return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t0, side: THREE.DoubleSide }));
+      }
       // motyw (obrazek) — przy prowokacji w barwach rywala
       const emoji = o.motyw.split(" ")[0];
       if (o.obrazliwa && o.rywalKolory) { g.fillStyle = o.rywalKolory[0]; g.beginPath(); g.arc(W2 * 0.15, H2 * 0.5, H2 * 0.42, 0, 7); g.fill(); g.strokeStyle = o.rywalKolory[1]; g.lineWidth = 10; g.stroke(); }

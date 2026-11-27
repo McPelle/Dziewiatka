@@ -1008,7 +1008,7 @@ export function zagrajKolejke(s: StanGry) {
   for (const w of tydzienJezykow(s)) wiadomosc(s, w); // nauka polskiego cudzoziemców, kurs, tłumacz
   for (const w of sprawdzOsiagniecia(s)) wiadomosc(s, w); // osiągnięcia trenera
   { // wędrująca oprawa z orłami — po stadionach scen kibicowskich (przez zgody)
-    const kand = Object.values(s.kluby).filter((k) => !!GRUPY_KIBICOW[k.nazwa] || k.poziom <= 3); // kluby ze sceną kibicowską
+    const kand = Object.values(s.kluby).filter((k) => k.poziom <= 5 && !k.rezerwaDla); // wszystkie kluby od Ekstraklasy do IV ligi
     const t = wedrownaOprawaTydzien(s, kand, (a) => kand.filter((b) => b.id !== a.id && !!zgodaKibicow(s, a, b)));
     if (t && (s.wedrujacaOprawa?.trasa.slice(-2).includes(s.kluby[s.mojKlub].nazwa) || s.wedrujacaOprawa?.trasa.length === 1 || Math.random() < 0.25)) wiadomosc(s, t);
   }
