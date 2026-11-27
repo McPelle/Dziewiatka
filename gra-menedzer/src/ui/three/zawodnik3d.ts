@@ -16,7 +16,7 @@ function teksturaNumeru(nr: number, kolor: string, tlo: string, nazwisko?: strin
 }
 const kontrast = (hex: string) => { const c = new THREE.Color(hex); return c.r * 0.3 + c.g * 0.59 + c.b * 0.11 > 0.55 ? "#111111" : "#ffffff"; };
 
-export function stworzPostac(o: { koszulka: string; spodenki: string; getry: string; nr: number; nazwisko?: string; seed: number; sedzia?: boolean; wzor?: "pasy" | "polowy" | "gladka" }): Postac {
+export function stworzPostac(o: { koszulka: string; dodatek?: string; spodenki: string; getry: string; nr: number; nazwisko?: string; seed: number; sedzia?: boolean; wzor?: "pasy" | "rekaw" | "jednolity" }): Postac {
   const g = new THREE.Group();
   const skora = new THREE.MeshStandardMaterial({ color: SKORA[o.seed % SKORA.length], roughness: 0.7 });
   const kosz = new THREE.MeshStandardMaterial({ color: o.koszulka, roughness: 0.75 });
@@ -28,7 +28,9 @@ export function stworzPostac(o: { koszulka: string; spodenki: string; getry: str
   const korpus = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 0.42, 4, 10), kosz); korpus.position.y = 0.32; korpus.scale.set(1.15, 1, 0.75); korpus.castShadow = true; tulow.add(korpus);
   const numer = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.34), new THREE.MeshStandardMaterial({ map: teksturaNumeru(o.nr, kontrast(o.koszulka), o.koszulka, o.nazwisko), roughness: 0.8 }));
   numer.position.set(0, 0.36, -0.158); numer.rotation.y = Math.PI; tulow.add(numer);
-  if (o.wzor === "pasy") for (let i = -1; i <= 1; i++) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.5, 0.31), spod); p.position.set(i * 0.14, 0.33, 0); tulow.add(p); }
+  const dod = new THREE.MeshStandardMaterial({ color: o.dodatek ?? o.spodenki, roughness: 0.75 });
+  if (o.wzor === "pasy") for (let i = -1; i <= 1; i++) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.52, 0.315), dod); p.position.set(i * 0.13, 0.33, 0); tulow.add(p); }
+  { const kol = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.018, 6, 14), dod); kol.rotation.x = Math.PI / 2; kol.position.y = 0.68; tulow.add(kol); } // kołnierzyk w kolorze dodatku
   const szyja = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.1), skora); szyja.position.y = 0.72; tulow.add(szyja);
   const glowa = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 12), skora); glowa.position.y = 0.88; glowa.scale.set(0.95, 1.08, 1); glowa.castShadow = true; tulow.add(glowa);
   const wl = new THREE.Mesh(new THREE.SphereGeometry(0.137, 14, 10, 0, Math.PI * 2, 0, Math.PI * (0.3 + (o.seed % 4) * 0.06)), new THREE.MeshStandardMaterial({ color: WLOSY[(o.seed >> 2) % WLOSY.length], roughness: 0.9 }));
@@ -49,7 +51,7 @@ export function stworzPostac(o: { koszulka: string; spodenki: string; getry: str
   // ręce (pivot w barku)
   const reka = (x: number) => {
     const bark = new THREE.Group(); bark.position.set(x, 0.58, 0); tulow.add(bark);
-    const r1 = new THREE.Mesh(new THREE.CapsuleGeometry(0.055, 0.22, 3, 8), o.sedzia ? kosz : kosz); r1.position.y = -0.14; bark.add(r1);
+    const r1 = new THREE.Mesh(new THREE.CapsuleGeometry(0.055, 0.22, 3, 8), o.wzor === "rekaw" ? dod : kosz); r1.position.y = -0.14; bark.add(r1);
     const r2 = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.22, 3, 8), skora); r2.position.y = -0.4; bark.add(r2);
     return bark;
   };

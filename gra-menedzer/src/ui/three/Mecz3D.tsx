@@ -13,7 +13,7 @@ import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { FORMACJE_SLOTY, przydzielSloty } from "../../engine/mecz";
 import type { MeczLive, PunktAkcji } from "../../engine/meczNaZywo";
 import type { PozycjaSzczegolowa, StanGry } from "../../engine/types";
-import { barwyKlubu } from "../../data/barwy";
+import type { StrojeMeczu } from "../strojeDane";
 import { DL, SZ, swiatla, zbudujStadion } from "./stadion3d";
 import { animuj, stworzPostac, type Postac } from "./zawodnik3d";
 import { gwizdek, kopniecie, napiecie, reakcjaTrybun } from "./dzwiek";
@@ -29,21 +29,10 @@ const SLOT_XY: Record<PozycjaSzczegolowa, [number, number]> = {
 const WX = (x: number) => (x / 100 - 0.5) * DL, WZ = (y: number) => (y / 100 - 0.5) * SZ;
 const odl = (a: THREE.Color, b: THREE.Color) => Math.abs(a.r - b.r) + Math.abs(a.g - b.g) + Math.abs(a.b - b.b);
 
-/** Stroje bez kolizji kolorów (jak decyzja sędziego przed meczem): gość zakłada strój wyjazdowy, gdy barwy się zlewają. */
-function stroje(domN: string, goscN: string) {
-  const [d1, d2] = barwyKlubu(domN), [g1, g2] = barwyKlubu(goscN);
-  const dom = { koszulka: d1, spodenki: d2, getry: d1 };
-  let gosc = { koszulka: g1, spodenki: g2, getry: g1 };
-  if (odl(new THREE.Color(d1), new THREE.Color(g1)) < 0.6) gosc = { koszulka: g2, spodenki: g1, getry: g2 };
-  if (odl(new THREE.Color(d1), new THREE.Color(gosc.koszulka)) < 0.6) gosc = { koszulka: "#f4f4f4", spodenki: "#1b1b1b", getry: "#f4f4f4" };
-  const ciemne = [dom.koszulka, gosc.koszulka].some((c) => { const x = new THREE.Color(c); return x.r + x.g + x.b < 0.6; });
-  return { dom, gosc, sedzia: ciemne ? { koszulka: "#f5e100", spodenki: "#111111", getry: "#111111" } : { koszulka: "#111111", spodenki: "#111111", getry: "#111111" } };
-}
-
 interface Seg { a: THREE.Vector3; b: THREE.Vector3; h: number; t: number; dur: number; p: PunktAkcji }
 
-export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, onKoniecSekwencji, onPowtorka, onBlad }: {
-  s: StanGry; m: MeczLive; wersja: number; predkosc: number; kamera: Kamera; ust: Ustawienia3D;
+export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSekwencji, onPowtorka, onBlad }: {
+  s: StanGry; m: MeczLive; wersja: number; predkosc: number; kamera: Kamera; ust: Ustawienia3D; stroje: StrojeMeczu;
   onKoniecSekwencji: () => void; onPowtorka: (p: boolean) => void; onBlad: () => void;
 }) {
   const host = useRef<any>(null);
@@ -94,7 +83,6 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, onKoniecSekwencji,
     const cienP = new THREE.Mesh(new THREE.CircleGeometry(0.3, 14), new THREE.MeshBasicMaterial({ color: 0, transparent: true, opacity: 0.35, depthWrite: false }));
     cienP.rotation.x = -Math.PI / 2; scena.add(cienP);
     // postacie
-    const kit = stroje(kd.nazwa, kg.nazwa);
     const postacie = new Map<string, Postac>();
     const strona = new Map<string, "dom" | "gosc">();
     const postac = (id: string, sd: "dom" | "gosc") => {
@@ -102,15 +90,16 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, onKoniecSekwencji,
       if (!p) {
         const z = s.zawodnicy[id];
         const br = z?.poz === "BR";
-        const k = br ? (sd === "dom" ? { koszulka: "#20c05a", spodenki: "#111111", getry: "#20c05a" } : { koszulka: "#ffb000", spodenki: "#222222", getry: "#ffb000" }) : kit[sd];
-        p = stworzPostac({ ...k, nr: z?.numer ?? 0, nazwisko: z?.nazwisko, seed: [...id].reduce((a, c) => a + c.charCodeAt(0) * 7, 0) });
+        const k = br ? stroje[sd].br : stroje[sd].pole;
+        p = stworzPostac({ koszulka: k.baza, dodatek: k.dodatek, wzor: k.wzor, spodenki: k.wzor === "jednolity" ? k.dodatek : k.dodatek, getry: k.baza, nr: z?.numer ?? 0, nazwisko: z?.nazwisko, seed: [...id].reduce((a, c) => a + c.charCodeAt(0) * 7, 0) });
         const startX = sd === "dom" ? -6 : 6;
         p.g.position.set(startX, 0, 0); scena.add(p.g); postacie.set(id, p); strona.set(id, sd);
       }
       return p;
     };
-    const sedzia = stworzPostac({ ...kit.sedzia, nr: 0, seed: 5, sedzia: true }); scena.add(sedzia.g);
-    const asystenci = [stworzPostac({ ...kit.sedzia, nr: 0, seed: 11 }), stworzPostac({ ...kit.sedzia, nr: 0, seed: 17 })];
+    const kS = { koszulka: stroje.sedzia.baza, spodenki: "#111111", getry: "#111111" };
+    const sedzia = stworzPostac({ ...kS, nr: 0, seed: 5, sedzia: true }); scena.add(sedzia.g);
+    const asystenci = [stworzPostac({ ...kS, nr: 0, seed: 11 }), stworzPostac({ ...kS, nr: 0, seed: 17 })];
     asystenci.forEach((a, i) => { a.g.position.set(i ? 25 : -25, 0, i ? -SZ / 2 - 1 : SZ / 2 + 1); scena.add(a.g); });
     const predk = new Map<Postac, THREE.Vector3>();
     // stan odtwarzania

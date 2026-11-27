@@ -8,6 +8,7 @@ import { maOswietlenie } from "../engine/sezon";
 import type { Nastawienie, StanGry } from "../engine/types";
 import { Herb } from "./Herb";
 import { CZCIONKA, K, st } from "./styl";
+import { dobierzStroje, dostepneStroje, kity, type Kit } from "./strojeDane";
 import { Mecz3D, type Kamera, type Ustawienia3D } from "./three/Mecz3D";
 import { czyWyciszony, gwizdek, startDzwieku, stopDzwieku, wycisz } from "./three/dzwiek";
 
@@ -43,6 +44,8 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
   const [kom, setKom] = useState<string | null>(null);
   const [glosno, setGlosno] = useState(!czyWyciszony());
   const [startTxt, setStartTxt] = useState(true);
+  const [wyborStroju, setWyborStroju] = useState<[number, number]>(() => { const st0 = dobierzStroje(s.kluby[para[0]], s.kluby[para[1]], para[0] === s.mojKlub ? "dom" : "gosc"); return para[0] === s.mojKlub ? st0.wyborDom : st0.wyborGosc; });
+  const stroje = useMemo(() => dobierzStroje(s.kluby[para[0]], s.kluby[para[1]], para[0] === s.mojKlub ? "dom" : "gosc", wyborStroju), [wyborStroju]);
   const kd = s.kluby[m.dom.klubId], kg = s.kluby[m.gosc.klubId];
   const moj = m.moja === "dom" ? m.dom : m.gosc;
   const odswiez = () => setWersja((v) => v + 1);
@@ -64,7 +67,15 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
     const t = setInterval(krok, 1400 / predkosc);
     return () => clearInterval(t);
   });
-  const graj = (v: number) => { setPredkosc(v); if (v > 0) setOstatniaPr(v); if (startTxt) { setStartTxt(false); startDzwieku(ust.widzowie / Math.max(1, kd.pojemnosc)); } };
+  const graj = (v: number) => {
+    setPredkosc(v); if (v > 0) setOstatniaPr(v);
+    if (startTxt) {
+      setStartTxt(false); startDzwieku(ust.widzowie / Math.max(1, kd.pojemnosc));
+      for (const u of stroje.uwagi) m.komentarz.unshift({ min: "0'", typ: "info", tekst: u });
+      if (stroje.kolizja) { const kara = [5000, 3000, 2000, 1000, 500, 300, 200, 150, 100][Math.min(8, kg.poziom - 1)]; kg.kasa -= kara; s.wiadomosci.unshift({ sezon: s.sezon, kolejka: s.kolejka, tekst: `⚖️ Kolizja strojów — ${kg.nazwa} ukarany kwotą ${kara} zł (§ 13 ust. 2 uchwały PZPN IX/140).` }); }
+      m.komentarz.unshift({ min: "0'", typ: "info", tekst: `👕 Stroje: ${kd.nazwa} — ${stroje.dom.pole.nazwa.toLowerCase()}, ${kg.nazwa} — ${stroje.gosc.pole.nazwa.toLowerCase()}. Sędzia w kolorze: ${stroje.sedzia.nazwa}.` });
+    }
+  };
   const dograj = (doPrzerwy: boolean) => { dograjDoKonca(s, m, doPrzerwy); setPredkosc(0); odswiez(); };
   const minuta = m.koniec ? "KONIEC" : przerwa(m) ? "PRZERWA" : m.polowa === 1 && m.min > 45 ? `45+${m.min - 45}'` : m.min > 90 ? `90+${m.min - 90}'` : `${m.min}'`;
   const posD = m.staty.posN ? Math.round((m.staty.posD / m.staty.posN) * 100) : 50;
@@ -122,12 +133,13 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
           {/* obraz meczu */}
           <View>
             {!bez3D ? (
-              <Mecz3D s={s} m={m} wersja={wersja} predkosc={predkosc} kamera={kamera} ust={ust} onKoniecSekwencji={krok} onPowtorka={setPowt} onBlad={() => setBez3D(true)} />
+              <Mecz3D key={wyborStroju.join("-")} s={s} m={m} stroje={stroje} wersja={wersja} predkosc={predkosc} kamera={kamera} ust={ust} onKoniecSekwencji={krok} onPowtorka={setPowt} onBlad={() => setBez3D(true)} />
             ) : <Boisko2D s={s} m={m} />}
             {powt && <View style={{ position: "absolute", top: 8, left: 8, backgroundColor: "#c8102e", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4 }}><Text style={{ color: "#fff", fontWeight: "900", fontSize: 11 }}>⟲ POWTÓRKA</Text></View>}
             {m.wazne?.typ === "gol" && predkosc > 0 && <View style={{ position: "absolute", top: "38%", alignSelf: "center", backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 18, paddingVertical: 6, borderRadius: 8 }}><Text style={{ color: K.akcent, fontWeight: "900", fontSize: 28, fontFamily: CZCIONKA }}>GOOOL!</Text></View>}
             {startTxt && <Pressable onPress={() => graj(1)} style={{ position: "absolute", inset: 0, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.35)" } as any}><Text style={{ color: "#fff", fontWeight: "900", fontSize: 20 }}>▶ Rozpocznij mecz</Text><Text style={[st.maly, { color: "#ddd" }]}>{m.zasady.opis}</Text></Pressable>}
           </View>
+          {startTxt && <WyborStrojow s={s} para={para} wybor={wyborStroju} setWybor={setWyborStroju} stroje={stroje} />}
           {/* sterowanie */}
           <View style={[st.wiersz, { flexWrap: "wrap", marginTop: 8 }]}>
             <Btn t={predkosc > 0 ? "⏸ Pauza" : "▶ Graj"} on={() => (predkosc > 0 ? setPredkosc(0) : graj(ostatniaPr))} akt={predkosc === 0} />
@@ -245,5 +257,42 @@ function MapaStrzalow({ m }: { m: MeczLive }) {
       <Line x1={52.5} y1={0.5} x2={52.5} y2={67.5} stroke="#cfe" strokeWidth={0.3} />
       {m.staty.strzaly.map((p, i) => <Circle key={i} cx={p.x * 1.05} cy={p.y * 0.68} r={0.8 + p.xg * 4} fill={p.gol ? "#ffce47" : "none"} stroke={p.strona === "dom" ? "#ffce47" : "#5aa9ff"} strokeWidth={0.4} />)}
     </Svg>
+  );
+}
+
+const Probka = ({ k, wybrany, blokada, on }: { k: Kit; wybrany: boolean; blokada: string | null; on: () => void }) => (
+  <Pressable onPress={blokada ? undefined : on} style={{ alignItems: "center", marginRight: 10, marginBottom: 6, opacity: blokada ? 0.35 : 1 }}>
+    <View style={{ width: 46, height: 46, borderRadius: 8, overflow: "hidden", borderWidth: wybrany ? 3 : 1, borderColor: wybrany ? K.akcent : K.linia, backgroundColor: k.baza, flexDirection: "row" }}>
+      {k.wzor === "pasy" && [0, 1, 2].map((i) => <View key={i} style={{ position: "absolute", left: 6 + i * 13, top: 0, bottom: 0, width: 6, backgroundColor: k.dodatek }} />)}
+      {k.wzor === "rekaw" && <><View style={{ position: "absolute", left: 0, top: 0, bottom: 18, width: 10, backgroundColor: k.dodatek }} /><View style={{ position: "absolute", right: 0, top: 0, bottom: 18, width: 10, backgroundColor: k.dodatek }} /></>}
+      <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 12, backgroundColor: k.dodatek }} />
+    </View>
+    <Text style={{ color: wybrany ? K.akcent : K.szary, fontSize: 10, marginTop: 2, fontFamily: CZCIONKA }}>{k.nazwa}{blokada ? " 🚫" : ""}</Text>
+  </Pressable>
+);
+/** Wybór strojów przed meczem — z blokadą kompletów zlewających się z rywalem (PZPN IX/140 § 13). */
+function WyborStrojow({ s, para, wybor, setWybor, stroje }: { s: StanGry; para: [string, string]; wybor: [number, number]; setWybor: (w: [number, number]) => void; stroje: ReturnType<typeof dobierzStroje> }) {
+  const dom = s.kluby[para[0]], gosc = s.kluby[para[1]];
+  const strona = para[0] === s.mojKlub ? "dom" : "gosc";
+  const moj = strona === "dom" ? dom : gosc, rywal = strona === "dom" ? gosc : dom;
+  const k = kity(moj);
+  const dost = dostepneStroje(dom, gosc, strona, wybor[0]);
+  const rw = strona === "dom" ? stroje.gosc : stroje.dom;
+  return (
+    <View style={[st.karta, { marginHorizontal: 0, marginTop: 8 }]}>
+      <Text style={st.naglowek}>👕 Stroje na mecz</Text>
+      <Text style={[st.maly, { marginBottom: 6 }]}>{strona === "dom" ? "Jesteś gospodarzem — grasz w wybranych barwach, gość musi się dostosować (§ 13 ust. 1 uchwały PZPN IX/140)." : `Grasz na wyjeździe — gospodarz (${rywal.nazwa}) wystąpi w stroju „${rw.pole.nazwa.toLowerCase()}". Komplety zlewające się z nim są zablokowane.`}</Text>
+      <Text style={[st.maly, { fontWeight: "800", color: K.tekst }]}>Zawodnicy z pola</Text>
+      <View style={[st.wiersz, { flexWrap: "wrap", marginTop: 4 }]}>{k.pole.map((kit, i) => <Probka key={i} k={kit} wybrany={wybor[0] === i} blokada={dost.pole[i]} on={() => setWybor([i, wybor[1]])} />)}</View>
+      <Text style={[st.maly, { fontWeight: "800", color: K.tekst }]}>Bramkarz</Text>
+      <View style={[st.wiersz, { flexWrap: "wrap", marginTop: 4 }]}>{k.bramkarz.map((kit, i) => <Probka key={i} k={kit} wybrany={(strona === "dom" ? stroje.wyborDom : stroje.wyborGosc)[1] === i} blokada={dost.br[i]} on={() => setWybor([wybor[0], i])} />)}</View>
+      {[...dost.pole, ...dost.br].some(Boolean) && <Text style={[st.maly, { fontSize: 10.5 }]}>🚫 {[...dost.pole, ...dost.br].find(Boolean)}</Text>}
+      <View style={[st.wiersz, { marginTop: 6, gap: 8 }]}>
+        <Text style={st.maly}>Rywal ({rywal.nazwa}):</Text>
+        <Probka k={rw.pole} wybrany={false} blokada={null} on={() => {}} /><Probka k={rw.br} wybrany={false} blokada={null} on={() => {}} />
+        <Text style={st.maly}>Sędzia: {stroje.sedzia.nazwa}</Text>
+      </View>
+      {stroje.uwagi.map((u, i) => <Text key={i} style={[st.maly, { color: K.akcent }]}>{u}</Text>)}
+    </View>
   );
 }

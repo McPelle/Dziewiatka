@@ -1,3 +1,4 @@
+import { grafika3D, Stadion3DWidok } from "./three/Stadion3DWidok";
 import { budowyKlubu, oglosPrzetarg, opisUtrudnien, trwaBudowa } from "../engine/budowy";
 import { PrzetargPanel, TrwajaceBudowy } from "./Budowy";
 import { useState } from "react";
@@ -44,6 +45,7 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
 
   const kadra = klub ? [...klub.zawodnicy].map((id) => s.zawodnicy[id]).sort((a, b) => POZYCJE.indexOf(a.poz) - POZYCJE.indexOf(b.poz) || b.umiej - a.umiej) : [];
 
+  const [widok3D, setWidok3D] = useState(true);
   const akcja = (f: () => string | null) => { const b = f(); odswiez(); if (b) komunikat(b); };
 
   return (
@@ -122,7 +124,10 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
               <View style={{ marginTop: 18 }}>
                 <Text style={st.naglowek}>🏟 Stadion z lotu ptaka</Text>
                 <Text style={[st.maly, { marginBottom: 6 }]}>{klub.pojemnosc.toLocaleString("pl")} miejsc · trybuny i obiekty rosną razem z rozbudową</Text>
-                <WidokStadionu klub={klub} oswietlenie={maOswietlenie(klub)} budowy={moj ? budowyKlubu(s) : undefined} />
+                {widok3D && Platform.OS === "web" && grafika3D()
+                  ? <Stadion3DWidok s={moj ? s : null} klub={klub} />
+                  : <WidokStadionu klub={klub} oswietlenie={maOswietlenie(klub)} budowy={moj ? budowyKlubu(s) : undefined} />}
+                {Platform.OS === "web" && grafika3D() && <Pressable onPress={() => setWidok3D(!widok3D)} style={{ marginTop: 6 }}><Text style={[st.maly, { color: K.akcent }]}>{widok3D ? "🗺 Pokaż plan 2D (z góry)" : "🏟 Pokaż stadion w 3D (obracaj palcem)"}</Text></Pressable>}
               </View>
 
               {moj && (

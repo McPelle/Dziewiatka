@@ -6,25 +6,8 @@ import { Herb } from "./Herb";
 import { LogoMarki } from "./LogoMarki";
 import { K, st } from "./styl";
 
-type Wzor = "jednolity" | "pasy" | "rekaw";
-interface Kit { baza: string; dodatek: string; wzor: Wzor; nazwa: string }
-
-function kity(klub: Klub): { pole: Kit[]; bramkarz: Kit[] } {
-  const [p, d] = barwyKlubu(klub.nazwa);
-  const wzorPole: Wzor = hashNazwy(klub.nazwa) % 3 === 0 ? "pasy" : hashNazwy(klub.nazwa) % 3 === 1 ? "rekaw" : "jednolity";
-  return {
-    pole: [
-      { baza: p, dodatek: d, wzor: wzorPole, nazwa: "Domowy" },
-      { baza: barwyWyjazdowe(klub.nazwa)[0], dodatek: barwyWyjazdowe(klub.nazwa)[1], wzor: "rekaw", nazwa: "Wyjazdowy" },
-      { baza: odcien(p, -0.25), dodatek: d, wzor: "jednolity", nazwa: "Trzeci" },
-    ],
-    bramkarz: [
-      { baza: "#1b8a3a", dodatek: "#0c3d1a", wzor: "rekaw", nazwa: "BR domowy" },
-      { baza: "#f1c40f", dodatek: "#1a1a1a", wzor: "jednolity", nazwa: "BR wyjazdowy" },
-      { baza: "#d81b60", dodatek: "#ffffff", wzor: "rekaw", nazwa: "BR trzeci" },
-    ],
-  };
-}
+import { kity, type Kit } from "./strojeDane";
+export { kity };
 
 /** Rysunek koszulki (View) z emblematem ligi i nazwą sponsora. */
 function Koszulka({ kit, klub, sponsor, producent, skrot, numer, nazwisko, tyl }: { kit: Kit; klub: Klub; sponsor?: string; producent?: string; skrot: string; numer?: number; nazwisko?: string; tyl?: boolean }) {

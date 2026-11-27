@@ -4,6 +4,10 @@ import type { StanGry } from "../engine/types";
 import { HerbGry, PlakietkaBeta } from "./Grafika";
 import { Herb } from "./Herb";
 import { TloStadion } from "./TloStadion";
+import { grafika3D, Stadion3DWidok } from "./three/Stadion3DWidok";
+import type { Klub } from "../engine/types";
+
+const KLUB_DEMO = { id: "demo", nazwa: "Dziewiątka", pojemnosc: 9000, poziom: 2, obiekty: { zadaszenie: 2, telebim: 1 }, oswietlenie: true, murawa: "naturalna", miasto: "", renoma: 0.6 } as unknown as Klub;
 import { CZCIONKA, cien, K } from "./styl";
 
 // Ekran tytułowy „DZIEWIĄTKA" — wektorowa scena stadionowa w tle, herb, nazwa i przyciski.
@@ -15,7 +19,8 @@ export function MenuGlowne({ stan, naKontynuuj, naNowa, naWczytaj }: { stan: Sta
     <View style={{ flex: 1, backgroundColor: K.tlo }}>
       {/* SCENA TYTUŁOWA */}
       <View style={{ height: "56%", borderBottomWidth: 2, borderBottomColor: K.akcent, overflow: "hidden" }}>
-        <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}><TloStadion /></View>
+        <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>{Platform.OS === "web" && grafika3D() ? <Stadion3DWidok s={stan} klub={klub ?? KLUB_DEMO} tlo /> : <TloStadion />}</View>
+        <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(4,12,8,0.35)" }} />
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingTop: Platform.OS === "android" ? 20 : 0 }}>
           <HerbGry rozmiar={112} />
           <Text style={{ color: "#fff", fontWeight: "900", fontSize: 46, letterSpacing: 2, marginTop: 10, fontFamily: CZCIONKA, textShadowColor: "rgba(0,0,0,0.6)", textShadowOffset: { width: 0, height: 3 }, textShadowRadius: 8 }}>DZIEWIĄTKA</Text>
