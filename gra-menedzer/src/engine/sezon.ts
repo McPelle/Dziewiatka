@@ -22,7 +22,7 @@ import { realizujUmowyWstepne, wykupZWypozyczenia } from "./transfery";
 import { nrZespolu, powolaniaAI, zespolyKlubu } from "./rezerwy";
 import { konferencjaPo, konferencjaPrzed } from "./konferencje";
 import { autoSklad, raportAsystenta, dostepny, FORMACJE, ileSpozaUE, limitSpozaUE, zagrajMecz } from "./mecz";
-import { pogodaMeczu, pogodaWDniuMeczu, gorskie } from "./pogoda";
+import { pogodaMeczu, pogodaWDniuMeczu, gorskie, mrozne } from "./pogoda";
 import { rozwinAtrybuty } from "./atrybuty";
 import { bonusRegeneracji, kosztSztabuNaKolejke, modRozwoj, modRozwojBR, sztabNowySezon } from "./sztab";
 import { trenerzyNowySezon, zwolnijTreneraAI } from "../data/trenerzy";
@@ -488,10 +488,10 @@ export function wyslijNaOboz(s: StanGry, idx: number): string | null {
   }
   s.obozSezon = s.sezon;
   // Zimowe zgrupowanie a pogoda: obóz zagraniczny (ciepłe kraje) daje lepsze wejście w rundę wiosenną — bezcenne,
-  // gdy w kraju trzyma mróz/śnieg (Kujawsko-Pomorskie, Zachodniopomorskie, górska Małopolska). Boost formy na start.
+  // gdy w kraju trzyma mróz/śnieg (Kujawsko-Pomorskie, Zachodniopomorskie, Warmia i Mazury, Podlasie, górska Małopolska). Boost formy na start.
   if (o.id === "zagraniczny") {
     const sc = (s.sciezka || "").toLowerCase();
-    const zimnoRegion = /kujawsko|zachodniopomor/.test(sc) || gorskie(moj.miasto);
+    const zimnoRegion = /kujawsko|zachodniopomor|warmi[ńn]sko|podlask/.test(sc) || gorskie(moj.miasto) || mrozne(moj.miasto);
     const boost = zimnoRegion ? 2 : 1;
     for (const id of moj.zawodnicy) { const z = s.zawodnicy[id]; if (z) z.forma = Math.min(5, z.forma + boost); }
     wiadomosc(s, zimnoRegion

@@ -273,6 +273,45 @@ export const KSZTALTY_STADIONOW: Record<string, KsztaltStadionu> = {
     wzor: "sektory", opis: "Stadion Miejski w Inowrocławiu: bieżnia lekkoatletyczna, zadaszona trybuna główna (?).",
   },
   "Garbarnia Kraków": glownaIOdkryta(undefined, "Stadion na Rydlówce: kameralna zadaszona trybuna (?).", { otoczenie: "metropolia" }, 0.4),
+  // ——— Warmińsko-mazurskie i podlaskie (stadiony.net + pl.wikipedia, sprawdzone 11.2026; krzesełka — barwy klubu) ———
+  "Stomil Olsztyn": {
+    trybuny: { S: { u: 0.85, dach: true, stara: true }, E: { u: 0.15, d: 0.45 } },
+    wzor: "sektory", opis: "Stadion OSiR w Olsztynie (1978): kryta trybuna prosta i czynny tylko łuk północno-wschodni (sektor gości ~500); bieżnię zlikwidowano w 2018. Nowy stadion na 10 tys. — w projektowaniu (PiG Architekci, 2026–2027).",
+  },
+  "Olimpia Elbląg": {
+    trybuny: { S: { u: 0.45, dach: true, d: 0.9 }, N: { u: 0.35, d: 0.8 }, E: { u: 0.2, d: 0.5 } },
+    wzor: "sektory", opis: "Stadion Miejski w Elblągu (ul. Agrykola 8): kryta trybuna prosta (814 miejsc pod dachem), sektor VIP i sektor gości na 750; od 08.2026 przebudowa płyty (podgrzewanie).",
+  },
+  "Wigry Suwałki": {
+    trybuny: { S: { u: 0.55, p: 2, dach: true, d: 0.8 }, N: { u: 0.45, d: 0.85, stara: true } },
+    wzor: "sektory", opis: "Stadion Miejski w Suwałkach: dwupoziomowa trybuna główna z 2011 (1 100 miejsc, 200 VIP), stara odkryta trybuna naprzeciw; podgrzewana murawa, oświetlenie.",
+  },
+  "ŁKS Łomża": {
+    trybuny: { S: { u: 0.52, dach: true }, N: { u: 0.42 }, E: { u: 0.06, d: 0.3 } }, bieznia: "lekkoatletyczna",
+    wzor: "sektory", opis: "Stadion Miejski w Łomży: kryta trybuna główna (1 800), odkryta od strony Narwi (1 450), sektor gości ~200; bieżnia lekkoatletyczna, podgrzewana murawa.",
+  },
+  "Olimpia Zambrów": glownaIOdkryta(undefined, "Stadion Miejski w Zambrowie (999 miejsc): zadaszona trybuna główna, sektor gości 128; bieżnia.", { bieznia: "lekkoatletyczna" }, 0.5),
+  "Polonia Lidzbark Warmiński": {
+    trybuny: { S: { u: 0.6, dach: true, d: 0.55 }, N: { u: 0.4, d: 0.7 } }, bieznia: "lekkoatletyczna", dachKolor: "#7a4a24",
+    wzor: "sektory", opis: "Stadion Miejski im. Henryka Wobalisa (1 600): trybuna główna z drewnianym zadaszeniem (480 miejsc pod dachem); bieżnia, oświetlenie.",
+  },
+  "Sokół Ostróda": {
+    trybuny: { S: { u: 0.5, dach: true }, N: { u: 0.5 } },
+    wzor: "sektory", opis: "Stadion Miejski w Ostródzie (2011): 4 998 krzesełek w sześciu trybunach wyłącznie wzdłuż boków — zachodnie kryte, wschodnie bez dachu; za bramkami brak trybun; podgrzewana murawa nad Jeziorem Drwęckim.",
+  },
+  "MKS Mazur Ełk": {
+    trybuny: { S: { u: 0.74, dach: true }, N: { u: 0.26, d: 0.7, stara: true } }, bieznia: "lekkoatletyczna",
+    wzor: "sektory", opis: "Stadion Miejski im. Stefana Marcinkiewicza w Ełku: żelbetowa kryta trybuna od ul. Piłsudskiego (2 000) i odkryta na starym nasypie (720); bieżnia, brak oświetlenia.",
+  },
+  "Czarni Olecko": {
+    trybuny: { S: { u: 1, d: 0.7 } },
+    wzor: "sektory", opis: "Stadion w Olecku: jedyna trybuna — trawiasty nasyp z krzesełkami (599) i zadaszonym sektorem honorowym (126); sektor gości 56.",
+  },
+  "Warmia Grajewo": glownaIOdkryta(undefined, "Stadion Miejski im. Witolda Terleckiego (1 740): żelbetowa trybuna z zapleczem, częściowo zadaszona; sektor gości 240; brak oświetlenia.", {}, 0.35),
+  "Puszcza Hajnówka": {
+    trybuny: { S: { u: 0.74, dach: true, d: 0.75 }, N: { u: 0.26, d: 0.55 } }, bieznia: "lekkoatletyczna",
+    wzor: "sektory", opis: "Stadion w Hajnówce: w pełni kryta trybuna główna z trzech segmentów (693) i dwie odkryte naprzeciw (2×124); 4-torowa bieżnia.",
+  },
 };
 
 /** Kształt stadionu klubu (rezerwy „X II" grające na stadionie pierwszego zespołu — bez dopasowania). */

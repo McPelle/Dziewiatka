@@ -17,10 +17,24 @@ export const DZIELNICE: Record<string, string[]> = {
   Toruń: ["Rubinkowo", "Bielany", "Mokre", "Chełmińskie Przedmieście", "Bydgoskie Przedmieście", "Podgórz"],
   Warszawa: ["Mokotów", "Wola", "Praga", "Ursynów", "Bemowo", "Bielany", "Żoliborz", "Ochota", "Targówek", "Grochów"],
   Poznań: ["Rataje", "Winogrady", "Wilda", "Jeżyce", "Łazarz", "Piątkowo"], Łódź: ["Bałuty", "Widzew", "Retkinia", "Teofilów", "Chojny"],
-  Wrocław: ["Krzyki", "Psie Pole", "Fabryczna", "Nadodrze", "Gaj"], Białystok: ["Bojary", "Dziesięciny", "Antoniuk", "Słoneczny Stok"],
+  Wrocław: ["Krzyki", "Psie Pole", "Fabryczna", "Nadodrze", "Gaj"], Białystok: ["Bojary", "Dziesięciny", "Antoniuk", "Słoneczny Stok", "Piaski", "Bacieczki", "Dziesięciny I", "Dziesięciny II", "Wysoki Stoczek", "Białostoczek", "Nowe Miasto", "Zielone Wzgórza", "Wygoda", "Mickiewicza"],
   Lublin: ["Czechów", "Kalinowszczyzna", "Bronowice", "Czuby"], Katowice: ["Ligota", "Giszowiec", "Nikiszowiec", "Załęże"],
   Koszalin: ["Rokosowo", "Lubiatowo", "Wilkowo"], Słupsk: ["Zatorze", "Ryczewo", "Westerplatte"], Tarnów: ["Mościce", "Grabówka", "Krzyż"],
   "Nowy Sącz": ["Gołąbkowice", "Wólki", "Zawada"], Włocławek: ["Zazamcze", "Południe", "Michelin"], Grudziądz: ["Strzemięcin", "Lotnisko", "Tarpno"],
+  // Warmińsko-mazurskie i podlaskie — dzielnice/osiedla wg pl.wikipedia (artykuły miast, „Podział administracyjny”)
+  "Olsztyn": ["Śródmieście", "Zatorze", "Kortowo", "Jaroty", "Pieczewo", "Nagórki", "Zielona Górka", "Dajtki", "Gutkowo", "Redykajny", "Likusy", "Generałów"],
+  "Elbląg": ["Śródmieście", "Stare Miasto", "Zatorze", "Zawada", "Nad Jarem", "Zakrzewo", "Rakowo", "Próchnik", "Dąbrowa", "Modrzewina", "Krasny Las", "Bielany"],
+  "Ełk": ["Centrum", "Grunwaldzkie", "Jeziorna", "Szyba", "Konieczki", "Północ I", "Północ II", "Zatorze", "Baranki", "Bogdanowicza", "Kochanowskiego", "Pod Lasem"],
+  "Iława": ["Stare Miasto", "Centrum", "Ostródzkie", "Piastowskie", "Kormoran", "Lipowy Dwór", "Gajerek", "Podleśne", "XXX-lecia", "Lubawskie", "Nowy Świat", "Marina Iława"],
+  "Giżycko": ["Moniuszki", "Kajki", "Wilanów", "Polamowiec"],
+  "Mrągowo": ["Centrum", "Osiedle Brzozowe", "Osiedle Grunwaldzkie", "Osiedle Mazurskie", "Osiedle Medyk", "Osiedle Metalowców", "Osiedle Nikutowo", "Osiedle Parkowe"],
+  "Szczytno": ["Bartna Strona", "Fiugajty", "Wolność"],
+  "Braniewo": ["Nowe Miasto", "Koźlin"],
+  "Olecko": ["Śródmieście", "XXX-lecia", "Osiedle Siejnik", "Lesk", "Osiedle Zielone", "Osiedle Nad Legą"],
+  "Suwałki": ["Śródmieście", "Osiedle Centrum", "Osiedle Północ I", "Osiedle Północ II", "Osiedle Hańcza", "Osiedle Polna", "Osiedle Jaćwingów", "Osiedle Klasztorna", "Osiedle Kolejowe", "Osiedle Piastowskie", "Osiedle Emilii Plater", "Szwajcaria"],
+  "Łomża": ["Stare Miasto", "Południe", "Łomżyca", "Kraska"],
+  "Augustów": ["Osiedle Wschód", "Osiedle Zachód", "Osiedle Uzdrowisko", "Śródmieście", "Klonownica", "Lipowiec", "Przewięź", "Zarzecze", "Borki", "Glinki", "Południe", "Limanowskiego"],
+  "Hajnówka": ["Centrum", "Placówka", "Majdan", "Mazury", "Osiedle Lipowa", "Osiedle Millenium", "Osiedle Stefana Batorego", "Osiedle Mikołaja Reja", "Osiedle Chemiczna", "Podlasie", "Czworaki", "Kolejki Leśne"],
 };
 
 function rng(seed: string) { let h = 2166136261; for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 100000) / 100000; }; }

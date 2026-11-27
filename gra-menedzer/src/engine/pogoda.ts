@@ -47,7 +47,24 @@ const DOLINY = [
   // Zachodniopomorskie — śródlądzie (pojezierza, dolina Odry)
   "Szczecin", "Stargard", "Choszczno", "Wałcz", "Szczecinek", "Drawsko", "Barlinek", "Myślibórz", "Pyrzyce",
   "Dębno", "Ińsko", "Złocieniec", "Połczyn", "Świdwin",
+  // Warmińsko-mazurskie — Pojezierze Mazurskie, Iławskie i Olsztyńskie (mgły nad jeziorami)
+  "Olsztyn", "Giżycko", "Mrągowo", "Pisz", "Mikołajki", "Ruciane", "Węgorzewo", "Ełk", "Iława", "Ostróda", "Szczytno",
+  "Biskupiec", "Barczewo", "Morąg", "Olecko", "Orzysz", "Ryn", "Kętrzyn", "Lubawa", "Nowe Miasto Lubawskie",
+  // Podlaskie — Pojezierze Augustowskie i Wschodniosuwalskie, doliny Narwi i Biebrzy
+  "Augustów", "Sejny", "Łomża", "Wizna", "Goniądz", "Tykocin", "Supraśl",
 ];
+// „Polski biegun zimna": Suwalszczyzna, północne Podlasie i wschodnie Mazury — najdłuższa i najmroźniejsza zima na niżu
+// (stacja IMGW Suwałki). Późną jesienią i wczesną wiosną częściej śnieg i mróz (jak w górach, nieco łagodniej).
+const MROZNE = [
+  "Suwałki", "Augustów", "Sejny", "Puńsk", "Raczki", "Filipów", "Szypliszki", "Wiżajny", "Rutka-Tartak", "Jeleniewo", "Bakałarzewo",
+  "Gołdap", "Olecko", "Węgorzewo", "Ełk", "Giżycko", "Kowale Oleckie", "Banie Mazurskie", "Dubeninki",
+  "Białystok", "Sokółka", "Dąbrowa Białostocka", "Mońki", "Grajewo", "Hajnówka", "Bielsk Podlaski", "Siemiatycze", "Łomża", "Kolno", "Zambrów",
+];
+/** Czy miejscowość leży w najzimniejszej części kraju (Suwalszczyzna, Podlasie, wschodnie Mazury). */
+export function mrozne(miasto: string): boolean {
+  return MROZNE.some((m) => miasto.includes(m));
+}
+
 /** Czy miejscowość leży w dolinie rzecznej / na pojezierzu (mgły jesienne — KP i śródlądzie ZP). */
 export function dolina(miasto: string): boolean {
   return DOLINY.some((m) => miasto.includes(m));
@@ -81,6 +98,8 @@ const WAGI_MORZE: [Kod, number][] = [["slonce", 16], ["pochmurno", 26], ["wiatr"
 const WAGI_LAD:   [Kod, number][] = [["slonce", 30], ["pochmurno", 34], ["wiatr", 16], ["deszcz", 17], ["sztorm", 3]];
 // Góry zimą (późna jesień / wczesna wiosna): sporo śniegu i mrozu, czasem mgła.
 const WAGI_GORY:  [Kod, number][] = [["slonce", 12], ["pochmurno", 22], ["wiatr", 10], ["deszcz", 10], ["snieg", 26], ["mroz", 14], ["mgla", 6]];
+// Biegun zimna (NE Polska) w zimnym oknie: śnieg i mróz częstsze niż na reszcie niżu.
+const WAGI_WSCHOD: [Kod, number][] = [["slonce", 14], ["pochmurno", 26], ["wiatr", 12], ["deszcz", 10], ["snieg", 20], ["mroz", 16], ["mgla", 4]];
 // Kotliny jesienią: dużo mgły radiacyjnej (poranki/wieczory), mniej wiatru.
 const WAGI_KOTLINA: [Kod, number][] = [["slonce", 14], ["pochmurno", 28], ["wiatr", 8], ["deszcz", 16], ["mgla", 34]];
 
@@ -101,8 +120,9 @@ export function pogodaMeczu(miastoGospodarza: string, kolejka?: number, liczbaKo
   // Upał na starcie sezonu (lipiec–sierpień): częstszy w głębi lądu; wybrzeże chłodzi bryza znad Bałtyku.
   if (frac < 0.18 && !nadmorskie(miastoGospodarza) && los(0, 1) < (gorskie(miastoGospodarza) ? 0.2 : 0.32)) return { ...POGODY.upal, kod: "upal" };
   const zimaGorska = gorskie(miastoGospodarza) && (frac >= 0.4 && frac <= 0.64);
-  const mglaJesien = !zimaGorska && (kotlina(miastoGospodarza) || dolina(miastoGospodarza)) && (frac >= 0.2 && frac < 0.5); // jesień: kotliny (małop.) i doliny/pojezierza (KP + śródlądzie ZP)
-  const baza = zimaGorska ? WAGI_GORY : mglaJesien ? WAGI_KOTLINA : nadmorskie(miastoGospodarza) ? WAGI_MORZE : WAGI_LAD;
+  const zimaWschod = !zimaGorska && mrozne(miastoGospodarza) && (frac >= 0.42 && frac <= 0.62);
+  const mglaJesien = !zimaGorska && !zimaWschod && (kotlina(miastoGospodarza) || dolina(miastoGospodarza)) && (frac >= 0.2 && frac < 0.5); // jesień: kotliny (małop.) i doliny/pojezierza (KP + śródlądzie ZP)
+  const baza = zimaGorska ? WAGI_GORY : zimaWschod ? WAGI_WSCHOD : mglaJesien ? WAGI_KOTLINA : nadmorskie(miastoGospodarza) ? WAGI_MORZE : WAGI_LAD;
   const m = sezonowyMnoznik(kolejka, liczbaKolejek);
   // Zła pogoda skalowana porą roku; słońce/pochmurno dopełniają.
   const wagi: [Kod, number][] = baza.map(([k, w]) => [k, (k === "wiatr" || k === "deszcz" || k === "sztorm" || k === "snieg" || k === "mroz" || k === "mgla") ? w * m : w]);
