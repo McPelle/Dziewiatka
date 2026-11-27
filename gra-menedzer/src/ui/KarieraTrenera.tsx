@@ -7,6 +7,11 @@ import { latTrenera, przedluzKontraktTrenera } from "../engine/sezon";
 import type { StanGry } from "../engine/types";
 import { Twarz } from "./Twarz";
 import { K, st } from "./styl";
+import { useEffect, useState } from "react";
+import { aktualizujKronike } from "../engine/dziennik";
+import { Dziennik, DziennikSkrot } from "./Dziennik";
+import { Muzeum } from "./Muzeum";
+import { GaleriaZdjec } from "./ZdjecieDruzyny";
 
 const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Alert.alert("", t));
 
@@ -31,6 +36,8 @@ export function KarieraTrenera({ s, widoczny, onClose, odswiez }: { s: StanGry; 
     mistrz: { t: "Mistrz", k: K.akcent }, awans: { t: "Awans", k: K.zielony }, spadek: { t: "Spadek", k: K.czerwony }, utrzymanie: { t: "Utrzymanie", k: K.szary },
   };
 
+  const [okno, setOkno] = useState<null | "dziennik" | "muzeum" | "zdjecia">(null);
+  useEffect(() => { if (widoczny) aktualizujKronike(s); }, [widoczny, s]);
   const przedluz = () => { const b = przedluzKontraktTrenera(s); odswiez(); komunikat(b ?? "Kontrakt przedłużony."); };
 
   return (
@@ -53,6 +60,17 @@ export function KarieraTrenera({ s, widoczny, onClose, odswiez }: { s: StanGry; 
                 <Text style={st.tytul}>{s.trener}</Text>
                 <Text style={st.maly}>Trener · {kariera.length} {kariera.length === 1 ? "klub" : "kluby/klubów"} w karierze</Text>
                 {s.trenerAgent ? <Text style={st.maly}>Agent: {s.trenerAgent}</Text> : null}
+              </View>
+            </View>
+
+            <View style={[st.karta, { marginHorizontal: 0, marginTop: 14 }]}>
+              <DziennikSkrot s={s} onWiecej={() => setOkno("dziennik")} />
+              <View style={[st.wiersz, { gap: 8, marginTop: 10 }]}>
+                {([["dziennik", "📖 Dziennik"], ["muzeum", "🏛 Muzeum klubu"], ["zdjecia", "📸 Zdjęcia drużyny"]] as const).map(([k, et]) => (
+                  <Pressable key={k} style={[st.przyciskMaly, { flex: 1, alignItems: "center", paddingHorizontal: 6 }]} onPress={() => setOkno(k)}>
+                    <Text style={[st.przyciskMalyTekst, { fontSize: 12.5 }]} numberOfLines={1}>{et}</Text>
+                  </Pressable>
+                ))}
               </View>
             </View>
 
@@ -154,6 +172,9 @@ export function KarieraTrenera({ s, widoczny, onClose, odswiez }: { s: StanGry; 
           </ScrollView>
         </View>
       </View>
+      <Dziennik s={s} widoczny={okno === "dziennik"} onClose={() => setOkno(null)} />
+      <Muzeum s={s} widoczny={okno === "muzeum"} onClose={() => setOkno(null)} odswiez={odswiez} />
+      <GaleriaZdjec s={s} widoczny={okno === "zdjecia"} onClose={() => setOkno(null)} odswiez={odswiez} />
     </Modal>
   );
 }

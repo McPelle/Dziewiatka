@@ -1,3 +1,4 @@
+import { aktualizujKronike } from "./dziennik";
 import { serwisKolejki } from "./serwisKraj";
 import { tydzienSklepu } from "./sklep";
 import { tydzienKart } from "./karty";
@@ -1048,6 +1049,7 @@ export function zagrajKolejke(s: StanGry) {
   } else {
     przygotujKolejke(s);
   }
+  aktualizujKronike(s); // dziennik kariery, muzeum (legendy), zdjęcie drużyny
 }
 
 /** Karuzela trenerska: kluby AI ze słabymi wynikami (znacznie poniżej oczekiwań wg renomy) zwalniają trenera w trakcie sezonu. */
@@ -2235,6 +2237,7 @@ export function nowySezon(s: StanGry) {
     wiadomosc(s, `Sezon ${s.sezon}/${(s.sezon + 1) % 100}: ${s.ligi[nowyPoziom - 1].nazwa}. Cel zarządu: ${s.cel}.`);
   }
   przygotujKolejke(s);
+  aktualizujKronike(s);
 }
 
 /** AI: wymienia najsłabszych na zawodników z poziomu ligi, trzyma kadrę 18–22. */

@@ -4,6 +4,9 @@ import { MapaWojewodztwa } from "./MapaWojewodztwa";
 import { SerwisKraj } from "./SerwisKraj";
 import { DniKlubu } from "./DniKlubu";
 import { Sklep } from "./Sklep";
+import { Dziennik } from "./Dziennik";
+import { Muzeum } from "./Muzeum";
+import { GaleriaZdjec } from "./ZdjecieDruzyny";
 import { AlbumKart } from "./AlbumKart";
 import { WydzialGier } from "./WydzialGier";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
@@ -39,6 +42,9 @@ const WPISY: Wpis[] = [
   { key: "sponsorzy", ikona: "🤝", nazwa: "Sponsorzy", opis: "Umowy, patroni i naming", grupa: "Klub", tryb: "inline" },
   { key: "sklep", ikona: "🛍", nazwa: "Sklep klubowy", opis: "Szaliki, koszulki, ceny i sprzedaż", grupa: "Klub", tryb: "inline" },
   { key: "karty", ikona: "🃏", nazwa: "Album kart", opis: "Karty kadry i karty specjalne", grupa: "Zespół", tryb: "inline" },
+  { key: "dziennik", ikona: "📖", nazwa: "Dziennik kariery", opis: "Najważniejsze chwile trenera", grupa: "Klub", tryb: "modal" },
+  { key: "muzeum", ikona: "🏛", nazwa: "Muzeum klubu", opis: "Legendy, trofea, numery", grupa: "Klub", tryb: "modal" },
+  { key: "zdjecia", ikona: "📸", nazwa: "Zdjęcia drużyny", opis: "Galeria — jedno na sezon", grupa: "Zespół", tryb: "modal" },
   { key: "klub", ikona: "🏟", nazwa: "Mój klub", opis: "Stadion, infrastruktura, dane", grupa: "Klub", tryb: "modal" },
   { key: "kariera", ikona: "📈", nazwa: "Kariera trenera", opis: "Historia, trofea i licencja", grupa: "Klub", tryb: "modal" },
   { key: "puchar", ikona: "🏆", nazwa: "Puchar", opis: "Drabinka i wyniki pucharów", grupa: "Rozgrywki", tryb: "inline" },
@@ -136,6 +142,9 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
 
       {/* Widoki typu „modal" renderują własne okno sterowane widocznością. */}
       <Finanse s={s} widoczny={otw === "finanse"} onClose={zamknij} />
+      <Dziennik s={s} widoczny={otw === "dziennik"} onClose={zamknij} />
+      <Muzeum s={s} widoczny={otw === "muzeum"} onClose={zamknij} odswiez={odswiez} />
+      <GaleriaZdjec s={s} widoczny={otw === "zdjecia"} onClose={zamknij} odswiez={odswiez} />
       <Sztab s={s} widoczny={otw === "sztab"} onClose={zamknij} odswiez={odswiez} />
       <Trening s={s} widoczny={otw === "trening"} onClose={zamknij} odswiez={odswiez} />
       <Akademia s={s} widoczny={otw === "akademia"} onClose={zamknij} odswiez={odswiez} />
