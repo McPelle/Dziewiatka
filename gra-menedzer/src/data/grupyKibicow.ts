@@ -212,5 +212,321 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "zgody": [
    "Łada Biłgoraj"
   ]
+ },
+ "Gryf Słupsk": {
+  "ultras": [
+   "Ultras Gryf Słupsk"
+  ],
+  "chuligani": [
+   "Tricolores Hooligans Gryf",
+   "Młoda Wiara Gryfa"
+  ],
+  "zgody": [
+   "Lechia Gdańsk",
+   "Chojniczanka Chojnice",
+   "Pomezania Malbork"
+  ]
+ },
+ "Pogoń Lębork": {
+  "ultras": [
+   "UPL - Ultras Pogoń Lębork"
+  ],
+  "chuligani": [
+   "ChML - Chuligani Miasta Lwa"
+  ],
+  "zgody": [
+   "Zawisza Bydgoszcz"
+  ]
+ },
+ "Gryf Wejherowo": {
+  "zgody": [
+   "Kaszubia Kościerzyna",
+   "Orkan Rumia",
+   "Gwardia Koszalin",
+   "Polonia Bytom"
+  ]
+ },
+ "Bałtyk Gdynia": {
+  "ultras": [
+   "Ultras Bałtyk Gdynia"
+  ],
+  "chuligani": [
+   "Odczuwalni'18"
+  ]
+ },
+ "Kaszubia Kościerzyna": {
+  "ultras": [
+   "UKK"
+  ],
+  "chuligani": [
+   "Młoda Kaszubia",
+   "Stara Gwardia"
+  ],
+  "fanklub": [
+   "FC Kościerzyna (Arka Gdynia)"
+  ],
+  "zgody": [
+   "Gryf Wejherowo",
+   "Wisła Tczew"
+  ]
+ },
+ "KP Starogard Gdański": {
+  "ultras": [
+   "KF'18 - Kocborowo Fans"
+  ],
+  "zgody": [
+   "Chojniczanka Chojnice"
+  ]
+ },
+ "Pomezania Malbork": {
+  "ultras": [
+   "Malborscy Lechiści"
+  ],
+  "zgody": [
+   "Gryf Słupsk"
+  ]
+ },
+ "Rodło Kwidzyn": {
+  "ultras": [
+   "Ultras Rodło"
+  ]
+ },
+ "Orkan Rumia MKS": {
+  "ultras": [
+   "Fanatycy Orkana"
+  ],
+  "fanklub": [
+   "Fan Club Arki Gdynia - Rumia"
+  ],
+  "zgody": [
+   "Gryf Wejherowo"
+  ]
+ },
+ "Polonia Bydgoszcz": {
+  "ultras": [
+   "UFP - Ultras From Polonia"
+  ],
+  "chuligani": [
+   "WRB - White Red Brothers"
+  ],
+  "zgody": [
+   "GKM Grudziądz",
+   "Stomil Olsztyn"
+  ]
+ },
+ "Sparta Brodnica": {
+  "ultras": [
+   "Gialloneri"
+  ],
+  "chuligani": [
+   "Spartanie"
+  ],
+  "zgody": [
+   "Legia Chełmża",
+   "Mławska Wiara"
+  ]
+ },
+ "Legia Chełmża": {
+  "ultras": [
+   "MB'13 - Młoda Banda"
+  ],
+  "chuligani": [
+   "Dynamit Boys'05"
+  ],
+  "zgody": [
+   "Sparta Brodnica"
+  ]
+ },
+ "Włocłavia Włocławek": {
+  "ultras": [
+   "Ultras Włocłavia Group"
+  ],
+  "chuligani": [
+   "GOC'04 - Gang of Chopina"
+  ]
+ },
+ "Goplania Inowrocław": {
+  "ultras": [
+   "UG'24 - Ultras Goplania"
+  ],
+  "chuligani": [
+   "Sportowa Goplania"
+  ]
+ },
+ "Unia Wąbrzeźno": {
+  "chuligani": [
+   "Młoda Unia"
+  ]
+ },
+ "Kujawiak Kowal": {
+  "ultras": [
+   "KF'18 - Kowal Fans"
+  ],
+  "zgody": [
+   "Start Pruszcz"
+  ]
+ },
+ "Start Pruszcz": {
+  "zgody": [
+   "Kujawiak Kowal"
+  ]
+ },
+ "Kotwica Kołobrzeg": {
+  "ultras": [
+   "UK'10 - Ultras Kotwa"
+  ],
+  "chuligani": [
+   "Młoda Kotwica"
+  ],
+  "zgody": [
+   "KKS Kalisz",
+   "Sokół Karlino"
+  ]
+ },
+ "Gwardia Koszalin": {
+  "ultras": [
+   "Ultras Gwardia Koszalin"
+  ],
+  "chuligani": [
+   "Ekipa Młodzieżowa'99",
+   "Malefactors Brigade"
+  ],
+  "zgody": [
+   "Arka Gdynia",
+   "Gryf Wejherowo"
+  ]
+ },
+ "Sokół Karlino": {
+  "ultras": [
+   "Ultras Karlino'11"
+  ],
+  "zgody": [
+   "Kotwica Kołobrzeg"
+  ]
+ },
+ "Energetyk Gryfino": {
+  "ultras": [
+   "FZR '14 - Fanatycy znad Regalicy"
+  ],
+  "zgody": [
+   "Odra Chojna",
+   "Pogoń Barlinek",
+   "Dąb Dębno"
+  ]
+ },
+ "Odra Chojna": {
+  "ultras": [
+   "FCh'92",
+   "Ultras Odra Chojna'22"
+  ],
+  "zgody": [
+   "Energetyk Gryfino",
+   "Dąb Dębno",
+   "Pogoń Barlinek"
+  ]
+ },
+ "Dąb Dębno": {
+  "zgody": [
+   "Energetyk Gryfino",
+   "Odra Chojna",
+   "Pogoń Barlinek"
+  ]
+ },
+ "Pogoń Barlinek": {
+  "ultras": [
+   "Barlineccy Fanatycy"
+  ],
+  "zgody": [
+   "Energetyk Gryfino",
+   "Odra Chojna",
+   "Dąb Dębno"
+  ]
+ },
+ "Rega Trzebiatów": {
+  "ultras": [
+   "MO '14",
+   "Fanatycy Regi"
+  ]
+ },
+ "Unia Tarnów": {
+  "ultras": [
+   "WBF - White Blue Fans",
+   "Mafia"
+  ],
+  "chuligani": [
+   "UTSC - Unia Tarnów Sportowe Charaktery"
+  ],
+  "zgody": [
+   "ETO Győr"
+  ]
+ },
+ "Tarnovia Tarnów": {
+  "chuligani": [
+   "Młodzi Gniewni"
+  ],
+  "zgody": [
+   "Cracovia"
+  ]
+ },
+ "Okocimski KS Brzesko": {
+  "ultras": [
+   "BF - Brzescy Fanatycy"
+  ]
+ },
+ "Glinik Gorlice": {
+  "ultras": [
+   "Glinik Fans'04"
+  ],
+  "chuligani": [
+   "Młoda Banda'19"
+  ],
+  "zgody": [
+   "Karpaty Krosno"
+  ]
+ },
+ "Beskid Andrychów": {
+  "ultras": [
+   "Ultras Beskid'08"
+  ],
+  "zgody": [
+   "Energie Cottbus"
+  ]
+ },
+ "Unia Oświęcim": {
+  "ultras": [
+   "Ultras Unia'08"
+  ],
+  "chuligani": [
+   "Unia Oświęcim Hooligans"
+  ],
+  "zgody": [
+   "Hejnał Kęty"
+  ]
+ },
+ "Victoria 1918 Jaworzno": {
+  "ultras": [
+   "LSM - Lepsza Strona Miasta"
+  ],
+  "zgody": [
+   "Fablok Chrzanów"
+  ]
+ },
+ "MKS Fablok Chrzanów": {
+  "zgody": [
+   "Victoria Jaworzno"
+  ]
+ },
+ "Garbarnia Kraków": {
+  "zgody": [
+   "Puszcza Niepołomice"
+  ]
+ },
+ "Pogoń Miechów": {
+  "ultras": [
+   "Pogoń Ultras'17"
+  ],
+  "zgody": [
+   "Spartak Wielkanoc"
+  ]
  }
 };

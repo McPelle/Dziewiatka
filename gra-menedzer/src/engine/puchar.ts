@@ -4,6 +4,9 @@
 import { frekwencja } from "./derby";
 import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj";
 import { autoSklad, meczZeScenariusza, zagrajMecz } from "./mecz";
+import { planOpraw } from "./oprawy";
+import { zgodaKibicow } from "./kibice";
+import { kulturaTrybun } from "./flagi";
 import { BILET, nadajNumery, noweId, nowyZawodnik } from "./swiat";
 import { wojKlubu } from "./regiony";
 import { odlegloscDrogowa } from "../data/miasta";
@@ -328,9 +331,17 @@ export function rundaPucharu(s: StanGry): WynikPucharu {
   // Frekwencja pucharowa: gdy gościsz u siebie (zwłaszcza wyżej notowany rywal), przychodzi więcej kibiców.
   if (uSiebie) {
     const kd = s.kluby[s.mojKlub];
-    const widzowie = frekwencja(s, s.mojKlub, rywalId, 0.15); // puchar = dodatkowe zainteresowanie
-    kd.kasa += widzowie * BILET[kd.poziom - 1];
-    if (s.kluby[rywalId].poziom < kd.poziom) wiadomosc(s, `Puchar: ${s.kluby[rywalId].nazwa} w gościach — ${widzowie.toLocaleString("pl")} kibiców na trybunach, komplet!`);
+    const rw = s.kluby[rywalId];
+    const wielki = rw.poziom < kd.poziom; // gość z wyższej ligi — święto dla miasta
+    const widzowie = wielki ? Math.round(kd.pojemnosc * (0.94 + Math.random() * 0.06)) : frekwencja(s, s.mojKlub, rywalId, 0.15);
+    const bilet = BILET[kd.poziom - 1] * (wielki ? 1.5 : 1); // podwyższone ceny na wielki mecz
+    kd.kasa += Math.round(widzowie * bilet);
+    if (wielki) {
+      wiadomosc(s, `🏟 Puchar: ${rw.nazwa} (${rw.poziom === 1 ? "Ekstraklasa" : `${rw.poziom}. poziom`}) w gościach — KOMPLET! ${widzowie.toLocaleString("pl")} widzów, bilety wyprzedane w kilka godzin, wpływy ${zl(Math.round(widzowie * bilet))}. Sektor gości wypełniony po brzegi.`);
+      for (const p of planOpraw(s, kd, rw, { derby: null, zgoda: zgodaKibicow(s, kd, rw), puchar: true, gosci: Math.round(kd.pojemnosc * 0.06), silaD: Math.max(0.4, kulturaTrybun(s, kd).pirotechnika), silaG: kulturaTrybun(s, rw).pirotechnika }))
+        wiadomosc(s, `🎆 ${p.min >= 46 ? "Po przerwie — " : ""}Oprawa kibiców ${p.sektor === "gospodarzy" ? kd.nazwa : rw.nazwa}: ${p.o.opis}`);
+      s.zaufanieKibicow = Math.min(100, (s.zaufanieKibicow ?? 60) + 3);
+    }
   } else if (p.faza === "glowny") {
     // Kibicowski wyjazd życia na daleki mecz pucharowy (realny rywal w głównym PP): dojazd przez pół Polski, oprawa, koszt.
     const d = odlegloscDrogowa(s.kluby[s.mojKlub].miasto, s.kluby[rywalId].miasto);

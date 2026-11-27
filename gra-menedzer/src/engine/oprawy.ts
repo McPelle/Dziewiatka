@@ -156,7 +156,7 @@ export function planOpraw(s: StanGry, kd: Klub, kg: Klub, o: { derby: string | n
   const okD = okazjaOprawy(s, kd, o.derby, s.kolejka, kg, o.zgoda, o.puchar);
   const okG = o.gosci > 0 ? (o.derby ? `derby: ${o.derby} (wyjazd)` : o.zgoda ? `zgoda: ${o.zgoda}` : (o.puchar || kd.poziom < kg.poziom) ? `wielki mecz z ${kd.nazwa}` : null) : null;
   // ile opraw: derby 2–4 u gospodarzy, zgoda 1–2 każdej stronie, wielki mecz 1–2, zwykły — zależnie od siły sceny
-  const ileD = !okD ? 0 : o.derby ? 2 + Math.floor(Math.random() * 3) : o.zgoda ? 1 + Math.floor(Math.random() * 2) : okD.startsWith("wielki") ? 1 + (Math.random() < o.silaD ? 1 : 0) : Math.random() < 0.3 + o.silaD * 0.5 ? 1 : 0;
+  const ileD = !okD ? 0 : o.derby ? 2 + Math.floor(Math.random() * 3) : o.zgoda ? 1 + Math.floor(Math.random() * 2) : okD.startsWith("wielki") ? (o.puchar ? 2 : 1) + (Math.random() < o.silaD ? 1 : 0) : Math.random() < 0.3 + o.silaD * 0.5 ? 1 : 0; // puchar z silniejszym — 2–3 oprawy
   const ileG = !okG ? 0 : o.derby ? 1 + Math.floor(Math.random() * 2) : o.zgoda ? 1 + Math.floor(Math.random() * 2) : Math.random() < o.silaG * 0.7 ? 1 : 0;
   // zwykłe mecze: mocne sceny (Ekstraklasa, I liga, kluby z tradycją) też pokazują oprawy kilka-kilkanaście razy w sezonie
   const zwykla = !okD && Math.random() < o.silaD * 0.45 ? "mecz ligowy — oprawa grup" : null;

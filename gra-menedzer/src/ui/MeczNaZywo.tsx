@@ -28,7 +28,7 @@ type Zakl = "relacja" | "staty" | "sklady" | "taktyka" | "zmiany";
 const KAMERY: [Kamera, string][] = [["auto", "🎬 Reżyser"], ["tv", "📺 TV"], ["bramka", "🥅 Zza bramki"], ["gora", "🛰 Z góry"], ["blisko", "🔍 Zbliżenie"]];
 
 /** Warunki meczu: pora (wieczór pod reflektorami), pogoda wg miesiąca, frekwencja wg renomy. */
-function warunki(s: StanGry, domId: string, goscId: string): Ustawienia3D {
+function warunki(s: StanGry, domId: string, goscId: string, puchar?: boolean): Ustawienia3D {
   const k = s.kluby[domId];
   const d = dzisiaj(s).data, mies = d.getMonth() + 1;
   const h = (s.sezon * 31 + s.kolejka * 7 + domId.length) % 100;
@@ -37,7 +37,8 @@ function warunki(s: StanGry, domId: string, goscId: string): Ustawienia3D {
   const zima = mies === 12 || mies <= 2, jesien = mies >= 10 && mies <= 11;
   const pogoda: Ustawienia3D["pogoda"] = zima && h % 3 === 0 ? "snieg" : (jesien || mies === 3 || mies === 4) && h % 4 === 1 ? "deszcz" : jesien && h % 9 === 2 ? "mgla" : h % 11 === 3 ? "deszcz" : "slonce";
   const pusto = domId === s.mojKlub && (s.zakazTrybun ?? 0) > 0; // kara ZPN: mecz przy pustych trybunach
-  const widzowie = pusto ? 0 : Math.round(k.pojemnosc * Math.min(0.95, 0.3 + k.renoma * 0.55));
+  const wielkiPuchar = !!puchar && s.kluby[goscId].poziom < k.poziom; // gość z wyższej ligi w pucharze — komplet
+  const widzowie = pusto ? 0 : wielkiPuchar ? Math.round(k.pojemnosc * 0.97) : Math.round(k.pojemnosc * Math.min(0.95, 0.3 + k.renoma * 0.55));
   const lekka = lekkaGrafika();
   return { noc, pogoda, widzowie, lekka, derby: !!jestDerby(s, domId, goscId), pusto, godz: gm.godz };
 }
@@ -67,7 +68,7 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
     if (z) { for (const [id, k] of Object.entries(z.kond)) if (s.zawodnicy[id]) s.zawodnicy[id].kondycja = k; z.m.komentarz.unshift({ min: `${z.m.min}'`, typ: "info", tekst: "▶ Wznowiono zapisany mecz." }); return z.m; }
     const nm = rozpocznijMeczNaZywo(s, para[0], para[1]);
     { // bezpieczeństwo meczu: plan ochrony (u siebie płaci klub), ryzyko incydentów, oprawa na start
-      const u = warunki(s, para[0], para[1]), kd0 = s.kluby[para[0]], kg0 = s.kluby[para[1]];
+      const u = warunki(s, para[0], para[1], !!puchar), kd0 = s.kluby[para[0]], kg0 = s.kluby[para[1]];
       const plan = para[0] === s.mojKlub ? planZabezpieczenia(s, kd0, u.widzowie, !!u.derby) : undefined;
       nm.bezp = { ryzyko: ryzykoIncydentow(s, kd0, kg0, u.widzowie, !!u.derby, plan), plan, derby: !!u.derby, widzowie: u.widzowie };
       // oprawy — kilka w meczu (derby, zgody, wielkie mecze), każda inna, nigdy się nie powtarza
@@ -100,7 +101,7 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
     }
     return nm;
   });
-  const ust = useMemo(() => warunki(s, para[0], para[1]), []);
+  const ust = useMemo(() => warunki(s, para[0], para[1], !!puchar), []);
   const [wersja, setWersja] = useState(0);
   const [predkosc, setPredkosc] = useState(0);
   const [ostatniaPr, setOstatniaPr] = useState(1);
