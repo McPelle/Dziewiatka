@@ -3,7 +3,7 @@
 // (Ekstraklasa, I–II liga). Kluby zawodowe startują od razu w fazie głównej.
 import { frekwencja } from "./derby";
 import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj";
-import { autoSklad, zagrajMecz } from "./mecz";
+import { autoSklad, meczZeScenariusza, zagrajMecz } from "./mecz";
 import { BILET, nadajNumery, noweId, nowyZawodnik } from "./swiat";
 import { wojKlubu } from "./regiony";
 import { odlegloscDrogowa } from "../data/miasta";
@@ -292,22 +292,30 @@ export function rundaPucharu(s: StanGry): WynikPucharu {
 
   const nazwyFazy = p.faza === "regionalny" ? nazwyRegion(s) : NAZWY_GLOWNY;
   const nazwa = nazwyFazy[Math.min(p.runda, nazwyFazy.length - 1)];
-  const rywalId = losujRywala(s, p.faza, p.runda);
+  const { rywal: rywalId, uSiebie } = losowanieMojegoMeczu(s, p);
+  p.najblizszy = undefined;
   p.przeciwnik = rywalId;
-
-  // Finał głównego PP gra się na neutralnym obiekcie (PGE Narodowy w Warszawie) — bez atutu własnego boiska.
   const finalGlowny = p.faza === "glowny" && p.runda === NAZWY_GLOWNY.length - 1;
-  // Gospodarz: losowo, ale słabszy (wyższy numer poziomu) częściej u siebie (jak w PP amator u siebie).
-  // Regulaminy PP (PZPN/ZPN): gospodarzem meczu jest drużyna z NIŻSZEJ klasy rozgrywkowej; przy równych — losowanie.
-  const pM = s.kluby[s.mojKlub].poziom, pR = s.kluby[rywalId].poziom;
-  const uSiebie = finalGlowny ? false : pM > pR ? true : pM < pR ? false : szansa(0.5);
+  // mecz obejrzany na żywo (z dogrywką / karnymi) — rozliczamy dokładnie to, co widziałeś
+  const live = s.meczLivePuchar; s.meczLivePuchar = undefined;
+  const liveOk = !!live?.koniec && live.dom.klubId === (uSiebie ? s.mojKlub : rywalId) && live.gosc.klubId === (uSiebie ? rywalId : s.mojKlub);
   if (finalGlowny) wiadomosc(s, `🏟 Finał STS Pucharu Polski na PGE Narodowym w Warszawie — przeciwnik: ${s.kluby[rywalId].nazwa}!`);
   const moj = { klubId: s.mojKlub, sklad: s.taktyka.sklad, formacja: s.taktyka.formacja, nastawienie: s.taktyka.nastawienie };
   const ryw = { klubId: rywalId, sklad: autoSklad(s, rywalId, "4-4-2"), formacja: "4-4-2", nastawienie: "zrownowazone" as const };
-  let w = zagrajMecz(s, uSiebie ? moj : ryw, uSiebie ? ryw : moj, true, { ...(finalGlowny ? { domAtut: 1 } : {}), puchar: "polski" });
+  let w = liveOk ? meczZeScenariusza(s, live!) : zagrajMecz(s, uSiebie ? moj : ryw, uSiebie ? ryw : moj, true, { ...(finalGlowny ? { domAtut: 1 } : {}), puchar: "polski" });
   // Puchar nie ma remisów — najpierw dogrywka, jeśli dalej remis to rzuty karne (lepszy lekko faworytem).
-  let karne = false, dogrywka = false;
-  if (w.gd === w.gg) {
+  let karne = false, dogrywka = false, karneTxt = "";
+  if (liveOk) {
+    dogrywka = live!.polowa >= 3;
+    if (live!.karne?.zwyciezca) {
+      karne = true; const [a, b] = [live!.karne.d.filter(Boolean).length, live!.karne.g.filter(Boolean).length];
+      const myDom = uSiebie; karneTxt = ` (k. ${myDom ? a : b}:${myDom ? b : a})`;
+      const wygr = (live!.karne.zwyciezca === "dom") === uSiebie;
+      // w tabeli wyników serii karnych zapisujemy rozstrzygnięcie +1 dla zwycięzcy (jak dotąd)
+      if (uSiebie) w = { ...w, gd: w.gd + (wygr ? 1 : 0), gg: w.gg + (wygr ? 0 : 1) }; else w = { ...w, gg: w.gg + (wygr ? 1 : 0), gd: w.gd + (wygr ? 0 : 1) };
+    }
+  }
+  else if (w.gd === w.gg) {
     const przewaga = Math.max(0.3, Math.min(0.7, 0.5 + (s.kluby[s.mojKlub].renoma - s.kluby[rywalId].renoma) * 0.4));
     const wygramy = szansa(przewaga);
     const dodaj = (my: boolean) => { if (uSiebie) w = { ...w, gd: w.gd + (my ? 1 : 0), gg: w.gg + (my ? 0 : 1) }; else w = { ...w, gg: w.gg + (my ? 1 : 0), gd: w.gd + (my ? 0 : 1) }; };
@@ -340,7 +348,7 @@ export function rundaPucharu(s: StanGry): WynikPucharu {
   const nagroda = p.faza === "regionalny" ? nagrodaRegion(s, p.runda) : NAGRODA_GLOWNY[Math.min(p.runda, NAGRODA_GLOWNY.length - 1)];
   s.kluby[s.mojKlub].kasa += nagroda;
   const rywalNazwa = s.kluby[rywalId].nazwa;
-  const wynikTekst = `${moje}:${ich}${karne ? " (k.)" : dogrywka ? " (dogr.)" : ""}`;
+  const wynikTekst = karneTxt ? `${moje - (awans ? 1 : 0)}:${ich - (awans ? 0 : 1)}${karneTxt}` : `${moje}:${ich}${karne ? " (k.)" : dogrywka ? " (dogr.)" : ""}`;
   if (!p.sciezka) p.sciezka = [];
   p.sciezka.push({ nazwa, przeciwnik: rywalId, wynik: wynikTekst, awans, uSiebie });
 
@@ -417,4 +425,26 @@ export function etapPucharu(s: StanGry): string {
   if (p.faza === "zdobyty") return "Zdobywca STS Pucharu Polski 🏆";
   if (p.faza === "kwalifikacja") return `Zdobywca ${pucharRegion(s).gen} 🏆 — w przyszłym sezonie 1/32 STS PP`;
   return "Odpadliście z pucharu";
+}
+
+/** Rozlosowany wcześniej (przy podglądzie / meczu na żywo) mój najbliższy mecz pucharowy — albo nowe losowanie. */
+function losowanieMojegoMeczu(s: StanGry, p: Puchar): { rywal: string; uSiebie: boolean } {
+  const n = p.najblizszy;
+  if (n && n.sezon === s.sezon && n.kolejka === s.kolejka && n.runda === p.runda && n.faza === p.faza && s.kluby[n.rywal]) return n;
+  const rywal = losujRywala(s, p.faza as "regionalny" | "glowny", p.runda);
+  // Finał głównego PP na neutralnym obiekcie (PGE Narodowy). Regulaminy PP (PZPN/ZPN): gospodarzem jest drużyna z NIŻSZEJ klasy; przy równych — losowanie.
+  const finalGlowny = p.faza === "glowny" && p.runda === NAZWY_GLOWNY.length - 1;
+  const pM = s.kluby[s.mojKlub].poziom, pR = s.kluby[rywal].poziom;
+  const uSiebie = finalGlowny ? false : pM > pR ? true : pM < pR ? false : szansa(0.5);
+  p.najblizszy = { sezon: s.sezon, kolejka: s.kolejka, runda: p.runda, faza: p.faza, rywal, uSiebie };
+  return p.najblizszy;
+}
+
+/** Mój mecz pucharowy w tej kolejce (para gospodarz–gość, nazwa rundy, czy przy remisie jest dogrywka, neutralny obiekt). */
+export function meczPucharuGracza(s: StanGry): { para: [string, string]; nazwa: string; dogrywka: boolean; neutralny: boolean } | null {
+  const p = s.puchar; if (!p || !moznaPuchar(s)) return null;
+  const { rywal, uSiebie } = losowanieMojegoMeczu(s, p);
+  const nazwyFazy = p.faza === "regionalny" ? nazwyRegion(s) : NAZWY_GLOWNY;
+  const nazwa = `${p.faza === "glowny" ? "STS Puchar Polski" : "Puchar Polski (ZPN)"} — ${nazwyFazy[Math.min(p.runda, nazwyFazy.length - 1)]}`;
+  return { para: uSiebie ? [s.mojKlub, rywal] : [rywal, s.mojKlub], nazwa, dogrywka: p.faza === "glowny" || dogrywkaWRundzie(s, p.runda), neutralny: p.faza === "glowny" && p.runda === NAZWY_GLOWNY.length - 1 };
 }

@@ -130,7 +130,7 @@ export function dalejDzien(s: StanGry): boolean {
   if (d.akt) { wpisy = wykonajAktywnosc(s, d.akt, () => treningDnia(s, d)); if (d.akt.rodzaj !== "trening") s.treningiDni = Math.min(3, (s.treningiDni ?? 0) + 1); } // dzień bez treningu nie „dolicza się" przy meczu
   else if (d.typ === "regeneracja") wpisy = raportMedyczny(s);
   else if (d.typ === "trening") wpisy = treningDnia(s, d);
-  else if (d.typ === "puchar") wpisy = ["Mecz pucharowy zostanie rozegrany w ramach tej kolejki — wynik w wiadomościach po weekendzie."];
+  else if (d.typ === "puchar") wpisy = s.meczLivePuchar ? [`🏆 Mecz pucharowy obejrzany na żywo: ${s.kluby[s.meczLivePuchar.dom.klubId]?.nazwa} ${s.meczLivePuchar.gd}:${s.meczLivePuchar.gg} ${s.kluby[s.meczLivePuchar.gosc.klubId]?.nazwa}${s.meczLivePuchar.karne ? ` (karne ${s.meczLivePuchar.karne.d.filter(Boolean).length}:${s.meczLivePuchar.karne.g.filter(Boolean).length})` : ""} — wynik trafi do drabinki razem z kolejką.`] : ["Mecz pucharowy zostanie rozegrany w ramach tej kolejki — wynik w wiadomościach po weekendzie."];
   else if (d.typ === "odprawa") wpisy = [`Skład na mecz: ${s.taktyka.sklad.length}/11 · formacja ${s.taktyka.formacja} · nastawienie ${s.taktyka.nastawienie}.`, s.taktyka.auto ? "Asystent ustawi skład automatycznie." : "Skład ustawiony ręcznie — sprawdź go przed meczem."];
   else wpisy = ["Spokojny dzień w klubie."];
   zapiszRaport(s, d, wpisy);

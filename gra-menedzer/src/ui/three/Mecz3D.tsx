@@ -136,6 +136,29 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       const t = stworzPostac({ koszulka: "#1d2536", spodenki: "#1d2536", getry: "#1d2536", nr: 0, seed: sd === "dom" ? 21 : 44 });
       t.g.position.set(sd === "dom" ? -9 : 9, 0, SZ / 2 + 1.2); t.g.rotation.y = Math.PI; scena.add(t.g); return { t, sd };
     });
+    // sędzia techniczny przy linii środkowej z elektroniczną tablicą (doliczony czas, numery przy zmianach)
+    const techniczny = stworzPostac({ koszulka: stroje.sedzia.baza, spodenki: "#111111", getry: "#111111", nr: 0, seed: 29 });
+    techniczny.g.position.set(0, 0, SZ / 2 + 1.7); techniczny.g.rotation.y = Math.PI; scena.add(techniczny.g);
+    const tabC = document.createElement("canvas"); tabC.width = 256; tabC.height = 128;
+    const tabTex = new THREE.CanvasTexture(tabC); tabTex.colorSpace = THREE.SRGBColorSpace;
+    const tablica = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.42, 0.05), new THREE.MeshBasicMaterial({ map: tabTex }));
+    tablica.position.set(0, 2.25, 0); tablica.visible = false; techniczny.g.add(tablica);
+    const rysujTab = (a: string, b?: string) => {
+      const g = tabC.getContext("2d")!; g.fillStyle = "#0b0b0b"; g.fillRect(0, 0, 256, 128); g.strokeStyle = "#444"; g.lineWidth = 6; g.strokeRect(3, 3, 250, 122);
+      g.textAlign = "center"; g.textBaseline = "middle";
+      if (b === undefined) { g.fillStyle = "#ff2a2a"; g.font = "bold 96px Arial"; g.fillText(a, 128, 70); }
+      else { g.font = "bold 72px Arial"; g.fillStyle = "#ff2a2a"; g.fillText(a, 68, 68); g.fillStyle = "#2aff5a"; g.fillText(b, 188, 68); g.fillStyle = "#666"; g.fillRect(126, 18, 4, 92); }
+      tabTex.needsUpdate = true;
+    };
+    let tabT = 0, ostZmian = m.zmianyLog.length, tabDolicz = 0;
+    // fizjoterapeuta z torbą — wbiega do kontuzjowanego
+    const fizjo = stworzPostac({ koszulka: "#1f8f4a", spodenki: "#1d2536", getry: "#1d2536", nr: 0, seed: 33 });
+    const torba = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.22, 0.18), new THREE.MeshLambertMaterial({ color: 0xc81818 })); torba.position.set(0, -0.6, 0.06); fizjo.ramiona[1].add(torba);
+    fizjo.g.visible = false; scena.add(fizjo.g);
+    let urazT = 0, urazId: string | undefined, ostUraz = m.urazy.length;
+    // wyjście z tunelu (tylko na początku meczu), mur przy rzucie wolnym
+    let wyjscie = m.min === 0 && !m.koniec ? 10 : 0;
+    let trzymaj = 0, murPkt: THREE.Vector3 | null = null, murIds: string[] = [], murSi = -1;
     let radoscTrenera: "dom" | "gosc" | null = null, radoscT = 0;
     const predk = new Map<Postac, THREE.Vector3>();
     // stan odtwarzania
@@ -147,6 +170,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
 
     const nowaSekwencja = () => {
       const pkt = m.sekwencja.length ? m.sekwencja : [{ x: 50, y: 50 }];
+      if (m.karne) pilka.position.set(WX(89), 0.22, 0);
       segs = []; let a = pilka.position.clone();
       for (const p of pkt) {
         const b = new THREE.Vector3(WX(p.zdarzenie === "gol" ? (p.x > 50 ? 101.8 : -1.8) : p.x), 0, WZ(p.y));
@@ -200,14 +224,42 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         celebracja -= dt;
         emocje = Math.max(emocje, 1);
         const sc = strzelec ? postacie.get(strzelec) : undefined;
-        if (sc) { sc.poza = "radosc"; sc.pozaT = 0.3; const cel = new THREE.Vector3(Math.sign(pilka.position.x) * (DL / 2 - 4), 0, SZ / 2 - 2);
+        if (sc && m.karne) { sc.poza = "radosc"; sc.pozaT = 0.3; animuj(sc, 0, dt); }
+        else if (sc) { sc.poza = "radosc"; sc.pozaT = 0.3; const cel = new THREE.Vector3(Math.sign(pilka.position.x) * (DL / 2 - 4), 0, SZ / 2 - 2);
           sc.g.position.lerp(cel, dt * 0.5);
           for (const [id, p] of postacie) if (id !== strzelec && strona.get(id) === strona.get(strzelec!) && s.zawodnicy[id]?.poz !== "BR") { p.g.position.lerp(tmp.copy(sc.g.position).add(new THREE.Vector3(Math.sin(p.faza) * 1.5, 0, Math.cos(p.faza) * 1.5)), dt * 0.8); animuj(p, 5, dt); } }
         for (const n of stad.siatki) n.scale.x = 1 + Math.sin(czas * 30) * 0.08 * Math.max(0, celebracja - 2);
         if (celebracja <= 0) {
-          if (!ust.lekka && nagranie.length > 30) { powtorka = 3.4; odtw = Math.max(0, nagranie.length - 200); stan.current.onPowtorka(true); rezyser = "bramka"; }
-          else { rozstawienie(); czekaNaKrok = true; stan.current.onKoniecSekwencji(); }
+          if (!ust.lekka && nagranie.length > 30 && !m.karne) { powtorka = 3.4; odtw = Math.max(0, nagranie.length - 200); stan.current.onPowtorka(true); rezyser = "bramka"; }
+          else { if (!m.karne) rozstawienie(); czekaNaKrok = true; stan.current.onKoniecSekwencji(); }
         }
+      } else if (wyjscie > 0) {
+        // ——— wyjście z tunelu: sędziowie na czele, drużyny parami, ustawienie przy linii środkowej, potem na pozycje ———
+        wyjscie -= dt; emocje = Math.max(emocje, 0.45);
+        const fazaW = wyjscie > 6 ? 0 : wyjscie > 2.4 ? 1 : 2;
+        const druz = [[m.dom.naBoisku, -1], [m.gosc.naBoisku, 1]] as const;
+        for (const [ids, str] of druz) ids.forEach((id, i) => {
+          const p = postac(id, str < 0 ? "dom" : "gosc");
+          if (fazaW < 2) {
+            const cel = fazaW === 0 ? tmp.set(str * 0.7, 0, SZ / 2 - 1 - (10 - wyjscie) * 3 + i * 1.1) : tmp.set(str * (1.6 + i * 0.95), 0, 5);
+            if (wyjscie > 9.9) p.g.position.set(str * 0.7, 0, SZ / 2 + 3 + i * 1.1);
+            const d = p.g.position.distanceTo(cel); p.g.position.lerp(cel, Math.min(1, dt * (fazaW === 0 ? 1.5 : 1.2)));
+            p.g.rotation.y = fazaW === 1 && d < 0.6 ? 0 : Math.atan2(cel.x - p.g.position.x, cel.z - p.g.position.z);
+            animuj(p, d > 0.4 ? 2.5 : 0, dt);
+            if (fazaW === 1 && d < 0.6 && wyjscie < 4.5) { p.ramiona[0].rotation.x = -1.2; p.ramiona[0].rotation.z = -0.3 + Math.sin(czas * 3 + i) * 0.4; } // machanie do kibiców
+          } else {
+            const u = ukladCache.find((x) => x.id === id); if (!u) return;
+            const x = u.sd === "dom" ? u.d * 0.48 : 100 - u.d * 0.48, y = u.sd === "dom" ? u.l : 100 - u.l;
+            const cel = tmp.set(WX(x), 0, WZ(y)); const d = p.g.position.distanceTo(cel);
+            p.g.position.lerp(cel, Math.min(1, dt * 1.4)); p.g.rotation.y = Math.atan2(cel.x - p.g.position.x, cel.z - p.g.position.z); animuj(p, d > 0.5 ? 6 : 0, dt);
+          }
+        });
+        sedzia.g.position.lerp(fazaW < 2 ? tmp.set(0, 0, fazaW === 0 ? SZ / 2 - 2 - (10 - wyjscie) * 3 : 5) : tmp.set(-7, 0, 6), Math.min(1, dt * 1.5)); sedzia.g.rotation.y = fazaW === 1 ? 0 : Math.PI; animuj(sedzia, fazaW === 1 ? 0 : 2.5, dt);
+        if (wyjscie <= 0) { rozstawienie(); reakcjaTrybun("gol", true); }
+      } else if (trzymaj > 0) {
+        trzymaj -= dtg; // ustawianie muru — sędzia odmierza 9,15 m
+      } else if (urazT > 0) {
+        // przerwa na udzielenie pomocy — gra stoi
       } else if (gra && segs.length && !czekaNaKrok) {
         // ——— piłka po torze ———
         const sg = segs[si];
@@ -223,9 +275,12 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
             if (z === "obrona") { const gk = [...postacie].find(([id]) => s.zawodnicy[id]?.poz === "BR" && Math.sign(postacie.get(id)!.g.position.x) === Math.sign(sg.b.x))?.[1]; if (gk) { gk.poza = "rzut"; gk.pozaT = 0.7; gk.faza = sg.b.z > gk.g.position.z ? 1 : -1; } reakcjaTrybun("ooo"); emocje = 0.6; }
             if (z === "slupek") { reakcjaTrybun("ooo"); emocje = 0.7; }
             if (z === "faul" || z === "spalony") gwizdek();
+            if (z === "wolny" && !m.karne) { gwizdek(); trzymaj = 1.3; murPkt = sg.b.clone(); murSi = si + 1; murIds = [];
+              const bramkaX = Math.sign(murPkt.x || 1) * DL / 2; const broni: "dom" | "gosc" = bramkaX > 0 ? "gosc" : "dom";
+              murIds = ukladCache.filter((u) => u.sd === broni && !u.br).map((u) => ({ id: u.id, d: postac(u.id, u.sd).g.position.distanceTo(murPkt!) })).sort((a, b) => a.d - b.d).slice(0, 4).map((x) => x.id); }
             if (z === "spalony") flagaT = 2.2;
             if (z === "gol") {
-              const domGol = sg.b.x > 0; strzelec = sg.p.nosnik; celebracja = 3.2; gwizdek();
+              const domGol = m.karne ? m.pilka.strona === "dom" : sg.b.x > 0; strzelec = sg.p.nosnik; celebracja = m.karne ? 1.3 : 3.2; if (!m.karne) gwizdek();
               radoscTrenera = domGol ? "dom" : "gosc"; radoscT = 4; if (domGol && race) raceT = 7;
               reakcjaTrybun(domGol ? "gol" : "zawod", domGol); // gospodarze mają większość na trybunach
               koniecSeg = true;
@@ -236,8 +291,27 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         }
       }
       // ——— zawodnicy: cele i ruch ———
-      if (powtorka <= 0 && celebracja <= 0) {
+      if (powtorka <= 0 && celebracja <= 0 && wyjscie <= 0) {
         const bx = pilka.position.x, bz = pilka.position.z;
+        if (murPkt && si > murSi) { murPkt = null; murIds = []; }
+        const murSrodek = murPkt ? murPkt.clone().add(tmp.set(Math.sign(murPkt.x || 1) * DL / 2 - murPkt.x, 0, -murPkt.z).normalize().multiplyScalar(9.15)) : null;
+        const murKier = murPkt && murSrodek ? new THREE.Vector3().subVectors(murSrodek, murPkt).normalize() : null;
+        // nowa kontuzja → leży, wbiega fizjoterapeuta, gra stoi
+        if (m.urazy.length > ostUraz) { const u = m.urazy[m.urazy.length - 1]; ostUraz = m.urazy.length; urazId = u.id; urazT = 6; fizjo.g.visible = true; fizjo.g.position.set(u.klubId === m.dom.klubId ? -13 : 13, 0, SZ / 2 + 2.4); }
+        if (urazT > 0) { urazT -= dt * Math.max(1, Math.min(3, sp * 0.6)); if (urazT <= 0) { const p = urazId ? postacie.get(urazId) : undefined; if (p) { p.poza = "stoi"; p.pozaT = 0; } } }
+        const lezacy = urazT > 0 && urazId ? postacie.get(urazId) : undefined;
+        if (fizjo.g.visible) {
+          const cel = lezacy ? tmp.set(lezacy.g.position.x + 0.7, 0, lezacy.g.position.z + 0.3) : tmp.set(Math.sign(fizjo.g.position.x || 1) * 13, 0, SZ / 2 + 2.4);
+          const d = fizjo.g.position.distanceTo(cel);
+          if (d > 0.15) { fizjo.g.position.add(tmp.sub(fizjo.g.position).normalize().multiplyScalar(Math.min(d, 6.5 * dt))); fizjo.g.rotation.y = Math.atan2(cel.x - fizjo.g.position.x, cel.z - fizjo.g.position.z); }
+          animuj(fizjo, d > 0.3 ? 6 : 0, dt);
+          if (lezacy && d < 0.3) { fizjo.uda.forEach((u) => (u.rotation.x = -1.4)); fizjo.lydki.forEach((l) => (l.rotation.x = 2.2)); fizjo.g.position.y = -0.45; fizjo.ramiona.forEach((r) => (r.rotation.x = -0.9)); fizjo.g.rotation.y = -Math.PI / 2; }
+          else fizjo.g.position.y = 0;
+          if (!lezacy && d < 0.3) fizjo.g.visible = false;
+        }
+        const karneStr = m.karne ? m.pilka.strona : null; // kto strzela w serii karnych
+        const ktoStrzela = m.karne ? segs[0]?.p.nosnik : undefined;
+        let idxKoło = 0;
         const xE = (bx / DL + 0.5) * 100, yE = (bz / SZ + 0.5) * 100;
         const atakuje = m.pilka.strona;
         const nosnik = segs[si]?.p.nosnik ?? segs[Math.max(0, si - 1)]?.p.nosnik;
@@ -250,6 +324,20 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
           d = Math.max(1, Math.min(96, d)); l = Math.max(3, Math.min(97, l));
           let tx = WX(u.sd === "dom" ? d : 100 - d), tz = WZ(u.sd === "dom" ? l : 100 - l);
           if (u.id === nosnik) { tx = bx - (u.sd === "dom" ? 0.6 : -0.6); tz = bz; }
+          if (murSrodek && murKier && murIds.includes(u.id)) { const k = murIds.indexOf(u.id) - 1.5; tx = murSrodek.x - murKier.z * k * 0.55; tz = murSrodek.z + murKier.x * k * 0.55; }
+          if (m.karne && !m.koniec) {
+            // seria karnych: strzelec na 11. metrze, bramkarz rywala na linii, reszta w kole środkowym
+            if (u.id === ktoStrzela) { tx = WX(87.6); tz = -0.4; }
+            else if (u.br && u.sd !== karneStr) { tx = WX(99.4); tz = 0; }
+            else if (u.br) { tx = WX(84); tz = WZ(75); }
+            else { const j = idxKoło++; tx = (u.sd === "dom" ? -0.7 : 0.7); tz = -6 + (j >> 1) * 1.3; }
+          }
+          if (m.koniec && celebracja <= 0) {
+            // po meczu: podziękowania dla kibiców — gospodarze pod trybuną główną, goście pod sektorem gości
+            const j = ukladCache.filter((x) => x.sd === u.sd).indexOf(u);
+            if (u.sd === "dom") { tx = -14 + j * 2.6; tz = SZ / 2 - 1.6; } else { tx = DL / 2 - 4 - (j % 4) * 1.4; tz = -SZ / 2 + 1.6 + Math.floor(j / 4) * 1.2; }
+          }
+          if (lezacy === p) { p.poza = "lezy"; p.pozaT = 1; animuj(p, 0, dt); continue; }
           if (atakuje !== u.sd && !u.br) { const dd = Math.hypot(p.g.position.x - bx, p.g.position.z - bz); if (dd < nd) { nd = dd; najblizszyObr = p; } }
           const v = predk.get(p) ?? new THREE.Vector3(); predk.set(p, v);
           const z = s.zawodnicy[u.id];
@@ -257,15 +345,31 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
           const vmax = (5.2 + ((z?.atrybuty?.szy ?? z?.umiej ?? 50) / 100) * 3.5) * (0.75 + 0.25 * kond) * Math.max(1, sp) * 1.6;
           tmp.set(tx - p.g.position.x, 0, tz - p.g.position.z);
           const dist = tmp.length();
-          if (dist > 0.05) { tmp.normalize().multiplyScalar(Math.min(dist, vmax * Math.max(dt, dtg) * (gra ? 1 : 0.15))); }
+          if (dist > 0.05) { tmp.normalize().multiplyScalar(Math.min(dist, m.koniec || m.karne || murIds.includes(u.id) ? 4 * dt : vmax * Math.max(dt, dtg) * (gra ? 1 : 0.15))); }
           p.g.position.add(tmp);
           const vr = tmp.length() / Math.max(0.001, dt) / Math.max(1, sp);
           if (tmp.lengthSq() > 1e-5) p.g.rotation.y = Math.atan2(tmp.x, tmp.z); else p.g.rotation.y = Math.atan2(bx - p.g.position.x, bz - p.g.position.z);
           animuj(p, vr, dt);
+          if (murIds.includes(u.id) && murSrodek && dist < 0.6) { p.g.rotation.y = Math.atan2(bx - p.g.position.x, bz - p.g.position.z); p.ramiona[0].rotation.x = -0.5; p.ramiona[1].rotation.x = -0.5; p.ramiona[0].rotation.z = 0.5; p.ramiona[1].rotation.z = -0.5; }
+          if (m.koniec && celebracja <= 0 && dist < 0.5) {
+            p.g.rotation.y = u.sd === "dom" ? 0 : Math.PI;
+            const wygrani = m.karne?.zwyciezca ? m.karne.zwyciezca === u.sd : (u.sd === "dom" ? m.gd > m.gg : m.gg > m.gd);
+            if (wygrani && Math.sin(czas * 0.7 + p.faza) > 0.6) { p.poza = "radosc"; p.pozaT = 0.2; }
+            else { p.ramiona[0].rotation.x = -1.35; p.ramiona[1].rotation.x = -1.35; const kl = Math.sin(czas * 13 + p.faza) * 0.28; p.ramiona[0].rotation.z = -0.32 + kl; p.ramiona[1].rotation.z = 0.32 - kl; }
+          } else if (!m.koniec && vr < 0.4 && p.poza === "stoi" && (z?.kondycja ?? 100) < 48) {
+            // zmęczenie: ręce na kolanach
+            p.tulow.rotation.x = 0.55; p.ramiona[0].rotation.x = -0.7; p.ramiona[1].rotation.x = -0.7;
+          }
         }
         if (najblizszyObr && gra) { tmp.set(bx - najblizszyObr.g.position.x, 0, bz - najblizszyObr.g.position.z); const d = tmp.length(); if (d > 1.4) najblizszyObr.g.position.add(tmp.normalize().multiplyScalar(Math.min(d - 1.4, 9 * dtg))); }
         // zawodnicy, którzy zeszli z boiska, schodzą do ławki
         for (const [id, p] of postacie) if (!m.dom.naBoisku.includes(id) && !m.gosc.naBoisku.includes(id) && !lawkowi.includes(p)) { p.g.position.lerp(tmp.set(strona.get(id) === "dom" ? -9 : 9, 0, SZ / 2 + 3), dt * 0.6); animuj(p, 2, dt); if (p.g.position.z > SZ / 2 + 2.5) p.g.visible = false; }
+        // sędzia techniczny: tablica z doliczonym czasem i numerami przy zmianach
+        if (m.zmianyLog.length > ostZmian) { const x = m.zmianyLog[m.zmianyLog.length - 1]; ostZmian = m.zmianyLog.length; rysujTab(String(s.zawodnicy[x.schodzi]?.numer ?? ""), String(s.zawodnicy[x.wchodzi]?.numer ?? "")); tabT = 4.5; }
+        const klDol = m.polowa === 1 && m.min >= 45 ? 1 : m.polowa === 2 && m.min >= 90 ? 2 : 0;
+        if (klDol && klDol !== tabDolicz && !m.koniec) { tabDolicz = klDol; rysujTab(`+${m.dolicz[klDol - 1]}`); tabT = 4.5; }
+        tabT = Math.max(0, tabT - dt); tablica.visible = tabT > 0; animuj(techniczny, 0, dt);
+        if (tabT > 0) { techniczny.ramiona[0].rotation.x = -2.95; techniczny.ramiona[1].rotation.x = -2.95; techniczny.ramiona[0].rotation.z = 0.25; techniczny.ramiona[1].rotation.z = -0.25; }
         // sędzia i asystenci
         tmp.set(bx - 7 - sedzia.g.position.x, 0, bz + 6 - sedzia.g.position.z); const ds = tmp.length();
         if (ds > 0.3) sedzia.g.position.add(tmp.normalize().multiplyScalar(Math.min(ds, 8 * Math.max(dt, dtg))));
@@ -312,7 +416,10 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       if (stan.current.kamera === "auto" && rezT <= 0 && powtorka <= 0) { if (rezyser !== "tv" && celebracja <= 0) rezyser = "tv"; rezT = 4; }
       if (powtorka > 0) tryb = "bramka";
       const bx = pilka.position.x, bz = pilka.position.z;
-      if (tryb === "tv" || tryb === "auto") { camPoz.set(bx * 0.78, 30, SZ / 2 + 52); camCel.set(bx * 0.86, 0, bz * 0.35); }
+      if (wyjscie > 0) { camPoz.set(wyjscie > 6 ? 6 : 0, wyjscie > 6 ? 5 : 7, SZ / 2 + (wyjscie > 6 ? 12 : 20)); camCel.set(0, 1.2, wyjscie > 6 ? SZ / 2 - 6 : 4); }
+      else if (m.karne && !m.koniec && powtorka <= 0 && stan.current.kamera === "auto") { camPoz.set(WX(80), 3.2, 2.5); camCel.set(WX(100), 1, 0); }
+      else if (m.koniec && celebracja <= 0 && stan.current.kamera === "auto") { camPoz.set(-4, 9, SZ / 2 + 22); camCel.set(0, 1, SZ / 2 - 6); }
+      else if (tryb === "tv" || tryb === "auto") { camPoz.set(bx * 0.78, 30, SZ / 2 + 52); camCel.set(bx * 0.86, 0, bz * 0.35); }
       else if (tryb === "bramka") { const sd = Math.sign(bx || 1); camPoz.set(sd * (DL / 2 + 22), 9, bz * 0.3 + 6); camCel.set(bx * 0.8, 1, bz * 0.6); }
       else if (tryb === "gora") { camPoz.set(bx * 0.4, 105, 18); camCel.set(bx * 0.4, 0, 0); }
       else { camPoz.set(bx - Math.sign(bx || 1) * 12, 10, bz + 19); camCel.set(bx, 1, bz); }

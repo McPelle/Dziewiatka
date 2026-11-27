@@ -8,11 +8,13 @@ import { MeczNaZywo, zapisanyMecz } from "./MeczNaZywo";
 import { KalendarzMiesiac } from "./KalendarzMiesiac";
 import { KartaDnia } from "./KartaDnia";
 import { paraMojegoMeczu } from "../engine/meczNaZywo";
+import { meczPucharuGracza } from "../engine/puchar";
 
 /** Panel kalendarza na pulpicie: dzisiejszy dzień, plan tygodnia, raport ostatniego dnia, przyciski Dalej / Do meczu. */
 export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => void; pokazMecz: () => void }) {
   const [rozwin, setRozwin] = useState(true);
   const [naZywo, setNaZywo] = useState<[string, string] | null>(null);
+  const [pucharLive, setPucharLive] = useState<ReturnType<typeof meczPucharuGracza>>(null);
   const [miesiac, setMiesiac] = useState(false);
   const [karta, setKarta] = useState<number | null>(null);
   if (s.okres) return <PanelOkresu s={s} odswiez={odswiez} />;
@@ -57,6 +59,11 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
             <Text style={[st.przyciskMalyTekst, { color: K.akcent }]}>{zapisanyMecz(s, paraMojegoMeczu(s)!) ? `▶ Wznów (${zapisanyMecz(s, paraMojegoMeczu(s)!)!.m.min}')` : "📺 Na żywo"}</Text>
           </Pressable>
         )}
+        {d.typ === "puchar" && !s.meczLivePuchar && meczPucharuGracza(s) && (
+          <Pressable style={[st.przyciskMaly, { justifyContent: "center", borderColor: K.akcent }]} onPress={() => setPucharLive(meczPucharuGracza(s))}>
+            <Text style={[st.przyciskMalyTekst, { color: K.akcent }]}>{zapisanyMecz(s, meczPucharuGracza(s)!.para) ? "▶ Wznów puchar" : "🏆 Puchar na żywo"}</Text>
+          </Pressable>
+        )}
         {d.typ !== "mecz" && (
           <Pressable style={[st.przyciskMaly, { justifyContent: "center", borderColor: K.niebieski }]} onPress={() => { doMeczu(s); odswiez(); }}>
             <Text style={[st.przyciskMalyTekst, { color: K.niebieski }]}>⏩ Do meczu</Text>
@@ -68,6 +75,7 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
         wydarzenia={plan[karta] ? [{ ikona: plan[karta].ikona, tekst: plan[karta].tytul }] : []}
         zablokowany={plan[karta]?.typ === "mecz" ? "Dzień meczu — rozruch i mecz." : plan[karta]?.typ === "puchar" ? "Mecz pucharowy." : karta < d.idx ? "Ten dzień już minął." : null}
         onClose={() => setKarta(null)} />}
+      {pucharLive && <MeczNaZywo s={s} para={pucharLive.para} puchar={pucharLive} onAnuluj={() => setPucharLive(null)} onKoniec={(m) => { s.meczLivePuchar = m; setPucharLive(null); dalejDzien(s); odswiez(); }} />}
       {naZywo && <MeczNaZywo s={s} para={naZywo} onAnuluj={() => setNaZywo(null)} onKoniec={(m) => { s.meczLive = m; setNaZywo(null); const mecz = dalejDzien(s); odswiez(); if (mecz) pokazMecz(); }} />}
     </View>
   );

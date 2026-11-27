@@ -3,7 +3,7 @@ import { Modal, Platform, Pressable, ScrollView, Text, View } from "react-native
 import Svg, { Circle, Line, Rect } from "react-native-svg";
 import { dzisiaj } from "../engine/dzien";
 import { FORMACJE } from "../engine/mecz";
-import { dograjDoKonca, krokMinuty, mowaWPrzerwie, NAZWA_NAST, okrzyk, OKRZYKI, podpowiedzi, przerwa, rozpocznijMeczNaZywo, zmianaGracza, zmienTaktyke, type MeczLive, type Mowa, type Okrzyk } from "../engine/meczNaZywo";
+import { dograjDoKonca, krokMinuty, mowaWPrzerwie, NAZWA_NAST, okrzyk, OKRZYKI, podpowiedzi, przerwa, rozpocznijMeczNaZywo, tekstMinuty, wynikKarnych, zmianaGracza, zmienTaktyke, type MeczLive, type Mowa, type Okrzyk } from "../engine/meczNaZywo";
 import { maOswietlenie } from "../engine/sezon";
 import { jestDerby } from "../engine/derby";
 import { godzinaMeczu } from "../engine/zywySwiat";
@@ -55,11 +55,17 @@ function zapiszMecz(s: StanGry, para: [string, string], m: MeczLive) {
   } catch { /* brak miejsca — mecz i tak trwa */ }
 }
 
-export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: [string, string]; onKoniec: (m: MeczLive) => void; onAnuluj: () => void }) {
+export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry; para: [string, string]; puchar?: { nazwa: string; dogrywka: boolean; neutralny: boolean }; onKoniec: (m: MeczLive) => void; onAnuluj: () => void }) {
   const [m] = useState<MeczLive>(() => {
     const z = zapisanyMecz(s, para);
     if (z) { for (const [id, k] of Object.entries(z.kond)) if (s.zawodnicy[id]) s.zawodnicy[id].kondycja = k; z.m.komentarz.unshift({ min: `${z.m.min}'`, typ: "info", tekst: "▶ Wznowiono zapisany mecz." }); return z.m; }
-    return rozpocznijMeczNaZywo(s, para[0], para[1]);
+    const nm = rozpocznijMeczNaZywo(s, para[0], para[1]);
+    if (puchar) {
+      nm.puchar = { nazwa: puchar.nazwa, dogrywka: puchar.dogrywka };
+      if (puchar.neutralny) nm.atut = 1;
+      nm.komentarz.unshift({ min: "0'", typ: "info", tekst: `🏆 ${puchar.nazwa}. Mecz o wszystko — przy remisie ${puchar.dogrywka ? "dogrywka 2×15 min, a potem rzuty karne" : "od razu rzuty karne (regulamin związku)"}.${puchar.neutralny ? " Neutralny obiekt — bez atutu własnego boiska." : ""}` });
+    }
+    return nm;
   });
   const ust = useMemo(() => warunki(s, para[0], para[1]), []);
   const [wersja, setWersja] = useState(0);
@@ -121,7 +127,8 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
     }
   };
   const dograj = (doPrzerwy: boolean) => { dograjDoKonca(s, m, doPrzerwy); setPredkosc(0); zapiszMecz(s, para, m); odswiez(); };
-  const minuta = m.koniec ? "KONIEC" : przerwa(m) ? "PRZERWA" : m.polowa === 1 && m.min > 45 ? `45+${m.min - 45}'` : m.min > 90 ? `90+${m.min - 90}'` : `${m.min}'`;
+  const karneW = wynikKarnych(m);
+  const minuta = m.koniec ? (karneW ? `KONIEC · karne ${karneW[0]}:${karneW[1]}` : m.polowa >= 3 ? "KONIEC PO DOGRYWCE" : "KONIEC") : karneW ? `🎯 RZUTY KARNE ${karneW[0]}:${karneW[1]}` : przerwa(m) ? "PRZERWA" : m.polowa >= 3 ? `${tekstMinuty(m)} DOGRYWKA` : tekstMinuty(m);
   const posD = m.staty.posN ? Math.round((m.staty.posD / m.staty.posN) * 100) : 50;
   const nz = (id: string) => { const z = s.zawodnicy[id]; return z ? `${z.nazwisko}` : "?"; };
 
@@ -167,7 +174,7 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
           <Herb klub={kg} rozmiar={30} />
         </View>
         <View style={[st.wiersz, { justifyContent: "center", gap: 10, paddingVertical: 4, backgroundColor: "#071710" }]}>
-          <LogoLigi nazwa={s.ligi[kd.poziom - 1]?.nazwa ?? ""} poziom={kd.poziom} rozmiar={18} />
+          {m.puchar ? <Text style={{ color: K.akcent, fontSize: 11, fontWeight: "800" }}>🏆 {m.puchar.nazwa}</Text> : <LogoLigi nazwa={s.ligi[kd.poziom - 1]?.nazwa ?? ""} poziom={kd.poziom} rozmiar={18} />}
           <Text style={{ color: K.akcent, fontWeight: "900", fontFamily: CZCIONKA }}>{minuta}</Text>
           <Text style={st.maly}>🕒 {ust.godz} · {ust.noc ? "🌙 pod reflektorami" : "☀️ dzień"} · {{ slonce: "pogodnie", deszcz: "🌧 deszcz", snieg: "❄️ śnieg (pomarańczowa piłka)", mgla: "🌫 mgła" }[ust.pogoda]} · {ust.pusto ? "🚷 puste trybuny (kara ZPN)" : `${ust.widzowie.toLocaleString("pl")} widzów`}{ust.derby ? " · ⚔ DERBY" : ""}</Text>
         </View>

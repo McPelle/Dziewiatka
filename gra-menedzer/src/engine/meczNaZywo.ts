@@ -39,7 +39,7 @@ export type Mowa = "pochwala" | "spokoj" | "wiara" | "ochrzan";
 export interface Wazne { typ: "gol" | "czerwona" | "uraz" | "karny" | "var" | "przerwa" | "koniec"; strona?: "dom" | "gosc"; id?: string; tekst: string }
 export interface MeczLive {
   dom: ZespolLive; gosc: ZespolLive; moja: "dom" | "gosc";
-  min: number; polowa: 1 | 2; dolicz: [number, number]; gd: number; gg: number; koniec: boolean;
+  min: number; polowa: 1 | 2 | 3 | 4; dolicz: [number, number]; gd: number; gg: number; koniec: boolean;
   gole: ScenGol[]; kartki: { min: number; klubId: string; id: string; typ: "zolta" | "czerwona"; opis: string }[];
   urazy: { min: number; klubId: string; id: string; tyg: number; opis: string }[];
   zmianyLog: { min: number; klubId: string; wchodzi: string; schodzi: string; powod: string }[];
@@ -50,6 +50,10 @@ export interface MeczLive {
   oceny: Record<string, number>; momentum: number; sekwencja: PunktAkcji[]; wazne: Wazne | null;
   okrzyk?: { typ: Okrzyk; do: number }; mowa?: Mowa; motMoj: number; var: boolean; poziom: number;
   dotkniecia: Record<string, number>; // ile razy był przy piłce (heatmapa / aktywność)
+  /** Mecz pucharowy: przy remisie dogrywka (2×15) albo od razu rzuty karne — wg regulaminu ZPN / PZPN. */
+  puchar?: { nazwa: string; dogrywka: boolean };
+  /** Seria rzutów karnych (po 5, potem do pierwszej pomyłki). */
+  karne?: { d: boolean[]; g: boolean[]; wykD: string[]; wykG: string[]; zwyciezca?: "dom" | "gosc" };
 }
 
 const nz = (s: StanGry, id: string) => { const z = s.zawodnicy[id]; return z ? `${z.imie[0]}. ${z.nazwisko}` : "?"; };
@@ -140,10 +144,11 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
   m.wazne = null;
   m.min++;
   const kon1 = 45 + m.dolicz[0], kon2 = 90 + m.dolicz[1];
-  const minZap = m.polowa === 1 ? Math.min(45, m.min) : m.min;
-  const minTxt = m.polowa === 1 ? (m.min > 45 ? `45+${m.min - 45}'` : `${m.min}'`) : (m.min > 90 ? `90+${m.min - 90}'` : `${m.min}'`);
+  if (m.karne) { m.min--; krokKarnych(s, m); return false; }
+  const minZap = m.polowa === 1 ? Math.min(45, m.min) : m.polowa === 2 ? m.min : m.polowa === 3 ? Math.min(105, m.min) : Math.min(120, m.min);
+  const minTxt = tekstMinuty(m);
   if (m.min === 46 && m.polowa === 1) m.komentarz.unshift({ min: "45'", typ: "info", tekst: `⏱ Sędzia techniczny pokazuje ${m.dolicz[0]} min doliczonego czasu.` });
-  if (m.min === 91) m.komentarz.unshift({ min: "90'", typ: "info", tekst: `⏱ Tablica w górze: ${m.dolicz[1]} min doliczonego czasu!` });
+  if (m.min === 91 && m.polowa === 2) m.komentarz.unshift({ min: "90'", typ: "info", tekst: `⏱ Tablica w górze: ${m.dolicz[1]} min doliczonego czasu!` });
   const [lD, lG] = tempoGoli(s, m);
   let gol = false;
   m.momentum *= 0.9;
@@ -306,10 +311,35 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
     for (const z of [m.dom, m.gosc]) for (const id of z.naBoisku) { const p = s.zawodnicy[id]; if (p) p.kondycja = Math.min(100, p.kondycja + 3); }
     m.sekwencja = [{ x: 50, y: 50 }]; m.pilka = { x: 50, y: 50, strona: "gosc" };
     m.wazne = { typ: "przerwa", tekst: "Przerwa — mowa w szatni" };
-  } else if (m.polowa === 2 && m.min >= kon2) {
+  } else if (m.polowa === 2 && m.min >= kon2 && m.puchar && m.gd === m.gg) {
+    // puchar: remis po 90 minutach — dogrywka albo od razu rzuty karne (regulamin związku)
+    m.min = 90;
+    if (m.puchar.dogrywka) {
+      m.polowa = 3;
+      m.zasady = { ...m.zasady, limit: m.zasady.limit + 1, okna: m.zasady.okna !== null ? m.zasady.okna + 1 : null };
+      m.komentarz.unshift({ min: "90'", typ: "info", tekst: `⏸ Remis ${m.gd}:${m.gg} po 90 minutach — DOGRYWKA (2×15 min). Regulamin pozwala na jedną dodatkową zmianę.` });
+      for (const z of [m.dom, m.gosc]) for (const id of z.naBoisku) { const p = s.zawodnicy[id]; if (p) p.kondycja = Math.min(100, p.kondycja + 2); }
+      m.sekwencja = [{ x: 50, y: 50 }]; m.pilka = { x: 50, y: 50, strona: "dom" };
+      m.wazne = { typ: "przerwa", tekst: "Dogrywka!" };
+    } else startKarnych(s, m, "Regulamin rozgrywek: przy remisie od razu rzuty karne.");
+  } else if (m.polowa === 3 && m.min >= 105) {
+    m.polowa = 4; m.min = 105;
+    m.komentarz.unshift({ min: "105'", typ: "info", tekst: `🔄 Zmiana stron w dogrywce. ${m.gd}:${m.gg}.` });
+    m.sekwencja = [{ x: 50, y: 50 }]; m.pilka = { x: 50, y: 50, strona: "gosc" };
+  } else if (m.polowa === 4 && m.min >= 120 && m.gd === m.gg) {
+    m.min = 120; startKarnych(s, m, "Dogrywka nie przyniosła rozstrzygnięcia.");
+  } else if ((m.polowa === 2 && m.min >= kon2) || (m.polowa === 4 && m.min >= 120)) {
+    if (m.polowa === 4) m.min = 120;
     m.koniec = true;
     const wyn = m.gd > m.gg ? s.kluby[m.dom.klubId].nazwa : m.gg > m.gd ? s.kluby[m.gosc.klubId].nazwa : null;
-    m.komentarz.unshift({ min: "FT", typ: "info", tekst: `🏁 Koniec meczu! ${s.kluby[m.dom.klubId].nazwa} ${m.gd}:${m.gg} ${s.kluby[m.gosc.klubId].nazwa}. ${wyn ? `Trzy punkty dla ${wyn}.` : "Podział punktów."}` });
+    m.komentarz.unshift({ min: "FT", typ: "info", tekst: `🏁 Koniec meczu${m.polowa === 4 ? " po dogrywce" : ""}! ${s.kluby[m.dom.klubId].nazwa} ${m.gd}:${m.gg} ${s.kluby[m.gosc.klubId].nazwa}. ${m.puchar ? `Awans: ${wyn}!` : wyn ? `Trzy punkty dla ${wyn}.` : "Podział punktów."}` });
+    ocenyKoncowe(s, m);
+    m.wazne = { typ: "koniec", tekst: "Koniec meczu" };
+  }
+  return gol;
+}
+
+function ocenyKoncowe(s: StanGry, m: MeczLive) {
     for (const z of [m.dom, m.gosc]) {
       const str = z === m.dom ? m.gd : m.gg, stra = z === m.dom ? m.gg : m.gd;
       for (const id of z.zagrali) {
@@ -317,9 +347,65 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
         ocena(m, id, (str > stra ? 0.5 : str < stra ? -0.4 : 0) + ((p.poz === "BR" || p.poz === "OBR") ? (stra === 0 ? (p.poz === "BR" ? 1.2 : 0.7) : -Math.min(1.5, stra * (p.poz === "BR" ? 0.35 : 0.25))) : 0) + Math.min(0.6, (m.dotkniecia[id] ?? 0) * 0.02) + los(-0.3, 0.3));
       }
     }
-    m.wazne = { typ: "koniec", tekst: "Koniec meczu" };
+}
+
+/** Minuta po polsku, z doliczonym czasem (45+2', 90+4') i dogrywką (105', 120'). */
+export function tekstMinuty(m: MeczLive): string {
+  if (m.karne) return "karne";
+  if (m.polowa === 1) return m.min > 45 ? `45+${m.min - 45}'` : `${m.min}'`;
+  if (m.polowa === 2) return m.min > 90 ? `90+${m.min - 90}'` : `${m.min}'`;
+  return `${m.min}'`;
+}
+
+/** Wynik serii karnych w kolejności strzałów. */
+export const wynikKarnych = (m: MeczLive) => m.karne ? [m.karne.d.filter(Boolean).length, m.karne.g.filter(Boolean).length] as [number, number] : null;
+
+function startKarnych(s: StanGry, m: MeczLive, powod: string) {
+  const kolejka = (z: ZespolLive) => z.naBoisku.map((id) => s.zawodnicy[id]).filter(Boolean)
+    .sort((a, b) => (b.poz === "BR" ? -50 : 0) + at(b, "str") + (b.cechy?.includes("egzekutor") ? 8 : 0) - ((a.poz === "BR" ? -50 : 0) + at(a, "str") + (a.cechy?.includes("egzekutor") ? 8 : 0))).map((z) => z.id);
+  const wykD = kolejka(m.dom), wykG = kolejka(m.gosc);
+  // pierwszy w kolejce własny wykonawca karnych (ustawiony przez trenera)
+  for (const [z, l] of [[m.dom, wykD], [m.gosc, wykG]] as const) { const w = z.klubId === s.mojKlub ? s.wykonawcy?.karne : undefined; if (w && l.includes(w)) { l.splice(l.indexOf(w), 1); l.unshift(w); } }
+  m.karne = { d: [], g: [], wykD, wykG };
+  m.komentarz.unshift({ min: "120'", typ: "karny", tekst: `🎯 ${powod} RZUTY KARNE! Kapitanowie losują bramkę i kolejność. Po 5 strzałów, potem do pierwszej pomyłki.` });
+  m.sekwencja = [{ x: 89, y: 50 }]; m.pilka = { x: 89, y: 50, strona: "dom" };
+  m.wazne = { typ: "karny", tekst: "Seria rzutów karnych!" };
+}
+
+/** Jeden strzał serii karnych (na zmianę: gospodarze, goście). */
+function krokKarnych(s: StanGry, m: MeczLive) {
+  const k = m.karne!; if (k.zwyciezca) return;
+  const kolejD = k.d.length <= k.g.length;
+  const strona: "dom" | "gosc" = kolejD ? "dom" : "gosc";
+  const lista = kolejD ? k.wykD : k.wykG, nr = (kolejD ? k.d : k.g).length;
+  const wid = lista[nr % Math.max(1, lista.length)];
+  const wyk = s.zawodnicy[wid], gk = bramkarz(s, kolejD ? m.gosc : m.dom);
+  const presja = nr >= 4 ? 0.05 : 0; // piąta seria i dalej — nogi miękną
+  const p = Math.max(0.55, Math.min(0.9, 0.76 + (at(wyk, "str") - at(gk, "br")) / 300 + (wyk?.cechy?.includes("egzekutor") ? 0.05 : 0) - presja));
+  const r = Math.random(), gol = r < p, obrona = !gol && r < p + (1 - p) * 0.6;
+  (kolejD ? k.d : k.g).push(gol);
+  const nazwa = s.kluby[(kolejD ? m.dom : m.gosc).klubId].nazwa;
+  const [a, b] = wynikKarnych(m)!;
+  const xB = 100; // karne na jedną bramkę
+  m.sekwencja = [{ x: 89, y: 50, nosnik: wid }, gol ? { x: xB + 1.8, y: szansa(0.5) ? 45 : 55, h: los(0.2, 1.8), nosnik: wid, zdarzenie: "gol" } : obrona ? { x: 99, y: szansa(0.5) ? 44 : 56, h: 0.8, nosnik: gk?.id, zdarzenie: "obrona" } : { x: 100, y: szansa(0.5) ? 38 : 62, h: 3, zdarzenie: "slupek" }];
+  m.pilka = { x: 89, y: 50, strona };
+  ocena(m, wid, gol ? 0.2 : -0.6); if (obrona) ocena(m, gk?.id, 0.5);
+  m.komentarz.unshift({ min: `K${nr + 1}`, typ: "karny", strona, tekst: `${gol ? "✅" : "❌"} ${nazwa}: ${nz(s, wid)} — ${gol ? "GOL!" : obrona ? `obronił ${gk ? nz(s, gk.id) : "bramkarz"}!` : "pudło!"}  (karne ${a}:${b})` });
+  // rozstrzygnięcie: po 5 seriach lub wcześniej, gdy jedna strona już nie dogoni; potem seria do skutku
+  const nd = k.d.length, ng = k.g.length;
+  let zw: "dom" | "gosc" | undefined;
+  if (nd <= 5 && ng <= 5) {
+    if (a + (5 - nd) < b) zw = "gosc"; else if (b + (5 - ng) < a) zw = "dom";
+    else if (nd === 5 && ng === 5 && a !== b) zw = a > b ? "dom" : "gosc";
+  } else if (nd === ng && a !== b) zw = a > b ? "dom" : "gosc";
+  if (zw) {
+    k.zwyciezca = zw; m.koniec = true;
+    const kz = s.kluby[(zw === "dom" ? m.dom : m.gosc).klubId].nazwa;
+    m.komentarz.unshift({ min: "FT", typ: "info", tekst: `🏁 Koniec! ${s.kluby[m.dom.klubId].nazwa} ${m.gd}:${m.gg} ${s.kluby[m.gosc.klubId].nazwa}, karne ${a}:${b}. Awansuje ${kz}!` });
+    ocenyKoncowe(s, m);
+    for (const z of [m.dom, m.gosc]) { const my = (z === m.dom ? "dom" : "gosc") === zw; for (const id of z.naBoisku) ocena(m, id, my ? 0.2 : -0.2); }
+    m.wazne = { typ: "koniec", strona: zw, tekst: `Karne ${a}:${b} — awans ${kz}` };
   }
-  return gol;
 }
 export const przerwa = (m: MeczLive) => m.polowa === 2 && m.min === 45;
 
@@ -437,7 +523,7 @@ export function podpowiedzi(s: StanGry, m: MeczLive): string[] {
   return out.slice(0, 6);
 }
 /** Dograj do końca bez oglądania (albo do przerwy). */
-export function dograjDoKonca(s: StanGry, m: MeczLive, doPrzerwy = false) { let n = 0; while (!m.koniec && n++ < 200) { krokMinuty(s, m); if (doPrzerwy && przerwa(m)) break; } }
+export function dograjDoKonca(s: StanGry, m: MeczLive, doPrzerwy = false) { let n = 0; while (!m.koniec && n++ < 400) { krokMinuty(s, m); if (doPrzerwy && przerwa(m)) break; } }
 
 /** Para meczu Twojej drużyny w bieżącej kolejce ligowej (gospodarz, gość) albo null (pauza). */
 export function paraMojegoMeczu(s: StanGry): [string, string] | null {

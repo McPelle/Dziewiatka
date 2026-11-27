@@ -307,6 +307,7 @@ export interface Puchar {
   sciezka?: { nazwa: string; przeciwnik: string; wynik: string; awans: boolean; uSiebie: boolean }[]; // drabinka: przebyte rundy
   pole?: string[]; // pełne pole uczestników (id klubów) wciąż w grze — do losowania par
   pary?: { dom: string; gosc: string; wynik: string }[]; // pełne losowanie par ostatniej rundy (wszystkie mecze, nie tylko mój)
+  najblizszy?: { sezon: number; kolejka: number; runda: number; faza: string; rywal: string; uSiebie: boolean }; // rozlosowany mój następny mecz (przed rozegraniem)
 }
 
 /** Jeden etap pracy trenera: klub, sezony i statystyki (narasta w trakcie gry). */
@@ -380,6 +381,7 @@ export interface StanGry {
   social?: import("./zywySwiat").Wpis[]; // wpisy kibiców w sieci
   kadraOkna?: string[]; // przerwy FIFA już rozegrane („sezon-miesiąc")
   kadraMecze?: import("./reprezentacje").MeczKadry[]; // ostatnie mecze reprezentacji
+  meczLivePuchar?: import("./meczNaZywo").MeczLive; // mecz pucharowy obejrzany na żywo — rozliczany z rundą pucharu
   meczLive?: import("./meczNaZywo").MeczLive; // mecz obejrzany na żywo — czeka na rozliczenie w kolejce
   przetarg?: import("./budowy").Przetarg; // otwarty przetarg na budowę
   budowy?: import("./budowy").Budowa[]; // trwające budowy na stadionie
