@@ -37,7 +37,9 @@ const KLUCZ_WOJ: Record<string, string> = { "Małopolskie": "małopolskie", "Pom
 // województwo = herb jego wojewódzkiego ZPN (oryginalne logo związku, bez tła)
 const crestWoj = (label: string, r = 38) => <View style={{ width: r * 1.15, height: r * 1.15, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={`${label} ZPN`} rozmiar={r * 1.1} /></View>;
 
-// ——— Struktura wyboru: ligi krajowe + województwa (IV liga → klasa B) ———
+/** Najniższa klasa rozgrywkowa województwa (podlaskie kończy się na klasie A — brak klasy B). */
+const najnizsza = (label: string) => (label === "Podlaskie" ? "klasa A" : "klasa B");
+// ——— Struktura wyboru: ligi krajowe + województwa (IV liga → najniższa klasa) ———
 const PREF = (n: string) => n.split(" — ")[0].trim();
 const WOJ_LABEL: Record<string, string> = {
   "Małopolska": "Małopolskie", "Pomorskie": "Pomorskie", "Zachodniopomorskie": "Zachodniopomorskie", "Kujawsko-Pomorskie": "Kujawsko-pomorskie",
@@ -167,7 +169,7 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
     const kluby = [...liga.kluby].sort((a, b) => sw.kluby[a].nazwa.localeCompare(sw.kluby[b].nazwa, "pl"));
     return (
       <View style={st.ekran}>
-        <Pasek tytul="Wybierz klub" pod={`${widok.tytul} · ${kluby.length} klubów`} onBack={() => setWidok(widok.powrot)} />
+        <Pasek tytul="Wybierz klub" pod={`${nazwaLigi(widok.tytul)} · ${kluby.length} klubów`} onBack={() => setWidok(widok.powrot)} />
         <Pressable onPress={() => setWidok({ typ: "kreator", sciezkaId: widok.sciezkaId, idx: widok.idx, powrot: widok })}
           style={({ pressed }) => [st.karta, st.wiersz, { marginTop: 8, paddingVertical: 14, borderColor: K.akcent, borderWidth: 1, opacity: pressed ? 0.85 : 1 }]}>
           <Text style={{ fontSize: 26, marginRight: 12 }}>🏗</Text>
@@ -220,7 +222,7 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
     const poziomy = szczebleWoj(woj);
     return (
       <View style={st.ekran}>
-        <Pasek tytul={woj.label} pod="Wybierz szczebel (IV liga → klasa B)" onBack={() => setWidok({ typ: "root" })} />
+        <Pasek tytul={woj.label} pod={`Wybierz szczebel (IV liga → ${najnizsza(woj.label)})`} onBack={() => setWidok({ typ: "root" })} />
         <ScrollView contentContainerStyle={{ padding: 10, paddingBottom: 26 }}>
           {poziomy.map((p) => (
             <Pozycja key={p.label} herb={<View style={{ width: 46, height: 38, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={`${p.label} ${woj.label}`} rozmiar={30} /></View>} tytul={p.label} pod={p.grupy.length > 1 ? `${p.grupy.length} grup` : nazwaLigi(p.grupy[0].nazwa)}
@@ -265,7 +267,7 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
 
       <Text style={[st.naglowek, { marginHorizontal: 16, marginTop: 18 }]}>Województwa — IV liga i niżej</Text>
       {WOJEWODZTWA.map((w, i) => (
-        <Pozycja key={w.label} herb={crestWoj(w.label)} tytul={w.label} pod="IV liga → klasa B" onPress={() => setWidok({ typ: "woj", wi: i })} />
+        <Pozycja key={w.label} herb={crestWoj(w.label)} tytul={w.label} pod={`IV liga → ${najnizsza(w.label)}`} onPress={() => setWidok({ typ: "woj", wi: i })} />
       ))}
       <View style={{ height: 8 }} />
     </ScrollView>
