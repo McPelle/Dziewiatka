@@ -372,6 +372,7 @@ export interface Europa {
 }
 
 export interface StanGry {
+  meczLive?: import("./meczNaZywo").MeczLive; // mecz obejrzany na żywo — czeka na rozliczenie w kolejce
   przetarg?: import("./budowy").Przetarg; // otwarty przetarg na budowę
   budowy?: import("./budowy").Budowa[]; // trwające budowy na stadionie
   slotId?: string; // id slotu zapisu tej kariery („Zapisz grę" nadpisuje ten slot)

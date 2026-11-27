@@ -258,6 +258,11 @@ const liderNaBoisku = (s: StanGry, linia: string[]) => linia.some((id) => s.zawo
 function hashTekst(t: string): number { let h = 2166136261; for (const c of t) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 
 export function zagrajMecz(s: StanGry, dom: Druzyna, gosc: Druzyna, zZdarzeniami: boolean, opcje?: { domAtut?: number; derby?: boolean; mojTrening?: import("./types").Trening; mojaStrona?: "dom" | "gosc"; pogoda?: number; puchar?: "woj" | "polski" }): Wynik {
+  // Mecz obejrzany na żywo — rozliczamy dokładnie to, co widziałeś (gole, kartki, zmiany, urazy).
+  if (zZdarzeniami && !opcje?.puchar && s.meczLive?.koniec && s.meczLive.dom.klubId === dom.klubId && s.meczLive.gosc.klubId === gosc.klubId) {
+    const m = s.meczLive; s.meczLive = undefined;
+    return meczZeScenariusza(s, m);
+  }
   const nd = NAST[dom.nastawienie];
   const ng = NAST[gosc.nastawienie];
   const amator = 1 + (s.kluby[dom.klubId].poziom - 1) * 0.025;
@@ -588,4 +593,81 @@ export function zagrajMecz(s: StanGry, dom: Druzyna, gosc: Druzyna, zZdarzeniami
   }
   // Obsada sędziowska (sedzia) policzona na początku meczu — patrz C2 wyżej.
   return { dom: dom.klubId, gosc: gosc.klubId, gd, gg, zdarzenia: zZdarzeniami ? zdarzenia : undefined, kara: karaMoja || undefined, staty, sedzia, doliczony };
+}
+
+/** Rozliczenie meczu rozegranego na żywo (scenariusz z meczNaZywo) — te same skutki, co zwykła symulacja. */
+export function meczZeScenariusza(s: StanGry, m: import("./meczNaZywo").MeczLive): Wynik {
+  const zdarzenia: Zdarzenie[] = [];
+  const KARA_CZERWONA = [4000, 2500, 1500, 800, 400, 250, 150, 100, 80];
+  const KARA_ZOLTA = [500, 350, 200, 120, 70, 45, 30, 20, 15];
+  let karaMoja = 0;
+  const goleM = new Map<string, number>(), asyM = new Map<string, number>(), kartaM = new Map<string, "zolta" | "czerwona">();
+  for (const zesp of [m.dom, m.gosc]) {
+    const pz = s.kluby[zesp.klubId].poziom;
+    for (const id of zesp.zagrali) {
+      const z = s.zawodnicy[id]; if (!z) continue;
+      z.mecze++; z.meczeKariera = (z.meczeKariera ?? 0) + 1; z.zgranie = Math.min(100, (z.zgranie ?? 80) + 2.5);
+      z.kondycja = Math.max(30, z.kondycja);
+    }
+    for (const k of m.kartki.filter((x) => x.klubId === zesp.klubId)) {
+      const z = s.zawodnicy[k.id]; if (!z) continue;
+      if (k.typ === "zolta") {
+        z.kartki++; kartaM.set(z.id, "zolta"); s.kluby[zesp.klubId].kasa -= KARA_ZOLTA[pz - 1]; if (zesp.klubId === s.mojKlub) karaMoja += KARA_ZOLTA[pz - 1];
+        zdarzenia.push({ min: k.min, klubId: zesp.klubId, typ: "zolta", zawodnikId: z.id, opis: `${z.kartki}. żółta` });
+        if (z.kartki % 4 === 0) { const pauza = z.kartki >= 12 ? 2 : 1; z.zawieszenie = Math.max(z.zawieszenie, pauza); zdarzenia.push({ min: 90, klubId: zesp.klubId, typ: "zawieszenie", zawodnikId: z.id, opis: `${z.kartki} żółtych — pauza ${pauza} kol.` }); }
+      } else {
+        const druga = k.opis === "druga żółta";
+        if (druga) z.kartki++;
+        z.zawieszenie = Math.max(z.zawieszenie, druga ? 1 : szansa(0.3) ? losInt(3, 6) : losInt(1, 2));
+        kartaM.set(z.id, "czerwona");
+        const kara = KARA_CZERWONA[pz - 1] * (z.zawieszenie >= 3 ? 2 : 1);
+        s.kluby[zesp.klubId].kasa -= kara; if (zesp.klubId === s.mojKlub) karaMoja += kara;
+        zdarzenia.push({ min: k.min, klubId: zesp.klubId, typ: "czerwona", zawodnikId: z.id, opis: druga ? "druga żółta — pauza 1 kol." : `pauza ${z.zawieszenie}` });
+      }
+    }
+    for (const u of m.urazy.filter((x) => x.klubId === zesp.klubId)) {
+      const z = s.zawodnicy[u.id]; if (!z) continue;
+      let tyg = u.tyg; if (zesp.klubId === s.mojKlub) tyg = Math.max(1, tyg - skrocenieKontuzji(s) * (tyg >= 6 ? 2 : 1));
+      z.kontuzja = tyg; z.urazy = (z.urazy ?? 0) + 1;
+      zdarzenia.push({ min: u.min, klubId: zesp.klubId, typ: "kontuzja", zawodnikId: z.id, opis: `${u.opis} — ${tyg} kol.` });
+    }
+    for (const x of m.zmianyLog.filter((x) => x.klubId === zesp.klubId))
+      zdarzenia.push({ min: x.min, klubId: zesp.klubId, typ: "zmiana", zawodnikId: x.wchodzi, opis: x.powod === "kontuzja" ? "za kontuzjowanego" : "zmiana" });
+    if (zesp.klubId === s.mojKlub) { const kl = s.kluby[zesp.klubId]; kl.znajomoscFormacji = kl.znajomoscFormacji ?? {}; kl.znajomoscFormacji[zesp.formacja] = (kl.znajomoscFormacji[zesp.formacja] ?? 0) + 1; }
+  }
+  for (const g of m.gole) {
+    if (g.typ === "samoboj") { zdarzenia.push({ min: g.min, klubId: g.klubId, typ: "samoboj", zawodnikId: g.strzelec, opis: "gol samobójczy" }); continue; }
+    const z = s.zawodnicy[g.strzelec]; if (!z) continue;
+    z.gole++; z.goleKariera = (z.goleKariera ?? 0) + 1; z.forma = Math.min(5, z.forma + 0.6);
+    const pr = [25000, 12000, 5000, 2000][s.kluby[g.klubId].poziom - 1] ?? 0; if (pr) { s.kluby[g.klubId].kasa -= pr; z.morale = Math.min(100, z.morale + 1); }
+    goleM.set(z.id, (goleM.get(z.id) ?? 0) + 1);
+    zdarzenia.push({ min: g.min, klubId: g.klubId, typ: "gol", zawodnikId: z.id, opis: g.typ === "karny" ? "rzut karny" : "" });
+    if (g.typ === "karny") zdarzenia.push({ min: g.min, klubId: g.klubId, typ: "karny", zawodnikId: z.id, opis: "wykorzystany" });
+    if (g.asysta && s.zawodnicy[g.asysta]) { s.zawodnicy[g.asysta].asysty++; asyM.set(g.asysta, (asyM.get(g.asysta) ?? 0) + 1); }
+  }
+  const czyste = (zesp: typeof m.dom, stracone: number) => { if (stracone) return; const br = zesp.naBoisku.map((id) => s.zawodnicy[id]).find((z) => z?.poz === "BR"); if (br) br.czysteKonta++; };
+  czyste(m.dom, m.gg); czyste(m.gosc, m.gd);
+  const ocen = (zesp: typeof m.dom, str: number, stra: number) => {
+    const w = str > stra ? 1 : str < stra ? -1 : 0;
+    for (const id of zesp.zagrali) {
+      const z = s.zawodnicy[id]; if (!z) continue;
+      let o = 6.0 + (z.umiej - 50) / 100 * 0.8 + (goleM.get(id) ?? 0) * (z.poz === "OBR" || z.poz === "BR" ? 1.8 : z.poz === "POM" ? 1.4 : 1.1) + (asyM.get(id) ?? 0) * 0.8;
+      if (z.poz === "BR" || z.poz === "OBR") o += stra === 0 ? (z.poz === "BR" ? 1.6 : 0.8) : -Math.min(1.8, stra * (z.poz === "BR" ? 0.5 : 0.35));
+      o += w === 1 ? 0.5 : w === -1 ? -0.4 : 0; o += z.forma * 0.06;
+      const k = kartaM.get(id); if (k === "czerwona") o -= 2.6; else if (k === "zolta") o -= 0.3;
+      z.ocenaMeczu = Math.max(1, Math.min(10, Math.round((o + los(-0.4, 0.4)) * 10) / 10));
+    }
+  };
+  ocen(m.dom, m.gd, m.gg); ocen(m.gosc, m.gg, m.gd);
+  const pObsady = Math.min(s.kluby[m.dom.klubId].poziom, s.kluby[m.gosc.klubId].poziom);
+  let sedzia: Wynik["sedzia"] = obsadaMeczu(s, pObsady, 1, {});
+  { const h = hashTekst(sedzia.glowny); const sur = 0.72 + (h % 1000) / 1000 * 0.56; sedzia = { ...sedzia, styl: sur >= 1.15 ? "surowy" : sur <= 0.85 ? "łagodny" : "normalny" }; }
+  zdarzenia.sort((a, b) => a.min - b.min);
+  const st = m.staty, posD = Math.round(st.posD / Math.max(1, st.posN) * 100);
+  const staty: Wynik["staty"] = {
+    pos: [posD, 100 - posD], strz: st.strz, celne: st.celne, rozne: st.rozne, faule: st.faule, spalone: st.spalone,
+    xg: [Math.round(st.strz[0] * 0.24 * 10) / 10, Math.round(st.strz[1] * 0.24 * 10) / 10], slupki: [0, 0],
+    obronione: [Math.max(0, st.celne[1] - m.gg), Math.max(0, st.celne[0] - m.gd)],
+  };
+  return { dom: m.dom.klubId, gosc: m.gosc.klubId, gd: m.gd, gg: m.gg, zdarzenia, kara: karaMoja || undefined, staty, sedzia, doliczony: m.dolicz };
 }
