@@ -1,3 +1,4 @@
+import { dwumecz, rozstrzygnij } from "./rozstrzygniecie";
 // Europejskie puchary — format OBOWIĄZUJĄCY OD SEZONU 2024/25 (reforma UEFA).
 // LM = Liga Mistrzów, LE = Liga Europy, LK = Liga Konferencji Europy.
 // Przebieg: eliminacje (dwumecze) → FAZA LIGOWA 36 drużyn (LM/LE 8 meczów, LK 6) → ranking 1–36:
@@ -93,24 +94,17 @@ function symulujFazeLigowa(s: StanGry, e: Europa) {
   return { pkt, z, r, p, miejsce, mecze, top8: pkt >= progTop8, playoff: pkt >= progPlay && pkt < progTop8 };
 }
 
-/** Dwumecz (u siebie + wyjazd) na agregat; remis → karne. */
+/** Dwumecz UEFA (u siebie + wyjazd): liczy się suma bramek — gole na wyjeździe bez znaczenia (od 2021/22);
+ *  przy remisie w dwumeczu dogrywka 2×15 na koniec rewanżu, a potem rzuty karne. */
 function symulujDwumecz(s: StanGry, k: EuroKlub): { wynik: string; awans: boolean } {
-  const baza = silaKlubu(s, s.mojKlub);
-  const rS = silaRywala(k);
-  const [d1, g1] = graj(baza, rS, 2); // u siebie
-  const [d2, g2, przewaga] = graj(baza, rS, 0); // wyjazd
-  let agMoje = d1 + d2, agIch = g1 + g2;
-  let karne = false;
-  if (agMoje === agIch) { karne = true; if (szansa(0.5 + przewaga * 0.06)) agMoje++; else agIch++; }
-  return { wynik: `${d1}:${g1}, ${d2}:${g2} → ${agMoje}:${agIch}${karne ? " k." : ""}`, awans: agMoje > agIch };
+  const r = dwumecz(silaKlubu(s, s.mojKlub), silaRywala(k));
+  return { wynik: r.tekst, awans: r.zwyciezcaA };
 }
 
-/** Finał: jeden mecz na neutralnym stadionie; remis → karne. */
+/** Finał: jeden mecz na neutralnym stadionie; remis → dogrywka 2×15, potem rzuty karne. */
 function symulujFinal(s: StanGry, k: EuroKlub): { wynik: string; awans: boolean } {
-  const [moje0, ich0, przewaga] = graj(silaKlubu(s, s.mojKlub), silaRywala(k), 0);
-  let moje = moje0, ich = ich0, karne = false;
-  if (moje === ich) { karne = true; if (szansa(0.5 + przewaga * 0.06)) moje++; else ich++; }
-  return { wynik: `${moje}:${ich}${karne ? " (k.)" : ""}`, awans: moje > ich };
+  const r = rozstrzygnij(silaKlubu(s, s.mojKlub), silaRywala(k), { dogrywka: true, neutralny: true });
+  return { wynik: r.tekst, awans: r.zwyciezca === "dom" };
 }
 
 // Premie (zł) — rosną z fazą, LM płaci najwięcej.

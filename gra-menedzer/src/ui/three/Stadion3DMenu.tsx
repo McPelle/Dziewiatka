@@ -43,7 +43,7 @@ function Stadion3DV2({ s, klub, tlo, wysokosc, noc }: { s: StanGry | null; klub:
       const m = (o as THREE.Mesh).material as THREE.Material | THREE.Material[] | undefined;
       if (!m || Array.isArray(m) || !(m instanceof THREE.MeshStandardMaterial)) return;
       let n = cache.get(m);
-      if (!n) { n = new THREE.MeshLambertMaterial({ color: m.color, map: m.map, transparent: m.transparent, opacity: m.opacity, side: m.side, emissive: m.emissive, emissiveIntensity: m.emissiveIntensity, depthWrite: m.depthWrite }); cache.set(m, n); }
+      if (!n) { n = new THREE.MeshLambertMaterial({ color: m.color, vertexColors: m.vertexColors, map: m.map, emissiveMap: m.emissiveMap, alphaTest: m.alphaTest, transparent: m.transparent, opacity: m.opacity, side: m.side, emissive: m.emissive, emissiveIntensity: m.emissiveIntensity, depthWrite: m.depthWrite }); cache.set(m, n); }
       (o as THREE.Mesh).material = n; (o as THREE.Mesh).castShadow = false; (o as THREE.Mesh).receiveShadow = false;
     });
     scena.add(stad.grupa);

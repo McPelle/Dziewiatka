@@ -2,7 +2,7 @@
 // regionu (Ekstraklasa → B-klasa) w swoich miejscowościach: herby klubów Twojej ligi i lig wyższych, kropki w kolorach
 // szczebla dla reszty. Podpisy bez nakładania się, przesuwanie palcem, przybliżanie, skala w km, filtr szczebla,
 // zgody/kosy wybranego klubu jako linie, karta klubu i lista rywali z odległościami.
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PanResponder, Pressable, Text, View } from "react-native";
 import Svg, { Line, Path, Rect, Text as SvgText } from "react-native-svg";
 import { GRANICE, kontur } from "../data/granice";
@@ -45,7 +45,9 @@ function klubyWojewodztwa(woj: string) {
 
 export function MapaWojewodztwa({ s }: { s: StanGry }) {
   const moj = s.kluby[s.mojKlub];
-  const [woj, setWoj] = useState<string>(() => wojMapy(s, moj) ?? "pomorskie");
+  // ligi centralne i III liga (grupy z kilku województw) → mapa Polski; niższe ligi → Twoje województwo
+  const [woj, setWoj] = useState<string>(() => (moj.poziom <= 4 ? "polska" : wojMapy(s, moj) ?? "pomorskie"));
+  const [grupa, setGrupa] = useState(true); // „Moja grupa”: tylko kluby Twojej ligi/grupy z odległościami
   const [poziom, setPoziom] = useState<number | null>(null);
   const [relacje, setRelacje] = useState(true);
   const [zoom, setZoom] = useState(1);
@@ -56,7 +58,7 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
 
   // projekcja: kontur województwa → jednostki mapy (W = 1000), z poprawką cos(φ)
   const geo = useMemo(() => {
-    const kt = kontur(woj); if (!kt.length) return null;
+    const kt = woj === "polska" ? Object.keys(GRANICE).flatMap((w) => kontur(w)) : kontur(woj); if (!kt.length) return null;
     const lo = kt.map((p) => p[0]), la = kt.map((p) => p[1]);
     let [minLo, maxLo, minLa, maxLa] = [Math.min(...lo), Math.max(...lo), Math.min(...la), Math.max(...la)];
     const pLo = (maxLo - minLo) * 0.06, pLa = (maxLa - minLa) * 0.06; minLo -= pLo; maxLo += pLo; minLa -= pLa; maxLa += pLa;
@@ -64,12 +66,13 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
     const W = 1000, H = W * (maxLa - minLa) / ((maxLo - minLo) * cos);
     const xy = (lat: number, lon: number): [number, number] => [((lon - minLo) / (maxLo - minLo)) * W, ((maxLa - lat) / (maxLa - minLa)) * H];
     const sciezka = (w: string) => kontur(w).map(([a, b], i) => { const [x, y] = xy(b, a); return `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`; }).join("") + "Z";
-    const inne = Object.keys(GRANICE).filter((w) => w !== woj).map((w) => {
+    const inne = Object.keys(GRANICE).filter((w) => w !== woj && woj !== "polska").map((w) => {
       const p = kontur(w); const c = xy(p.reduce((a, q) => a + q[1], 0) / p.length, p.reduce((a, q) => a + q[0], 0) / p.length);
       return { w, d: sciezka(w), c };
     });
     const mo = MORZE_OBSZAR[woj]; const morze = mo ? (() => { const [x0, y0] = xy(mo[0], Math.max(minLo, mo[1])); return { x: x0, y: -H, w: W * 2, h: y0 + H }; })() : null;
-    return { W, H, xy, d: sciezka(woj), inne, morze, jednKm: H / ((maxLa - minLa) * 111.2) };
+    const wszystkieWoj = woj === "polska" ? Object.keys(GRANICE).map((w) => sciezka(w)) : [];
+    return { W, H, xy, d: woj === "polska" ? "" : sciezka(woj), wszystkieWoj, inne, morze, jednKm: H / ((maxLa - minLa) * 111.2) };
   }, [woj]);
 
   // kluby województwa: z danych WSZYSTKICH podokręgów 4 województw (niezależnie od tego, gdzie toczy się kariera),
@@ -77,10 +80,10 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
   const kluby = useMemo(() => {
     if (!geo) return [];
     const zDanych = new Map<string, { k: Klub; liga: string }>();
-    for (const d of klubyWojewodztwa(woj)) zDanych.set(d.k.nazwa, d);
+    if (woj !== "polska") for (const d of klubyWojewodztwa(woj)) zDanych.set(d.k.nazwa, d);
     for (const k of Object.values(s.kluby)) {
-      if (k.rezerwaDla) continue;
-      if (zDanych.has(k.nazwa) || wojMapy(s, k) === woj) zDanych.set(k.nazwa, { k, liga: s.ligi[k.poziom - 1]?.nazwa ?? NAZWY_POZ[Math.min(8, k.poziom - 1)] });
+      if (k.rezerwaDla && k.poziom !== moj.poziom) continue;
+      if (woj === "polska" ? k.poziom === moj.poziom : zDanych.has(k.nazwa) || wojMapy(s, k) === woj) zDanych.set(k.nazwa, { k, liga: s.ligi[k.poziom - 1]?.nazwa ?? NAZWY_POZ[Math.min(8, k.poziom - 1)] });
     }
     const wszystkie = [...zDanych.values()];
     const znane = wszystkie.filter((x) => MIASTA[x.k.miasto]);
@@ -109,7 +112,19 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
   }), []);
 
   // znaczniki: herby (Twoja liga, ligi wyższe, przy przybliżeniu — wszystkie), kropki dla reszty; rozsunięte w jednym mieście
-  const widoczne = kluby.filter((p) => poziom == null || p.k.poziom === poziom || p.k.id === s.mojKlub);
+  const wGrupie = (p: { liga: string; k: Klub }) => p.k.id === s.mojKlub || p.liga === mojaLiga;
+  const trybGrupy = grupa && kluby.some((p) => p.liga === mojaLiga && p.k.id !== s.mojKlub);
+  const widoczne = kluby.filter((p) => (trybGrupy ? wGrupie(p) : poziom == null || p.k.poziom === poziom || p.k.id === s.mojKlub));
+  const kmDo = useMemo(() => new Map(kluby.filter(wGrupie).map((p) => [p.k.id, odlegloscDrogowa(moj.miasto, p.k.miasto)])), [kluby, mojaLiga]);
+  // dopasowanie widoku do całej grupy (po wejściu w tryb „Moja grupa” / zmianie mapy)
+  useEffect(() => {
+    if (!trybGrupy || !geo) return;
+    const pk = kluby.filter(wGrupie); if (!pk.length) return;
+    const xs = pk.map((p) => p.x), ys = pk.map((p) => p.y);
+    const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+    const z = Math.max(1, Math.min(6, Math.min(geo.W / ((x1 - x0) * 1.5 + 60), geo.H / ((y1 - y0) * 1.5 + 60))));
+    setZoom(z); setSrodek([(x0 + x1) / 2, (y0 + y1) / 2]);
+  }, [trybGrupy, woj, kluby.length]);
   const znaczniki = useMemo(() => {
     const grupy = new Map<string, typeof widoczne>();
     for (const p of widoczne) { const kl = p.znana ? p.k.miasto : `≈${p.k.poziom}`; grupy.set(kl, [...(grupy.get(kl) ?? []), p]); }
@@ -117,7 +132,7 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
     for (const g of grupy.values()) {
       g.sort((a, b) => a.k.poziom - b.k.poziom);
       g.forEach((p, i) => {
-        const herb = p.k.id === s.mojKlub || p.k.id === wyb || p.liga === mojaLiga || p.k.poziom <= 4 || zoom >= 2.4 || poziom != null;
+        const herb = trybGrupy || p.k.id === s.mojKlub || p.k.id === wyb || p.liga === mojaLiga || p.k.poziom <= 4 || zoom >= 2.4 || poziom != null;
         const r = p.k.id === s.mojKlub ? 17 : herb ? 12 : 5;
         let [sx, sy] = naEkran(p.x, p.y);
         if (g.length > 1) { const kat = i * 2.39996, rr = (herb ? 13 : 7) * Math.sqrt(i) * (p.znana ? 1 : 1.6); sx += Math.cos(kat) * rr; sy += Math.sin(kat) * rr; }
@@ -125,7 +140,7 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
       });
     }
     return out;
-  }, [widoczne, vx, vy, skala, wyb, zoom, poziom]);
+  }, [widoczne, vx, vy, skala, wyb, zoom, poziom, trybGrupy]);
 
   // podpisy bez nakładania się (priorytet: Twój klub, wybrany, Twoja liga, wyższe szczeble)
   const podpisy = useMemo(() => {
@@ -134,12 +149,18 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
     const prio = (z: (typeof znaczniki)[number]) => (z.p.k.id === s.mojKlub ? -100 : z.p.k.id === wyb ? -90 : z.p.liga === mojaLiga ? -50 : 0) + z.p.k.poziom;
     const out: { z: (typeof znaczniki)[number]; x: number; y: number; t: string }[] = [];
     for (const z of [...znaczniki].sort((a, b) => prio(a) - prio(b))) {
-      const t = (z.p.znana ? "" : "≈ ") + z.p.k.nazwa; const w = t.length * 5.9 + 8, h = 15;
+      const km = trybGrupy && z.p.k.id !== s.mojKlub ? kmDo.get(z.p.k.id) : undefined;
+      const t = (z.p.znana ? "" : "≈ ") + z.p.k.nazwa + (km != null ? ` · ${km} km` : ""); const w = t.length * 5.9 + 8, h = 15;
       const kand: [number, number][] = [[z.sx + z.r + 2, z.sy - h / 2], [z.sx - z.r - 2 - w, z.sy - h / 2], [z.sx - w / 2, z.sy + z.r + 1], [z.sx - w / 2, z.sy - z.r - h - 1]];
-      for (const [x, y] of kand) { const b: [number, number, number, number] = [x, y, x + w, y + h]; if (!kol(b)) { zajete.push(b); out.push({ z, x, y, t }); break; } }
+      let ok = false;
+      for (const [x, y] of kand) { const b: [number, number, number, number] = [x, y, x + w, y + h]; if (!kol(b)) { zajete.push(b); out.push({ z, x, y, t }); ok = true; break; } }
+      if (!ok && trybGrupy) { // w trybie grupy podpis każdego klubu musi być — przesuwamy w dół, aż znajdzie się miejsce
+        for (let d = 1; d < 8 && !ok; d++) for (const [x, y] of [[z.sx + z.r + 2, z.sy - h / 2 + d * 16], [z.sx + z.r + 2, z.sy - h / 2 - d * 16], [z.sx - z.r - 2 - w, z.sy - h / 2 + d * 16]] as [number, number][]) { const b: [number, number, number, number] = [Math.max(0, Math.min(szer - w, x)), Math.max(0, Math.min(wys - h, y)), 0, 0]; b[2] = b[0] + w; b[3] = b[1] + h; if (!kol(b)) { zajete.push(b); out.push({ z, x: b[0], y: b[1], t }); ok = true; break; } }
+        if (!ok) out.push({ z, x: Math.max(0, Math.min(szer - w, z.sx + z.r + 2)), y: z.sy - h / 2, t });
+      }
     }
     return out;
-  }, [znaczniki, szer, wys]);
+  }, [znaczniki, szer, wys, trybGrupy, kmDo]);
 
   if (!geo) return null;
   const k = wyb ? kluby.find((p) => p.k.id === wyb)?.k ?? null : null;
@@ -161,8 +182,11 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
 
   return (
     <View style={[st.karta, { marginTop: 10, padding: 12 }]}>
-      <Text style={st.naglowek}>🗺 Mapa województwa</Text>
+      <Text style={st.naglowek}>🗺 Mapa {woj === "polska" ? "Polski" : "województwa"}</Text>
+      {trybGrupy && <Text style={[st.tekst, { fontSize: 13, marginBottom: 6 }]}>Twoja grupa: <Text style={{ fontWeight: "900", color: K.akcent }}>{mojaLiga}</Text> — {kluby.filter(wGrupie).length} drużyn, każda w swojej miejscowości z odległością drogową od Twojego stadionu.</Text>}
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
+        {chip(trybGrupy, `📍 Moja grupa (${kluby.filter(wGrupie).length})`, () => { setGrupa(!grupa); if (grupa) { setZoom(1); setSrodek(null); } })}
+        {moj.poziom <= 4 && chip(woj === "polska", "Polska", () => { setWoj("polska"); setZoom(1); setSrodek(null); setWyb(null); setPoziom(null); })}
         {WOJE.map(([w, n]) => chip(woj === w, n, () => { setWoj(w); setZoom(1); setSrodek(null); setWyb(null); setPoziom(null); }))}
       </View>
       <View onLayout={(e) => setSzer(Math.max(200, e.nativeEvent.layout.width))} style={{ transform: tryb3d ? [{ perspective: 900 }, { rotateX: "38deg" }, { scale: 0.92 }] : [], shadowColor: "#000", shadowOpacity: tryb3d ? 0.6 : 0, shadowRadius: 18, shadowOffset: { width: 0, height: 16 }, height: wys, borderRadius: 12, overflow: "hidden", backgroundColor: "#151a18", borderWidth: 1, borderColor: K.liniaMocna }} {...pan.panHandlers}>
@@ -173,6 +197,8 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
           <Path d={geo.d} fill="#1d4a31" stroke="#9be7b0" strokeWidth={2.2 / skala} />
           {geo.inne.map((o) => <SvgText key={`n${o.w}`} x={o.c[0]} y={o.c[1]} fontSize={11 / skala} fill="#6f8a7c" textAnchor="middle" fontStyle="italic">{SKROT[o.w] ?? o.w}</SvgText>)}
           {MORZE[woj] && <SvgText x={geo.xy(...MORZE[woj])[0]} y={geo.xy(...MORZE[woj])[1]} fontSize={13 / skala} fill="#6fa6d6" textAnchor="middle" fontStyle="italic" letterSpacing={3 / skala}>Morze Bałtyckie</SvgText>}
+          {geo.wszystkieWoj.map((d, i) => <Path key={`pl${i}`} d={d} fill="#1d4a31" stroke="#9be7b0" strokeWidth={1.2 / skala} />)}
+          {trybGrupy && ja && widoczne.filter((p) => p.k.id !== s.mojKlub).map((p) => <Line key={`g${p.k.id}`} x1={ja.x} y1={ja.y} x2={p.x} y2={p.y} stroke="#ffce47" strokeWidth={1 / skala} opacity={0.45} />)}
           {ja && [...derby].map((id) => { const p = kluby.find((q) => q.k.id === id); return p ? <Line key={`d${id}`} x1={ja.x} y1={ja.y} x2={p.x} y2={p.y} stroke="#ff3b30" strokeWidth={1.6 / skala} strokeDasharray={`${4 / skala},${3 / skala}`} opacity={0.7} /> : null; })}
           {linie.map((l, i) => <Line key={i} x1={l.a!.x} y1={l.a!.y} x2={l.b!.x} y2={l.b!.y} stroke={l.r.typ === "kosa" ? "#ff5a5a" : l.r.typ === "uklad" ? "#5aa9ff" : "#3fe08a"} strokeWidth={2.4 / skala} strokeDasharray={l.r.typ === "uklad" ? `${6 / skala},${4 / skala}` : undefined} opacity={0.9} />)}
         </Svg>

@@ -1,3 +1,4 @@
+import { opisWyniku, rozstrzygnij } from "./rozstrzygniecie";
 import { ogloszenieReorganizacji, zastosujReorganizacje } from "./reorganizacja";
 import { zakazTransferow } from "./wydzialGier";
 import { pzpnPoKolejce, pzpnPrzedKolejka, pzpnPrzedSkladem } from "./pzpnCykl";
@@ -684,12 +685,14 @@ function regulyBarazy(poziomGorny: number, n: number): { b: number; rb: number }
 
 /** Jeden mecz barażowy wg PZPN: na boisku WYŻEJ sklasyfikowanego (przewaga własnego boiska).
  * Remis → dogrywka, dalej remis → rzuty karne (lekko po stronie gospodarza). Zwraca zwycięzcę (awansuje/zostaje). */
+let ostatniBaraz = ""; // tekst wyniku ostatniego meczu barażowego (do komunikatu)
 function meczBarazowy(s: StanGry, wyzej: string, nizej: string): string {
-  const atut = 1.3; // przewaga gospodarza (wyżej sklasyfikowany gra u siebie — regulamin PZPN)
-  const sW = silaKlubu(s, wyzej) + atut + los(-3, 3);
-  const sN = silaKlubu(s, nizej) + los(-3, 3);
-  if (Math.abs(sW - sN) < 0.6) return szansa(0.56) ? wyzej : nizej; // remis → karne, minimalnie dla gospodarza
-  return sW >= sN ? wyzej : nizej;
+  // mecz rozegrany wcześniej przez gracza (na żywo albo symulowany z ekranu baraży) — liczy się jego wynik
+  const z = s.barazeGracza?.mecze.find((m) => m.dom === wyzej && m.gosc === nizej && m.zwyc);
+  if (z) { ostatniBaraz = z.wynik ?? ""; return z.zwyc!; }
+  const r = rozstrzygnij(silaKlubu(s, wyzej), silaKlubu(s, nizej), { dogrywka: true }); // 90' → dogrywka → karne (PZPN)
+  ostatniBaraz = r.tekst;
+  return r.zwyciezca === "dom" ? wyzej : nizej;
 }
 
 /** Baraż (play-off) PZPN — mecze JEDNOMECZOWE u wyżej sklasyfikowanego, rozstawienie najlepszy↔najgorszy
@@ -707,8 +710,8 @@ function baraz(s: StanGry, klubIds: string[], ileZostaje: number, kontekst: "awa
         const rywal = s.mojKlub === wyzej ? nizej : wyzej;
         const uSiebie = s.mojKlub === wyzej;
         wiadomosc(s, s.mojKlub === zwyc
-          ? `⚽ Baraż ${kontekst === "awans" ? "o awans" : "o utrzymanie"} (${uSiebie ? "u siebie" : "na wyjeździe"}): wygraliście z ${s.kluby[rywal].nazwa}!`
-          : `⚽ Baraż ${kontekst === "awans" ? "o awans" : "o utrzymanie"} (${uSiebie ? "u siebie" : "na wyjeździe"}): porażka z ${s.kluby[rywal].nazwa}.`);
+          ? `⚽ Baraż ${kontekst === "awans" ? "o awans" : "o utrzymanie"} (${uSiebie ? "u siebie" : "na wyjeździe"}): ${s.kluby[wyzej].nazwa} ${ostatniBaraz} ${s.kluby[nizej].nazwa} — wygraliście z ${s.kluby[rywal].nazwa}!`
+          : `⚽ Baraż ${kontekst === "awans" ? "o awans" : "o utrzymanie"} (${uSiebie ? "u siebie" : "na wyjeździe"}): ${s.kluby[wyzej].nazwa} ${ostatniBaraz} ${s.kluby[nizej].nazwa} — porażka z ${s.kluby[rywal].nazwa}.`);
       }
       next.push(zwyc);
     }
@@ -1052,6 +1055,7 @@ export function zagrajKolejke(s: StanGry) {
   if (s.kolejka >= ileKolejek(s)) {
     s.koniecSezonu = true;
     wiadomosc(s, "Koniec sezonu w Twojej lidze! Zobacz tabelę i przejdź do nowego sezonu.");
+    przygotujBarazeGracza(s); // Twoje baraże (jeśli jesteś w strefie) — do rozegrania przed zakończeniem sezonu
   } else {
     przygotujKolejke(s);
   }
@@ -1450,14 +1454,11 @@ function superpucharPolski(s: StanGry, ekstraklasa: string[]) {
   if (!ppId || ppId === mistrzId) ppId = ekstraklasa[1]; // dublet → wicemistrz
   const A = s.kluby[mistrzId], B = s.kluby[ppId];
   if (!A || !B) return;
-  const przewaga = silaKlubu(s, mistrzId) - silaKlubu(s, ppId);
-  const gA = Math.max(0, Math.round(1.3 + przewaga * 0.12 + los(-0.9, 0.9)));
-  const gB = Math.max(0, Math.round(1.3 - przewaga * 0.12 + los(-0.9, 0.9)));
-  let karne = "", aWin: boolean;
-  if (gA === gB) { aWin = szansa(0.5 + Math.max(-0.2, Math.min(0.2, przewaga * 0.03))); karne = " k."; }
-  else aWin = gA > gB;
+  // Regulamin Superpucharu: jeden mecz na stadionie mistrza; przy remisie po 90 min od razu rzuty karne (bez dogrywki).
+  const r = rozstrzygnij(silaKlubu(s, mistrzId), silaKlubu(s, ppId), { dogrywka: false });
+  const aWin = r.zwyciezca === "dom";
   const zwyc = aWin ? A : B, przeg = aWin ? B : A;
-  const wynik = `${gA}:${gB}${karne}`;
+  const wynik = r.tekst;
   const sedzia = obsadaMeczu(s, 1, los(0.6, 1.4), { cupPolski: true }).glowny;
   zwyc.kasa += 1_500_000; przeg.kasa += 700_000; // nagrody PZPN
   s.superpuchar = { sezon: s.sezon, zwyciezca: zwyc.nazwa, przegrany: przeg.nazwa, wynik };
@@ -1618,6 +1619,7 @@ function uzupelnijLige(s: StanGry, ost: number, ile: number): string[] {
 }
 
 export function nowySezon(s: StanGry) {
+  for (let i = 0; i < 4 && barazDoRozegrania(s); i++) symulujBarazGracza(s); // nierozegrane Twoje baraże → symulacja
   // dogranie pozostałych kolejek w dłuższych ligach
   const max = Math.max(...s.ligi.map((l) => l.terminarz.length));
   while (s.kolejka < max) {
@@ -3566,4 +3568,68 @@ export function wolneKlubyDlaZwolnionego(s: StanGry): string[] {
     for (const id of kluby.slice(0, 5)) lista.push(id);
   }
   return lista;
+}
+
+
+// ——— Twoje baraże jako prawdziwe mecze (na żywo albo symulacja) — zgodnie z rozstawieniem PZPN ———
+// Po ostatniej kolejce gra sprawdza, czy Twój klub jest w strefie barażowej. Pary jak w `baraz()`: najlepszy ↔ najgorszy
+// w strefie, mecz u wyżej sklasyfikowanego, zwycięzcy grają dalej (finał u lepiej rozstawionego). Pozostałe pary są
+// rozgrywane od razu (symulacja z dogrywką i karnymi), więc rywala w finale znasz po swoim półfinale.
+export function przygotujBarazeGracza(s: StanGry) {
+  const k = s.kluby[s.mojKlub]; if (!k || s.barazeGracza?.sezon === s.sezon) return;
+  const p = k.poziom; const tab = (lv: number) => (s.ligi[lv - 1] ? tabelaLigi(s, s.ligi[lv - 1]).map((w) => w.klubId) : []);
+  let pula: string[] = [], kontekst: "awans" | "utrzymanie" = "awans", nazwa = "";
+  if (p >= 2) { // baraż o awans: moja liga = dolna, wyższa liga = poziom p-1
+    const i = p - 2, n = s.wymiana[i] ?? 0; const dolna = tab(p);
+    const dolnaE = dolna.filter((id) => { const kk = s.kluby[id]; return !(kk.rezerwaDla && (i + 1) <= (s.kluby[kk.rezerwaDla]?.poziom ?? 99)); });
+    const { b } = regulyBarazy(i + 1, n);
+    if (b > 0 && dolnaE.length >= n + b) { const strefa = dolnaE.slice(n - b, n - b + 4 * b); if (strefa.includes(s.mojKlub)) { pula = strefa; nazwa = `Baraże o awans do ${s.ligi[p - 2]?.nazwa ?? "wyższej ligi"}`; } }
+  }
+  if (!pula.length && p < s.ligi.length) { // baraż o utrzymanie (np. II liga): drużyny tuż nad strefą bezpośredniego spadku
+    const n = s.wymiana[p - 1] ?? 0; const { rb } = regulyBarazy(p, n);
+    if (rb > 0) { const g = tab(p); const directDown = Math.max(0, n - rb); const strefa = g.slice(g.length - directDown - 2 * rb, g.length - directDown);
+      if (strefa.includes(s.mojKlub)) { pula = strefa; kontekst = "utrzymanie"; nazwa = `Baraż o utrzymanie w ${s.ligi[p - 1].nazwa}`; } }
+  }
+  if (!pula.length) return;
+  const mecze: NonNullable<StanGry["barazeGracza"]>["mecze"] = [];
+  const polowa = Math.floor(pula.length / 2);
+  for (let i = 0; i < polowa; i++) mecze.push({ runda: pula.length > 2 ? "Półfinał baraży" : "Finał baraży", dom: pula[i], gosc: pula[pula.length - 1 - i] });
+  s.barazeGracza = { sezon: s.sezon, kontekst, nazwa, mecze };
+  for (const m of mecze) if (m.dom !== s.mojKlub && m.gosc !== s.mojKlub) rozegrajBarazAI(s, m);
+  const moj = mecze.find((m) => m.dom === s.mojKlub || m.gosc === s.mojKlub)!;
+  wiadomosc(s, `⚔️ ${nazwa}! ${moj.runda}: ${s.kluby[moj.dom].nazwa} — ${s.kluby[moj.gosc].nazwa} (${moj.dom === s.mojKlub ? "u siebie" : "na wyjeździe"}). Jeden mecz, przy remisie dogrywka i rzuty karne. Zagraj na żywo z pulpitu albo zasymuluj.`);
+}
+function rozegrajBarazAI(s: StanGry, m: { dom: string; gosc: string; wynik?: string; zwyc?: string }) {
+  const r = rozstrzygnij(silaKlubu(s, m.dom), silaKlubu(s, m.gosc), { dogrywka: true });
+  m.wynik = r.tekst; m.zwyc = r.zwyciezca === "dom" ? m.dom : m.gosc;
+}
+/** Najbliższy Twój mecz barażowy do rozegrania. */
+export function barazDoRozegrania(s: StanGry) {
+  const b = s.barazeGracza; if (!b || b.sezon !== s.sezon) return null;
+  return b.mecze.find((m) => !m.zwyc && (m.dom === s.mojKlub || m.gosc === s.mojKlub)) ?? null;
+}
+/** Zapis wyniku Twojego meczu barażowego (z meczu na żywo albo symulacji) i ewentualne utworzenie finału. */
+export function zapiszBaraz(s: StanGry, gd: number, gg: number, dogrywka: boolean, karne?: [number, number]) {
+  const b = s.barazeGracza, m = barazDoRozegrania(s); if (!b || !m) return;
+  m.wynik = opisWyniku(gd, gg, dogrywka, karne);
+  m.zwyc = karne ? (karne[0] > karne[1] ? m.dom : m.gosc) : gd > gg ? m.dom : m.gosc;
+  const wygral = m.zwyc === s.mojKlub;
+  wiadomosc(s, `${wygral ? "🎉" : "💔"} ${m.runda}: ${s.kluby[m.dom].nazwa} ${m.wynik} ${s.kluby[m.gosc].nazwa}${wygral ? (m.runda === "Finał baraży" ? (b.kontekst === "awans" ? " — AWANS!" : " — UTRZYMANIE!") : " — gracie dalej!") : (b.kontekst === "awans" ? " — koniec marzeń o awansie." : " — spadek.")}`);
+  // runda zakończona → finał (zwycięzcy w kolejności par; gospodarzem lepiej rozstawiony)
+  const runda = b.mecze.filter((x) => x.runda === m.runda);
+  if (m.runda === "Półfinał baraży" && runda.every((x) => x.zwyc)) {
+    const zw = runda.map((x) => x.zwyc!);
+    if (zw.length >= 2 && !b.mecze.some((x) => x.runda === "Finał baraży")) {
+      const fin = { runda: "Finał baraży", dom: zw[0], gosc: zw[1] } as { runda: string; dom: string; gosc: string; wynik?: string; zwyc?: string };
+      b.mecze.push(fin);
+      if (fin.dom !== s.mojKlub && fin.gosc !== s.mojKlub) rozegrajBarazAI(s, fin);
+      else wiadomosc(s, `⚔️ Finał baraży: ${s.kluby[fin.dom].nazwa} — ${s.kluby[fin.gosc].nazwa} (${fin.dom === s.mojKlub ? "u siebie" : "na wyjeździe"}).`);
+    }
+  }
+}
+/** Symulacja Twojego meczu barażowego (90' → dogrywka → karne). */
+export function symulujBarazGracza(s: StanGry) {
+  const m = barazDoRozegrania(s); if (!m) return;
+  const r = rozstrzygnij(silaKlubu(s, m.dom), silaKlubu(s, m.gosc), { dogrywka: true });
+  zapiszBaraz(s, r.gd, r.gg, r.dogrywka, r.karne);
 }

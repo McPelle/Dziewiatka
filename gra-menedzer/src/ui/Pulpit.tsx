@@ -6,6 +6,8 @@ import { Samouczek } from "./Samouczek";
 import { PodsumowanieSezonu } from "./PodsumowanieSezonu";
 import { KartaWyzwania } from "./Wyzwania";
 import { KafelkiPulpitu } from "./KafelkiPulpitu";
+import { MeczNaZywo } from "./MeczNaZywo";
+import { barazDoRozegrania, symulujBarazGracza, zapiszBaraz } from "../engine/sezon";
 import { nowiWKlubie, Prezentacja } from "./Prezentacja";
 import { prognozaMeczu } from "../engine/pogoda";
 import { useState } from "react";
@@ -35,6 +37,7 @@ const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Aler
 export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => void; pokazMecz: () => void }) {
   const [feta, setFeta] = useState<string | null>(null);
   const [magazyn, setMagazyn] = useState(false);
+  const [barazLive, setBarazLive] = useState<[string, string] | null>(null);
   const [widokKlub, setWidokKlub] = useState<string | null>(null);
   const [kariera, setKariera] = useState(false);
   const [scout, setScout] = useState<string | null>(null);
@@ -310,6 +313,24 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
 
       <KartaWyzwania s={s} />
       {s.koniecSezonu && (magazyn || s.magazynSezon !== s.sezon) && <PodsumowanieSezonu s={s} onZamknij={() => { s.magazynSezon = s.sezon; setMagazyn(false); odswiez(); }} />}
+      {s.koniecSezonu && s.barazeGracza?.sezon === s.sezon && (() => { const b = s.barazeGracza!; const nast = barazDoRozegrania(s); return (
+        <View style={[st.karta, { borderColor: K.czerwony }]}>
+          <Text style={st.naglowek}>⚔️ {b.nazwa}</Text>
+          {b.mecze.map((m, i) => { const moj = m.dom === s.mojKlub || m.gosc === s.mojKlub; return (
+            <View key={i} style={[st.wiersz, { gap: 6, paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: K.linia, backgroundColor: moj ? "rgba(255,206,71,0.08)" : "transparent" }]}>
+              <Text style={[st.maly, { width: 74, fontSize: 11 }]}>{m.runda.replace(" baraży", "")}</Text>
+              <Herb klub={s.kluby[m.dom]} rozmiar={18} /><Text style={[st.tekst, { flex: 1, fontSize: 12.5, fontWeight: moj ? "800" : "400" }]} numberOfLines={1}>{s.kluby[m.dom].nazwa} — {s.kluby[m.gosc].nazwa}</Text><Herb klub={s.kluby[m.gosc]} rozmiar={18} />
+              <Text style={{ color: m.zwyc ? (m.zwyc === s.mojKlub ? K.zielony : moj ? K.czerwony : K.tekst) : K.akcent, fontWeight: "800", fontSize: 12, minWidth: 54, textAlign: "right" }}>{m.wynik ?? "—"}</Text>
+            </View>); })}
+          {nast ? (<>
+            <Text style={[st.maly, { marginTop: 6 }]}>Jeden mecz u wyżej sklasyfikowanego · przy remisie dogrywka 2×15 i rzuty karne (regulamin PZPN/ZPN).</Text>
+            <View style={[st.wiersz, { gap: 8, marginTop: 8 }]}>
+              <Pressable style={[st.przycisk, { flex: 1, marginHorizontal: 0, marginTop: 0 }]} onPress={() => setBarazLive([nast.dom, nast.gosc])}><Text style={st.przyciskTekst}>📺 Na żywo</Text></Pressable>
+              <Pressable style={[st.przyciskMaly, { flex: 1, justifyContent: "center" }]} onPress={() => { symulujBarazGracza(s); odswiez(); }}><Text style={st.przyciskMalyTekst}>⏩ Symuluj</Text></Pressable>
+            </View></>) : <Text style={[st.maly, { marginTop: 6 }]}>Baraże zakończone — rozstrzygnięcie wejdzie w życie przy zakończeniu sezonu.</Text>}
+        </View>); })()}
+      {barazLive && (() => { const nast = barazDoRozegrania(s); return <MeczNaZywo s={s} para={barazLive} puchar={{ nazwa: `${s.barazeGracza?.nazwa ?? "Baraż"} — ${nast?.runda ?? ""}`, dogrywka: true, neutralny: false }} onAnuluj={() => setBarazLive(null)}
+        onKoniec={(m) => { setBarazLive(null); zapiszBaraz(s, m.gd, m.gg, m.polowa >= 3, m.karne?.zwyciezca ? [m.karne.d.filter(Boolean).length, m.karne.g.filter(Boolean).length] : undefined); odswiez(); }} />; })()}
       {s.koniecSezonu && <Pressable style={[st.przyciskMaly, { marginHorizontal: 12, marginTop: 10 }]} onPress={() => setMagazyn(true)}><Text style={st.przyciskMalyTekst}>📺 Magazyn — podsumowanie sezonu</Text></Pressable>}
       {s.koniecSezonu ? (
         <Pressable style={st.przycisk} onPress={() => { nowySezon(s); const h = s.historia?.[s.historia.length - 1]; if (h && (h.wynik === "awans" || h.wynik === "mistrz" || h.puchar) && s.fetaSezon !== h.sezon) { s.fetaSezon = h.sezon; setFeta(h.wynik === "mistrz" ? "MISTRZOSTWO" : h.wynik === "awans" ? "AWANS" : h.puchar === "glowny" ? "PUCHAR POLSKI" : "PUCHAR ZPN"); } odswiez(); }}>

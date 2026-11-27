@@ -6,9 +6,11 @@ import type { Klub, StanGry } from "../../engine/types";
 import type { Budowa } from "../../engine/budowy";
 import { barwyKlubu } from "../../data/barwy";
 import { podzialTrybun } from "../WidokStadionu";
+import { ksztaltStadionu, type KsztaltStadionu, type TrybunaKsztalt } from "../../data/ksztaltyStadionow";
+import { DL, SZ, Geo, kolor, zbudujTrybuny, type MiejscaKibicow, type Strona, type Trybuny3D } from "./trybuny3d";
+import { typOtoczenia, zbudujOtoczenie } from "./otoczenie3d";
 
-export const DL = 105, SZ = 68; // wymiary boiska (m)
-type Strona = "S" | "N" | "W" | "E";
+export { DL, SZ };
 
 function rng(seed: string) {
   let h = 2166136261;
@@ -75,7 +77,7 @@ export function bramka(strona: -1 | 1, siatka: boolean): THREE.Group {
   return g;
 }
 
-function bandy(sponsorzy: string[], led: boolean): THREE.Group {
+function bandy(sponsorzy: string[], led: boolean, odl = 4): THREE.Group {
   const g = new THREE.Group();
   const tex = (tekst: string, i: number) => {
     const c = canvas(512, 64), x = c.getContext("2d")!;
@@ -93,13 +95,33 @@ function bandy(sponsorzy: string[], led: boolean): THREE.Group {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.9, 0.15), mat); m.position.set(x, 0.45, z); m.rotation.y = rot; m.castShadow = true; g.add(m); i++;
   };
   const W = 10;
-  for (let x = -DL / 2 + 5; x <= DL / 2 - 5; x += W) { segment(x, -SZ / 2 - 4, 0, W - 0.2); segment(x, SZ / 2 + 4, Math.PI, W - 0.2); }
+  for (let x = -DL / 2 + 5; x <= DL / 2 - 5; x += W) { segment(x, -SZ / 2 - odl, 0, W - 0.2); segment(x, SZ / 2 + odl, Math.PI, W - 0.2); }
   for (const sx of [-1, 1]) for (const z of [-24, -14, 14, 24]) segment(sx * (DL / 2 + 4.5), z, sx * Math.PI / 2, W - 0.2);
   return g;
 }
 
 export interface OpcjeStadionu { noc: boolean; snieg: boolean; deszcz: boolean; widzowie: number; budowy?: Budowa[]; lekka?: boolean }
 export interface Stadion3D { grupa: THREE.Group; kibice?: THREE.InstancedMesh; kibiceBaza: Float32Array; reflektory: THREE.Object3D[]; siatki: THREE.Mesh[]; aktualizuj: (t: number, emocje: number) => void }
+
+/** Typowy stadion (kluby bez prawdziwego kształtu): trybuny wg pojemności — jak dotąd (podzialTrybun). */
+function ksztaltOgolny(klub: Klub, kol1: string, kol2: string): KsztaltStadionu {
+  const { strony, narozniki } = podzialTrybun(klub.pojemnosc);
+  const trybuny: Partial<Record<Strona, TrybunaKsztalt>> = {};
+  for (const st of Object.keys(strony) as Strona[]) {
+    const m = strony[st]!, pelna = st === "S" || st === "N" ? DL + 4 : SZ + 4;
+    const dl = m < 1200 ? Math.min(pelna, 12 + m * 0.05) : pelna;
+    trybuny[st] = { u: m, d: dl / pelna, p: klub.pojemnosc >= 20000 && (st === "S" || st === "N") ? 2 : 1, stara: klub.poziom >= 6 };
+  }
+  return { trybuny, narozniki: narozniki > 0, krzeselka: [kol1, kol2], wzor: "pasy", opis: "typowy stadion wg pojemności" };
+}
+/** Dachy: z kształtu stadionu + rozbudowa zadaszenia w obiektach klubu (1 = główna, 2 = wzdłuż boiska, 3+ = wszystkie). */
+function ksztaltZDachami(ks: KsztaltStadionu, klub: Klub): KsztaltStadionu {
+  const zad = klub.obiekty?.zadaszenie ?? 0;
+  const zadaszone: Strona[] = zad >= 3 ? ["S", "N", "W", "E"] : zad === 2 ? ["S", "N"] : zad === 1 ? ["S"] : [];
+  const trybuny: Partial<Record<Strona, TrybunaKsztalt>> = {};
+  for (const st of Object.keys(ks.trybuny) as Strona[]) trybuny[st] = { ...ks.trybuny[st]!, dach: !!ks.trybuny[st]!.dach || zadaszone.includes(st) };
+  return { ...ks, trybuny };
+}
 
 /** Buduje cały stadion z otoczeniem. */
 export function zbudujStadion(s: StanGry | null, klub: Klub, o: OpcjeStadionu): Stadion3D {
@@ -108,6 +130,9 @@ export function zbudujStadion(s: StanGry | null, klub: Klub, o: OpcjeStadionu): 
   const [kol1, kol2] = barwyKlubu(klub.nazwa);
   const poj = klub.pojemnosc;
   const nisko = klub.poziom >= 7;
+  const ksReal = ksztaltStadionu(klub.nazwa);
+  const ks = ksztaltZDachami(ksReal ?? ksztaltOgolny(klub, kol1, kol2), klub);
+  const matBeton = new THREE.MeshStandardMaterial({ color: 0x8d8f8a, roughness: 0.95 });
   // teren
   const teren = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshStandardMaterial({ color: o.snieg ? 0xe8eef2 : 0x3d6b35, roughness: 1 }));
   teren.rotation.x = -Math.PI / 2; teren.position.y = -0.02; teren.receiveShadow = true; grupa.add(teren);
@@ -132,103 +157,129 @@ export function zbudujStadion(s: StanGry | null, klub: Klub, o: OpcjeStadionu): 
   }
   // bandy (sponsorzy) — od IV ligi wzwyż; niżej barierki
   const sponsorzy = s?.sponsorzy?.map((x) => x.nazwa) ?? [];
-  if (!nisko) grupa.add(bandy(sponsorzy, klub.poziom <= 3));
+  if (!nisko) grupa.add(bandy(sponsorzy, klub.poziom <= 3, ks.bieznia ? 1.9 : 4));
   else {
-    const mat = new THREE.MeshStandardMaterial({ color: 0x9aa0a6, metalness: 0.6, roughness: 0.4 });
-    for (const z of [-SZ / 2 - 3, SZ / 2 + 3]) { const b = new THREE.Mesh(new THREE.BoxGeometry(DL + 6, 0.06, 0.06), mat); b.position.set(0, 1.05, z); grupa.add(b);
-      for (let x = -DL / 2 - 3; x <= DL / 2 + 3; x += 3) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.05), mat); p.position.set(x, 0.52, z); grupa.add(p); } }
+    // barierki z rur (jedna scalona siatka zamiast ~80 osobnych)
+    const g = new Geo(), rura = kolor(0x9aa0a6);
+    for (const z of [-SZ / 2 - 3, SZ / 2 + 3]) {
+      g.box(0, 1.05, z, DL + 6, 0.06, 0.06, rura);
+      for (let x = -DL / 2 - 3; x <= DL / 2 + 3; x += 3) g.box(x, 0.52, z, 0.05, 1.05, 0.05, rura);
+    }
+    grupa.add(new THREE.Mesh(g.zbuduj(), new THREE.MeshStandardMaterial({ vertexColors: true, metalness: 0.6, roughness: 0.4 })));
   }
-  // ——— trybuny ———
-  const { strony, narozniki } = podzialTrybun(poj);
-  const zad = klub.obiekty?.zadaszenie ?? 0;
-  const zadaszone: Strona[] = zad >= 3 ? ["S", "N", "W", "E"] : zad === 2 ? ["S", "N"] : zad === 1 ? ["S"] : [];
-  const kibicePoz: number[] = [];
-  const matSiedz = [new THREE.MeshStandardMaterial({ color: kol1, roughness: 0.7 }), new THREE.MeshStandardMaterial({ color: kol2, roughness: 0.7 })];
-  const matBeton = new THREE.MeshStandardMaterial({ color: 0x8d8f8a, roughness: 0.95 });
-  const trybuna = (st: Strona, miejsca: number) => {
-    const dlugaPelna = st === "S" || st === "N" ? DL + 6 : SZ + 4;
-    const dl = miejsca < 1200 ? Math.min(dlugaPelna, 12 + miejsca * 0.05) : dlugaPelna;
-    const rzedy = Math.max(2, Math.min(42, Math.round(miejsca / (dl * 2.0))));
-    const gl = 0.8, wys = 0.42, odl = st === "S" || st === "N" ? SZ / 2 + 6 : DL / 2 + 6;
-    const g = new THREE.Group();
-    for (let i = 0; i < rzedy; i++) {
-      const stopien = new THREE.Mesh(new THREE.BoxGeometry(dl, wys * (i + 1), gl), i % 6 === 5 ? matBeton : matSiedz[Math.floor(i / 6) % 2]);
-      stopien.position.set(0, (wys * (i + 1)) / 2, i * gl + gl / 2); stopien.castShadow = !o.lekka && i % 3 === 0; stopien.receiveShadow = true; g.add(stopien);
-      for (let x = -dl / 2 + 0.3; x < dl / 2; x += 0.55) kibicePoz.push(0, 0, 0, x, wys * (i + 1) + 0.5, i * gl + gl / 2, st === "S" ? 0 : st === "N" ? 1 : st === "W" ? 2 : 3, odl);
-    }
-    const tyl = new THREE.Mesh(new THREE.BoxGeometry(dl, wys * rzedy + 1.5, 0.4), matBeton); tyl.position.set(0, (wys * rzedy + 1.5) / 2, rzedy * gl + 0.2); tyl.castShadow = true; g.add(tyl);
-    if (rzedy > 28) { const p2 = new THREE.Mesh(new THREE.BoxGeometry(dl, 0.6, 1.2), matBeton); p2.position.set(0, wys * 18, 18 * gl); g.add(p2); }
-    if (zadaszone.includes(st)) {
-      const gleb = rzedy * gl + 2, h = wys * rzedy + 4;
-      const dach = new THREE.Mesh(new THREE.BoxGeometry(dl + 1, 0.3, gleb * 0.9), new THREE.MeshStandardMaterial({ color: 0xdfe5e8, metalness: 0.5, roughness: 0.35, transparent: true, opacity: 0.92 }));
-      dach.position.set(0, h, gleb * 0.45 + 1); dach.rotation.x = -0.06; dach.castShadow = true; g.add(dach);
-      for (let x = -dl / 2; x <= dl / 2; x += Math.max(12, dl / 6)) { const sl = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, h), matBeton); sl.position.set(x, h / 2, rzedy * gl + 0.4); g.add(sl); }
-    }
-    // ustaw trybunę na właściwym boku (stopnie rosną od boiska na zewnątrz)
-    if (st === "S") { g.position.set(0, 0, odl); }
-    else if (st === "N") { g.rotation.y = Math.PI; g.position.set(0, 0, -odl); }
-    else if (st === "W") { g.rotation.y = -Math.PI / 2; g.position.set(-odl, 0, 0); }
-    else { g.rotation.y = Math.PI / 2; g.position.set(odl, 0, 0); }
-    grupa.add(g);
-    return g;
-  };
+  // ——— trybuny: prawdziwy kształt stadionu (#31) albo typowy wg pojemności ———
+  const matTryb = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, side: THREE.DoubleSide });
+  const zrodla: MiejscaKibicow[] = [];
+  let tryb: Trybuny3D | undefined;
   if (poj < 150) {
     // klasa B: ławeczki i kilka krzesełek przy linii
-    for (let i = 0; i < 4; i++) { const l = new THREE.Mesh(new THREE.BoxGeometry(5, 0.45, 0.4), new THREE.MeshStandardMaterial({ color: 0x8a5a2b })); l.position.set(-15 + i * 10, 0.45, SZ / 2 + 6); grupa.add(l); for (let x = -2; x <= 2; x += 0.6) kibicePoz.push(0, 0, 0, -15 + i * 10 + x, 1.0, 0, 9, 0); }
-  } else for (const st of Object.keys(strony) as Strona[]) trybuna(st, strony[st]!);
-  if (narozniki > 0) for (const [x, z, rot] of [[-1, -1, Math.PI * 0.75], [1, -1, -Math.PI * 0.75], [-1, 1, Math.PI * 0.25], [1, 1, -Math.PI * 0.25]] as [number, number, number][]) {
-    const n = new THREE.Mesh(new THREE.BoxGeometry(26, 10, 14), matSiedz[0]); n.position.set(x * (DL / 2 + 12), 5, z * (SZ / 2 + 12)); n.rotation.y = rot; n.castShadow = true; grupa.add(n);
+    const lawkiPoz: number[] = [];
+    const g = new Geo(), drewno = kolor(o.snieg ? 0xb8a890 : 0x8a5a2b), noga = kolor(0x555555);
+    for (let i = 0; i < 4; i++) {
+      const x0 = -15 + i * 10;
+      g.box(x0, 0.45, SZ / 2 + 6, 5, 0.08, 0.4, drewno);
+      for (const dx of [-2.2, 2.2]) g.box(x0 + dx, 0.2, SZ / 2 + 6, 0.08, 0.4, 0.35, noga);
+      for (let x = -2; x <= 2; x += 0.6) lawkiPoz.push(x0 + x, 1.0, SZ / 2 + 6.4);
+    }
+    const m = new THREE.Mesh(g.zbuduj(), matTryb); m.castShadow = !o.lekka; grupa.add(m);
+    zrodla.push({ klucz: "L", dolne: lawkiPoz, gorne: [] });
+  } else {
+    tryb = zbudujTrybuny(ks, poj, matTryb, { lekka: !!o.lekka, snieg: o.snieg, kol1, kol2, y0: klub.poziom <= 3 ? 1.2 : nisko ? 0.5 : 0.9 }, Math.floor(r() * 1e6));
+    grupa.add(tryb.grupa); zrodla.push(...tryb.miejsca);
   }
-  // ——— kibice (instancje) ———
-  let kibice: THREE.InstancedMesh | undefined;
-  const wsz = kibicePoz.length / 8;
+  const strony = tryb?.strony ?? {};
+  // ——— kibice (instancje; osobno dla każdej trybuny, by chować je razem z trybuną przy kamerze „na trybunie") ———
+  const grupyKibicow: { im: THREE.InstancedMesh; baza: Float32Array }[] = [];
+  const wsz = zrodla.reduce((a, z) => a + (z.dolne.length + z.gorne.length) / 3, 0);
   const ile = Math.min(o.lekka ? 1500 : 6000, Math.round(wsz * Math.min(1, o.widzowie / Math.max(1, poj))));
-  const kibiceBaza = new Float32Array(ile * 3);
   if (ile > 0) {
-    kibice = new THREE.InstancedMesh(new THREE.BoxGeometry(0.42, 0.9, 0.3), new THREE.MeshStandardMaterial({ roughness: 0.9 }), ile);
+    const frac = ile / wsz;
+    const geoK = new THREE.BoxGeometry(0.42, 0.9, 0.3), matK = new THREE.MeshStandardMaterial({ roughness: 0.9 });
     const mtx = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), sc = new THREE.Vector3(1, 1, 1), col = new THREE.Color();
     const kolory = [kol1, kol2, "#222222", "#3a4a6a", "#d0d0d0", "#7a2a2a", kol1];
-    const wybrane = new Set<number>(); while (wybrane.size < ile) wybrane.add(Math.floor(r() * wsz));
-    let k = 0;
-    for (const idx of wybrane) {
-      const b = idx * 8, lx = kibicePoz[b + 3], ly = kibicePoz[b + 4], lz = kibicePoz[b + 5], st = kibicePoz[b + 6], odl = kibicePoz[b + 7];
-      if (st === 0) v.set(lx, ly, odl + lz); else if (st === 1) v.set(-lx, ly, -odl - lz); else if (st === 2) v.set(-odl - lz, ly, -lx); else if (st === 3) v.set(odl + lz, ly, lx); else v.set(lx, ly, SZ / 2 + 7.5);
-      v.x += (r() - 0.5) * 0.15;
-      kibiceBaza[k * 3] = v.x; kibiceBaza[k * 3 + 1] = v.y; kibiceBaza[k * 3 + 2] = v.z;
-      mtx.compose(v, q, sc); kibice.setMatrixAt(k, mtx); kibice.setColorAt(k, col.set(kolory[Math.floor(r() * kolory.length)])); k++;
+    const wybierz = (arr: number[]): number[] => {
+      const n = arr.length / 3, k = Math.min(n, Math.round(n * frac)), idx = Array.from({ length: n }, (_, i) => i);
+      for (let i = 0; i < k; i++) { const j = i + Math.floor(r() * (n - i)); const t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
+      return idx.slice(0, k);
+    };
+    for (const z of zrodla) {
+      const dol = wybierz(z.dolne), gor = wybierz(z.gorne), n = dol.length + gor.length;
+      if (!n) continue;
+      const im = new THREE.InstancedMesh(geoK, matK, n), baza = new Float32Array(n * 3);
+      let k = 0;
+      for (const [arr, lista] of [[z.dolne, dol], [z.gorne, gor]] as [number[], number[]][]) for (const i of lista) {
+        v.set(arr[i * 3] + (r() - 0.5) * 0.15, arr[i * 3 + 1], arr[i * 3 + 2]);
+        baza[k * 3] = v.x; baza[k * 3 + 1] = v.y; baza[k * 3 + 2] = v.z;
+        mtx.compose(v, q, sc); im.setMatrixAt(k, mtx); im.setColorAt(k, col.set(kolory[Math.floor(r() * kolory.length)])); k++;
+      }
+      const nDol = dol.length, ukryj = z.ukryj;
+      if (ukryj) im.onBeforeRender = (_r, _s, cam) => { const u = ukryj(cam); im.count = u === 2 ? 0 : u === 1 ? nDol : n; };
+      im.castShadow = false; grupa.add(im); grupyKibicow.push({ im, baza });
     }
-    kibice.castShadow = false; grupa.add(kibice);
   }
-  // ——— maszty oświetleniowe ———
+  const glowni = grupyKibicow.slice().sort((a, b) => b.baza.length - a.baza.length)[0];
+  const kibice = glowni?.im, kibiceBaza = glowni?.baza ?? new Float32Array(0);
+  // ——— oświetlenie: maszty w narożnikach albo reflektory pod dachem zamkniętej misy ———
   const reflektory: THREE.Object3D[] = [];
   const oswietlenie = klub.oswietlenie ?? klub.poziom <= 3;
-  if (oswietlenie) for (const x of [-1, 1]) for (const z of [-1, 1]) {
-    const h = klub.poziom <= 2 ? 40 : 26;
-    const maszt = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.6, h), new THREE.MeshStandardMaterial({ color: 0xb8bcc0, metalness: 0.7, roughness: 0.3 }));
-    const px = x * (DL / 2 + 16), pz = z * (SZ / 2 + 16);
-    maszt.position.set(px, h / 2, pz); maszt.castShadow = true; grupa.add(maszt);
-    const panel = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 0.5), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: new THREE.Color(o.noc ? 0xfff6d8 : 0x000000), emissiveIntensity: o.noc ? 3 : 0 }));
-    panel.position.set(px, h + 1, pz); panel.lookAt(0, 0, 0); grupa.add(panel); reflektory.push(panel);
+  if (tryb?.swiatlaDach) {
+    const m = tryb.swiatlaDach.material as THREE.MeshStandardMaterial;
+    if (oswietlenie && o.noc) { m.emissive.set(0xfff6d8); m.emissiveIntensity = 3; }
+    reflektory.push(tryb.swiatlaDach);
+  } else if (oswietlenie) {
+    const maszty = tryb?.maszty.length ? tryb.maszty : [-1, 1].flatMap((x) => [-1, 1].map((z) => ({ x: x * (DL / 2 + 16), z: z * (SZ / 2 + 16), h: 26 })));
+    const matMaszt = new THREE.MeshStandardMaterial({ color: 0xb8bcc0, metalness: 0.7, roughness: 0.3 });
+    const matPanel = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: new THREE.Color(o.noc ? 0xfff6d8 : 0x000000), emissiveIntensity: o.noc ? 3 : 0 });
+    for (const mp of maszty) {
+      const h = Math.max(mp.h, klub.poziom <= 2 ? 40 : 26);
+      const maszt = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.6, h), matMaszt);
+      maszt.position.set(mp.x, h / 2, mp.z); maszt.castShadow = !o.lekka; grupa.add(maszt);
+      const panel = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 0.5), matPanel);
+      panel.position.set(mp.x, h + 1, mp.z); panel.lookAt(0, 0, 0); grupa.add(panel); reflektory.push(panel);
+    }
   }
   // ——— tablica wyników ———
   const elektr = klub.poziom <= 4;
   const tab = new THREE.Mesh(new THREE.BoxGeometry(elektr ? 12 : 5, elektr ? 5 : 2.4, 0.4), new THREE.MeshStandardMaterial({ color: elektr ? 0x111111 : 0x1d3d1d, emissive: elektr ? new THREE.Color(0x223344) : new THREE.Color(0), emissiveIntensity: 0.6 }));
-  tab.position.set(-(DL / 2 + (strony.W ? 26 : 10)), elektr ? 14 : 2.6, 0); tab.rotation.y = Math.PI / 2; tab.name = "tablica"; grupa.add(tab);
-  if (!elektr) { const n = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2), matBeton); n.position.set(tab.position.x, 1, 0); grupa.add(n); }
-  // ——— otoczenie: miasto albo wieś ———
-  const miasto = klub.poziom <= 5 || poj >= 3000;
-  const matDom = [0xd8cfc0, 0xb9a48a, 0xe6e0d4, 0x9fa7ad, 0xc77b55].map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 }));
-  for (let i = 0; i < (o.lekka ? 25 : 60); i++) {
-    const kat = r() * Math.PI * 2, d = 120 + r() * 140;
-    const x = Math.cos(kat) * d, z = Math.sin(kat) * d;
-    if (miasto && r() < 0.6) { const h = 12 + r() * 30; const b = new THREE.Mesh(new THREE.BoxGeometry(14 + r() * 10, h, 10 + r() * 8), matDom[Math.floor(r() * 4)]); b.position.set(x, h / 2, z); b.rotation.y = kat; grupa.add(b); }
-    else if (r() < 0.5) { const dom = new THREE.Group(); const sc = new THREE.Mesh(new THREE.BoxGeometry(9, 6, 8), matDom[Math.floor(r() * 5)]); sc.position.y = 3; const dach = new THREE.Mesh(new THREE.ConeGeometry(7, 4, 4), new THREE.MeshStandardMaterial({ color: 0x8a3b2a })); dach.position.y = 8; dach.rotation.y = Math.PI / 4; dom.add(sc, dach); dom.position.set(x, 0, z); grupa.add(dom); }
-    else { const dr = new THREE.Mesh(new THREE.ConeGeometry(3 + r() * 2, 9 + r() * 6, 7), new THREE.MeshStandardMaterial({ color: o.snieg ? 0xdfe8e4 : 0x23502a, roughness: 1 })); dr.position.set(x, 5, z); dr.castShadow = !o.lekka; grupa.add(dr); }
+  const tp = tryb?.tablica;
+  if (tp && tp.zawieszona) tab.position.set(tp.x, tp.y, tp.z);
+  else if (tp && tp.y > 0) {
+    tab.position.set(tp.x, tp.y + (elektr ? 3 : 1.5), tp.z);
+    for (const dz of [-3, 3]) { const n = new THREE.Mesh(new THREE.BoxGeometry(0.3, tab.position.y, 0.3), matBeton); n.position.set(tp.x - 0.4, tab.position.y / 2, tp.z + (elektr ? dz : dz / 2.5)); grupa.add(n); }
+  } else {
+    tab.position.set(tp ? tp.x : -(DL / 2 + 10), elektr ? 14 : 2.6, 0);
+    const n = new THREE.Mesh(new THREE.CylinderGeometry(elektr ? 0.3 : 0.08, elektr ? 0.3 : 0.08, tab.position.y), matBeton); n.position.set(tab.position.x - 0.3, tab.position.y / 2, 0); grupa.add(n);
   }
-  if (!miasto) { // wiejski kościół na horyzoncie
-    const k = new THREE.Group(); const naw = new THREE.Mesh(new THREE.BoxGeometry(10, 9, 22), matDom[2]); naw.position.y = 4.5; const wie = new THREE.Mesh(new THREE.BoxGeometry(5, 22, 5), matDom[2]); wie.position.set(0, 11, -12);
-    const hel = new THREE.Mesh(new THREE.ConeGeometry(3.6, 8, 4), new THREE.MeshStandardMaterial({ color: 0x3a5a45, metalness: 0.4 })); hel.position.set(0, 26, -12); hel.rotation.y = Math.PI / 4; k.add(naw, wie, hel); k.position.set(-150, 0, -170); grupa.add(k);
+  tab.rotation.y = Math.PI / 2; tab.name = "tablica"; grupa.add(tab);
+  // ——— małe boisko (niższe ligi): ogrodzenie z siatki, budynek klubowy z szatniami ———
+  if (klub.poziom >= 6 || poj < 1500) {
+    const g = new Geo(), slup = kolor(0x4f6b52), mur = kolor([0xf0ead8, 0xe8e0c8, 0xdfe6e0][Math.floor(r() * 3)]), dachK = kolor(o.snieg ? 0xeef2f5 : 0x5a5d62);
+    const zS = Math.max(SZ / 2 + 16, SZ / 2 + 6 + (strony.S ?? 0) + 5), zN = Math.max(SZ / 2 + 14, SZ / 2 + 6 + (strony.N ?? 0) + 5), xE = DL / 2 + 14 + (strony.E ?? 0), xW = DL / 2 + 14 + (strony.W ?? 0);
+    const pts: [number, number][] = [[-xW, -zN], [xE, -zN], [xE, zS], [-xW, zS]];
+    const siatkaPos: number[] = [], siatkaUv: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      const [x0, z0] = pts[i], [x1, z1] = pts[(i + 1) % 4], L = Math.hypot(x1 - x0, z1 - z0), H = 2.4;
+      for (let s = 0; s <= L; s += 3) g.box(x0 + ((x1 - x0) * s) / L, H / 2, z0 + ((z1 - z0) * s) / L, 0.08, H, 0.08, slup);
+      siatkaPos.push(x0, 0, z0, x1, 0, z1, x1, H, z1, x0, 0, z0, x1, H, z1, x0, H, z0);
+      siatkaUv.push(0, 0, L / 1.2, 0, L / 1.2, H / 1.2, 0, 0, L / 1.2, H / 1.2, 0, H / 1.2);
+    }
+    // budynek klubowy (szatnie) przy narożniku trybuny głównej
+    const bx = -(DL / 2 + 4), bz = Math.min(zS - 7, SZ / 2 + 12);
+    g.box(bx, 2, bz, 16, 4, 8, mur); g.box(bx, 4.15, bz, 16.6, 0.3, 8.6, dachK);
+    g.box(bx + 3, 1.1, bz - 4.02, 1.2, 2.2, 0.06, kolor(0x6b4a2e));
+    for (const dx of [-5, -2, 6]) g.box(bx + dx, 2.4, bz - 4.02, 1.6, 1.0, 0.06, kolor(0x34404c));
+    // maszt z flagą klubu
+    g.box(bx + 9.5, 4, bz - 2, 0.12, 8, 0.12, kolor(0xdddddd)); g.box(bx + 10.5, 7.3, bz - 2, 2, 1.2, 0.04, kolor(kol1)); g.box(bx + 10.5, 6.7, bz - 2, 2, 0.6, 0.05, kolor(kol2));
+    const m = new THREE.Mesh(g.zbuduj(), matTryb); m.castShadow = !o.lekka; grupa.add(m);
+    const cv = canvas(32, 32), x = cv.getContext("2d")!; x.strokeStyle = "rgba(70,95,75,0.9)"; x.lineWidth = 2;
+    x.beginPath(); x.moveTo(0, 16); x.lineTo(16, 0); x.lineTo(32, 16); x.lineTo(16, 32); x.closePath(); x.stroke();
+    const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    const sg = new THREE.BufferGeometry(); sg.setAttribute("position", new THREE.Float32BufferAttribute(siatkaPos, 3)); sg.setAttribute("uv", new THREE.Float32BufferAttribute(siatkaUv, 2)); sg.computeVertexNormals();
+    grupa.add(new THREE.Mesh(sg, new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: 0.3, side: THREE.DoubleSide, depthWrite: false })));
   }
+  // ——— otoczenie: metropolia / miasto / wieś (#32) ———
+  const typ = typOtoczenia(klub, s, ksReal);
+  grupa.add(zbudujOtoczenie(typ, r, (tryb?.zasieg ?? 75) + 18, matTryb, { noc: o.noc, snieg: o.snieg, lekka: !!o.lekka }, 70 + Math.sqrt(poj) * 0.9)); // orbita kamery menu (Stadion3DMenu/Widok)
   // ——— place budowy: ogrodzenie, dźwig, robotnicy ———
   for (const b of o.budowy ?? []) {
     const bud = new THREE.Group();
@@ -247,13 +298,13 @@ export function zbudujStadion(s: StanGry | null, klub: Klub, o: OpcjeStadionu): 
   const mtx = new THREE.Matrix4(), v = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3(1, 1, 1);
   const aktualizuj = (t: number, emocje: number) => {
     // kibice: podskakują i falują przy emocjach (gol, groźna akcja)
-    if (kibice && emocje > 0.05) {
-      const n = kibice.count;
+    if (emocje > 0.05) for (const { im, baza } of grupyKibicow) {
+      const n = baza.length / 3;
       for (let i = 0; i < n; i += 1) {
         const skok = Math.max(0, Math.sin(t * 9 + i * 1.7)) * 0.45 * emocje;
-        v.set(kibiceBaza[i * 3], kibiceBaza[i * 3 + 1] + skok, kibiceBaza[i * 3 + 2]); mtx.compose(v, q, sc); kibice.setMatrixAt(i, mtx);
+        v.set(baza[i * 3], baza[i * 3 + 1] + skok, baza[i * 3 + 2]); mtx.compose(v, q, sc); im.setMatrixAt(i, mtx);
       }
-      kibice.instanceMatrix.needsUpdate = true;
+      im.instanceMatrix.needsUpdate = true;
     }
     grupa.traverse((x) => { if (x.name === "wysiegnik") x.rotation.y = Math.sin(t * 0.15) * 0.6; if (x.name === "robotnik") x.position.y = Math.abs(Math.sin(t * 3 + x.id)) * 0.08; });
   };
@@ -290,7 +341,7 @@ export function uproscMaterialy(obj: THREE.Object3D) {
     const mesh = o as THREE.Mesh; const m = mesh.material as THREE.Material | THREE.Material[] | undefined;
     if (!m || Array.isArray(m) || !(m instanceof THREE.MeshStandardMaterial)) return;
     let n = cache.get(m);
-    if (!n) { n = new THREE.MeshLambertMaterial({ color: m.color, map: m.map, transparent: m.transparent, opacity: m.opacity, side: m.side, emissive: m.emissive, emissiveIntensity: m.emissiveIntensity, emissiveMap: m.emissiveMap, depthWrite: m.depthWrite }); cache.set(m, n); }
+    if (!n) { n = new THREE.MeshLambertMaterial({ color: m.color, vertexColors: m.vertexColors, map: m.map, transparent: m.transparent, opacity: m.opacity, alphaTest: m.alphaTest, side: m.side, emissive: m.emissive, emissiveIntensity: m.emissiveIntensity, emissiveMap: m.emissiveMap, depthWrite: m.depthWrite }); cache.set(m, n); }
     mesh.material = n;
   });
 }

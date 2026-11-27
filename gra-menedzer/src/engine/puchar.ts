@@ -1,3 +1,5 @@
+import { lambdy, rozstrzygnij, seriaKarnych } from "./rozstrzygniecie";
+import { silaKlubu } from "./swiat";
 // Puchar — jak w Polsce: najpierw wojewódzki (regionalny) Puchar Polski dla amatorów,
 // jego zdobywca awansuje do głównego (centralnego) Pucharu Polski, gdzie grają zawodowcy
 // (Ekstraklasa, I–II liga). Kluby zawodowe startują od razu w fazie głównej.
@@ -215,18 +217,12 @@ export function nowyPuchar(s: StanGry): Puchar {
   };
 }
 
-/** Szybkie rozegranie pary pucharowej (bez symulacji minuta-po-minucie) — zwycięzca wg siły/renomy + wynik. */
-function rozegrajPare(s: StanGry, aId: string, bId: string): { winner: string; tekst: string } {
-  const ra = s.kluby[aId]?.renoma ?? 0.3, rb = s.kluby[bId]?.renoma ?? 0.3;
-  const pWin = Math.max(0.15, Math.min(0.85, 0.5 + (ra - rb) * 1.1));
-  const aWin = szansa(pWin);
-  const silniej = aWin ? ra : rb, slabiej = aWin ? rb : ra;
-  let gW = losInt(1, 2) + (silniej - slabiej > 0.2 ? losInt(0, 2) : 0);
-  let gP = losInt(0, 1);
-  if (gW <= gP) gW = gP + 1;
-  const karne = gW === gP + 1 && szansa(0.18) && silniej - slabiej < 0.1;
-  const tekst = aWin ? `${gW}:${gP}${karne ? " k." : ""}` : `${gP}:${gW}${karne ? " k." : ""}`;
-  return { winner: aWin ? aId : bId, tekst };
+/** Szybkie rozegranie pary pucharowej (bez symulacji minuta-po-minucie): 90 min wg siły składów (+ renoma),
+ *  przy remisie dogrywka (gdy regulamin rundy ją przewiduje) i seria rzutów karnych — z pełnym zapisem wyniku. */
+function rozegrajPare(s: StanGry, aId: string, bId: string, dogrywka = true, neutralny = false): { winner: string; tekst: string } {
+  const sila = (id: string) => (s.kluby[id] ? silaKlubu(s, id) : 40) + (s.kluby[id]?.renoma ?? 0.3) * 6;
+  const r = rozstrzygnij(sila(aId), sila(bId), { dogrywka, neutralny });
+  return { winner: r.zwyciezca === "dom" ? aId : bId, tekst: r.tekst };
 }
 
 /** Losuje rywala pucharowego z właściwej puli (regionalny = amatorzy regionu; główny = zawodowcy, coraz mocniejsi). */
@@ -319,13 +315,19 @@ export function rundaPucharu(s: StanGry): WynikPucharu {
     }
   }
   else if (w.gd === w.gg) {
-    const przewaga = Math.max(0.3, Math.min(0.7, 0.5 + (s.kluby[s.mojKlub].renoma - s.kluby[rywalId].renoma) * 0.4));
-    const wygramy = szansa(przewaga);
-    const dodaj = (my: boolean) => { if (uSiebie) w = { ...w, gd: w.gd + (my ? 1 : 0), gg: w.gg + (my ? 0 : 1) }; else w = { ...w, gg: w.gg + (my ? 1 : 0), gd: w.gd + (my ? 0 : 1) }; };
     // Regulaminy: w fazie centralnej dogrywka zawsze; w ZPN — zależnie od związku i rundy (inaczej od razu karne).
     const mozeDogrywka = p.faza === "glowny" || dogrywkaWRundzie(s, p.runda);
-    if (mozeDogrywka && szansa(0.4)) { dogrywka = true; dodaj(wygramy); } // gol w dogrywce rozstrzyga
-    else { karne = true; dodaj(wygramy); }                               // rzuty karne
+    const sD = silaKlubu(s, w.dom), sG = silaKlubu(s, w.gosc);
+    if (mozeDogrywka) { // dogrywka 2×15 (IFAB) — gole liczone jak w meczu, z mniejszą intensywnością
+      dogrywka = true; const [lD, lG] = lambdy(sD, sG, !finalGlowny);
+      const pois = (l: number) => { const L = Math.exp(-l); let k = 0, q = 1; do { k++; q *= Math.random(); } while (q > L); return k - 1; };
+      w = { ...w, gd: w.gd + pois(lD / 3 * 0.9), gg: w.gg + pois(lG / 3 * 0.9) };
+    }
+    if (w.gd === w.gg) { // seria rzutów karnych: 5 + nagła śmierć
+      const ser = seriaKarnych(sD, sG); karne = true;
+      const a = ser.d.filter(Boolean).length, b = ser.g.filter(Boolean).length; karneTxt = ` (k. ${uSiebie ? a : b}:${uSiebie ? b : a})`;
+      if (ser.zwyciezca === "dom") w = { ...w, gd: w.gd + 1 }; else w = { ...w, gg: w.gg + 1 };
+    }
   }
   p.ostatniMecz = w;
   // Frekwencja pucharowa: gdy gościsz u siebie (zwłaszcza wyżej notowany rywal), przychodzi więcej kibiców.
@@ -359,7 +361,7 @@ export function rundaPucharu(s: StanGry): WynikPucharu {
   const nagroda = p.faza === "regionalny" ? nagrodaRegion(s, p.runda) : NAGRODA_GLOWNY[Math.min(p.runda, NAGRODA_GLOWNY.length - 1)];
   s.kluby[s.mojKlub].kasa += nagroda;
   const rywalNazwa = s.kluby[rywalId].nazwa;
-  const wynikTekst = karneTxt ? `${moje - (awans ? 1 : 0)}:${ich - (awans ? 0 : 1)}${karneTxt}` : `${moje}:${ich}${karne ? " (k.)" : dogrywka ? " (dogr.)" : ""}`;
+  const wynikTekst = karneTxt ? `${moje - (awans ? 1 : 0)}:${ich - (awans ? 0 : 1)}${dogrywka ? " po dogr." : ""}${karneTxt}` : `${moje}:${ich}${dogrywka ? " po dogr." : ""}`;
   if (!p.sciezka) p.sciezka = [];
   p.sciezka.push({ nazwa, przeciwnik: rywalId, wynik: wynikTekst, awans, uSiebie });
 
@@ -369,7 +371,7 @@ export function rundaPucharu(s: StanGry): WynikPucharu {
     const pary: { dom: string; gosc: string; wynik: string }[] = [{ dom: uSiebie ? s.mojKlub : rywalId, gosc: uSiebie ? rywalId : s.mojKlub, wynik: wynikTekst }];
     const zwyciezcy: string[] = [awans ? s.mojKlub : rywalId];
     for (let i = 0; i + 1 < pozostali.length; i += 2) {
-      const r = rozegrajPare(s, pozostali[i], pozostali[i + 1]);
+      const r = rozegrajPare(s, pozostali[i], pozostali[i + 1], p.faza === "glowny" || dogrywkaWRundzie(s, p.runda), finalGlowny);
       pary.push({ dom: pozostali[i], gosc: pozostali[i + 1], wynik: r.tekst });
       zwyciezcy.push(r.winner);
     }

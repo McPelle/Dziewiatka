@@ -170,6 +170,7 @@ export interface Trybuny3D {
 /** Ukrywanie części siatki zależnie od kamery (bez przebudowy sceny): drawRange w onBeforeRender. */
 function ukrywana(m: THREE.Mesh, warunek: (cam: THREE.Camera) => boolean) {
   m.onBeforeRender = (_r, _s, cam, geom) => { geom.setDrawRange(0, warunek(cam) ? 0 : Infinity); };
+  m.onBeforeShadow = (_r, _o, _c, _sc, geom) => { geom.setDrawRange(0, Infinity); }; // cień dachu zostaje na murawie
 }
 
 export function zbudujTrybuny(ks: KsztaltStadionu, poj: number, mat: THREE.Material, o: OpcjeTrybun, ziarno: number): Trybuny3D {
