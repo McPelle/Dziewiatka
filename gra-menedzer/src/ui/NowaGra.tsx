@@ -11,6 +11,7 @@ import { kontur } from "../data/granice";
 import { KreatorKlubu } from "./KreatorKlubu";
 import { stworzWlasnyKlub } from "../engine/wlasnyKlub";
 import { cien, CZCIONKA, ikona3D, K, st, szklo3D } from "./styl";
+import { nazwaLigi } from "../data/nazwyLigOficjalne";
 
 // Barwy oryginalnych herbów lig (wg szczebla) i województw (wg regionu) — własne, nie kopie logo.
 const BARWY_LIGI: [string, string, string][] = [
@@ -206,7 +207,7 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
         <Pasek tytul="Betclic 3. Liga" pod="Wybierz grupę" onBack={() => setWidok({ typ: "root" })} />
         <ScrollView contentContainerStyle={{ padding: 10, paddingBottom: 26 }}>
           {TRZECIA_GRUPY.map((g) => (
-            <Pozycja key={g.nazwa} herb={crestLigi(3)} tytul={g.nazwa} pod="III liga" onPress={() => otworzKluby(g.sciezkaId, 3, g.nazwa, { typ: "trzecia" })} />
+            <Pozycja key={g.nazwa} herb={crestLigi(3)} tytul={nazwaLigi(g.nazwa)} pod="III liga" onPress={() => otworzKluby(g.sciezkaId, 3, g.nazwa, { typ: "trzecia" })} />
           ))}
         </ScrollView>
       </View>
@@ -222,7 +223,7 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
         <Pasek tytul={woj.label} pod="Wybierz szczebel (IV liga → klasa B)" onBack={() => setWidok({ typ: "root" })} />
         <ScrollView contentContainerStyle={{ padding: 10, paddingBottom: 26 }}>
           {poziomy.map((p) => (
-            <Pozycja key={p.label} herb={<View style={{ width: 46, height: 38, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={`${p.label} ${woj.label}`} rozmiar={30} /></View>} tytul={p.label} pod={p.grupy.length > 1 ? `${p.grupy.length} grup` : p.grupy[0].nazwa}
+            <Pozycja key={p.label} herb={<View style={{ width: 46, height: 38, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={`${p.label} ${woj.label}`} rozmiar={30} /></View>} tytul={p.label} pod={p.grupy.length > 1 ? `${p.grupy.length} grup` : nazwaLigi(p.grupy[0].nazwa)}
               onPress={() => p.grupy.length > 1 ? setWidok({ typ: "wojLevel", wi: widok.wi, label: p.label, grupy: p.grupy }) : otworzKluby(p.grupy[0].sciezkaId, p.grupy[0].idx, p.grupy[0].nazwa, { typ: "woj", wi: widok.wi })} />
           ))}
         </ScrollView>
@@ -238,7 +239,7 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
         <Pasek tytul={`${woj.label} · ${widok.label}`} pod="Wybierz grupę" onBack={() => setWidok({ typ: "woj", wi: widok.wi })} />
         <ScrollView contentContainerStyle={{ padding: 10, paddingBottom: 26 }}>
           {widok.grupy.map((g) => (
-            <Pozycja key={g.nazwa} tytul={g.nazwa} onPress={() => otworzKluby(g.sciezkaId, g.idx, g.nazwa, { typ: "wojLevel", wi: widok.wi, label: widok.label, grupy: widok.grupy })} />
+            <Pozycja key={g.nazwa} tytul={nazwaLigi(g.nazwa)} onPress={() => otworzKluby(g.sciezkaId, g.idx, g.nazwa, { typ: "wojLevel", wi: widok.wi, label: widok.label, grupy: widok.grupy })} />
           ))}
         </ScrollView>
       </View>

@@ -8,6 +8,7 @@ import type { StanGry } from "../engine/types";
 import { WYZWANIA, ustawWyzwanie, type DefWyzwania } from "../engine/wyzwania";
 import { Herb } from "./Herb";
 import { CZCIONKA, K, st } from "./styl";
+import { nazwaLigi } from "../data/nazwyLigOficjalne";
 
 export function Wyzwania({ onStart, onWstecz, ukonczone }: { onStart: (s: StanGry) => void; onWstecz: () => void; ukonczone?: Record<string, boolean | undefined> }) {
   const [region, setRegion] = useState(() => Math.max(0, SCIEZKI.findIndex((x) => x.nazwa.startsWith("Pomorskie"))));
@@ -44,7 +45,7 @@ export function Wyzwania({ onStart, onWstecz, ukonczone }: { onStart: (s: StanGr
           <Text style={[st.maly, { marginTop: 6 }]}>{d.opis}</Text>
           {k ? <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8 }}>
             <Herb klub={k} rozmiar={30} />
-            <View style={{ flex: 1 }}><Text style={[st.tekst, { fontSize: 13.5 }]}>{k.nazwa}</Text><Text style={[st.maly, { fontSize: 11.5 }]}>{s.ligi[k.poziom - 1]?.nazwa}</Text></View>
+            <View style={{ flex: 1 }}><Text style={[st.tekst, { fontSize: 13.5 }]}>{k.nazwa}</Text><Text style={[st.maly, { fontSize: 11.5 }]}>{nazwaLigi(s.ligi[k.poziom - 1]?.nazwa)}</Text></View>
             <Pressable onPress={() => start(d)} style={[st.przyciskMaly, { borderColor: K.akcent }]}><Text style={st.przyciskMalyTekst}>Podejmij ›</Text></Pressable>
           </View> : <Text style={[st.maly, { marginTop: 6 }]}>Niedostępne w tym regionie.</Text>}
         </View>); })}

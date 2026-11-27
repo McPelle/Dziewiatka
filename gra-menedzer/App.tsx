@@ -23,6 +23,7 @@ import { Transfery } from "./src/ui/Transfery";
 import { WczytajGre } from "./src/ui/WczytajGre";
 import { Wiecej } from "./src/ui/Wiecej";
 import { usunZapis, wczytaj, zapisz } from "./src/ui/zapis";
+import { nazwaLigi } from "./src/data/nazwyLigOficjalne";
 
 type Zakladka = "pulpit" | "sklad" | "tabela" | "mecze" | "transfery" | "wiecej";
 type Ekran = "szybki" | "wyzwania" | "menu" | "nowa" | "gra" | "wczytaj";
@@ -171,7 +172,7 @@ function NaglowekKlubu({ s, onMenu, onNowa }: { s: StanGry; onMenu: () => void; 
       </View>
       <View style={{ flex: 1, marginLeft: 10 }}>
         <Text numberOfLines={1} style={{ color: "#fff", fontWeight: "900", fontSize: 16, letterSpacing: 0.2, fontFamily: CZCIONKA }}>{klub.nazwa}</Text>
-        <Text numberOfLines={1} style={{ color: "rgba(255,255,255,0.72)", fontSize: 11, fontWeight: "700", marginTop: 1, fontFamily: CZCIONKA }}>{liga?.nazwa ?? "Liga"} · kolejka {kol}/{ile} · sezon {s.sezon}</Text>
+        <Text numberOfLines={1} style={{ color: "rgba(255,255,255,0.72)", fontSize: 11, fontWeight: "700", marginTop: 1, fontFamily: CZCIONKA }}>{liga?.nazwa ? nazwaLigi(liga.nazwa) : "Liga"} · kolejka {kol}/{ile} · sezon {s.sezon}</Text>
       </View>
       <View style={{ alignItems: "flex-end", marginRight: 10 }}>
         <AnimLiczba wartosc={klub.kasa} format={zl} style={{ color: K.akcent, fontSize: 14, fontWeight: "900", fontFamily: CZCIONKA }} />

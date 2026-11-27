@@ -73,7 +73,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Lechia Gdańsk",
    "Pogoń Szczecin",
    "KKS Kalisz",
-   "Zagłębie Sosnowiec"
+   "Zagłębie Sosnowiec",
+   "KKS 1925 Kalisz",
+   "Wisła Kraków"
   ]
  },
  "Górnik Zabrze": {
@@ -115,7 +117,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Piast Gliwice",
    "Polonia Bytom",
    "Zagłębie Sosnowiec",
-   "Legia Warszawa"
+   "Legia Warszawa",
+   "GKS Tychy",
+   "Odra Opole",
+   "Raków Częstochowa"
   ]
  },
  "Jagiellonia Białystok": {
@@ -124,7 +129,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "UJB - Ultras Jagiellonia Białystok"
   ],
   "zgody": [
-   "Mazur Ełk"
+   "Mazur Ełk",
+   "MKS Mazur Ełk"
   ],
   "flagi": [
    "Dzieci Białegostoku"
@@ -165,7 +171,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Chemik Kędzierzyn-Koźle",
    "Videoton Szekesfehervar",
    "Stomil Olsztyn (układ)",
-   "Lechia Gdańsk (układ)"
+   "Lechia Gdańsk (układ)",
+   "Lechia Gdańsk"
   ],
   "flagi": [
    "Wieczny Raków"
@@ -182,7 +189,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Wisła Kraków",
    "Elana Toruń",
    "Górnik Zabrze",
-   "Piast Gliwice"
+   "Piast Gliwice",
+   "Odra Opole"
   ]
  },
  "GKS Katowice": {
@@ -195,7 +203,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "zgody": [
    "Banik Ostrava",
    "JKS Jarosław (układ)",
-   "ROW Rybnik (układ)"
+   "ROW Rybnik (układ)",
+   "JKS 1909 Jarosław"
   ],
   "fanklub": [
    "FANKLUB Bieruń (Stary)",
@@ -229,7 +238,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Legia Warszawa",
    "GKS Jastrzębie",
    "Widzew Łódź",
-   "Piast Gliwice"
+   "Piast Gliwice",
+   "Odra Opole",
+   "Polonia Bytom"
   ]
  },
  "Legia Warszawa": {
@@ -327,7 +338,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Wisła Kraków",
    "Ruch Chorzów",
    "Górnik Zabrze",
-   "GKS Katowice"
+   "GKS Katowice",
+   "GKS Tychy",
+   "Korona Kielce",
+   "Sandecja Nowy Sącz",
+   "Wisła Płock",
+   "Zagłębie Lubin",
+   "Zawisza Bydgoszcz"
   ]
  },
  "Zagłębie Lubin": {
@@ -343,7 +360,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Arka Gdynia",
    "Odra Opole",
    "Zawisza Bydgoszcz",
-   "Polonia Bytom (układ)"
+   "Polonia Bytom (układ)",
+   "Polonia Bytom"
   ],
   "flagi": [
    "Zagłębie Fanatyków"
@@ -374,7 +392,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Legia Warszawa",
    "ŁKS Łódź",
    "Widzew Łódź",
-   "Ruch Chorzów"
+   "Ruch Chorzów",
+   "Chrobry Głogów",
+   "Elana Toruń"
   ]
  },
  "Wisła Płock": {
@@ -387,7 +407,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Stomil Olsztyn",
-   "Hutnik Kraków (układ)"
+   "Hutnik Kraków (układ)",
+   "Hutnik Kraków"
   ],
   "fanklub": [
    "FANKLUB Drobin",
@@ -401,7 +422,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Olimpia Elbląg",
    "Wisła Kraków",
    "Arka Gdynia",
-   "Zawisza Bydgoszcz"
+   "Zawisza Bydgoszcz",
+   "Znicz Pruszków"
   ]
  },
  "Pogoń Szczecin": {
@@ -441,7 +463,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Cracovia",
    "Arka Gdynia",
    "Zagłębie Sosnowiec",
-   "Lechia Gdańsk"
+   "Lechia Gdańsk",
+   "Gryf Słupsk",
+   "Gwardia Koszalin"
   ]
  },
  "Radomiak Radom": {
@@ -452,7 +476,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Radomscy Chuligani"
   ],
   "zgody": [
-   "Legia Warszawa"
+   "Legia Warszawa",
+   "Olimpia Elbląg"
   ],
   "fanklub": [
    "FANKLUB Białobrzegi",
@@ -471,7 +496,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Motor Lublin",
    "GKS Tychy",
    "Polonia Warszawa",
-   "Resovia Rzeszów"
+   "Resovia Rzeszów",
+   "Resovia"
   ]
  },
  "Korona Kielce": {
@@ -501,14 +527,19 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Chmielnik"
   ],
   "zgody": [
-   "Naprzód Jędrzejów (układ)"
+   "Naprzód Jędrzejów (układ)",
+   "Naprzód Jędrzejów"
   ],
   "kosy": [
    "KSZO Ostrowiec Świętokrzyski",
    "Widzew Łódź",
    "Wisła Kraków",
    "Radomiak Radom",
-   "Legia Warszawa"
+   "Legia Warszawa",
+   "Hutnik Kraków",
+   "Motor Lublin",
+   "Stal Stalowa Wola",
+   "Star Starachowice"
   ]
  },
  "Motor Lublin": {
@@ -549,7 +580,16 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Ruch Chorzów",
    "Stal Stalowa Wola",
    "Avia Świdnik",
-   "Arka Gdynia"
+   "Arka Gdynia",
+   "Cracovia",
+   "Elana Toruń",
+   "KKS 1925 Kalisz",
+   "Korona Kielce",
+   "Lechia Gdańsk",
+   "Podlasie Biała Podlaska",
+   "Pogoń Siedlce",
+   "Radomiak Radom",
+   "Stal Rzeszów"
   ]
  },
  "Cracovia": {
@@ -612,7 +652,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Motor Lublin",
    "Zagłębie Sosnowiec",
    "Widzew Łódź",
-   "Ruch Chorzów"
+   "Ruch Chorzów",
+   "Glinik Gorlice",
+   "Hutnik Kraków",
+   "Jagiellonia Białystok",
+   "Okocimski KS Brzesko",
+   "Podhale Nowy Targ",
+   "Unia Tarnów"
   ]
  },
  "Widzew Łódź": {
@@ -631,7 +677,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Elana Toruń",
    "Wisła Kraków (układ)",
    "KKS Kalisz (układ)",
-   "CSKA Moskwa (układ)"
+   "CSKA Moskwa (układ)",
+   "KKS 1925 Kalisz",
+   "Wisła Kraków"
   ],
   "fanklub": [
    "FANKLUB Grudziądz",
@@ -685,7 +733,18 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Motor Lublin",
    "Zawisza Bydgoszcz",
    "Górnik Zabrze",
-   "GKS Katowice"
+   "GKS Katowice",
+   "Chełmianka Chełm",
+   "GKS Tychy",
+   "Korona Kielce",
+   "Miedź Legnica",
+   "Pogoń Grodzisk Mazowiecki",
+   "Polonia Bydgoszcz",
+   "Raków Częstochowa",
+   "Resovia",
+   "Rodło Kwidzyn",
+   "Włocłavia Włocławek",
+   "Zagłębie Lubin"
   ]
  },
  "Piast Gliwice": {
@@ -714,7 +773,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "GKS Katowice",
    "Zagłębie Sosnowiec",
    "Polonia Bytom",
-   "ROW Rybnik"
+   "ROW Rybnik",
+   "Raków Częstochowa"
   ]
  },
  "Wisła Kraków": {
@@ -731,7 +791,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Lazio Rzym",
    "Widzew Łódź (układ)",
    "Unia Tarnów (układ)",
-   "Slovan Bratysława (układ)"
+   "Slovan Bratysława (układ)",
+   "Unia Tarnów",
+   "Widzew Łódź"
   ],
   "fanklub": [
    "FANKLUB Alwernia",
@@ -788,7 +850,22 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "BKS Stal Bielsko-Biała",
    "Zagłębie Sosnowiec",
    "Legia Warszawa",
-   "Lech Poznań"
+   "Lech Poznań",
+   "Arka Gdynia",
+   "Beskid Andrychów",
+   "GKS Tychy",
+   "Górnik Zabrze",
+   "Jagiellonia Białystok",
+   "Korona Kielce",
+   "Miedź Legnica",
+   "Raków Częstochowa",
+   "Sandecja Nowy Sącz",
+   "Tarnovia Tarnów",
+   "Wisła Płock",
+   "Włocłavia Włocławek",
+   "Zagłębie Lubin",
+   "Zawisza Bydgoszcz",
+   "ŁKS Łódź"
   ]
  },
  "Śląsk Wrocław": {
@@ -875,7 +952,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Ruch Chorzów",
    "Wisła Kraków",
    "Lech Poznań",
-   "Arka Gdynia"
+   "Arka Gdynia",
+   "Chrobry Głogów",
+   "Cracovia",
+   "Legia Warszawa",
+   "Odra Opole"
   ]
  },
  "Chrobry Głogów": {
@@ -940,7 +1021,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Elana Toruń",
    "Stal Rzeszów",
    "Legia Warszawa",
-   "Arka Gdynia"
+   "Arka Gdynia",
+   "Polonia Bydgoszcz",
+   "Unia Skierniewice",
+   "Zagłębie Lubin"
   ]
  },
  "Polonia Warszawa": {
@@ -976,7 +1060,12 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "K6 on tour"
   ],
   "kosy": [
-   "Legia Warszawa"
+   "Legia Warszawa",
+   "Pogoń Grodzisk Mazowiecki",
+   "Pogoń Siedlce",
+   "Radomiak Radom",
+   "Wisła Płock",
+   "Znicz Pruszków"
   ]
  },
  "Ruch Chorzów": {
@@ -1031,7 +1120,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Lech Poznań",
    "Śląsk Wrocław",
    "Lechia Gdańsk",
-   "ROW Rybnik"
+   "ROW Rybnik",
+   "Cracovia",
+   "Miedź Legnica",
+   "Polonia Bytom",
+   "Resovia",
+   "Włocłavia Włocławek",
+   "Zagłębie Lubin",
+   "Zawisza Bydgoszcz",
+   "ŁKS Łódź"
   ]
  },
  "Miedź Legnica": {
@@ -1091,7 +1188,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Odra Opole",
    "Góral Żywiec",
    "Gryf Wejherowo",
-   "Zagłębie Lubin (układ)"
+   "Zagłębie Lubin (układ)",
+   "Zagłębie Lubin"
   ],
   "fanklub": [
    "FANKLUB Cieszyn",
@@ -1105,7 +1203,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Górnik Zabrze",
    "GKS Katowice",
    "Zagłębie Sosnowiec",
-   "BKS Stal Bielsko-Biała"
+   "BKS Stal Bielsko-Biała",
+   "Piast Gliwice",
+   "Ruch Chorzów"
   ]
  },
  "Pogoń Grodzisk Mazowiecki": {
@@ -1175,7 +1275,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Raków Częstochowa",
    "Chemik Kędzierzyn-Koźle",
    "GKS Katowice",
-   "Zagłębie Sosnowiec"
+   "Zagłębie Sosnowiec",
+   "Miedź Legnica"
   ]
  },
  "Stal Rzeszów": {
@@ -1191,7 +1292,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Stal Stalowa Wola (układ)",
    "Łada Biłgoraj (układ)",
    "FC VSS Košice (układ)",
-   "Polonia Przemyśl (układ)"
+   "Polonia Przemyśl (układ)",
+   "Stal Stalowa Wola"
   ],
   "fanklub": [
    "FANKLUB Dynów",
@@ -1212,7 +1314,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "JKS Jarosław",
    "Siarka Tarnobrzeg",
    "Czuwaj Przemyśl",
-   "Stal Sanok"
+   "Stal Sanok",
+   "JKS 1909 Jarosław",
+   "Resovia"
   ]
  },
  "Stal Mielec": {
@@ -1234,7 +1338,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Stal Stalowa Wola",
    "Wisłoka Dębica",
    "Stal Rzeszów",
-   "Karpaty Krosno"
+   "Karpaty Krosno",
+   "JKS 1909 Jarosław"
   ]
  },
  "Pogoń Siedlce": {
@@ -1248,7 +1353,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Wisła Puławy",
    "Dolcan Ząbki",
    "Mazovia Mińsk Mazowiecki",
-   "AZS Podlasie Biała Podlaska (układ)"
+   "AZS Podlasie Biała Podlaska (układ)",
+   "Podlasie Biała Podlaska"
   ],
   "kosy": [
    "Motor Lublin",
@@ -1270,7 +1376,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Śląsk Wrocław",
    "Gryf Słupsk",
    "Stomil Olsztyn (układ)",
-   "Raków Częstochowa (układ)"
+   "Raków Częstochowa (układ)",
+   "Raków Częstochowa",
+   "Stomil Olsztyn"
   ],
   "flagi": [
    "Lwy Północy"
@@ -1310,7 +1418,17 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Elana Toruń",
    "Widzew Łódź",
    "Ruch Chorzów",
-   "Pogoń Szczecin"
+   "Pogoń Szczecin",
+   "Gryf Wejherowo",
+   "Gwardia Koszalin",
+   "Jagiellonia Białystok",
+   "Kaszubia Kościerzyna",
+   "Legia Warszawa",
+   "Motor Lublin",
+   "Rodło Kwidzyn",
+   "Wisła Kraków",
+   "Zagłębie Lubin",
+   "Zawisza Bydgoszcz"
   ]
  },
  "Arka Gdynia": {
@@ -1386,7 +1504,17 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Wisła Kraków",
    "Pogoń Szczecin",
    "Zagłębie Sosnowiec",
-   "Legia Warszawa"
+   "Legia Warszawa",
+   "Bałtyk Gdynia",
+   "Chojniczanka Chojnice",
+   "Gryf Słupsk",
+   "Jagiellonia Białystok",
+   "Motor Lublin",
+   "Pomezania Malbork",
+   "Rodło Kwidzyn",
+   "Wisła Płock",
+   "ŁKS Łódź",
+   "Olimpia Elbląg"
   ]
  },
  "Bruk-Bet Termalica Nieciecza": {
@@ -1436,7 +1564,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Zagłębie Sosnowiec",
-   "BKS Stal Bielsko-Biała"
+   "BKS Stal Bielsko-Biała",
+   "Znicz Pruszków"
   ]
  },
  "Olimpia Grudziądz": {
@@ -1461,7 +1590,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Stomil Olsztyn",
    "Chojniczanka Chojnice",
    "Sparta Brodnica",
-   "Legia Chełmża"
+   "Legia Chełmża",
+   "Rodło Kwidzyn",
+   "Unia Skierniewice",
+   "Unia Wąbrzeźno",
+   "Włocłavia Włocławek"
   ]
  },
  "Sandecja Nowy Sącz": {
@@ -1484,7 +1617,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Glinik Gorlice",
    "Unia Tarnów",
    "Okocimski KS Brzesko",
-   "Wisłoka Dębica"
+   "Wisłoka Dębica",
+   "Podhale Nowy Targ"
   ]
  },
  "Podhale Nowy Targ": {
@@ -1520,7 +1654,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FZGT - Fanatycy z Grodu Tura"
   ],
   "kosy": [
-   "Arka Gdynia"
+   "Arka Gdynia",
+   "Olimpia Grudziądz",
+   "Pogoń Lębork"
   ]
  },
  "Stal Stalowa Wola": {
@@ -1558,7 +1694,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Stal Mielec",
    "Górnik Łęczna",
    "Chełmianka Chełm",
-   "Siarka Tarnobrzeg"
+   "Siarka Tarnobrzeg",
+   "Hetman Zamość",
+   "JKS 1909 Jarosław",
+   "Resovia",
+   "Wisłoka Dębica"
   ]
  },
  "Hutnik Kraków": {
@@ -1590,7 +1730,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Unia Tarnów",
    "Stal Stalowa Wola",
    "Cracovia",
-   "Polonia Przemyśl"
+   "Polonia Przemyśl",
+   "KSZO Ostrowiec Świętokrzyski",
+   "Korona Kielce",
+   "Resovia"
   ]
  },
  "Resovia": {
@@ -1623,7 +1766,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Widzew Łódź",
    "Ruch Chorzów",
    "Elana Toruń",
-   "Polonia Przemyśl"
+   "Polonia Przemyśl",
+   "Hutnik Kraków",
+   "Radomiak Radom"
   ]
  },
  "Górnik Łęczna": {
@@ -1639,7 +1784,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Avia Świdnik",
-   "Stal Stalowa Wola"
+   "Stal Stalowa Wola",
+   "Podlasie Biała Podlaska",
+   "Pogoń Siedlce"
   ]
  },
  "Znicz Pruszków": {
@@ -1686,7 +1833,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "BKS Stal Bielsko-Biała",
    "Widzew Łódź",
    "Wisła Kraków",
-   "Legia Warszawa"
+   "Legia Warszawa",
+   "Radomiak Radom"
   ]
  },
  "Zawisza Bydgoszcz": {
@@ -1726,7 +1874,12 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Wisła Kraków",
    "GKM Grudziądz",
    "Legia Warszawa",
-   "Lechia Gdańsk"
+   "Lechia Gdańsk",
+   "Gryf Słupsk",
+   "KP Starogard Gdański",
+   "Legia Chełmża",
+   "Unia Wąbrzeźno",
+   "Wisła Płock"
   ]
  },
  "Lechia Zielona Góra": {
@@ -1767,7 +1920,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "zgody": [
    "Widzew Łódź",
    "KKS Kalisz",
-   "KS Myszków"
+   "KS Myszków",
+   "KKS 1925 Kalisz"
   ],
   "fanklub": [
    "FANKLUB Aleksandrów Kujawski",
@@ -1786,7 +1940,20 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Zawisza Bydgoszcz",
    "Lechia Gdańsk",
    "ŁKS Łódź",
-   "Motor Lublin"
+   "Motor Lublin",
+   "Goplania Inowrocław",
+   "Górnik Zabrze",
+   "Kujawiak Kowal",
+   "Lech Poznań",
+   "Legia Chełmża",
+   "Miedź Legnica",
+   "Olimpia Grudziądz",
+   "Polonia Bydgoszcz",
+   "Raków Częstochowa",
+   "Resovia",
+   "Sparta Brodnica",
+   "Włocłavia Włocławek",
+   "Zagłębie Lubin"
   ]
  },
  "Bałtyk Gdynia": {
@@ -1795,6 +1962,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "chuligani": [
    "Odczuwalni'18"
+  ],
+  "kosy": [
+   "Arka Gdynia",
+   "Kaszubia Kościerzyna"
   ]
  },
  "Gryf Słupsk": {
@@ -1808,7 +1979,17 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "zgody": [
    "Lechia Gdańsk",
    "Chojniczanka Chojnice",
-   "Pomezania Malbork"
+   "Pomezania Malbork",
+   "Kotwica Kołobrzeg"
+  ],
+  "kosy": [
+   "Arka Gdynia",
+   "Gryf Wejherowo",
+   "Gwardia Koszalin",
+   "KKS 1925 Kalisz",
+   "Pogoń Lębork",
+   "Pogoń Szczecin",
+   "Zawisza Bydgoszcz"
   ]
  },
  "Kotwica Kołobrzeg": {
@@ -1821,7 +2002,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "zgody": [
    "KKS Kalisz",
    "MKS Karlino",
-   "Sokół Karlino"
+   "Sokół Karlino",
+   "KKS 1925 Kalisz",
+   "Gryf Słupsk"
+  ],
+  "kosy": [
+   "Błękitni Stargard",
+   "Flota Świnoujście",
+   "Gryf Wejherowo",
+   "Gwardia Koszalin"
   ]
  },
  "Unia Tarnów": {
@@ -1833,7 +2022,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "UTSC - Unia Tarnów Sportowe Charaktery"
   ],
   "zgody": [
-   "ETO Győr"
+   "ETO Győr",
+   "Wisła Kraków"
   ],
   "fanklub": [
    "FANKLUB Dębno&Sufczyn",
@@ -1842,6 +2032,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Radłów",
    "FANKLUB Zakliczyn",
    "FANKLUB Tuchów"
+  ],
+  "kosy": [
+   "Beskid Andrychów",
+   "Cracovia",
+   "Hutnik Kraków",
+   "Miedź Legnica",
+   "Sandecja Nowy Sącz",
+   "Tarnovia Tarnów",
+   "Wisłoka Dębica"
   ]
  },
  "Gwardia Koszalin": {
@@ -1855,6 +2054,17 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "zgody": [
    "Arka Gdynia",
    "Gryf Wejherowo"
+  ],
+  "kosy": [
+   "Energetyk Gryfino",
+   "Flota Świnoujście",
+   "Gryf Słupsk",
+   "Kotwica Kołobrzeg",
+   "Lechia Gdańsk",
+   "Odra Chojna",
+   "Pogoń Lębork",
+   "Pogoń Szczecin",
+   "Sokół Karlino"
   ]
  },
  "Pogoń Lębork": {
@@ -1873,6 +2083,12 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Cewice",
    "FANKLUB Krępa Kaszubska",
    "FANKLUB Nowa Wieś Lęborska"
+  ],
+  "kosy": [
+   "Chojniczanka Chojnice",
+   "Gryf Słupsk",
+   "Gryf Wejherowo",
+   "Gwardia Koszalin"
   ]
  },
  "Polonia Bydgoszcz": {
@@ -1890,6 +2106,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Solec Kujawski",
    "FANKLUB Pakość",
    "FANKLUB Tuchola"
+  ],
+  "kosy": [
+   "Elana Toruń",
+   "Goplania Inowrocław",
+   "Kujawiak Kowal",
+   "Widzew Łódź",
+   "Włocłavia Włocławek",
+   "Zawisza Bydgoszcz",
+   "ŁKS Łódź"
   ]
  },
  "Flota Świnoujście": {
@@ -1936,6 +2161,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Gryf Słupsk"
+  ],
+  "kosy": [
+   "Arka Gdynia",
+   "Rodło Kwidzyn"
   ]
  },
  "Tarnovia Tarnów": {
@@ -1944,6 +2173,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Cracovia"
+  ],
+  "kosy": [
+   "Glinik Gorlice",
+   "Okocimski KS Brzesko",
+   "Podhale Nowy Targ",
+   "Unia Tarnów",
+   "Wisła Kraków"
   ]
  },
  "Goplania Inowrocław": {
@@ -1952,6 +2188,14 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "chuligani": [
    "Sportowa Goplania"
+  ],
+  "kosy": [
+   "Elana Toruń",
+   "Legia Chełmża",
+   "Polonia Bydgoszcz",
+   "Sparta Brodnica",
+   "Unia Gniewkowo",
+   "Unia Wąbrzeźno"
   ]
  },
  "Energetyk Gryfino": {
@@ -1962,6 +2206,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Odra Chojna",
    "Pogoń Barlinek",
    "Dąb Dębno"
+  ],
+  "kosy": [
+   "Błękitni Stargard",
+   "Flota Świnoujście",
+   "Gwardia Koszalin"
   ]
  },
  "Sparta Brodnica": {
@@ -1974,6 +2223,14 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "zgody": [
    "Legia Chełmża",
    "Mławska Wiara"
+  ],
+  "kosy": [
+   "Elana Toruń",
+   "Goplania Inowrocław",
+   "Kujawiak Kowal",
+   "Olimpia Grudziądz",
+   "Unia Wąbrzeźno",
+   "Włocłavia Włocławek"
   ]
  },
  "Włocłavia Włocławek": {
@@ -1982,6 +2239,19 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "chuligani": [
    "GOC'04 - Gang of Chopina"
+  ],
+  "zgody": [
+   "Kujawiak Kowal"
+  ],
+  "kosy": [
+   "Elana Toruń",
+   "Legia Chełmża",
+   "Olimpia Grudziądz",
+   "Polonia Bydgoszcz",
+   "Ruch Chorzów",
+   "Sparta Brodnica",
+   "Widzew Łódź",
+   "Wisła Kraków"
   ]
  },
  "GKM Grudziądz": {
@@ -2010,11 +2280,30 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Sparta Brodnica"
+  ],
+  "kosy": [
+   "Elana Toruń",
+   "Goplania Inowrocław",
+   "Kujawiak Kowal",
+   "Olimpia Grudziądz",
+   "Unia Gniewkowo",
+   "Unia Wąbrzeźno",
+   "Włocłavia Włocławek",
+   "Zawisza Bydgoszcz"
   ]
  },
  "Unia Wąbrzeźno": {
   "chuligani": [
    "Młoda Unia"
+  ],
+  "kosy": [
+   "Chełminianka Chełmno",
+   "Goplania Inowrocław",
+   "Kujawiak Kowal",
+   "Legia Chełmża",
+   "Olimpia Grudziądz",
+   "Sparta Brodnica",
+   "Zawisza Bydgoszcz"
   ]
  },
  "Kujawiak Kowal": {
@@ -2022,7 +2311,17 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "KF'18 - Kowal Fans"
   ],
   "zgody": [
-   "Start Pruszcz"
+   "Start Pruszcz",
+   "Włocłavia Włocławek"
+  ],
+  "kosy": [
+   "Elana Toruń",
+   "Legia Chełmża",
+   "Polonia Bydgoszcz",
+   "Sparta Brodnica",
+   "Unia Gniewkowo",
+   "Unia Wąbrzeźno",
+   "Wisła Dobrzyń nad Wisłą"
   ]
  },
  "Czarni Słupsk": {
@@ -2043,10 +2342,18 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Gryf Wejherowo",
-   "Wisła Tczew"
+   "Wisła Tczew",
+   "Orkan Rumia MKS"
   ],
   "fanklub": [
    "FC Kościerzyna (Arka Gdynia)"
+  ],
+  "kosy": [
+   "Bałtyk Gdynia",
+   "Bytovia Bytów",
+   "Cartusia Kartuzy",
+   "KP Starogard Gdański",
+   "Lechia Gdańsk"
   ]
  },
  "KP Starogard Gdański": {
@@ -2055,6 +2362,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Chojniczanka Chojnice"
+  ],
+  "kosy": [
+   "Kaszubia Kościerzyna",
+   "Zawisza Bydgoszcz"
   ]
  },
  "Odra Chojna": {
@@ -2066,6 +2377,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Energetyk Gryfino",
    "Dąb Dębno",
    "Pogoń Barlinek"
+  ],
+  "kosy": [
+   "Flota Świnoujście",
+   "Gwardia Koszalin",
+   "Olimp Złocieniec"
   ]
  },
  "MKS Karlino": {
@@ -2100,6 +2416,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Karpaty Krosno"
+  ],
+  "kosy": [
+   "Beskid Andrychów",
+   "Cracovia",
+   "Okocimski KS Brzesko",
+   "Sandecja Nowy Sącz",
+   "Tarnovia Tarnów"
   ]
  },
  "Beskid Andrychów": {
@@ -2108,6 +2431,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Energie Cottbus"
+  ],
+  "kosy": [
+   "Glinik Gorlice",
+   "Podhale Nowy Targ",
+   "Unia Oświęcim",
+   "Unia Tarnów",
+   "Wisła Kraków"
   ]
  },
  "Unia Oświęcim": {
@@ -2119,11 +2449,23 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Hejnał Kęty"
+  ],
+  "kosy": [
+   "Beskid Andrychów",
+   "Podhale Nowy Targ"
   ]
  },
  "Rodło Kwidzyn": {
   "ultras": [
    "Ultras Rodło"
+  ],
+  "kosy": [
+   "Arka Gdynia",
+   "Lechia Gdańsk",
+   "Olimpia Grudziądz",
+   "Pogoń Prabuty",
+   "Pomezania Malbork",
+   "Widzew Łódź"
   ]
  },
  "Gryf Wejherowo": {
@@ -2131,7 +2473,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Kaszubia Kościerzyna",
    "Orkan Rumia",
    "Gwardia Koszalin",
-   "Polonia Bytom"
+   "Polonia Bytom",
+   "Orkan Rumia MKS"
+  ],
+  "kosy": [
+   "Flota Świnoujście",
+   "Gryf Słupsk",
+   "Kotwica Kołobrzeg",
+   "Lechia Gdańsk",
+   "Pogoń Lębork"
   ]
  },
  "Orkan Rumia MKS": {
@@ -2142,7 +2492,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Fan Club Arki Gdynia - Rumia"
   ],
   "zgody": [
-   "Gryf Wejherowo"
+   "Gryf Wejherowo",
+   "Kaszubia Kościerzyna"
   ]
  },
  "Start Pruszcz": {
@@ -2155,7 +2506,12 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Ultras Karlino'11"
   ],
   "zgody": [
-   "Kotwica Kołobrzeg"
+   "Kotwica Kołobrzeg",
+   "Drawa Drawsko Pomorskie"
+  ],
+  "kosy": [
+   "Gwardia Koszalin",
+   "Iskra Białogard"
   ]
  },
  "Dąb Dębno": {
@@ -2184,6 +2540,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  "Okocimski KS Brzesko": {
   "ultras": [
    "BF - Brzescy Fanatycy"
+  ],
+  "kosy": [
+   "Cracovia",
+   "Glinik Gorlice",
+   "Podhale Nowy Targ",
+   "Sandecja Nowy Sącz",
+   "Tarnovia Tarnów"
   ]
  },
  "Victoria 1918 Jaworzno": {
@@ -2191,12 +2554,14 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "LSM - Lepsza Strona Miasta"
   ],
   "zgody": [
-   "Fablok Chrzanów"
+   "Fablok Chrzanów",
+   "MKS Fablok Chrzanów"
   ]
  },
  "MKS Fablok Chrzanów": {
   "zgody": [
-   "Victoria Jaworzno"
+   "Victoria Jaworzno",
+   "Victoria 1918 Jaworzno"
   ]
  },
  "Garbarnia Kraków": {
@@ -2226,7 +2591,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Górnik Konin",
    "Motor Lublin",
    "Ostrovia Ostrów Wielkopolski",
-   "Astra Krotoszyn"
+   "Astra Krotoszyn",
+   "Gryf Słupsk"
   ]
  },
  "Bytovia Bytów": {
@@ -2357,7 +2723,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Avia Świdnik",
    "Łada Biłgoraj",
    "Widzew Łódź",
-   "Unia Hrubieszów"
+   "Unia Hrubieszów",
+   "Podlasie Biała Podlaska",
+   "Pogoń Siedlce",
+   "Stal Stalowa Wola"
   ]
  },
  "KSZO Ostrowiec Świętokrzyski": {
@@ -2372,7 +2741,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Korona Kielce",
    "Stal Stalowa Wola",
    "Radomiak Radom",
-   "Hutnik Kraków"
+   "Hutnik Kraków",
+   "Naprzód Jędrzejów",
+   "Star Starachowice"
   ]
  },
  "Hetman Zamość": {
@@ -2389,7 +2760,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Avia Świdnik",
    "Chełmianka Chełm",
    "Łada Biłgoraj",
-   "Stal Stalowa Wola"
+   "Stal Stalowa Wola",
+   "Podlasie Biała Podlaska"
   ]
  },
  "Czarni Połaniec": {
@@ -2415,7 +2787,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Unia Tarnów",
    "Stal Rzeszów",
    "Stal Stalowa Wola",
-   "Igloopol Dębica"
+   "Igloopol Dębica",
+   "JKS 1909 Jarosław",
+   "Sandecja Nowy Sącz"
   ]
  },
  "Naprzód Jędrzejów": {
@@ -2428,6 +2802,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Star Starachowice",
    "Granat Skarżysko-Kamienna",
    "Pogoń Staszów"
+  ],
+  "zgody": [
+   "Korona Kielce"
   ]
  },
  "Siarka Tarnobrzeg": {
@@ -2445,7 +2822,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Stal Stalowa Wola",
    "Stal Mielec",
    "Stal Rzeszów",
-   "Karpaty Krosno"
+   "Karpaty Krosno",
+   "Podlasie Biała Podlaska"
   ]
  },
  "Star Starachowice": {
@@ -2461,7 +2839,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "kosy": [
    "Korona Kielce",
    "KSZO Ostrowiec Świętokrzyski",
-   "Wisła Sandomierz"
+   "Wisła Sandomierz",
+   "Czarni Połaniec",
+   "Naprzód Jędrzejów"
   ]
  },
  "JKS 1909 Jarosław": {

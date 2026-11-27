@@ -10,6 +10,7 @@ import { Herb } from "./Herb";
 import { ProfilZawodnika } from "./ProfilZawodnika";
 import { WidokKlubu } from "./WidokKlubu";
 import { CZCIONKA, K, KOLOR_POZ, st, szklo3D } from "./styl";
+import { nazwaLigi } from "../data/nazwyLigOficjalne";
 
 // „Wszystkie ligi" — podgląd całej gry z dowolnej kariery: ligi centralne, III liga (grupy) i 4 województwa (IV liga → klasa B/C).
 // Ligi z Twojej piramidy są symulowane (żywa tabela, pełne kluby, oferty za zawodników).
@@ -117,7 +118,7 @@ export function PrzegladLig({ s, widoczny, onClose, odswiez }: { s: StanGry; wid
     tytul = `${WOJ_ETYK[w.w]} · ${w.sz}`;
     tresc = <View>{kat.woj[w.w][w.sz].map((l) => <Wiersz key={l.nazwa} tytul={l.nazwa} pod={`${l.kluby.length} klubów${zyjaca(l) ? " ★ Twoja piramida" : ""}`} onPress={() => idz({ t: "liga", l })} />)}</View>;
   } else if (w.t === "liga") {
-    tytul = w.l.nazwa;
+    tytul = nazwaLigi(w.l.nazwa);
     const live = zyjaca(w.l);
     if (live) {
       const tab = tabelaLigi(s, live);
@@ -156,7 +157,7 @@ export function PrzegladLig({ s, widoczny, onClose, odswiez }: { s: StanGry; wid
           <Herb klub={pseudoKlub(w.d, w.l.poziom)} rozmiar={64} />
           <View style={{ flex: 1 }}>
             <Text style={st.tytul}>{w.d.nazwa}</Text>
-            <Text style={st.maly}>{w.l.nazwa}</Text>
+            <Text style={st.maly}>{nazwaLigi(w.l.nazwa)}</Text>
             <Text style={st.maly}>{w.d.miasto}{dd.stadion ? ` · ${dd.stadion}` : ""}</Text>
             {dd.adres ? <Text style={st.maly}>{dd.adres}</Text> : null}
           </View>

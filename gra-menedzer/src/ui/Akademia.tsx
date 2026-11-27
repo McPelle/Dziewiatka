@@ -9,6 +9,7 @@ import type { KatJun, StanGry } from "../engine/types";
 import { SKROT_POZ } from "../data/pozycje";
 import { ProfilZawodnika } from "./ProfilZawodnika";
 import { K, KOLOR_POZ, st } from "./styl";
+import { nazwaLigi } from "../data/nazwyLigOficjalne";
 
 const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Alert.alert("", t));
 type Widok = "akademia" | "U19" | "U17";
@@ -185,7 +186,7 @@ function KategoriaWidok({ s, kat, odswiez, otworz }: { s: StanGry; kat: KatJun; 
 
       {liga && (
         <>
-          <Text style={[st.naglowek, { marginTop: 16 }]}>{liga.nazwa}</Text>
+          <Text style={[st.naglowek, { marginTop: 16 }]}>{nazwaLigi(liga.nazwa)}</Text>
           <Text style={[st.maly, { marginBottom: 4 }]}>Ostatnie: {wyniki.length ? wyniki.map((w) => `${w.moje}:${w.ich}`).join("  ") : "—"}</Text>
           {tab.map((w, i) => {
             const moj = w.klubId === s.mojKlub;

@@ -10,6 +10,7 @@ import type { StanGry } from "../engine/types";
 import { Herb } from "./Herb";
 import { MeczNaZywo } from "./MeczNaZywo";
 import { CZCIONKA, K, plyta3D, st } from "./styl";
+import { nazwaLigi } from "../data/nazwyLigOficjalne";
 
 export function SzybkiMecz({ onWstecz }: { onWstecz: () => void }) {
   // świat gry per region (podokręg) — prawdziwe kluby od Ekstraklasy po B-klasę z oryginalnymi herbami; tworzony na żądanie
@@ -50,7 +51,7 @@ export function SzybkiMecz({ onWstecz }: { onWstecz: () => void }) {
     <View style={{ flex: 1, alignItems: "center", padding: 8, backgroundColor: K.karta, borderRadius: 12, borderWidth: 1, borderColor: k ? K.akcent : K.linia, ...plyta3D }}>
       {k ? <Herb klub={k} rozmiar={44} /> : <Text style={{ fontSize: 30 }}>❔</Text>}
       <Text style={[st.tekst, { fontSize: 13, textAlign: "center", marginTop: 4 }]} numberOfLines={2}>{k ? k.nazwa : "wybierz"}</Text>
-      {k && <Text style={[st.maly, { fontSize: 10.5 }]}>{swiat(r).ligi[k.poziom - 1]?.nazwa ?? ""}</Text>}
+      {k && <Text style={[st.maly, { fontSize: 10.5 }]}>{nazwaLigi(swiat(r).ligi[k.poziom - 1]?.nazwa)}</Text>}
     </View>); };
 
   return (
@@ -78,7 +79,7 @@ export function SzybkiMecz({ onWstecz }: { onWstecz: () => void }) {
         {kluby.map((k) => (
           <Pressable key={k.id} onPress={() => wybierz(k.id)} style={[st.wiersz, { gap: 10, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: K.linia, backgroundColor: k.id === dom || k.id === gosc ? "rgba(255,206,71,0.12)" : "transparent" }]}>
             <Herb klub={k} rozmiar={28} />
-            <View style={{ flex: 1 }}><Text style={[st.tekst, { fontSize: 13.5 }]}>{k.nazwa}</Text><Text style={st.maly}>{k.miasto} · {s.ligi[k.poziom - 1]?.nazwa ?? ""}</Text></View>
+            <View style={{ flex: 1 }}><Text style={[st.tekst, { fontSize: 13.5 }]}>{k.nazwa}</Text><Text style={st.maly}>{k.miasto} · {nazwaLigi(s.ligi[k.poziom - 1]?.nazwa)}</Text></View>
             <Text style={{ color: K.akcent }}>{k.id === dom && domR === region ? "🏠" : k.id === gosc && goscR === region ? "🚌" : "›"}</Text>
           </Pressable>))}
       </ScrollView>

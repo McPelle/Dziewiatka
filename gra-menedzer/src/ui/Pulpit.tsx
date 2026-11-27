@@ -31,6 +31,7 @@ import { Herb } from "./Herb";
 import { Twarz } from "./Twarz";
 import { wybierzZdjecie } from "./zdjecie";
 import { K, pasek3D, st } from "./styl";
+import { nazwaLigi } from "../data/nazwyLigOficjalne";
 
 const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Alert.alert("", t));
 
@@ -80,7 +81,7 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
                 <Herb klub={kl} rozmiar={40} />
                 <View style={{ marginLeft: 12, flex: 1 }}>
                   <Text style={st.tekst}>{kl.nazwa}{o.obecny ? "  · obecny klub" : ""}</Text>
-                  <Text style={st.maly}>{s.ligi[kl.poziom - 1]?.nazwa} · {zl(o.pensja)}/sezon{o.lata ? ` · ${o.lata} sez.` : ""}</Text>
+                  <Text style={st.maly}>{nazwaLigi(s.ligi[kl.poziom - 1]?.nazwa)} · {zl(o.pensja)}/sezon{o.lata ? ` · ${o.lata} sez.` : ""}</Text>
                 </View>
                 <Text style={{ color: K.akcent, fontWeight: "700" }}>{o.obecny ? "Zostań ›" : "Podpisz ›"}</Text>
               </Pressable>
@@ -111,7 +112,7 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
         <Herb klub={klub} rozmiar={52} />
         <View style={{ marginLeft: 14, flex: 1 }}>
           <Text style={st.tytul}>{klub.nazwa}</Text>
-          <Text style={st.maly}>{liga.nazwa} · sezon {s.sezon}/{(s.sezon + 1) % 100} · trener {s.trener}</Text>
+          <Text style={st.maly}>{nazwaLigi(liga.nazwa)} · sezon {s.sezon}/{(s.sezon + 1) % 100} · trener {s.trener}</Text>
           {(klub.seria ?? 0) !== 0 && (() => { const se = klub.seria ?? 0; const dobra = se > 0; const n = Math.abs(se); return (
             <View style={{ marginTop: 5, alignSelf: "flex-start", backgroundColor: dobra ? "rgba(54,217,137,0.16)" : "rgba(255,100,112,0.16)", borderWidth: 1, borderColor: dobra ? K.zielony : K.czerwony, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 }}>
               <Text style={{ color: dobra ? K.zielony : K.czerwony, fontWeight: "800", fontSize: 12 }}>{dobra ? "🔥" : "🥶"} {dobra ? `${n} ${n === 1 ? "zwycięstwo" : n < 5 ? "zwycięstwa" : "zwycięstw"} z rzędu` : `${n} ${n < 5 ? "porażki" : "porażek"} z rzędu`}</Text>
@@ -168,7 +169,7 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
                 <Herb klub={kl} rozmiar={28} />
                 <View style={{ flex: 1, marginLeft: 8 }}>
                   <Text style={[st.tekst, { fontWeight: "700" }]} numberOfLines={1}>{kl.nazwa}</Text>
-                  <Text style={st.maly}>{s.ligi[kl.poziom - 1]?.nazwa} · {zl(o.pensja)}/sezon</Text>
+                  <Text style={st.maly}>{nazwaLigi(s.ligi[kl.poziom - 1]?.nazwa)} · {zl(o.pensja)}/sezon</Text>
                 </View>
                 <Pressable style={[st.przyciskMaly, { borderColor: K.akcent }]} onPress={() => {
                   const przejdz = () => { const b = przyjmijOferteTrenera(s, i); komunikat(b ?? `Przeniosłeś się do ${kl.nazwa}.`); odswiez(); };

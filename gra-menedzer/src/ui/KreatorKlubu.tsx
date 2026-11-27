@@ -6,6 +6,7 @@ import { ligaOtwarta, type OpcjeKlubu } from "../engine/wlasnyKlub";
 import { HerbGenerowany } from "./HerbGen";
 import { Herb } from "./Herb";
 import { CZCIONKA, K, st, szklo3D } from "./styl";
+import { nazwaLigi } from "../data/nazwyLigOficjalne";
 
 // Kreator własnego klubu: nazwa, miasto, rok, barwy, stadion, właściciel, budżet i drużyna, której miejsce zajmie.
 const PALETA = ["#c8102e", "#0033a0", "#006a3c", "#ffd100", "#000000", "#ffffff", "#6a1b9a", "#ff6f00", "#00a3e0", "#7b1e1e", "#2e7d32", "#9e9e9e", "#1a237e", "#f06292"];
@@ -67,7 +68,7 @@ export function KreatorKlubu({ sw, idx, onUtworz, onWstecz }: { sw: StanGry; idx
         </Pressable>
         <View style={{ marginLeft: 12, flex: 1 }}>
           <Text style={{ color: K.tekst, fontSize: 15, fontWeight: "800", fontFamily: CZCIONKA }}>🏗 Załóż własny klub</Text>
-          <Text style={{ color: K.szary, fontSize: 11.5, fontFamily: CZCIONKA }} numberOfLines={1}>Start: {liga.nazwa}</Text>
+          <Text style={{ color: K.szary, fontSize: 11.5, fontFamily: CZCIONKA }} numberOfLines={1}>Start: {nazwaLigi(liga.nazwa)}</Text>
         </View>
       </View>
       <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 40 }}>
@@ -105,7 +106,7 @@ export function KreatorKlubu({ sw, idx, onUtworz, onWstecz }: { sw: StanGry; idx
 
         {otwarta ? (
           <View style={[st.karta, { marginHorizontal: 0, borderColor: K.akcent }]}>
-            <Text style={st.naglowek}>Zgłoszenie do {liga.nazwa}</Text>
+            <Text style={st.naglowek}>Zgłoszenie do {nazwaLigi(liga.nazwa)}</Text>
             <Text style={st.tekst}>➕ Twój klub dołączy jako NOWA, dodatkowa drużyna — nikogo nie zastępuje.</Text>
             <Text style={[st.maly, { marginTop: 4 }]}>W klasach A i B liczba drużyn nie jest stała (nowe zgłoszenia do ZPN): grupa powiększy się z {kluby.length} do {kluby.length + 1} zespołów, a terminarz zostanie ułożony od nowa.</Text>
           </View>

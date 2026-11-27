@@ -14,6 +14,7 @@ import type { Klub, StanGry } from "../engine/types";
 import { Herb, nazwaPierwszejDruzyny } from "./Herb";
 import { SCIEZKI } from "../data/sciezki";
 import { CZCIONKA, K, st } from "./styl";
+import { nazwaLigi } from "../data/nazwyLigOficjalne";
 
 const KOLOR_POZ = ["#ffd23f", "#ff9f43", "#ff6b6b", "#c56cf0", "#5aa9ff", "#3fd47f", "#7bed9f", "#b8c4d0", "#8a94a0"];
 const NAZWY_POZ = ["Ekstraklasa", "I liga", "II liga", "III liga", "IV liga", "V liga", "Okręgówka", "A klasa", "B klasa"];
@@ -240,7 +241,7 @@ export function MapaWojewodztwa({ s }: { s: StanGry }) {
         <Herb klub={fokus} rozmiar={44} />
         <View style={{ flex: 1 }}>
           <Text style={[st.tekst, { fontSize: 15, fontWeight: "800" }]}>{fokus.nazwa}{fokus.id === s.mojKlub ? " · Twój klub" : ""}</Text>
-          <Text style={[st.maly, { fontSize: 12 }]}>📍 {fokus.miasto}{MIASTA[fokus.miasto] ? "" : " (≈)"} · {fokusP?.liga ?? s.ligi[fokus.poziom - 1]?.nazwa ?? NAZWY_POZ[fokus.poziom - 1]}{fokus.id !== s.mojKlub ? ` · 🚌 ${odlegloscDrogowa(moj.miasto, fokus.miasto)} km` : ""}</Text>
+          <Text style={[st.maly, { fontSize: 12 }]}>📍 {fokus.miasto}{MIASTA[fokus.miasto] ? "" : " (≈)"} · {nazwaLigi(fokusP?.liga ?? s.ligi[fokus.poziom - 1]?.nazwa) || NAZWY_POZ[fokus.poziom - 1]}{fokus.id !== s.mojKlub ? ` · 🚌 ${odlegloscDrogowa(moj.miasto, fokus.miasto)} km` : ""}</Text>
           {relKlubu(fokus.nazwa).length > 0 && <Text style={[st.maly, { fontSize: 12, marginTop: 2 }]}>{relKlubu(fokus.nazwa).slice(0, 8).map((r) => `${r.typ === "kosa" ? "⚔️" : r.typ === "uklad" ? "🤜🤛" : "🤝"} ${r.a === fokus.nazwa ? r.b : r.a}`).join("  ")}</Text>}
         </View>
       </View>

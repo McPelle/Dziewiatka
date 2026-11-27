@@ -8,6 +8,7 @@ import { Herb } from "./Herb";
 import { LogoLigi } from "./LogoLigi";
 import { WidokKlubu } from "./WidokKlubu";
 import { K, st, web } from "./styl";
+import { nazwaLigi } from "../data/nazwyLigOficjalne";
 
 type Widok = "tabela" | "strzelcy" | "asysty" | "konta" | "xi";
 const WIDOKI: [Widok, string][] = [["tabela", "Tabela"], ["strzelcy", "Strzelcy"], ["asysty", "Asysty"], ["konta", "Czyste konta"], ["xi", "⭐ XI kolejki"]];
@@ -34,7 +35,7 @@ export function Tabela({ s }: { s: StanGry }) {
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, paddingTop: 10, paddingLeft: 12 }}>
         {s.ligi.map((l) => (
           <Pressable key={l.poziom} onPress={() => setPoziom(l.poziom)} style={[st.chip, l.poziom === poziom && st.chipAktywny]}>
-            <Text style={{ color: l.poziom === poziom ? "#17310f" : K.tekst, fontWeight: "700" }}>{l.nazwa}</Text>
+            <Text style={{ color: l.poziom === poziom ? "#17310f" : K.tekst, fontWeight: "700" }}>{nazwaLigi(l.nazwa)}</Text>
           </Pressable>
         ))}
       </ScrollView>
@@ -49,7 +50,7 @@ export function Tabela({ s }: { s: StanGry }) {
       <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
         <View style={[st.wiersz, { gap: 10, paddingHorizontal: 14, paddingTop: 8 }]}>
           <LogoLigi nazwa={liga.nazwa} poziom={liga.poziom} rozmiar={34} />
-          <Text style={[st.tytul, { fontSize: 17, flex: 1 }]}>{liga.nazwa}</Text>
+          <Text style={[st.tytul, { fontSize: 17, flex: 1 }]}>{nazwaLigi(liga.nazwa)}</Text>
         </View>
         {widok === "xi" ? (
           (() => {
@@ -117,7 +118,7 @@ export function Tabela({ s }: { s: StanGry }) {
         ) : (
           <View style={st.karta}>
             <Text style={st.naglowek}>
-              {widok === "strzelcy" ? "Król strzelców" : widok === "asysty" ? "Król asyst" : "Czyste konta (bramkarze)"} — {liga.nazwa}
+              {widok === "strzelcy" ? "Król strzelców" : widok === "asysty" ? "Król asyst" : "Czyste konta (bramkarze)"} — {nazwaLigi(liga.nazwa)}
             </Text>
             {(() => {
               const klucz = widok === "strzelcy" ? "gole" : widok === "asysty" ? "asysty" : "czysteKonta";

@@ -3,6 +3,7 @@ import { mojaLiga } from "../engine/sezon";
 import type { StanGry, Wynik } from "../engine/types";
 import { Herb } from "./Herb";
 import { K, KOLOR_POZ, st } from "./styl";
+import { nazwaLigi } from "../data/nazwyLigOficjalne";
 
 const KOLOR_OCENY = (o: number) => (o >= 8.5 ? "#36d989" : o >= 7 ? "#ffce47" : o >= 5.5 ? "#8fb6a1" : "#ff6470");
 
@@ -15,7 +16,7 @@ export function Terminarz({ s }: { s: StanGry }) {
     <ScrollView style={st.ekran} contentContainerStyle={{ paddingBottom: 30 }}>
       {ostatni && <Relacja s={s} w={ostatni} />}
       <View style={st.karta}>
-        <Text style={st.naglowek}>Terminarz — {liga.nazwa}</Text>
+        <Text style={st.naglowek}>Terminarz — {nazwaLigi(liga.nazwa)}</Text>
         {liga.terminarz.map((pary, r) => {
           const para = pary.find(([a, b]) => a === s.mojKlub || b === s.mojKlub);
           const wynik = liga.wyniki[r]?.find((w) => w.dom === s.mojKlub || w.gosc === s.mojKlub);

@@ -5,6 +5,7 @@ import type { StanGry } from "../engine/types";
 import { SKROT_POZ } from "../data/pozycje";
 import { Herb } from "./Herb";
 import { K, KOLOR_POZ, st } from "./styl";
+import { nazwaLigi } from "../data/nazwyLigOficjalne";
 
 const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Alert.alert("", t));
 
@@ -24,7 +25,7 @@ export function ZespolyKlubu({ s, odswiez }: { s: StanGry; odswiez: () => void }
           <View style={[st.wiersz, { gap: 8 }]}>
             <Herb klub={zespol} rozmiar={22} />
             <Text style={[st.tekst, { fontWeight: "800" }]}>{zespol.nazwa}</Text>
-            <Text style={st.maly}>· {s.ligi[zespol.poziom - 1]?.nazwa}</Text>
+            <Text style={st.maly}>· {nazwaLigi(s.ligi[zespol.poziom - 1]?.nazwa)}</Text>
           </View>
           {zawodnicy.slice(0, 14).map((z) => {
             const jest = powolani.includes(z.id);
