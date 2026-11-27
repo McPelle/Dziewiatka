@@ -1128,29 +1128,12 @@ function tydzien(s: StanGry) {
     }
     if (z.kontuzja > 0) z.kontuzja--;
     if (z.zawieszenie > 0) z.zawieszenie--;
-    // trening: rozwój ku potencjałowi; fokus klubowy + intensywność działają na Twoją kadrę
-    let bazaDelta = 0;
-    if (z.umiej < z.potencjal) {
-      let mn = (z.wiek <= 20 ? 0.18 : z.wiek <= 24 ? 0.1 : 0.04) * (graWRezerwach ? 1.4 : 1) * treningMn(freq);
-      if (moj) {
-        mn *= mnoznikFokus(s, z); // fokus (ogólny/gra/umiejętność/młodzież) + intensywność
-        if (z.wiek <= 21) mn *= 1.3 + aMoj * 0.5; // akademia przyspiesza juniorów
-        if (z.wiek <= 21 && wSkladzie) mn *= 1.25; // minuty w pierwszym składzie = szybszy rozwój młodzieżowca
-        if (z.wiek <= 21 && maWeterana) mn *= 1.12; // mentoring: weteran w kadrze przyspiesza młodych
-        mn *= modRozwoj(s); if (z.poz === "BR") mn *= 1 + modRozwojBR(s); // asystent/trener bramkarzy
-      }
-      bazaDelta = mn * los(0.5, 1.5);
-      rozwinAtrybuty(z, bazaDelta);
-    }
-    // Trening ukierunkowany w atrybuty + indywidualny + nauka pozycji (tylko Twoja kadra).
-    if (moj) {
-      for (const m of treningGracza(s, z, bazaDelta)) wiadomosc(s, m);
-      if (szansa(kontuzjaTreningowa(s, z))) {
-        z.kontuzja = losInt(1, 2);
-        wiadomosc(s, `🤕 ${z.imie} ${z.nazwisko} nabawił się drobnego urazu na treningu — pauza ${z.kontuzja} ${z.kontuzja === 1 ? "kolejka" : "kolejki"}.`);
-      }
-    }
+    // trening: rozwój ku potencjałowi; fokus klubowy + intensywność działają na Twoją kadrę.
+    // Twoja kadra: część tygodnia mogła już zostać wytrenowana dzień po dniu (kalendarz) — tu dokładamy resztę.
+    const frac = moj ? Math.max(0, 1 - (s.treningiDni ?? 0) / 3) : 1;
+    if (frac > 0) rozwojTreningowy(s, z, frac, { moj, wSkladzie, graWRezerwach, freq, aMoj, maWeterana }, (m) => wiadomosc(s, m));
   }
+  s.treningiDni = 0;
   naborUlicy(s);     // adept „z ulicy" może trafić do akademii U-21
   rozwojJuniorow(s); // juniorzy rozwijają się (gra U-21 + szkolenie)
   rozwojTestow(s); odswiezRynekTestow(s); sprzatnijRynekTestow(s); // zawodnicy na testach (niższe ligi)
@@ -1407,6 +1390,38 @@ export function aktualizujTypyKontraktow(s: StanGry) {
 
 /** Czy liga to klasa okręgowa / A / B / C (liczba drużyn zmienia się co sezon; IV liga i wyżej — stała, regulaminowa). */
 function klasaZmienna(nazwa: string): boolean { return /klasa (a|b|c)\b/i.test(nazwa) && !/okręgow/i.test(nazwa); }
+/** Rozwój treningowy zawodnika za część tygodnia (`frac`: 1 = cały tydzień, 1/3 = jeden dzień treningowy). */
+export function rozwojTreningowy(s: StanGry, z: Zawodnik, frac: number,
+  c: { moj: boolean; wSkladzie: boolean; graWRezerwach: boolean; freq: number; aMoj: number; maWeterana: boolean }, msg: (t: string) => void) {
+  let bazaDelta = 0;
+  if (z.umiej < z.potencjal) {
+    let mn = (z.wiek <= 20 ? 0.18 : z.wiek <= 24 ? 0.1 : 0.04) * (c.graWRezerwach ? 1.4 : 1) * treningMn(c.freq);
+    if (c.moj) {
+      mn *= mnoznikFokus(s, z); // fokus (ogólny/gra/umiejętność/młodzież) + intensywność
+      if (z.wiek <= 21) mn *= 1.3 + c.aMoj * 0.5; // akademia przyspiesza juniorów
+      if (z.wiek <= 21 && c.wSkladzie) mn *= 1.25; // minuty w pierwszym składzie = szybszy rozwój młodzieżowca
+      if (z.wiek <= 21 && c.maWeterana) mn *= 1.12; // mentoring: weteran w kadrze przyspiesza młodych
+      mn *= modRozwoj(s); if (z.poz === "BR") mn *= 1 + modRozwojBR(s); // asystent/trener bramkarzy
+    }
+    bazaDelta = mn * los(0.5, 1.5) * frac;
+    rozwinAtrybuty(z, bazaDelta);
+  }
+  // Trening ukierunkowany w atrybuty + indywidualny + nauka pozycji (tylko Twoja kadra).
+  if (c.moj) {
+    for (const m of treningGracza(s, z, bazaDelta, frac)) msg(m);
+    if (szansa(kontuzjaTreningowa(s, z) * frac)) {
+      z.kontuzja = losInt(1, 2);
+      msg(`🤕 ${z.imie} ${z.nazwisko} nabawił się drobnego urazu na treningu — pauza ${z.kontuzja} ${z.kontuzja === 1 ? "kolejka" : "kolejki"}.`);
+    }
+  }
+}
+/** Kontekst treningu Twojej kadry (do treningu dziennego w kalendarzu). */
+export function kontekstTreningu(s: StanGry, z: Zawodnik) {
+  const mk = s.kluby[s.mojKlub];
+  const wSkladzie = s.taktyka.sklad.includes(z.id);
+  return { moj: true, wSkladzie, graWRezerwach: !wSkladzie && !!mk.rezerwaId && z.zawieszenie === 0 && z.kontuzja === 0, freq: treningiMoje(s),
+    aMoj: poziomAkademii(mk) / 5, maWeterana: mk.zawodnicy.some((id) => s.zawodnicy[id]?.cechy?.includes("weteran")) };
+}
 /** Mistrzowie grup-rodzeństwa (spoza symulowanej piramidy) awansujący do ligi poziomu i (np. mistrz IV ligi innego województwa).
  *  Klub z danych wraca do gry (albo zostaje utworzony) z kadrą na poziomie ligi. */
 function awanseZRodzenstwa(s: StanGry, i: number, n: number): string[] {

@@ -409,6 +409,9 @@ export interface StanGry {
   xiHistoria?: XIKolejki[]; // archiwum jedenastek kolejek z sezonu
   konferencja?: Konferencja;
   motywacjaMeczu?: number;
+  dzien?: number; // dzień tygodnia w kalendarzu (0 = poniedziałek … 6 = niedziela); mecz ligowy w sobotę
+  treningiDni?: number; // ile dni treningowych tego tygodnia już wykonano (każdy = 1/3 tygodniowego treningu)
+  raportyDni?: { data: string; tytul: string; ikona: string; wpisy: string[] }[]; // dziennik kalendarza (ostatnie dni)
   powolaniKlubowi?: string[]; // zawodnicy z innych zespołów klubu (I/II/III) powołani na najbliższy mecz Twojego zespołu
   ostatnieSklady?: Record<string, string[]>; // ostatnia XI zespołów klubów wielozespołowych (do limitów powołań)
   rozmiaryStart?: number[];

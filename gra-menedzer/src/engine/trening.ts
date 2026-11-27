@@ -163,7 +163,7 @@ export function zmeczenieIntensywnosci(s: StanGry): number {
 /** Trening ukierunkowany + indywidualny + nauka pozycji dla JEDNEGO mojego zawodnika.
  *  `baza` = bazowy przyrost overalla z tego tygodnia (po mnożnikach) — część idzie w atrybuty fokusu.
  *  Zwraca komunikaty (kamienie milowe: wyuczona pozycja). */
-export function treningGracza(s: StanGry, z: Zawodnik, baza: number): string[] {
+export function treningGracza(s: StanGry, z: Zawodnik, baza: number, frac = 1): string[] {
   const msg: string[] = [];
   const intens = intensywnosc(s).rozwoj;
   // 1) fokus celuje w konkretne atrybuty (nawet gdy overall na suficie — podnosi wskazane cechy)
@@ -176,12 +176,12 @@ export function treningGracza(s: StanGry, z: Zawodnik, baza: number): string[] {
   // 2) trening indywidualny — szybszy rozwój wskazanego atrybutu (ponad drużynę)
   if (z.treningIndywidualny) {
     const mlodyMn = z.wiek <= 20 ? 1.4 : z.wiek <= 24 ? 1.1 : z.wiek <= 29 ? 0.8 : 0.5;
-    const d = (0.10 + poziomSztabu(s, "asystent") * 0.015) * mlodyMn * intens * los(0.7, 1.3);
+    const d = (0.10 + poziomSztabu(s, "asystent") * 0.015) * mlodyMn * intens * los(0.7, 1.3) * frac;
     rozwinAtrybut(z, z.treningIndywidualny, d);
   }
   // 3) nauka nowej pozycji
   if (z.naukaPozycji) {
-    z.naukaPozycji.postep += tempoNauki(s, z);
+    z.naukaPozycji.postep += tempoNauki(s, z) * frac;
     if (z.naukaPozycji.postep >= 100) {
       const poz = z.naukaPozycji.poz;
       z.pozycjeDodatkowe = [...(z.pozycjeDodatkowe ?? []), poz];

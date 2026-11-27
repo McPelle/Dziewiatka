@@ -9,6 +9,7 @@ import { dataKolejki } from "../engine/kalendarz";
 import type { StanGry } from "../engine/types";
 import { KarieraTrenera } from "./KarieraTrenera";
 import { KontraktTrenera } from "./KontraktTrenera";
+import { PanelDnia } from "./PanelDnia";
 import { KonferencjaEkran } from "./Konferencja";
 import { Finanse } from "./Finanse";
 import { Scouting } from "./Scouting";
@@ -297,9 +298,7 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
           <Text style={st.przyciskTekst}>Zakończ sezon — awanse i spadki ›</Text>
         </Pressable>
       ) : (
-        <Pressable style={st.przycisk} onPress={() => { zagrajKolejke(s); odswiez(); if (rywalId) pokazMecz(); }}>
-          <Text style={st.przyciskTekst}>Rozegraj kolejkę ›</Text>
-        </Pressable>
+        <PanelDnia s={s} odswiez={odswiez} pokazMecz={() => { if (rywalId) pokazMecz(); }} />
       )}
 
       <View style={[st.karta, st.wiersz, { justifyContent: "space-between" }]}>
