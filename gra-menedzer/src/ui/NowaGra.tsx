@@ -32,14 +32,8 @@ const crestLigi = (idx: number, r = 38) => (
     <LogoLigi nazwa={NAZWY_LOGO[Math.min(idx, 3)]} poziom={idx + 1} rozmiar={r * 0.9} znak />
   </View>);
 const KLUCZ_WOJ: Record<string, string> = { "Małopolskie": "małopolskie", "Pomorskie": "pomorskie", "Zachodniopomorskie": "zachodniopomorskie", "Kujawsko-pomorskie": "kujawsko-pomorskie" };
-const crestWoj = (label: string, r = 38) => {
-  const [tlo, akcent] = BARWY_WOJ[label] ?? ["#1a3a2a", "#ffce47"];
-  const kt = kontur(KLUCZ_WOJ[label] ?? ""); if (!kt.length) return <LogoLigi nazwa={label} rozmiar={r * 0.8} />;
-  const lo = kt.map((q) => q[0]), la = kt.map((q) => q[1]); const [a, b, c, d] = [Math.min(...lo), Math.max(...lo), Math.min(...la), Math.max(...la)];
-  const cos = Math.cos(((c + d) / 2) * Math.PI / 180), w = (b - a) * cos, h = d - c, sk = 90 / Math.max(w, h);
-  const path = kt.map(([x, y], i) => `${i ? "L" : "M"}${(5 + ((x - a) * cos) * sk + (90 - w * sk) / 2).toFixed(1)},${(5 + (d - y) * sk + (90 - h * sk) / 2).toFixed(1)}`).join("") + "Z";
-  return <Svg width={r * 1.15} height={r * 1.15} viewBox="0 0 100 100"><Path d={path} fill={tlo} stroke={akcent} strokeWidth={4} strokeLinejoin="round" /></Svg>;
-};
+// województwo = herb jego wojewódzkiego ZPN (oryginalne logo związku, bez tła)
+const crestWoj = (label: string, r = 38) => <View style={{ width: r * 1.15, height: r * 1.15, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={`${label} ZPN`} rozmiar={r * 1.1} /></View>;
 
 // ——— Struktura wyboru: ligi krajowe + województwa (IV liga → klasa B) ———
 const PREF = (n: string) => n.split(" — ")[0].trim();
