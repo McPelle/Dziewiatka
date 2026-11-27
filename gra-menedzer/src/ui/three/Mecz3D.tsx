@@ -5,6 +5,7 @@
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import * as THREE from "three";
+import { barwyKlubu } from "../../data/barwy";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
@@ -78,8 +79,15 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     if (!ust.lekka) composer.addPass(bokeh);
     composer.addPass(new OutputPass());
     // pogoda
-    let opady: THREE.Points | undefined;
-    if (ust.pogoda === "deszcz" || ust.pogoda === "snieg") {
+    let opady: THREE.Points | undefined, smugi: THREE.LineSegments | undefined;
+    if (ust.pogoda === "deszcz") {
+      // deszcz: smugi (odcinki) lekko pochylone wiatrem — wyglądają jak prawdziwe krople w ruchu
+      const n = ust.lekka ? 1800 : 6000, pos = new Float32Array(n * 6);
+      for (let i = 0; i < n; i++) { const x = (Math.random() - 0.5) * 160, y = Math.random() * 50, z = (Math.random() - 0.5) * 110; pos.set([x, y, z, x + 0.12, y + 0.9, z + 0.05], i * 6); }
+      const gm = new THREE.BufferGeometry(); gm.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      smugi = new THREE.LineSegments(gm, new THREE.LineBasicMaterial({ color: 0xc8d8ec, transparent: true, opacity: ust.noc ? 0.55 : 0.35 }));
+      smugi.frustumCulled = false; scena.add(smugi);
+    } else if (ust.pogoda === "snieg") {
       const n = ust.lekka ? 1500 : 5000, pos = new Float32Array(n * 3);
       for (let i = 0; i < n; i++) { pos[i * 3] = (Math.random() - 0.5) * 160; pos[i * 3 + 1] = Math.random() * 50; pos[i * 3 + 2] = (Math.random() - 0.5) * 110; }
       const gm = new THREE.BufferGeometry(); gm.setAttribute("position", new THREE.BufferAttribute(pos, 3));
@@ -537,6 +545,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
               const domGol = m.karne ? m.pilka.strona === "dom" : sg.b.x > 0; strzelec = sg.p.nosnik; celebracja = m.karne ? 1.3 : 3.2; if (!m.karne) gwizdek();
               radoscTrenera = domGol ? "dom" : "gosc"; radoscT = 4; if (domGol && race) raceT = 7;
               reakcjaTrybun(domGol ? "gol" : "zawod", domGol); // gospodarze mają większość na trybunach
+              { const kStrz = s.kluby[domGol ? m.dom.klubId : m.gosc.klubId]; const [b1, b2] = barwyKlubu(kStrz?.nazwa ?? ""); if (domGol) stad.ledy?.gol(b1, b2, "GOOOL!"); }
               koniecSeg = true;
             }
             si++;
@@ -712,7 +721,10 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         let c = cienie4.get(id); if (!c) { c = KIER4.map((k) => { const mm = new THREE.Mesh(geoCien, matCien); mm.rotation.order = "YXZ"; mm.rotation.set(-Math.PI / 2, k, 0); scena.add(mm); return mm; }); cienie4.set(id, c); }
         for (const x of c) { x.visible = true; x.position.set(p.g.position.x, 0.013, p.g.position.z); }
       }
-      stad.aktualizuj(czas, emocje);
+      stad.aktualizuj(czas, emocje); stad.ledy?.aktualizuj(dt);
+      if (smugi) { const a = smugi.geometry.getAttribute("position") as THREE.BufferAttribute; const arr = a.array as Float32Array; const dy = 24 * dt, dx = 3 * dt;
+        for (let i = 0; i < arr.length; i += 6) { arr[i + 1] -= dy; arr[i + 4] -= dy; arr[i] -= dx; arr[i + 3] -= dx; if (arr[i + 1] < 0) { const x = (Math.random() - 0.5) * 160, z = (Math.random() - 0.5) * 110; arr[i] = x; arr[i + 1] = 50; arr[i + 2] = z; arr[i + 3] = x + 0.12; arr[i + 4] = 50.9; arr[i + 5] = z + 0.05; } }
+        a.needsUpdate = true; }
       if (opady) { const a = opady.geometry.getAttribute("position") as THREE.BufferAttribute; const spd = ust.pogoda === "snieg" ? 2.5 : 22;
         for (let i = 0; i < a.count; i++) { let y = a.getY(i) - spd * dt; if (y < 0) y = 50; a.setY(i, y); if (ust.pogoda === "snieg") a.setX(i, a.getX(i) + Math.sin(czas + i) * dt * 0.4); } a.needsUpdate = true; }
       // ——— kamera (reżyser) ———

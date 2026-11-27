@@ -121,27 +121,77 @@ export function bramka(strona: -1 | 1, siatka: boolean): THREE.Group {
   return g;
 }
 
-function bandy(sponsorzy: string[], led: boolean, odl = 4): THREE.Group {
+/** Sterowanie bandami LED (szczebel centralny): przewijanie reklam i animacja „GOOOL!” w barwach strzelców. */
+export interface Ledy { aktualizuj: (dt: number) => void; gol: (kolor: string, akcent: string, napis?: string) => void }
+
+function bandy(sponsorzy: string[], led: boolean, odl = 4): { g: THREE.Group; ledy?: Ledy } {
   const g = new THREE.Group();
   const tex = (tekst: string, i: number) => {
     const c = canvas(512, 64), x = c.getContext("2d")!;
-    const kol = led ? ["#0b1d4a", "#1a1a1a", "#7a0d10", "#0d4a22"][i % 4] : ["#f4f4f0", "#1e3d8f", "#c8102e", "#f2c230"][i % 4];
+    const kol = ["#f4f4f0", "#1e3d8f", "#c8102e", "#f2c230"][i % 4];
     x.fillStyle = kol; x.fillRect(0, 0, 512, 64);
-    x.fillStyle = led ? "#ffffff" : (i % 4 === 0 || i % 4 === 3 ? "#111" : "#fff"); x.font = "bold 40px Arial"; x.textAlign = "center"; x.textBaseline = "middle";
+    x.fillStyle = i % 4 === 0 || i % 4 === 3 ? "#111" : "#fff"; x.font = "bold 40px Arial"; x.textAlign = "center"; x.textBaseline = "middle";
     x.fillText(tekst.toUpperCase().slice(0, 22), 256, 34);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   };
   const lista = sponsorzy.length ? sponsorzy : ["Twoja reklama tutaj", "Sklep u Basi", "Auto-Serwis", "Piekarnia"];
+  // LED: jeden długi pas ze wszystkimi reklamami (siatka pikseli), przewijany w zsynchronizowanym rytmie na wszystkich bandach
+  let pas: THREE.CanvasTexture | undefined, golTex: THREE.CanvasTexture | undefined, golCanvas: HTMLCanvasElement | undefined;
+  const matyLed: THREE.MeshStandardMaterial[] = [];
+  if (led) {
+    const n = Math.max(4, lista.length), c = canvas(512 * n, 64), x = c.getContext("2d")!;
+    const tla = ["#0b1d4a", "#111111", "#7a0d10", "#0d4a22", "#3b1060", "#0d3a4a"];
+    for (let i = 0; i < n; i++) {
+      const gr = x.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, tla[i % tla.length]); gr.addColorStop(1, "#000000");
+      x.fillStyle = gr; x.fillRect(i * 512, 0, 512, 64);
+      x.fillStyle = "#ffffff"; x.font = "bold 40px Arial"; x.textAlign = "center"; x.textBaseline = "middle";
+      x.fillText(lista[i % lista.length].toUpperCase().slice(0, 22), i * 512 + 256, 34);
+    }
+    // siatka diod (ciemne linie co 4 px) — efekt prawdziwego ekranu LED
+    x.fillStyle = "rgba(0,0,0,0.35)"; for (let px = 0; px < c.width; px += 4) x.fillRect(px, 0, 1, 64); for (let py = 0; py < 64; py += 4) x.fillRect(0, py, c.width, 1);
+    pas = new THREE.CanvasTexture(c); pas.colorSpace = THREE.SRGBColorSpace; pas.wrapS = THREE.RepeatWrapping; pas.repeat.x = 1 / n;
+    golCanvas = canvas(512, 64); golTex = new THREE.CanvasTexture(golCanvas); golTex.colorSpace = THREE.SRGBColorSpace;
+  }
   let i = 0;
   const segment = (x: number, z: number, rot: number, w: number) => {
-    const mat = new THREE.MeshStandardMaterial({ map: tex(lista[i % lista.length], i), emissive: led ? new THREE.Color(0xffffff) : new THREE.Color(0), emissiveIntensity: led ? 0.35 : 0, emissiveMap: led ? undefined : undefined, roughness: 0.6 });
-    if (led) mat.emissiveMap = mat.map;
+    const mat = led
+      ? new THREE.MeshStandardMaterial({ map: pas, emissive: new THREE.Color(0xffffff), emissiveMap: pas, emissiveIntensity: 0.55, roughness: 0.5 })
+      : new THREE.MeshStandardMaterial({ map: tex(lista[i % lista.length], i), roughness: 0.6 });
+    if (led) matyLed.push(mat);
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.9, 0.15), mat); m.position.set(x, 0.45, z); m.rotation.y = rot; m.castShadow = true; g.add(m); i++;
   };
   const W = 10;
   for (let x = -DL / 2 + 5; x <= DL / 2 - 5; x += W) { segment(x, -SZ / 2 - odl, 0, W - 0.2); segment(x, SZ / 2 + odl, Math.PI, W - 0.2); }
   for (const sx of [-1, 1]) for (const z of [-24, -14, 14, 24]) segment(sx * (DL / 2 + 4.5), z, sx * Math.PI / 2, W - 0.2);
-  return g;
+  if (!led || !pas || !golTex || !golCanvas) return { g };
+  // rytm: reklama stoi ~5 s, potem płynnie przesuwa się na następną (0,6 s)
+  let tPas = 0, golT = 0, golKolor = "#c8102e", golAkcent = "#ffffff", golNapis = "GOOOL!";
+  const nSlot = 1 / pas.repeat.x;
+  const rysujGol = (faza: number) => {
+    const x = golCanvas!.getContext("2d")!; const miga = Math.floor(faza * 6) % 2 === 0;
+    x.fillStyle = miga ? golKolor : golAkcent; x.fillRect(0, 0, 512, 64);
+    x.fillStyle = miga ? golAkcent : golKolor; x.font = "900 46px Arial"; x.textAlign = "center"; x.textBaseline = "middle";
+    const przes = ((faza * 260) % 700) - 100; x.fillText(golNapis, 256 + (przes - 256) * 0.0, 34); x.fillText("★", przes, 34);
+    x.fillStyle = "rgba(0,0,0,0.3)"; for (let px = 0; px < 512; px += 4) x.fillRect(px, 0, 1, 64);
+    golTex!.needsUpdate = true;
+  };
+  const ledy: Ledy = {
+    aktualizuj: (dt) => {
+      if (golT > 0) {
+        golT -= dt; rysujGol(4.5 - golT);
+        if (golT <= 0) for (const m of matyLed) { m.map = pas!; m.emissiveMap = pas!; m.needsUpdate = true; }
+        return;
+      }
+      tPas += dt; const cykl = 5.6, slot = Math.floor(tPas / cykl), w = tPas % cykl;
+      const przejscie = w > 5 ? (w - 5) / 0.6 : 0, e = przejscie * przejscie * (3 - 2 * przejscie);
+      pas!.offset.x = ((slot + e) % nSlot) / nSlot;
+    },
+    gol: (kolor, akcent, napis = "GOOOL!") => {
+      golKolor = kolor; golAkcent = akcent; golNapis = napis; golT = 4.5; rysujGol(0);
+      for (const m of matyLed) { m.map = golTex!; m.emissiveMap = golTex!; m.needsUpdate = true; }
+    },
+  };
+  return { g, ledy };
 }
 
 export interface OpcjeStadionu { noc: boolean; wieczor?: boolean; snieg: boolean; deszcz: boolean; widzowie: number; budowy?: Budowa[]; lekka?: boolean }
@@ -156,7 +206,7 @@ function teksturaKibica(): THREE.Texture {
   g.fillStyle = "rgba(0,0,0,0.25)"; g.fillRect(4, 40, 24, 3); // cień kołnierza
   _tekstKib = new THREE.CanvasTexture(c); _tekstKib.colorSpace = THREE.SRGBColorSpace; return _tekstKib;
 }
-export interface Stadion3D { grupa: THREE.Group; kibice?: THREE.InstancedMesh; kibiceBaza: Float32Array; reflektory: THREE.Object3D[]; siatki: THREE.Mesh[]; aktualizuj: (t: number, emocje: number) => void }
+export interface Stadion3D { grupa: THREE.Group; kibice?: THREE.InstancedMesh; kibiceBaza: Float32Array; reflektory: THREE.Object3D[]; siatki: THREE.Mesh[]; aktualizuj: (t: number, emocje: number) => void; ledy?: Ledy }
 
 /** Typowy stadion (kluby bez prawdziwego kształtu): trybuny wg pojemności — jak dotąd (podzialTrybun). */
 function ksztaltOgolny(klub: Klub, kol1: string, kol2: string): KsztaltStadionu {
@@ -212,7 +262,8 @@ export function zbudujStadion(s: StanGry | null, klub: Klub, o: OpcjeStadionu): 
   }
   // bandy (sponsorzy) — od IV ligi wzwyż; niżej barierki
   const sponsorzy = s?.sponsorzy?.map((x) => x.nazwa) ?? [];
-  if (!nisko) grupa.add(bandy(sponsorzy, klub.poziom <= 3, ks.bieznia ? 1.9 : 4));
+  let ledy: Ledy | undefined;
+  if (!nisko) { const b = bandy(sponsorzy, klub.poziom <= 3, ks.bieznia ? 1.9 : 4); grupa.add(b.g); ledy = b.ledy; }
   else {
     // barierki z rur (jedna scalona siatka zamiast ~80 osobnych)
     const g = new Geo(), rura = kolor(0x9aa0a6);
@@ -427,7 +478,7 @@ export function zbudujStadion(s: StanGry | null, klub: Klub, o: OpcjeStadionu): 
     }
     grupa.traverse((x) => { if (x.name === "wysiegnik") x.rotation.y = Math.sin(t * 0.15) * 0.6; if (x.name === "robotnik") x.position.y = Math.abs(Math.sin(t * 3 + x.id)) * 0.08; });
   };
-  return { grupa, kibice, kibiceBaza, reflektory, siatki, aktualizuj };
+  return { grupa, kibice, kibiceBaza, reflektory, siatki, aktualizuj, ledy };
 }
 
 /** Prosty robotnik budowlany (kask, kamizelka). */
