@@ -6,7 +6,7 @@ import { zl } from "../engine/losuj";
 import { dalejDzien, doMeczu, fmtData } from "../engine/dzien";
 import { dataOkresu, dniRazem, kosztObozuPrzyg, nazwaDnia, OBOZY_PRZYG, pozyskajKandydata, rywaleSparingowi, skrocUrlop, testySzczebel, wybierzOboz, zaplanujSparing } from "../engine/okres";
 import type { StanGry } from "../engine/types";
-import { CZCIONKA, K, st } from "./styl";
+import { CZCIONKA, K, pasek3D, st, szklo3D } from "./styl";
 
 const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Alert.alert("", t));
 
@@ -33,7 +33,7 @@ export function PanelOkresu({ s, odswiez }: { s: StanGry; odswiez: () => void })
       <Text style={[st.tekst, { fontSize: 17, fontWeight: "900", marginTop: 2 }]}>
         {o.dzien < o.dniUrlopu ? `🏖 Urlop — dzień ${o.dzien + 1} z ${o.dniUrlopu}` : `🏃 Przygotowania — dzień ${o.dzien - o.dniUrlopu + 1} z ${o.dniPrzygotowan}`}
       </Text>
-      <View style={{ height: 6, backgroundColor: K.karta2, borderRadius: 3, marginTop: 8, overflow: "hidden" }}>
+      <View style={{ height: 6, backgroundColor: K.karta2, borderRadius: 3, marginTop: 8, overflow: "hidden", ...pasek3D }}>
         <View style={{ width: `${(o.dzien / razem) * 100}%`, height: 6, backgroundColor: K.niebieski }} />
       </View>
       <Text style={[st.maly, { marginTop: 4 }]}>Start {o.rodzaj === "lato" ? "sezonu" : "rundy wiosennej"} za {razem - o.dzien} dni.{o.skroconyUrlop ? ` Urlop skrócony o ${o.skroconyUrlop} dni.` : ""}</Text>
@@ -96,7 +96,7 @@ export function PanelOkresu({ s, odswiez }: { s: StanGry; odswiez: () => void })
       )}
 
       {raport && (
-        <View style={{ marginTop: 10, backgroundColor: K.karta2, borderRadius: 10, padding: 10 }}>
+        <View style={{ marginTop: 10, backgroundColor: K.karta2, borderRadius: 10, padding: 10, ...szklo3D }}>
           <Text style={[st.maly, { fontWeight: "800", color: K.tekst }]}>{raport.ikona} {raport.data} — {raport.tytul}</Text>
           {raport.wpisy.map((w, i) => <Text key={i} style={[st.maly, { marginTop: 3 }]}>{w}</Text>)}
         </View>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 import type { StanGry } from "../engine/types";
 import { importujZPliku, listaZapisow, usunSlot, wczytaj as wczytajAuto, wczytajSlot, type MetaZapisu } from "./zapis";
-import { CZCIONKA, K, st } from "./styl";
+import { CZCIONKA, ikona3D, K, st, szklo3D } from "./styl";
 
 function kiedyTekst(ms: number): string {
   const d = new Date(ms);
@@ -31,7 +31,7 @@ export function WczytajGre({ onWczytaj, onWstecz }: { onWczytaj: (s: StanGry) =>
   return (
     <View style={st.ekran}>
       <View style={[st.wiersz, { paddingHorizontal: 12, paddingVertical: 10, backgroundColor: K.pas, borderBottomWidth: 1, borderBottomColor: K.liniaMocna }]}>
-        <Pressable onPress={onWstecz} style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.linia, opacity: pressed ? 0.8 : 1 }]}>
+        <Pressable onPress={onWstecz} style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.linia, ...szklo3D, opacity: pressed ? 0.8 : 1 }]}>
           <Text style={{ color: K.akcent, fontSize: 16, fontWeight: "900", marginRight: 4, fontFamily: CZCIONKA }}>‹</Text>
           <Text style={{ color: K.tekst, fontSize: 13, fontWeight: "700", fontFamily: CZCIONKA }}>Wstecz</Text>
         </Pressable>
@@ -41,7 +41,7 @@ export function WczytajGre({ onWczytaj, onWstecz }: { onWczytaj: (s: StanGry) =>
       <ScrollView contentContainerStyle={{ padding: 12, paddingBottom: 28 }}>
         {auto && auto.kluby?.[auto.mojKlub] ? (
           <Pressable onPress={() => onWczytaj(auto)} style={[st.karta, st.wiersz, { marginTop: 8, paddingVertical: 12, borderColor: K.akcent2, borderWidth: 1 }]}>
-            <View style={{ width: 42, height: 42, borderRadius: 11, backgroundColor: K.karta2, alignItems: "center", justifyContent: "center", marginRight: 12 }}><Text style={{ fontSize: 20 }}>⏱</Text></View>
+            <View style={{ width: 42, height: 42, borderRadius: 11, backgroundColor: K.karta2, ...ikona3D, alignItems: "center", justifyContent: "center", marginRight: 12 }}><Text style={{ fontSize: 20 }}>⏱</Text></View>
             <View style={{ flex: 1 }}>
               <Text style={{ color: K.akcent2, fontSize: 11, fontWeight: "900", fontFamily: CZCIONKA }}>AUTOZAPIS · OSTATNIA GRA</Text>
               <Text numberOfLines={1} style={{ color: K.tekst, fontSize: 15.5, fontWeight: "800", fontFamily: CZCIONKA }}>{auto.kluby[auto.mojKlub].nazwa}</Text>
@@ -66,7 +66,7 @@ export function WczytajGre({ onWczytaj, onWstecz }: { onWczytaj: (s: StanGry) =>
         ) : (
           lista.map((m) => (
             <View key={m.id} style={[st.karta, st.wiersz, { marginTop: 8, paddingVertical: 12 }]}>
-              <View style={{ width: 42, height: 42, borderRadius: 11, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.liniaMocna, alignItems: "center", justifyContent: "center", marginRight: 12 }}>
+              <View style={{ width: 42, height: 42, borderRadius: 11, backgroundColor: K.karta2, ...ikona3D, borderWidth: 1, borderColor: K.liniaMocna, alignItems: "center", justifyContent: "center", marginRight: 12 }}>
                 <Text style={{ fontSize: 20 }}>⚽</Text>
               </View>
               <Pressable onPress={() => wczytaj(m)} style={{ flex: 1 }}>

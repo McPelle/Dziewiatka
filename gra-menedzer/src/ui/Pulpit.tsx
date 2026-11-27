@@ -30,7 +30,7 @@ import { WidokKlubu } from "./WidokKlubu";
 import { Herb } from "./Herb";
 import { Twarz } from "./Twarz";
 import { wybierzZdjecie } from "./zdjecie";
-import { K, st } from "./styl";
+import { K, pasek3D, st } from "./styl";
 
 const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Alert.alert("", t));
 
@@ -363,13 +363,13 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
       <View style={st.karta}>
         <Text style={st.naglowek}>Zarząd · cel: {s.cel}</Text>
         {s.celDlugo && <Text style={[st.maly, { marginBottom: 4 }]}>🎯 Długofalowo: {s.celDlugo.opis} (do sezonu {s.celDlugo.doSezonu})</Text>}
-        <View style={{ height: 10, backgroundColor: K.karta2, borderRadius: 5, overflow: "hidden" }}>
+        <View style={{ height: 10, backgroundColor: K.karta2, borderRadius: 5, overflow: "hidden", ...pasek3D }}>
           <View style={{ width: `${s.zarzad}%`, height: 10, backgroundColor: s.zarzad > 50 ? K.zielony : s.zarzad > 25 ? K.akcent : K.czerwony }} />
         </View>
         <Text style={[st.maly, { marginTop: 6 }]}>Zaufanie zarządu: {Math.round(s.zarzad)}%</Text>
         {s.zaufanieKibicow != null && (
           <>
-            <View style={{ height: 8, backgroundColor: K.karta2, borderRadius: 4, overflow: "hidden", marginTop: 6 }}>
+            <View style={{ height: 8, backgroundColor: K.karta2, borderRadius: 4, overflow: "hidden", marginTop: 6, ...pasek3D }}>
               <View style={{ width: `${s.zaufanieKibicow}%`, height: 8, backgroundColor: s.zaufanieKibicow > 55 ? K.zielony : s.zaufanieKibicow > 30 ? K.akcent : K.czerwony }} />
             </View>
             <Text style={[st.maly, { marginTop: 4 }]}>❤ Zaufanie kibiców: {Math.round(s.zaufanieKibicow)}% <Text style={{ color: K.szary }}>(wpływa na frekwencję)</Text></Text>

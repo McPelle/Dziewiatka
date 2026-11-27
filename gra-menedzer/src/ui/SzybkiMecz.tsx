@@ -9,7 +9,7 @@ import type { MeczLive } from "../engine/meczNaZywo";
 import type { StanGry } from "../engine/types";
 import { Herb } from "./Herb";
 import { MeczNaZywo } from "./MeczNaZywo";
-import { CZCIONKA, K, st } from "./styl";
+import { CZCIONKA, K, plyta3D, st } from "./styl";
 
 export function SzybkiMecz({ onWstecz }: { onWstecz: () => void }) {
   // świat gry per region (podokręg) — prawdziwe kluby od Ekstraklasy po B-klasę z oryginalnymi herbami; tworzony na żądanie
@@ -47,7 +47,7 @@ export function SzybkiMecz({ onWstecz }: { onWstecz: () => void }) {
     setGra(w); setWynik(null); setGram([dom, g]);
   };
   const Klub = ({ id, r }: { id: string | null; r: number }) => { const k = id ? swiat(r).kluby[id] : null; return (
-    <View style={{ flex: 1, alignItems: "center", padding: 8, backgroundColor: K.karta, borderRadius: 12, borderWidth: 1, borderColor: k ? K.akcent : K.linia }}>
+    <View style={{ flex: 1, alignItems: "center", padding: 8, backgroundColor: K.karta, borderRadius: 12, borderWidth: 1, borderColor: k ? K.akcent : K.linia, ...plyta3D }}>
       {k ? <Herb klub={k} rozmiar={44} /> : <Text style={{ fontSize: 30 }}>❔</Text>}
       <Text style={[st.tekst, { fontSize: 13, textAlign: "center", marginTop: 4 }]} numberOfLines={2}>{k ? k.nazwa : "wybierz"}</Text>
       {k && <Text style={[st.maly, { fontSize: 10.5 }]}>{swiat(r).ligi[k.poziom - 1]?.nazwa ?? ""}</Text>}

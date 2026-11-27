@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { dalejDzien, doMeczu, dzisiaj, fmtData, planTygodnia } from "../engine/dzien";
 import type { StanGry } from "../engine/types";
-import { CZCIONKA, K, st } from "./styl";
+import { CZCIONKA, K, st, szklo3D } from "./styl";
 import { PanelOkresu } from "./PanelOkresu";
 import { MeczNaZywo, zapisanyMecz } from "./MeczNaZywo";
 import { KalendarzMiesiac } from "./KalendarzMiesiac";
@@ -57,7 +57,7 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
         })}
       </View>
       {raport && (
-        <Pressable onPress={() => setRozwin(!rozwin)} style={{ marginTop: 10, backgroundColor: K.karta2, borderRadius: 10, padding: 10 }}>
+        <Pressable onPress={() => setRozwin(!rozwin)} style={{ marginTop: 10, backgroundColor: K.karta2, borderRadius: 10, padding: 10, ...szklo3D }}>
           <Text style={[st.maly, { fontWeight: "800", color: K.tekst }]}>{raport.ikona} Raport: {raport.data} — {raport.tytul} {rozwin ? "▲" : "▼"}</Text>
           {rozwin && raport.wpisy.map((w, i) => <Text key={i} style={[st.maly, { marginTop: 3 }]}>{w}</Text>)}
         </Pressable>

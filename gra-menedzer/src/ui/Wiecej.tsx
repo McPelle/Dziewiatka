@@ -28,7 +28,7 @@ import { Sponsorzy } from "./Sponsorzy";
 import { Stroje } from "./Stroje";
 import { PucharEkran } from "./PucharEkran";
 import { PrzegladLig } from "./PrzegladLig";
-import { CZCIONKA, cien, G, K, st, web } from "./styl";
+import { CZCIONKA, cien, G, K, st, szklo3D, web } from "./styl";
 
 // Hub „Więcej" — pełne menu wszystkich działów klubu. Karty pogrupowane, z ikoną i krótkim opisem.
 type Tryb = "modal" | "inline";
@@ -160,7 +160,7 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
 function PasekPowrotu({ tytul, ikona, onBack }: { tytul: string; ikona: string; onBack: () => void }) {
   return (
     <View style={[st.wiersz, { paddingHorizontal: 12, paddingVertical: 10, backgroundColor: K.pas, borderBottomWidth: 1, borderBottomColor: K.liniaMocna }]}>
-      <Pressable onPress={onBack} style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.linia, opacity: pressed ? 0.8 : 1 }]}>
+      <Pressable onPress={onBack} style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.linia, ...szklo3D, opacity: pressed ? 0.8 : 1 }]}>
         <Text style={{ color: K.akcent, fontSize: 16, fontWeight: "900", marginRight: 4, fontFamily: CZCIONKA }}>‹</Text>
         <Text style={{ color: K.tekst, fontSize: 13, fontWeight: "700", fontFamily: CZCIONKA }}>Wstecz</Text>
       </Pressable>

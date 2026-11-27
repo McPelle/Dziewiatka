@@ -5,7 +5,7 @@ import type { StanGry, WlasnoscKlubu } from "../engine/types";
 import { ligaOtwarta, type OpcjeKlubu } from "../engine/wlasnyKlub";
 import { HerbGenerowany } from "./HerbGen";
 import { Herb } from "./Herb";
-import { CZCIONKA, K, st } from "./styl";
+import { CZCIONKA, K, st, szklo3D } from "./styl";
 
 // Kreator własnego klubu: nazwa, miasto, rok, barwy, stadion, właściciel, budżet i drużyna, której miejsce zajmie.
 const PALETA = ["#c8102e", "#0033a0", "#006a3c", "#ffd100", "#000000", "#ffffff", "#6a1b9a", "#ff6f00", "#00a3e0", "#7b1e1e", "#2e7d32", "#9e9e9e", "#1a237e", "#f06292"];
@@ -61,7 +61,7 @@ export function KreatorKlubu({ sw, idx, onUtworz, onWstecz }: { sw: StanGry; idx
   return (
     <View style={st.ekran}>
       <View style={[st.wiersz, { paddingHorizontal: 12, paddingVertical: 10, backgroundColor: K.pas, borderBottomWidth: 1, borderBottomColor: K.liniaMocna }]}>
-        <Pressable onPress={onWstecz} style={{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.linia }}>
+        <Pressable onPress={onWstecz} style={{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.linia, ...szklo3D }}>
           <Text style={{ color: K.akcent, fontSize: 16, fontWeight: "900", marginRight: 4 }}>‹</Text>
           <Text style={{ color: K.tekst, fontSize: 13, fontWeight: "700", fontFamily: CZCIONKA }}>Wstecz</Text>
         </Pressable>

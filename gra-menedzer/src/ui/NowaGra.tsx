@@ -10,7 +10,7 @@ import Svg, { Path } from "react-native-svg";
 import { kontur } from "../data/granice";
 import { KreatorKlubu } from "./KreatorKlubu";
 import { stworzWlasnyKlub } from "../engine/wlasnyKlub";
-import { CZCIONKA, cien, K, st } from "./styl";
+import { cien, CZCIONKA, ikona3D, K, st, szklo3D } from "./styl";
 
 // Barwy oryginalnych herbów lig (wg szczebla) i województw (wg regionu) — własne, nie kopie logo.
 const BARWY_LIGI: [string, string, string][] = [
@@ -122,7 +122,7 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
 
   const Pasek = ({ tytul, pod, onBack }: { tytul: string; pod?: string; onBack: () => void }) => (
     <View style={[st.wiersz, { paddingHorizontal: 12, paddingVertical: 10, backgroundColor: K.pas, borderBottomWidth: 1, borderBottomColor: K.liniaMocna }]}>
-      <Pressable onPress={onBack} style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.linia, opacity: pressed ? 0.8 : 1 }]}>
+      <Pressable onPress={onBack} style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.linia, ...szklo3D, opacity: pressed ? 0.8 : 1 }]}>
         <Text style={{ color: K.akcent, fontSize: 16, fontWeight: "900", marginRight: 4, fontFamily: CZCIONKA }}>‹</Text>
         <Text style={{ color: K.tekst, fontSize: 13, fontWeight: "700", fontFamily: CZCIONKA }}>Wstecz</Text>
       </Pressable>
@@ -136,7 +136,7 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
   const Pozycja = ({ ikona, herb, tytul, pod, onPress, zlote }: { ikona?: string; herb?: ReactNode; tytul: string; pod?: string; onPress: () => void; zlote?: boolean }) => (
     <Pressable onPress={onPress} style={({ pressed }) => [st.karta, st.wiersz, { marginTop: 8, paddingVertical: 14, opacity: pressed ? 0.85 : 1, borderColor: zlote ? "rgba(255,206,71,0.4)" : K.linia }]}>
       {herb ? <View style={{ marginRight: 12 }}>{herb}</View>
-        : ikona ? <View style={{ width: 40, height: 40, borderRadius: 11, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.liniaMocna, alignItems: "center", justifyContent: "center", marginRight: 12 }}><Text style={{ fontSize: 20 }}>{ikona}</Text></View> : null}
+        : ikona ? <View style={{ width: 40, height: 40, borderRadius: 11, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.liniaMocna, ...ikona3D, alignItems: "center", justifyContent: "center", marginRight: 12 }}><Text style={{ fontSize: 20 }}>{ikona}</Text></View> : null}
       <View style={{ flex: 1 }}>
         <Text style={{ color: K.tekst, fontSize: 15.5, fontWeight: "800", fontFamily: CZCIONKA }}>{tytul}</Text>
         {pod ? <Text style={{ color: K.szary, fontSize: 12, marginTop: 1, fontFamily: CZCIONKA }}>{pod}</Text> : null}

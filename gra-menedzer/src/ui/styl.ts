@@ -48,6 +48,12 @@ const cienKarty = "0 14px 28px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.35), ins
 const cienPrzycisku = "0 5px 0 #9c6a07, 0 12px 20px rgba(0,0,0,0.45), inset 0 2px 0 rgba(255,255,255,0.75), inset 0 -2px 0 rgba(0,0,0,0.18)";
 const cienMalego = "0 3px 0 rgba(0,0,0,0.45), 0 6px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)";
 
+/** Gotowe wykończenia 3D (tylko web): płyta (karta/kafel), szkło (mały przycisk), ikona w pudełku. */
+export const plyta3D = web({ backgroundImage: G.karta, boxShadow: "0 4px 0 rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.09)" });
+export const szklo3D = web({ backgroundImage: G.szklo, boxShadow: "0 3px 0 rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.14)" });
+export const ikona3D = web({ backgroundImage: G.ciemny, boxShadow: "0 3px 0 rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.18), 0 0 10px rgba(255,206,71,0.12)" });
+export const pasek3D = web({ boxShadow: "inset 0 2px 4px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.06)" });
+
 export const st = StyleSheet.create({
   ekran: { flex: 1, backgroundColor: K.tlo, ...web({ backgroundImage: G.tlo }) },
   karta: { backgroundColor: K.karta, borderRadius: 18, padding: 16, marginHorizontal: 12, marginTop: 12, borderWidth: 1, borderColor: "rgba(255,255,255,0.08)", ...cien, ...web({ backgroundImage: G.karta, boxShadow: cienKarty }) },

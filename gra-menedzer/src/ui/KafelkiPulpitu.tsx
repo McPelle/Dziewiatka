@@ -6,7 +6,7 @@ import { bilansKolejki } from "../engine/sezon";
 import { tabelaLigi } from "../engine/swiat";
 import type { StanGry } from "../engine/types";
 import { Herb } from "./Herb";
-import { CZCIONKA, K, st } from "./styl";
+import { CZCIONKA, K, plyta3D, st } from "./styl";
 
 const zl = (n: number) => `${Math.round(n).toLocaleString("pl-PL")} zł`;
 /** Liczba, która płynnie dobiega do nowej wartości (np. kasa po transferze). */
@@ -27,7 +27,7 @@ export function KafelkiPulpitu({ s }: { s: StanGry }) {
   const b = bilansKolejki(s);
   const kol = (r: string) => (r === "W" ? K.zielony : r === "P" ? K.czerwony : "#8a94a0");
   const Kafel = ({ tytul, children }: { tytul: string; children: React.ReactNode }) => (
-    <View style={{ flexBasis: "48%", flexGrow: 1, backgroundColor: K.karta, borderRadius: 14, padding: 12, borderWidth: 1, borderColor: K.linia }}>
+    <View style={{ flexBasis: "48%", flexGrow: 1, backgroundColor: K.karta, borderRadius: 14, padding: 12, borderWidth: 1, borderColor: K.linia, ...plyta3D }}>
       <Text style={[st.naglowek, { marginBottom: 6 }]}>{tytul}</Text>{children}
     </View>);
   return (
@@ -43,7 +43,7 @@ export function KafelkiPulpitu({ s }: { s: StanGry }) {
         <AnimLiczba wartosc={k.kasa} format={zl} style={{ color: k.kasa < 0 ? K.czerwony : K.zielony, fontSize: 18, fontWeight: "900", fontFamily: CZCIONKA }} />
         <Text style={[st.maly, { fontSize: 12, marginTop: 4 }]}>Bilans kolejki: <Text style={{ color: b.bilans >= 0 ? K.zielony : K.czerwony, fontWeight: "800" }}>{b.bilans >= 0 ? "+" : ""}{zl(b.bilans)}</Text></Text>
       </Kafel>
-      <View style={{ flexBasis: "100%", backgroundColor: K.karta, borderRadius: 14, padding: 12, borderWidth: 1, borderColor: K.linia }}>
+      <View style={{ flexBasis: "100%", backgroundColor: K.karta, borderRadius: 14, padding: 12, borderWidth: 1, borderColor: K.linia, ...plyta3D }}>
         <Text style={[st.naglowek, { marginBottom: 6 }]}>Tabela wokół Ciebie</Text>
         {okno.map((x) => { const nr = t.indexOf(x) + 1, ja = x.klubId === s.mojKlub; return (
           <View key={x.klubId} style={[st.wiersz, { gap: 8, paddingVertical: 4, paddingHorizontal: 6, borderRadius: 8, backgroundColor: ja ? "rgba(255,206,71,0.14)" : "transparent" }]}>

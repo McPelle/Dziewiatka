@@ -9,7 +9,7 @@ import { SKROT_POZ } from "../data/pozycje";
 import { Herb } from "./Herb";
 import { ProfilZawodnika } from "./ProfilZawodnika";
 import { WidokKlubu } from "./WidokKlubu";
-import { CZCIONKA, K, KOLOR_POZ, st } from "./styl";
+import { CZCIONKA, K, KOLOR_POZ, st, szklo3D } from "./styl";
 
 // „Wszystkie ligi" — podgląd całej gry z dowolnej kariery: ligi centralne, III liga (grupy) i 4 województwa (IV liga → klasa B/C).
 // Ligi z Twojej piramidy są symulowane (żywa tabela, pełne kluby, oferty za zawodników).
@@ -179,7 +179,7 @@ export function PrzegladLig({ s, widoczny, onClose, odswiez }: { s: StanGry; wid
     <Modal visible={widoczny} animationType="slide" onRequestClose={wstecz}>
       <View style={st.ekran}>
         <View style={[st.wiersz, { paddingHorizontal: 12, paddingVertical: 10, backgroundColor: K.pas, borderBottomWidth: 1, borderBottomColor: K.liniaMocna }]}>
-          <Pressable onPress={wstecz} style={{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.linia }}>
+          <Pressable onPress={wstecz} style={{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.linia, ...szklo3D }}>
             <Text style={{ color: K.akcent, fontSize: 16, fontWeight: "900", marginRight: 4 }}>‹</Text>
             <Text style={{ color: K.tekst, fontSize: 13, fontWeight: "700", fontFamily: CZCIONKA }}>{hist.length > 1 ? "Wstecz" : "Zamknij"}</Text>
           </Pressable>
