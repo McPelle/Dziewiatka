@@ -21,7 +21,7 @@ mkdirSync(OUT, { recursive: true });
 // 1) Bundel JS pod nazwą z hashem (przeglądarka nie weźmie starej wersji z pamięci).
 const jsDir = join(DIST, "_expo/static/js/web");
 const jsName = readdirSync(jsDir).find((f) => f.endsWith(".js"));
-const js = readFileSync(join(jsDir, jsName));
+const js = Buffer.from(readFileSync(join(jsDir, jsName), "utf8").replace(/"\/assets\//g, "\"./assets/"));
 const hash = createHash("sha1").update(js).digest("hex").slice(0, 10);
 const appJs = `app-${hash}.js`;
 writeFileSync(join(OUT, appJs), js);
@@ -34,9 +34,9 @@ if (existsSync(join(REPO, "public3d"))) cpSync(join(REPO, "public3d"), join(OUT,
 for (const [z, d] of [["ikona9-180.png", "ikona-180.png"], ["ikona9-512.png", "ikona-512.png"]]) if (existsSync(join(IKONY, z))) cpSync(join(IKONY, z), join(OUT, d));
 writeFileSync(join(OUT, "manifest.webmanifest"), JSON.stringify({
   name: "Dziewiątka — Menedżer Piłkarski", short_name: "Dziewiątka", lang: "pl",
-  start_url: "/", scope: "/", display: "standalone", orientation: "portrait",
+  start_url: "./", scope: "./", display: "standalone", orientation: "portrait",
   background_color: "#06130d", theme_color: "#0c5230",
-  icons: [{ src: "/ikona-180.png", sizes: "180x180", type: "image/png" }, { src: "/ikona-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }],
+  icons: [{ src: "./ikona-180.png", sizes: "180x180", type: "image/png" }, { src: "./ikona-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }],
 }, null, 2));
 
 // 4) index.html z rejestracją service workera i komunikatem o nowej wersji.
@@ -51,9 +51,9 @@ const html = `<!doctype html>
 <meta name="apple-mobile-web-app-title" content="Dziewiątka" />
 <meta name="theme-color" content="#0c5230" />
 <title>Dziewiątka — Menedżer Piłkarski</title>
-<link rel="manifest" href="/manifest.webmanifest" />
-<link rel="apple-touch-icon" href="/ikona-180.png" />
-<link rel="icon" type="image/png" sizes="512x512" href="/ikona-512.png" />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="apple-touch-icon" href="./ikona-180.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="./ikona-512.png" />
 <style id="expo-reset">
   html, body { height: 100%; background: #06130d; }
   body { overflow: hidden; margin: 0; }
@@ -66,7 +66,7 @@ const html = `<!doctype html>
 </head>
 <body>
 <noscript>Włącz JavaScript, aby uruchomić grę.</noscript>
-<div id="start"><img src="/ikona-180.png" width="96" height="96" style="border-radius:22px" alt="" /><div style="margin-top:14px">DZIEWIĄTKA</div><div style="font-size:12px;color:#9fb3a6;margin-top:6px">Ładowanie gry…</div></div>
+<div id="start"><img src="./ikona-180.png" width="96" height="96" style="border-radius:22px" alt="" /><div style="margin-top:14px">DZIEWIĄTKA</div><div style="font-size:12px;color:#9fb3a6;margin-top:6px">Ładowanie gry…</div></div>
 <div id="root"></div>
 <div id="nowa-wersja"><button id="nw-ok">Uruchom ponownie</button>⚽ Nowa wersja gry jest gotowa. Zapisz grę i uruchom ponownie — albo włączy się sama przy następnym otwarciu.</div>
 <script>
@@ -76,7 +76,7 @@ const html = `<!doctype html>
     obs.observe(document.getElementById("root"), { childList: true });
     if (!("serviceWorker" in navigator)) return;
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("/sw.js").then(function (reg) {
+      navigator.serviceWorker.register("./sw.js").then(function (reg) {
         function pokaz(w) {
           var b = document.getElementById("nowa-wersja"); b.style.display = "block";
           document.getElementById("nw-ok").onclick = function () { w.postMessage("AKTUALIZUJ"); };
@@ -95,7 +95,7 @@ const html = `<!doctype html>
     });
   })();
 </script>
-<script src="/${appJs}" defer></script>
+<script src="./${appJs}" defer></script>
 </body>
 </html>`;
 writeFileSync(join(OUT, "index.html"), html);
@@ -106,7 +106,7 @@ const pliki = [];
 const wersja = createHash("sha1").update(pliki.join("|") + hash).digest("hex").slice(0, 12);
 const sw = `// Service worker gry „Dziewiątka" — wersja ${wersja}
 const WERSJA = "dziewiatka-${wersja}";
-const PLIKI = ${JSON.stringify(["/", ...pliki.filter((p) => p !== "/sw.js" && p !== "/_headers")])};
+const PLIKI = ${JSON.stringify(["./", ...pliki.filter((p) => p !== "/sw.js" && p !== "/_headers" && p !== "/.nojekyll").map((p) => "." + p)])};
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(WERSJA).then((c) => c.addAll(PLIKI)));
 });
@@ -117,11 +117,12 @@ self.addEventListener("message", (e) => { if (e.data === "AKTUALIZUJ") self.skip
 self.addEventListener("fetch", (e) => {
   const r = e.request;
   if (r.method !== "GET" || new URL(r.url).origin !== location.origin) return;
-  if (r.mode === "navigate") { e.respondWith(caches.match("/index.html").then((c) => c || fetch(r))); return; }
+  if (r.mode === "navigate") { e.respondWith(caches.match("./index.html").then((c) => c || fetch(r))); return; }
   e.respondWith(caches.match(r).then((c) => c || fetch(r).then((res) => { const kopia = res.clone(); caches.open(WERSJA).then((ca) => ca.put(r, kopia)); return res; })));
 });
 `;
 writeFileSync(join(OUT, "sw.js"), sw);
+writeFileSync(join(OUT, ".nojekyll"), "");
 writeFileSync(join(OUT, "_headers"), `/index.html\n  Cache-Control: no-cache\n/sw.js\n  Cache-Control: no-cache\n/manifest.webmanifest\n  Cache-Control: no-cache\n/app-*\n  Cache-Control: public, max-age=31536000, immutable\n`);
 let rozm = 0; for (const p of pliki) rozm += statSync(join(OUT, p)).size;
 console.error(`Zapisano folder ${OUT}: ${pliki.length} plików, ${(rozm / 1048576).toFixed(1)} MB, wersja ${wersja}`);

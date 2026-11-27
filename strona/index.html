@@ -9,9 +9,9 @@
 <meta name="apple-mobile-web-app-title" content="Dziewiątka" />
 <meta name="theme-color" content="#0c5230" />
 <title>Dziewiątka — Menedżer Piłkarski</title>
-<link rel="manifest" href="/manifest.webmanifest" />
-<link rel="apple-touch-icon" href="/ikona-180.png" />
-<link rel="icon" type="image/png" sizes="512x512" href="/ikona-512.png" />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="apple-touch-icon" href="./ikona-180.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="./ikona-512.png" />
 <style id="expo-reset">
   html, body { height: 100%; background: #06130d; }
   body { overflow: hidden; margin: 0; }
@@ -24,7 +24,7 @@
 </head>
 <body>
 <noscript>Włącz JavaScript, aby uruchomić grę.</noscript>
-<div id="start"><img src="/ikona-180.png" width="96" height="96" style="border-radius:22px" alt="" /><div style="margin-top:14px">DZIEWIĄTKA</div><div style="font-size:12px;color:#9fb3a6;margin-top:6px">Ładowanie gry…</div></div>
+<div id="start"><img src="./ikona-180.png" width="96" height="96" style="border-radius:22px" alt="" /><div style="margin-top:14px">DZIEWIĄTKA</div><div style="font-size:12px;color:#9fb3a6;margin-top:6px">Ładowanie gry…</div></div>
 <div id="root"></div>
 <div id="nowa-wersja"><button id="nw-ok">Uruchom ponownie</button>⚽ Nowa wersja gry jest gotowa. Zapisz grę i uruchom ponownie — albo włączy się sama przy następnym otwarciu.</div>
 <script>
@@ -34,7 +34,7 @@
     obs.observe(document.getElementById("root"), { childList: true });
     if (!("serviceWorker" in navigator)) return;
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("/sw.js").then(function (reg) {
+      navigator.serviceWorker.register("./sw.js").then(function (reg) {
         function pokaz(w) {
           var b = document.getElementById("nowa-wersja"); b.style.display = "block";
           document.getElementById("nw-ok").onclick = function () { w.postMessage("AKTUALIZUJ"); };
@@ -53,6 +53,6 @@
     });
   })();
 </script>
-<script src="/app-385d2d964f.js" defer></script>
+<script src="./app-cf34cf8976.js" defer></script>
 </body>
 </html>

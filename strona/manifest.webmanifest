@@ -2,20 +2,20 @@
   "name": "Dziewiątka — Menedżer Piłkarski",
   "short_name": "Dziewiątka",
   "lang": "pl",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#06130d",
   "theme_color": "#0c5230",
   "icons": [
     {
-      "src": "/ikona-180.png",
+      "src": "./ikona-180.png",
       "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "/ikona-512.png",
+      "src": "./ikona-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
