@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Platform, Pressable, SafeAreaView, Text, View } from "react-native";
+import { ActivityIndicator, Animated, Platform, Pressable, SafeAreaView, Text, View } from "react-native";
 import { zl } from "./src/engine/losuj";
 import { ileKolejek, mojaLiga } from "./src/engine/sezon";
 import type { StanGry } from "./src/engine/types";
@@ -100,14 +100,14 @@ export default function App() {
       {ekran === "gra" && stan && (
         <View style={{ flex: 1 }}>
           <NaglowekKlubu s={stan} onMenu={() => setEkran("menu")} onNowa={() => doMenu(true)} />
-          <View style={{ flex: 1 }}>
+          <PrzejscieTV klucz={zakladka}>
             {zakladka === "pulpit" && <Pulpit s={stan} odswiez={odswiez} pokazMecz={() => setZakladka("mecze")} />}
             {zakladka === "sklad" && <Sklad s={stan} odswiez={odswiez} />}
             {zakladka === "tabela" && <Tabela s={stan} />}
             {zakladka === "mecze" && <Terminarz s={stan} />}
             {zakladka === "transfery" && <Transfery s={stan} odswiez={odswiez} />}
             {zakladka === "wiecej" && <Wiecej s={stan} odswiez={odswiez} />}
-          </View>
+          </PrzejscieTV>
           <PasekZakladek zakladka={zakladka} na={setZakladka} akcent={koloryMotywu(stan.kluby[stan.mojKlub]?.nazwa ?? "").akcent} />
         </View>
       )}
@@ -198,6 +198,22 @@ function PasekZakladek({ zakladka, na, akcent = K.akcent }: { zakladka: Zakladka
           </Pressable>
         );
       })}
+    </View>
+  );
+}
+
+// Przejście jak w telewizji (#59): przy zmianie zakładki złota belka „wipe” przelatuje przez ekran, treść wjeżdża z boku.
+function PrzejscieTV({ klucz, children }: { klucz: string; children: React.ReactNode }) {
+  const [a] = useState(() => new Animated.Value(1));
+  const pierwszy = useRef(true);
+  useEffect(() => {
+    if (pierwszy.current) { pierwszy.current = false; return; }
+    a.setValue(0); Animated.timing(a, { toValue: 1, duration: 380, useNativeDriver: Platform.OS !== "web" }).start();
+  }, [klucz]);
+  return (
+    <View style={{ flex: 1, overflow: "hidden" }}>
+      <Animated.View style={{ flex: 1, opacity: a.interpolate({ inputRange: [0, 0.35, 1], outputRange: [0, 0.6, 1] }), transform: [{ translateX: a.interpolate({ inputRange: [0, 1], outputRange: [28, 0] }) }] }}>{children}</Animated.View>
+      <Animated.View pointerEvents="none" style={{ position: "absolute", top: 0, bottom: 0, width: 70, backgroundColor: K.akcent, opacity: a.interpolate({ inputRange: [0, 0.8, 1], outputRange: [0.85, 0.5, 0] }), transform: [{ skewX: "-14deg" }, { translateX: a.interpolate({ inputRange: [0, 1], outputRange: [-90, 520] }) }] }} />
     </View>
   );
 }
