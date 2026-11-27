@@ -407,7 +407,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Ultra Wisła"
   ],
   "chuligani": [
-   "Wisła Devils"
+   "Wisła Devils",
+   "Młoda Ferajna",
+   "Wisła Sharks"
   ],
   "zgody": [
    "Ruch Chorzów",

@@ -20,6 +20,7 @@ export function Osiagniecia({ s, odswiez }: { s: StanGry; odswiez: () => void })
         {(Object.keys(TRUDNOSCI) as Trudnosc[]).map((t) => <Pressable key={t} onPress={() => { s.trudnosc = t; odswiez(); }} style={[st.chip, { marginBottom: 0 }, trudnosc(s) === t && st.chipAktywny]}><Text style={{ color: trudnosc(s) === t ? "#17310f" : K.tekst, fontSize: 12, fontWeight: "700" }}>{TRUDNOSCI[t].nazwa}</Text></Pressable>)}
       </View>
       <Text style={[st.maly, { marginTop: 4 }]}>{TRUDNOSCI[trudnosc(s)].opis}</Text>
+      <Pressable onPress={() => { s.samouczekZrobiony = false; odswiez(); }} style={{ marginTop: 6 }}><Text style={[st.maly, { color: K.niebieski }]}>📖 Pokaż samouczek ponownie</Text></Pressable>
       {otw && OSIAGNIECIA.map((o) => (
         <View key={o.id} style={[st.wiersz, { gap: 10, paddingVertical: 6, borderTopWidth: 1, borderTopColor: K.linia, opacity: ma[o.id] ? 1 : 0.45 }]}>
           <Text style={{ fontSize: 22 }}>{ma[o.id] ? o.ikona : "🔒"}</Text>

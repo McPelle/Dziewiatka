@@ -391,6 +391,7 @@ export interface StanGry {
   ostatnieZabezpieczenie?: import("./bezpieczenstwo").Zabezpieczenie & { widzowie: number; rywal: string; incydenty: import("./bezpieczenstwo").Incydent[] };
   sektorGosciProcent?: number; // wielkość sektora gości na Twoim stadionie (min. 5% wg PZPN; 0 = zamknięty)
   opiniaPolicji?: number;
+  samouczekZrobiony?: boolean;
   trudnosc?: string; // poziom trudności: latwy | normalny | trudny | legendarny
   osiagniecia?: Record<string, number>; // id osiągnięcia → sezon odblokowania
   osiagnieciaFlagi?: { trening?: boolean; mowa?: boolean };
