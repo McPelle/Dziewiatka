@@ -1,3 +1,4 @@
+import { PrzejscieDnia, type DzienKarty } from "./PrzejscieDnia";
 import { useState } from "react";
 import { Alert, Platform, Pressable, Text, View } from "react-native";
 import { KalendarzMiesiac } from "./KalendarzMiesiac";
@@ -18,10 +19,12 @@ export function PanelOkresu({ s, odswiez }: { s: StanGry; odswiez: () => void })
   const razem = dniRazem(o);
   const raport = s.raportyDni?.[0];
   const [miesiac, setMiesiac] = useState(false);
+  const [przejscie, setPrzejscie] = useState<{ stary: DzienKarty; nowy: DzienKarty } | null>(null);
   const dzienSparingu = Math.max(o.dzien + 1, o.dniUrlopu + 2);
   const kand = (o.kandydaci ?? []).map((id) => s.zawodnicy[id]).filter((z) => z && !z.klubId);
   return (
     <View style={[st.karta, { borderColor: K.niebieski, borderWidth: 1 }]}>
+      {przejscie && <PrzejscieDnia stary={przejscie.stary} nowy={przejscie.nowy} onKoniec={() => setPrzejscie(null)} />}
       <Text style={{ color: K.niebieski, fontWeight: "900", fontSize: 12, letterSpacing: 0.6, fontFamily: CZCIONKA }}>
         {o.rodzaj === "lato" ? "☀️ OKRES LETNI" : "❄️ PRZERWA ZIMOWA"} · {nazwaDnia(d).toUpperCase()} {fmtData(d)}
       </Text>
@@ -99,7 +102,12 @@ export function PanelOkresu({ s, odswiez }: { s: StanGry; odswiez: () => void })
         </View>
       )}
       <View style={[st.wiersz, { gap: 8, marginTop: 12 }]}>
-        <Pressable style={[st.przycisk, { flex: 1, marginHorizontal: 0, marginTop: 0 }]} onPress={() => { dalejDzien(s); odswiez(); }}>
+        <Pressable style={[st.przycisk, { flex: 1, marginHorizontal: 0, marginTop: 0 }]} onPress={() => {
+          const urlop = (x: typeof o) => x.dzien < x.dniUrlopu;
+          const stary = { data: d, nazwa: nazwaDnia(d), ikona: urlop(o) ? "🏖" : "🏃", tytul: urlop(o) ? "Urlop" : "Przygotowania" };
+          dalejDzien(s); odswiez();
+          if (s.okres) { const n = dataOkresu(s); setPrzejscie({ stary, nowy: { data: n, nazwa: nazwaDnia(n), ikona: urlop(s.okres) ? "🏖" : "🏃", tytul: urlop(s.okres) ? `Urlop — dzień ${s.okres.dzien + 1}` : `Przygotowania — dzień ${s.okres.dzien - s.okres.dniUrlopu + 1}` } }); }
+        }}>
           <Text style={st.przyciskTekst}>Dalej ›</Text>
         </Pressable>
         <Pressable style={[st.przyciskMaly, { justifyContent: "center", borderColor: K.niebieski }]} onPress={() => {

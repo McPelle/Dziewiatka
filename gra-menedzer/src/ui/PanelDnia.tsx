@@ -1,3 +1,4 @@
+import { PrzejscieDnia, type DzienKarty } from "./PrzejscieDnia";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { dalejDzien, doMeczu, dzisiaj, fmtData, planTygodnia } from "../engine/dzien";
@@ -20,13 +21,21 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
   const [miesiac, setMiesiac] = useState(false);
   const [treningLive, setTreningLive] = useState(false);
   const [karta, setKarta] = useState<number | null>(null);
+  const [przejscie, setPrzejscie] = useState<{ stary: DzienKarty; nowy: DzienKarty } | null>(null);
   if (s.okres) return <PanelOkresu s={s} odswiez={odswiez} />;
   const plan = planTygodnia(s);
   const d = dzisiaj(s);
   const raport = s.raportyDni?.[0];
-  const dalej = () => { const mecz = dalejDzien(s); odswiez(); if (mecz) pokazMecz(); };
+  const dalej = () => {
+    const stary = { data: d.data, nazwa: d.nazwa, ikona: d.ikona, tytul: d.tytul };
+    const mecz = dalejDzien(s); odswiez();
+    if (mecz) { pokazMecz(); return; }
+    const n = s.okres ? null : dzisiaj(s);
+    if (n) setPrzejscie({ stary, nowy: { data: n.data, nazwa: n.nazwa, ikona: n.ikona, tytul: n.tytul } });
+  };
   return (
     <View style={[st.karta, { borderColor: K.akcent, borderWidth: 1 }]}>
+      {przejscie && <PrzejscieDnia stary={przejscie.stary} nowy={przejscie.nowy} onKoniec={() => setPrzejscie(null)} />}
       <View style={[st.wiersz, { justifyContent: "space-between" }]}>
         <View style={{ flex: 1 }}>
           <Text style={{ color: K.akcent, fontWeight: "900", fontSize: 12, letterSpacing: 0.6, fontFamily: CZCIONKA }}>{d.nazwa.toUpperCase()} · {fmtData(d.data)}</Text>
