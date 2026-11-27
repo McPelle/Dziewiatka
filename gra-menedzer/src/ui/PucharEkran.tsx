@@ -1,6 +1,7 @@
 import { ScrollView, Text, View } from "react-native";
 import { drabinkaEuropy, NAZWA_ROZGRYWEK } from "../engine/europa";
 import { etapPucharu, pelnaDrabinka, pucharRegion } from "../engine/puchar";
+import { LogoLigi } from "./LogoLigi";
 import type { EuroRywal, StanGry } from "../engine/types";
 import { Relacja } from "./Terminarz";
 import { Herb } from "./Herb";
@@ -171,8 +172,13 @@ export function PucharEkran({ s }: { s: StanGry }) {
     <ScrollView style={st.ekran} contentContainerStyle={{ paddingBottom: 30 }}>
       <Europa s={s} />
       <View style={st.karta}>
-        <Text style={st.naglowek}>Puchar</Text>
-        <Text style={[st.tytul, { color: kolor }]}>{etapPucharu(s)}</Text>
+        <View style={[st.wiersz, { gap: 12 }]}>
+          <LogoLigi nazwa={p.faza === "glowny" || p.faza === "zdobyty" ? "Puchar Polski" : "Puchar regionalny ZPN"} rozmiar={p.faza === "glowny" || p.faza === "zdobyty" ? 56 : 40} />
+          <View style={{ flex: 1 }}>
+            <Text style={st.naglowek}>{p.faza === "glowny" || p.faza === "zdobyty" ? "STS Puchar Polski" : pucharRegion(s).nom}</Text>
+            <Text style={[st.tytul, { color: kolor }]}>{etapPucharu(s)}</Text>
+          </View>
+        </View>
         {p.faza === "regionalny" && (
           <Text style={[st.maly, { marginTop: 6 }]}>
             Grasz wojewódzki {pucharRegion(s).nom}. Zdobywca awansuje do głównego Pucharu Polski i zagra z zawodowcami

@@ -4,6 +4,7 @@ import { silaKlubu, tabelaLigi } from "../engine/swiat";
 import type { StanGry, Zawodnik } from "../engine/types";
 import { BoiskoXI } from "./BoiskoXI";
 import { Herb } from "./Herb";
+import { LogoLigi } from "./LogoLigi";
 import { WidokKlubu } from "./WidokKlubu";
 import { K, st } from "./styl";
 
@@ -43,6 +44,10 @@ export function Tabela({ s }: { s: StanGry }) {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
+        <View style={[st.wiersz, { gap: 10, paddingHorizontal: 14, paddingTop: 8 }]}>
+          <LogoLigi nazwa={liga.nazwa} poziom={liga.poziom} rozmiar={34} />
+          <Text style={[st.tytul, { fontSize: 17, flex: 1 }]}>{liga.nazwa}</Text>
+        </View>
         {widok === "xi" ? (
           (() => {
             const hist = s.xiHistoria ?? (s.xiKolejki ? [s.xiKolejki] : []);

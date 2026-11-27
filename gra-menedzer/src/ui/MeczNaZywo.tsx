@@ -7,6 +7,7 @@ import { dograjDoKonca, krokMinuty, mowaWPrzerwie, NAZWA_NAST, okrzyk, OKRZYKI, 
 import { maOswietlenie } from "../engine/sezon";
 import type { Nastawienie, StanGry } from "../engine/types";
 import { Herb } from "./Herb";
+import { LogoLigi } from "./LogoLigi";
 import { CZCIONKA, K, st } from "./styl";
 import { dobierzStroje, dostepneStroje, kity, type Kit } from "./strojeDane";
 import { Mecz3D, type Kamera, type Ustawienia3D } from "./three/Mecz3D";
@@ -160,6 +161,7 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
           <Herb klub={kg} rozmiar={30} />
         </View>
         <View style={[st.wiersz, { justifyContent: "center", gap: 10, paddingVertical: 4, backgroundColor: "#071710" }]}>
+          <LogoLigi nazwa={s.ligi[kd.poziom - 1]?.nazwa ?? ""} poziom={kd.poziom} rozmiar={18} />
           <Text style={{ color: K.akcent, fontWeight: "900", fontFamily: CZCIONKA }}>{minuta}</Text>
           <Text style={st.maly}>{ust.noc ? "🌙 pod reflektorami" : "☀️ dzień"} · {{ slonce: "pogodnie", deszcz: "🌧 deszcz", snieg: "❄️ śnieg (pomarańczowa piłka)", mgla: "🌫 mgła" }[ust.pogoda]} · {ust.widzowie.toLocaleString("pl")} widzów</Text>
         </View>
