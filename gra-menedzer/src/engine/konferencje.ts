@@ -5,6 +5,7 @@ import { jestDerby } from "./derby";
 import { szansa, tasuj, wybierz } from "./losuj";
 import { tabelaLigi } from "./swiat";
 import type { StanGry, Wynik } from "./types";
+import { jezykZawodnika, NAZWA_JEZYKA, polski, tlumaczDla } from "./jezyki";
 
 export interface OpcjaKonf { tekst: string; morale: number; zarzad: number; kibice?: number; motywacja?: number; zawodnik?: { id: string; morale: number }; odzew: string }
 export interface PytanieKonf { kontekst: string; pytanie: string; opcje: OpcjaKonf[] }
@@ -55,6 +56,17 @@ export function konferencjaPrzed(s: StanGry, rywalId: string, puchar: boolean): 
   if (kontuzjowani[0]) { const z = kontuzjowani[0]; pyt.push({ kontekst: "Kontuzje", pytanie: `Brakuje ${z.imie} ${z.nazwisko}. Jak sobie poradzicie?`, opcje: [
     { tekst: "Mamy szeroką kadrę — ktoś wykorzysta szansę.", morale: 2, zarzad: 1, odzew: "Rezerwowi poczuli zaufanie." },
     { tekst: "To ogromna strata, nie da się go zastąpić.", morale: -1, zarzad: 0, zawodnik: { id: z.id, morale: 4 }, odzew: `${z.nazwisko} docenił słowa, reszta mniej.` } ] }); }
+  // cudzoziemiec bez polskiego w kadrze
+  const obcy = s.kluby[s.mojKlub].zawodnicy.map((id) => s.zawodnicy[id]).find((z) => z && polski(z) < 40 && s.taktyka.sklad.includes(z.id));
+  if (obcy && szansa(0.5)) pyt.push({ kontekst: "Język w szatni", pytanie: `${obcy.imie} ${obcy.nazwisko} wciąż nie mówi po polsku (${NAZWA_JEZYKA[jezykZawodnika(obcy)]}). Jak się z nim dogadujecie?`, opcje: [
+    { tekst: tlumaczDla(s, jezykZawodnika(obcy)) ? "Mamy tłumacza, a on ciężko pracuje nad polskim." : "Uczy się — zapisaliśmy go na kurs, reszta pomaga.", morale: 1, zarzad: 1, zawodnik: { id: obcy.id, morale: 4 }, odzew: `${obcy.nazwisko} docenił wsparcie.` },
+    { tekst: "Piłka nożna ma jeden język — boisko.", morale: 2, zarzad: 0, odzew: "Zgrabna odpowiedź, media kupiły." },
+    { tekst: "Musi się szybciej uczyć, inaczej będzie problem.", morale: -1, zarzad: 1, zawodnik: { id: obcy.id, morale: -5 }, odzew: `Presja na ${obcy.nazwisko} — w szatni cisza.` } ] });
+  // trener rywala z zagranicy
+  const rk = s.kluby[rywalId];
+  if (rk?.trenerKraj && szansa(0.4)) pyt.push({ kontekst: "Trener rywala", pytanie: `Trener ${R}, ${rk.trenerImie} ${rk.trenerNazwisko} (${rk.trenerKraj}), mówi, że polska liga jest „fizyczna i chaotyczna”. Co na to?`, opcje: [
+    { tekst: "Zapraszam na boisko — sprawdzimy, kto jest chaotyczny.", morale: 2, zarzad: 0, kibice: 2, motywacja: 0.02, odzew: "Wojna słowna! Nagłówki gotowe." },
+    { tekst: "Każdy ma prawo do opinii. My robimy swoje.", morale: 1, zarzad: 1, odzew: "Spokój i klasa." } ] });
   // Ogólne — zawsze coś na koniec
   pyt.push(wybierz([
     { kontekst: "Cel sezonu", pytanie: `Zarząd oczekuje: ${s.cel}. Realne?`, opcje: [
@@ -90,6 +102,16 @@ export function konferencjaPo(s: StanGry, w: Wynik, moje: number, ich: number, p
     { tekst: "Każdy ma gorszy mecz — dalej w niego wierzę.", morale: 1, zarzad: 0, zawodnik: { id: worst.id, morale: 6 }, odzew: `${worst.nazwisko} poczuł wsparcie.` },
     { tekst: "Porozmawiamy w cztery oczy, nie przez media.", morale: 1, zarzad: 1, odzew: "Profesjonalnie." },
     { tekst: "Tak grać nie można. Wyciągnę konsekwencje.", morale: -1, zarzad: 1, zawodnik: { id: worst.id, morale: -8 }, odzew: `Publiczna krytyka zabolała ${worst.nazwisko}.` } ] });
+  // zadymy / oprawy po meczu u siebie
+  const zab = s.ostatnieZabezpieczenie;
+  const zadyma = zab?.incydenty?.find((i) => i.typ !== "oprawa");
+  if (zadyma && szansa(0.7)) pyt.push({ kontekst: "Incydenty na trybunach", pytanie: `Race, przerwa w grze, interwencja policji… Klub znów zapłaci karę. Co powie Pan kibicom?`, opcje: [
+    { tekst: "Kocham ten doping, ale pirotechnika kosztuje klub i drużynę. Apeluję o rozsądek.", morale: 0, zarzad: 2, kibice: -1, odzew: "Zarząd zadowolony, młyn trochę mniej." },
+    { tekst: "To sprawa klubu i ochrony, ja odpowiadam za boisko.", morale: 1, zarzad: 0, odzew: "Unik — ale bez wpadki." },
+    { tekst: "Kibice robią atmosferę, której zazdrości cała liga.", morale: 1, zarzad: -2, kibice: 3, odzew: "Młyn skanduje Twoje nazwisko, zarząd marszczy brwi." } ] });
+  else if (zab?.incydenty?.some((i) => i.typ === "oprawa") && szansa(0.6)) pyt.push({ kontekst: "Oprawa", pytanie: "Kibice przygotowali dziś piękną oprawę. Widział Pan z ławki?", opcje: [
+    { tekst: "Ciarki! Dziękujemy — graliśmy także dla nich.", morale: 1, zarzad: 0, kibice: 4, odzew: "Kibice wrzucili cytat na profil grupy." },
+    { tekst: "Skupiałem się na meczu, ale słyszałem doping.", morale: 0, zarzad: 1, kibice: 1, odzew: "Profesjonalnie." } ] });
   pyt.push(wybierz([
     { kontekst: "Kibice", pytanie: "Jak oceniasz doping kibiców?", opcje: [
       { tekst: "Byli naszym dwunastym zawodnikiem — dziękujemy!", morale: 1, zarzad: 0, kibice: 4, odzew: "Kibice docenieni — frekwencja w górę." },

@@ -41,11 +41,11 @@ export function kulturaTrybun(s: StanGry, k: Klub, kolory: [string, string] = ba
   const nGrup = sl > 0.6 ? 4 : sl > 0.35 ? 3 : sl > 0.18 ? 2 : sl > 0.1 ? 1 : 0;
   const wzory = [() => `Ultras ${K}`, () => `${dz.length ? pick(dz) : k.miasto} Boys '${rok()}`, () => `Młoda Załoga '${rok()}`, () => `${pick(["North", "South", "East", "West"])} Side ${K}`, () => `Old Boys ${rok()}`, () => `Fanatics ${k.miasto}`, () => `${K} Crew '${rok()}`];
   const grupy = [...new Set(Array.from({ length: nGrup }, () => pick(wzory)()))];
-  const nFlag = Math.round(1 + sl * 16);
-  const flagi: Flaga[] = [{ tekst: k.nazwa.toUpperCase(), typ: "klub", kolory }];
-  for (const d of [...dz].sort(() => r() - 0.5).slice(0, Math.min(dz.length, Math.ceil(nFlag * 0.35)))) flagi.push({ tekst: d.toUpperCase(), typ: "dzielnica", kolory });
   // fanklub z okolicznych miejscowości (do ~45 km)
   const okolica = Object.keys(MIASTA).filter((m) => m !== k.miasto && odlegloscMiast(m, k.miasto) > 3 && odlegloscMiast(m, k.miasto) < 45).sort(() => r() - 0.5);
+  const nFlag = Math.round(2 + sl * 32); // duże sceny: 30+ flag na płotach młyna
+  const flagi: Flaga[] = [{ tekst: k.nazwa.toUpperCase(), typ: "klub", kolory }];
+  for (const d of [...dz].sort(() => r() - 0.5).slice(0, Math.min(dz.length, Math.ceil(nFlag * 0.35)))) flagi.push({ tekst: d.toUpperCase(), typ: "dzielnica", kolory });
   for (const m of okolica.slice(0, Math.ceil(nFlag * 0.35))) flagi.push({ tekst: `FANKLUB ${m.toUpperCase()}`, typ: "fanklub", kolory: [kolory[1], kolory[0]] });
   for (const g of grupy) flagi.push({ tekst: g.toUpperCase(), typ: "grupa", kolory: ["#111111", kolory[0]] });
   if (sl > 0.15) flagi.push({ tekst: pick([`ZAWSZE WIERNI ${K.toUpperCase()}`, `${k.miasto.toUpperCase()} TO MY`, "WIERNI DO KOŃCA", `DUMA ${k.miasto.toUpperCase()}`, `${K.toUpperCase()} PONAD WSZYSTKO`]), typ: "haslo", kolory });
@@ -56,10 +56,13 @@ export function kulturaTrybun(s: StanGry, k: Klub, kolory: [string, string] = ba
     const fl: Flaga[] = [{ tekst: k.nazwa.toUpperCase(), typ: "klub", kolory }];
     for (const g of gr) fl.push({ tekst: g.toUpperCase(), typ: "grupa", kolory: ["#111111", kolory[0]] });
     for (const f of real.fanklub ?? []) fl.push({ tekst: f.toUpperCase(), typ: "fanklub", kolory: [kolory[1], kolory[0]] });
-    for (const d of dz.slice(0, 4)) fl.push({ tekst: d.toUpperCase(), typ: "dzielnica", kolory });
-    return { mlyn: real.trybuna?.[0] ? `Młyn — ${real.trybuna[0]}` : mlyn, gniazdowy: true, grupy: gr.length ? gr : grupy, flagi: fl.slice(0, 22), pirotechnika: Math.min(0.9, Math.max(0.35, sl * 1.1)), zgody: real.zgody, realne: true };
+    for (const d of dz) fl.push({ tekst: d.toUpperCase(), typ: "dzielnica", kolory });
+    for (const m of okolica.slice(0, 10)) fl.push({ tekst: `FANKLUB ${m.toUpperCase()}`, typ: "fanklub", kolory: [kolory[1], kolory[0]] });
+    for (const n of s.noweFlagi?.[k.nazwa] ?? []) fl.push({ tekst: n.tekst, typ: n.typ as TypFlagi, kolory: n.typ === "grupa" ? ["#111111", kolory[0]] : kolory });
+    return { mlyn: real.trybuna?.[0] ? `Młyn — ${real.trybuna[0]}` : mlyn, gniazdowy: true, grupy: gr.length ? gr : grupy, flagi: fl.slice(0, 44), pirotechnika: Math.min(0.9, Math.max(0.35, sl * 1.1)), zgody: real.zgody, realne: true };
   }
-  return { mlyn, gniazdowy: sl > 0.18, grupy, flagi: flagi.slice(0, Math.max(1, nFlag + 1)), pirotechnika: Math.min(0.9, sl * 1.1) };
+  const lista = [...flagi.slice(0, Math.max(1, nFlag + 1)), ...(s.noweFlagi?.[k.nazwa] ?? []).map((n) => ({ tekst: n.tekst, typ: n.typ as TypFlagi, kolory: (n.typ === "grupa" ? ["#111111", kolory[0]] : kolory) as [string, string] }))];
+  return { mlyn, gniazdowy: sl > 0.18, grupy, flagi: lista.slice(0, 44), pirotechnika: Math.min(0.9, sl * 1.1) };
 }
 
 /** Okrzyki młyna w trakcie meczu (do relacji na żywo). */
@@ -69,4 +72,25 @@ export function okrzykMlyna(k: Klub, kt: KulturaTrybun, wynik: number): string {
     : wynik < 0 ? [`Gniazdowy przez megafon: „Głośniej! Nie zostawiamy ich samych!” — „${K} walczy, ${K} gra!”`, "Młyn nie przestaje: „Walczcie, walczcie!” mimo wyniku.", "Kibice odwracają się plecami do boiska i śpiewają — wsparcie do końca."]
     : [`„${k.miasto.toUpperCase()}!” — doping z ${kt.mlyn.toLowerCase()}.`, "Bęben wybija rytm, młyn śpiewa na dwie trybuny.", "Klaskanie nad głowami — cały sektor ręce w górę."];
   return `🥁 ${l[Math.floor(Math.random() * l.length)]}`;
+}
+
+const NOWE_OSIEDLA = ["Słoneczne", "Leśne", "Młodych", "Kopernika", "Tysiąclecia", "Piastowskie", "Zachód", "Północ", "Przylesie", "Kwiatowe", "Parkowe", "Batorego", "Sportowe", "Zielone Wzgórza", "Nad Rzeką", "Stare Miasto", "Kolejowe", "Działki"];
+/** Tydzień trybun: kibice czasem dorabiają nową flagę (nowe osiedle, fanklub z miasteczka, młoda grupa). Zwraca komunikat dla klubu gracza. */
+export function noweFlagiTydzien(s: StanGry, k: Klub): string | null {
+  const sl = sila(k); if (sl < 0.12 || Math.random() > sl * 0.07) return null;
+  const ist = new Set(kulturaTrybun(s, k).flagi.map((f) => f.tekst));
+  const K = krot(k), rok = String(s.sezon % 100).padStart(2, "0");
+  const okol = Object.keys(MIASTA).filter((m) => m !== k.miasto && odlegloscMiast(m, k.miasto) < 60);
+  const kandydaci: { tekst: string; typ: string; opis: string }[] = [
+    ...okol.map((m) => ({ tekst: `FANKLUB ${m.toUpperCase()}`, typ: "fanklub", opis: `kibice z miejscowości ${m} założyli fanklub i zaczęli jeździć na mecze` })),
+    ...NOWE_OSIEDLA.map((o) => ({ tekst: `OS. ${o.toUpperCase()}`, typ: "dzielnica", opis: `chłopaki z osiedla ${o} dorobili własną flagę` })),
+    ...(DZIELNICE[k.miasto] ?? []).map((d) => ({ tekst: d.toUpperCase(), typ: "dzielnica", opis: `${d} ma wreszcie swoją flagę` })),
+    { tekst: `MŁODZI ${K.toUpperCase()} '${rok}`, typ: "grupa", opis: "powstała nowa grupa młodych kibiców" },
+    { tekst: `${K.toUpperCase()} ZA GRANICĄ`, typ: "fanklub", opis: "emigranci z Wysp i Niemiec przyjeżdżają na mecze z własną flagą" },
+    { tekst: `KOBIETY ${K.toUpperCase()}`, typ: "fanklub", opis: "sekcja kobiet kibicujących klubowi zawiesiła flagę" },
+  ].filter((x) => !ist.has(x.tekst));
+  if (!kandydaci.length) return null;
+  const n = kandydaci[Math.floor(Math.random() * kandydaci.length)];
+  (s.noweFlagi ??= {})[k.nazwa] = [...(s.noweFlagi[k.nazwa] ?? []), { tekst: n.tekst, typ: n.typ, sezon: s.sezon }];
+  return `🚩 Nowa flaga na płocie ${k.nazwa}: „${n.tekst}” — ${n.opis}.`;
 }

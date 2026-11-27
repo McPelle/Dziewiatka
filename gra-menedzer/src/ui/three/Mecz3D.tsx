@@ -232,10 +232,12 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     };
     if (!ust.pusto && ust.widzowie > 0 && m.kultura) {
       const fd = m.kultura.dom.flagi;
+      // płot młyna za bramką (2 rzędy po 15) + barierka trybuny głównej (2 rzędy po 20)
       fd.forEach((f, i) => {
         const fl = flagaMesh(f.tekst, f.kolory[0], f.kolory[1], 3.6);
-        if (i % 2 === 0) { fl.position.set(-DL / 2 - 6.6, 1.2, -16 + (i / 2) * 4); fl.rotation.y = Math.PI / 2; }
-        else { fl.position.set(-30 + ((i - 1) / 2) * 4.4, 1.15, SZ / 2 + 6.3); fl.rotation.y = Math.PI; }
+        const zaBramka = i % 3 !== 2, nr = zaBramka ? Math.floor(i / 3) * 2 + (i % 3) : Math.floor(i / 3);
+        if (zaBramka) { const rz = Math.floor(nr / 15), poz = nr % 15; fl.position.set(-DL / 2 - 6.6 - rz * 0.6, 1.2 + rz * 1.15, -28 + poz * 4); fl.rotation.y = Math.PI / 2; }
+        else { const rz = Math.floor(nr / 20), poz = nr % 20; fl.position.set(-42 + poz * 4.4, 1.15 + rz * 1.15, SZ / 2 + 6.3 + rz * 0.6); fl.rotation.y = Math.PI; }
         scena.add(fl);
       });
       if (m.komentarz.some((c) => c.tekst.startsWith("🧱"))) m.kultura.gosc.flagi.slice(0, 4).forEach((f, i) => {

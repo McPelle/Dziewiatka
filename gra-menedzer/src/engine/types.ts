@@ -391,6 +391,7 @@ export interface StanGry {
   ostatnieZabezpieczenie?: import("./bezpieczenstwo").Zabezpieczenie & { widzowie: number; rywal: string; incydenty: import("./bezpieczenstwo").Incydent[] };
   sektorGosciProcent?: number; // wielkość sektora gości na Twoim stadionie (min. 5% wg PZPN; 0 = zamknięty)
   opiniaPolicji?: number;
+  noweFlagi?: Record<string, { tekst: string; typ: string; sezon: number }[]>; // flagi dorabiane przez kibiców z czasem
   oprawyUzyte?: Record<string, string[]>; // podpisy pokazanych opraw każdego klubu — oprawa nigdy się nie powtarza // opinia policji o organizacji meczów 0–100
   tlumacze?: Tlumacz[]; // zatrudnieni tłumacze (każdy zna swoje języki)
   rynekTlumaczy?: Tlumacz[]; // kandydaci na tłumaczy

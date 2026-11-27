@@ -39,7 +39,7 @@ import { tydzienJezykow } from "./jezyki";
 import { nalozSankcje, losujIncydent, rozliczBezpieczenstwo, rozliczWyjazd, zuzyjSankcje } from "./bezpieczenstwo";
 import { akcjeKibicow, karaZaAkcje, sektorGosci, szkodyZaAkcje, zgodaKibicow } from "./kibice";
 import { planOpraw } from "./oprawy";
-import { kulturaTrybun } from "./flagi";
+import { kulturaTrybun, noweFlagiTydzien } from "./flagi";
 import type { GraczXI, Historia, Klub, Konferencja, Wynik, Liga, Nastawienie, Sponsor, SponsorTyp, StanGry, WlasnoscKlubu, WpisTrenera, Zawodnik } from "./types";
 
 /** Najlepsza jedenastka kolejki w danej lidze (1 BR, 4 OBR, 4 POM, 2 NAP) wg ocen meczu. */
@@ -1003,6 +1003,7 @@ export function zagrajKolejke(s: StanGry) {
   liczXIKolejki(s, mojaL, przedMecze, r + 1);
   if (moznaPuchar(s)) rundaPucharu(s);
   for (const w of tydzienJezykow(s)) wiadomosc(s, w); // nauka polskiego cudzoziemców, kurs, tłumacz
+  { const ml = s.ligi[s.kluby[s.mojKlub].poziom - 1]; for (const id of ml?.kluby ?? []) { const t = noweFlagiTydzien(s, s.kluby[id]); if (t && id === s.mojKlub) wiadomosc(s, t); } } // flagi dorabiane z czasem
   if (europaNaKolejke(s)) rundaEuropy(s);
   tydzien(s);
   s.kolejka++;
