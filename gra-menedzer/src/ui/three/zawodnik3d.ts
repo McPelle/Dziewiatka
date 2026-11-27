@@ -2,7 +2,8 @@
 // Stroje: koszulka/spodenki/getry w barwach klubu, numer na plecach, osobny strój bramkarza; kolor skóry i włosów z nasionka.
 import * as THREE from "three";
 
-export interface Postac { g: THREE.Group; uda: [THREE.Object3D, THREE.Object3D]; lydki: [THREE.Object3D, THREE.Object3D]; ramiona: [THREE.Object3D, THREE.Object3D]; tulow: THREE.Object3D; faza: number; poza: "bieg" | "strzal" | "radosc" | "rzut" | "stoi" | "lezy"; pozaT: number }
+export interface Twarz3D { usta: THREE.Mesh; brwi: [THREE.Mesh, THREE.Mesh]; oczy: [THREE.Mesh, THREE.Mesh]; glowa: THREE.Object3D }
+export interface Postac { twarz?: Twarz3D; g: THREE.Group; uda: [THREE.Object3D, THREE.Object3D]; lydki: [THREE.Object3D, THREE.Object3D]; ramiona: [THREE.Object3D, THREE.Object3D]; tulow: THREE.Object3D; faza: number; poza: "bieg" | "strzal" | "radosc" | "rzut" | "stoi" | "lezy"; pozaT: number }
 const SKORA = [0xf1c9a5, 0xe8b48c, 0xd29b74, 0xb07a52, 0x7a4e30, 0x4e3220];
 const WLOSY = [0x2b1d12, 0x4a3020, 0x8a6a3a, 0xc9a35a, 0x111111, 0x6b4a2a];
 
@@ -16,7 +17,7 @@ function teksturaNumeru(nr: number, kolor: string, tlo: string, nazwisko?: strin
 }
 const kontrast = (hex: string) => { const c = new THREE.Color(hex); return c.r * 0.3 + c.g * 0.59 + c.b * 0.11 > 0.55 ? "#111111" : "#ffffff"; };
 
-export function stworzPostac(o: { koszulka: string; dodatek?: string; spodenki: string; getry: string; nr: number; nazwisko?: string; seed: number; sedzia?: boolean; wzor?: "pasy" | "rekaw" | "jednolity" }): Postac {
+export function stworzPostac(o: { twarz?: boolean; koszulka: string; dodatek?: string; spodenki: string; getry: string; nr: number; nazwisko?: string; seed: number; sedzia?: boolean; wzor?: "pasy" | "rekaw" | "jednolity" }): Postac {
   const g = new THREE.Group();
   const skora = new THREE.MeshStandardMaterial({ color: SKORA[o.seed % SKORA.length], roughness: 0.7 });
   const kosz = new THREE.MeshStandardMaterial({ color: o.koszulka, roughness: 0.75 });
@@ -35,6 +36,18 @@ export function stworzPostac(o: { koszulka: string; dodatek?: string; spodenki: 
   const glowa = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 12), skora); glowa.position.y = 0.88; glowa.scale.set(0.95, 1.08, 1); glowa.castShadow = true; tulow.add(glowa);
   const wl = new THREE.Mesh(new THREE.SphereGeometry(0.137, 14, 10, 0, Math.PI * 2, 0, Math.PI * (0.3 + (o.seed % 4) * 0.06)), new THREE.MeshStandardMaterial({ color: WLOSY[(o.seed >> 2) % WLOSY.length], roughness: 0.9 }));
   wl.position.y = 0.9; wl.rotation.x = -0.25; tulow.add(wl);
+  // twarz z mimiką (zbliżenia: rozmowy, konferencje, szatnia)
+  let twarz: Twarz3D | undefined;
+  if (o.twarz) {
+    const czarny = new THREE.MeshStandardMaterial({ color: 0x1a1410, roughness: 0.5 });
+    const bialko = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+    const oko = (x: number) => { const b = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), bialko); b.position.set(x, 0.905, 0.112); const z = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), czarny); z.position.set(0, 0, 0.014); b.add(z); tulow.add(b); return b; };
+    const brew = (x: number) => { const m = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.009, 0.01), new THREE.MeshStandardMaterial({ color: WLOSY[(o.seed >> 2) % WLOSY.length] })); m.position.set(x, 0.945, 0.118); tulow.add(m); return m; };
+    const usta = new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.007, 6, 16, Math.PI), new THREE.MeshStandardMaterial({ color: 0x8a3a3a }));
+    usta.position.set(0, 0.835, 0.118); usta.rotation.z = Math.PI; tulow.add(usta);
+    const nos = new THREE.Mesh(new THREE.ConeGeometry(0.018, 0.05, 8), skora); nos.rotation.x = Math.PI / 2; nos.position.set(0, 0.875, 0.135); tulow.add(nos);
+    twarz = { usta, brwi: [brew(-0.045), brew(0.045)], oczy: [oko(-0.045), oko(0.045)], glowa };
+  }
   // spodenki
   const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.2, 0.24, 10), spod); sp.position.y = 0.95; sp.scale.z = 0.75; sp.castShadow = true; g.add(sp);
   // nogi: udo (pivot w biodrze) → łydka (pivot w kolanie)
@@ -60,7 +73,7 @@ export function stworzPostac(o: { koszulka: string; dodatek?: string; spodenki: 
   const cien = new THREE.Mesh(new THREE.CircleGeometry(0.42, 16), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.28, depthWrite: false }));
   cien.rotation.x = -Math.PI / 2; cien.position.y = 0.015; g.add(cien);
   g.scale.setScalar(1.05 + ((o.seed >> 3) % 5) * 0.025); // wzrost 1,72–1,92 m
-  return { g, uda: [u1, u2], lydki: [k1, k2], ramiona, tulow, faza: (o.seed % 100) / 15, poza: "stoi", pozaT: 0 };
+  return { twarz, g, uda: [u1, u2], lydki: [k1, k2], ramiona, tulow, faza: (o.seed % 100) / 15, poza: "stoi", pozaT: 0 };
 }
 
 /** Animacja postaci: v = prędkość (m/s), dt = czas klatki. */
@@ -91,4 +104,18 @@ export function animuj(p: Postac, v: number, dt: number) {
   } else if (p.poza === "lezy") {
     p.tulow.rotation.x = -1.45; u1.rotation.x = -0.2; u2.rotation.x = 0.3; p.g.position.y = 0.02;
   }
+}
+
+/** Mimika: emocja −1 (złość/smutek) … 0 (neutralnie) … +1 (radość). `mowi` = ruch ust. Mruganie co kilka sekund. */
+export function minka(p: Postac, emocja: number, t: number, mowi = false) {
+  const tw = p.twarz; if (!tw) return;
+  const e = Math.max(-1, Math.min(1, emocja));
+  // usta: łuk w górę (uśmiech) albo w dół (smutek/złość), skala przy mówieniu
+  tw.usta.rotation.z = e >= 0 ? Math.PI : 0;
+  tw.usta.position.y = e >= 0 ? 0.84 : 0.825;
+  tw.usta.scale.set(0.8 + Math.abs(e) * 0.5, (0.3 + Math.abs(e) * 0.9) * (mowi ? 0.7 + Math.abs(Math.sin(t * 14)) * 0.8 : 1), 1);
+  // brwi: zmarszczone przy złości, uniesione przy radości
+  tw.brwi[0].rotation.z = e < 0 ? -0.35 * -e : 0.1 * e; tw.brwi[1].rotation.z = -tw.brwi[0].rotation.z;
+  tw.brwi[0].position.y = tw.brwi[1].position.y = 0.945 + e * 0.008;
+  const mrug = (t % 3.7) < 0.12 ? 0.15 : 1; tw.oczy[0].scale.y = tw.oczy[1].scale.y = mrug;
 }

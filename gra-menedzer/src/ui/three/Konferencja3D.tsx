@@ -58,15 +58,15 @@ export function Konferencja3D({ klub, sponsorzy, typ, nastroj, nrPytania, nrOdpo
     try { renderer = new THREE.WebGLRenderer({ antialias: !lekka }); } catch { return; }
     const W = () => el.clientWidth || 360, H = () => el.clientHeight || 200;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lekka ? 1 : 2)); renderer.setSize(W(), H());
-    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.9;
     Object.assign(renderer.domElement.style, { width: "100%", height: "100%", display: "block" });
     el.appendChild(renderer.domElement);
     const scena = new THREE.Scene(); scena.background = new THREE.Color(0x15171c);
     const [k1] = barwyKlubu(klub.nazwa);
     // światło: miękkie studyjne + punktowe na stół
-    scena.add(new THREE.HemisphereLight(0xffffff, 0x333333, 0.9));
-    const key = new THREE.SpotLight(0xfff1dd, 220, 30, 0.6, 0.5, 1.4); key.position.set(2, 7, 6); key.target.position.set(0, 1, 0); key.castShadow = true; scena.add(key, key.target);
-    const fill = new THREE.DirectionalLight(0xcfe0ff, 0.6); fill.position.set(-5, 4, 4); scena.add(fill);
+    scena.add(new THREE.HemisphereLight(0xffffff, 0x333333, 0.55));
+    const key = new THREE.SpotLight(0xfff1dd, 18, 30, 0.6, 0.5, 1.2); key.position.set(2, 7, 6); key.target.position.set(0, 1, 0); key.castShadow = true; scena.add(key, key.target);
+    const fill = new THREE.DirectionalLight(0xcfe0ff, 0.35); fill.position.set(-5, 4, 4); scena.add(fill);
     // podłoga i ściany
     const pod = new THREE.Mesh(new THREE.PlaneGeometry(30, 20), new THREE.MeshStandardMaterial({ color: 0x2b2f36, roughness: 0.95 })); pod.rotation.x = -Math.PI / 2; pod.receiveShadow = true; scena.add(pod);
     const sciana = new THREE.Mesh(new THREE.PlaneGeometry(30, 8), new THREE.MeshStandardMaterial({ color: 0x3a3f48, roughness: 1 })); sciana.position.set(0, 4, -3.2); scena.add(sciana);
@@ -116,7 +116,7 @@ export function Konferencja3D({ klub, sponsorzy, typ, nastroj, nrPytania, nrOdpo
     }
     const cam = new THREE.PerspectiveCamera(38, W() / H(), 0.1, 100);
     const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scena, cam));
-    if (!lekka) composer.addPass(new UnrealBloomPass(new THREE.Vector2(W(), H()), 0.9, 0.5, 0.85));
+    if (!lekka) composer.addPass(new UnrealBloomPass(new THREE.Vector2(W(), H()), 0.5, 0.4, 0.92));
     composer.addPass(new OutputPass());
     let ostP = -1, ostO = -1, t = 0, gest = 0, flesze = 0, ujecie = 0, ostT = performance.now(), raf = 0;
     const smutek = typeof nastroj === "number" && nastroj < 0;
@@ -130,8 +130,8 @@ export function Konferencja3D({ klub, sponsorzy, typ, nastroj, nrPytania, nrOdpo
       flesze = Math.max(0, flesze - dt);
       for (const d of dzienn) {
         const blysk = flesze > 0 && Math.random() < 0.08 ? 1 : 0;
-        d.lampa.intensity = blysk ? 25 : d.lampa.intensity * 0.6;
-        (d.aparat.material as THREE.MeshStandardMaterial).emissiveIntensity = blysk ? 6 : (d.aparat.material as THREE.MeshStandardMaterial).emissiveIntensity * 0.6;
+        d.lampa.intensity = blysk ? 4 : d.lampa.intensity * 0.6;
+        (d.aparat.material as THREE.MeshStandardMaterial).emissiveIntensity = blysk ? 3 : (d.aparat.material as THREE.MeshStandardMaterial).emissiveIntensity * 0.6;
         d.p.ramiona[0].rotation.x = -1.3 + Math.sin(t * 0.7 + d.p.faza) * 0.05; d.p.ramiona[1].rotation.x = -1.3;
         d.p.tulow.rotation.y = Math.sin(t * 0.3 + d.p.faza) * 0.15;
       }

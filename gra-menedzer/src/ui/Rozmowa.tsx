@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
+import { Rozmowa3D } from "./three/Rozmowa3D";
+import { grafika3D } from "./three/Stadion3DWidok";
+import { mow, zamilknij } from "./three/glos";
 import { OpcjaRozmowy, TematRozmowy, TON_ETYKIETA, tematyRozmowy, zastosujRozmowe } from "../engine/rozmowy";
 import type { StanGry, Zawodnik } from "../engine/types";
 import { Twarz } from "./Twarz";
@@ -10,12 +13,22 @@ export function Rozmowa({ s, z, widoczny, onClose, odswiez }: { s: StanGry; z: Z
   const [reakcja, setReakcja] = useState<string | null>(null);
   const [wynik, setWynik] = useState<{ delta: number; uwaga?: string } | null>(null);
 
-  useEffect(() => { if (!widoczny) { setTemat(null); setReakcja(null); } }, [widoczny]);
+  const [mowi, setMowi] = useState<"trener" | "zawodnik" | null>(null);
+  useEffect(() => { if (!widoczny) { setTemat(null); setReakcja(null); setWynik(null); zamilknij(); } }, [widoczny]);
+  // zawodnik zaczyna rozmowę na głos
+  useEffect(() => { if (temat && !reakcja) { setMowi("zawodnik"); mow(temat.kwestia, "zawodnik", { przerwij: true }); const t = setTimeout(() => setMowi(null), 3500); return () => clearTimeout(t); } }, [temat?.id]);
 
   if (!z) return null;
   const tematy = tematyRozmowy(s, z);
 
-  const wybierzOpcje = (o: OpcjaRozmowy) => { const r = zastosujRozmowe(s, z, o); setReakcja(r.reakcja); setWynik({ delta: r.delta, uwaga: r.uwaga }); odswiez(); };
+  const wybierzOpcje = (o: OpcjaRozmowy) => {
+    const r = zastosujRozmowe(s, z, o);
+    setMowi("trener"); mow(o.tekst, "trener", { przerwij: true });
+    // odpowiedź zawodnika po wypowiedzi trenera — z emocją wynikającą z rozmowy
+    setTimeout(() => { setReakcja(r.reakcja); setWynik({ delta: r.delta, uwaga: r.uwaga }); setMowi("zawodnik"); mow(r.reakcja, "zawodnik"); setTimeout(() => setMowi(null), 3500); }, Platform.OS === "web" && grafika3D() ? 1800 : 0);
+    odswiez();
+  };
+  const emocja = wynik ? Math.max(-1, Math.min(1, wynik.delta / 6)) : temat ? ((z.morale ?? 60) - 60) / 60 : 0;
 
   const Dymek = ({ tekst, trenera }: { tekst: string; trenera?: boolean }) => (
     <View style={[st.wiersz, { gap: 8, marginTop: 8, flexDirection: trenera ? "row-reverse" : "row" }]}>
@@ -31,6 +44,7 @@ export function Rozmowa({ s, z, widoczny, onClose, odswiez }: { s: StanGry; z: Z
       <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
         <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "88%", paddingBottom: 20 }}>
           <ScrollView contentContainerStyle={{ padding: 18 }}>
+            {Platform.OS === "web" && grafika3D() && <View style={{ marginBottom: 12 }}><Rozmowa3D klub={s.kluby[s.mojKlub]} z={z} emocja={emocja} mowi={mowi} trofea={0} /></View>}
             <View style={[st.wiersz, { gap: 12 }]}>
               <Twarz seed={z.imie + z.nazwisko} rozmiar={44} zdjecie={z.zdjecie} cechy={z.twarz} />
               <View style={{ flex: 1 }}>
