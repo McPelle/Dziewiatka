@@ -3,6 +3,7 @@ import { Feta3D } from "./three/Trofea3D";
 import { grafika3D } from "./three/Stadion3DWidok";
 import { bilansZRywalem } from "../engine/zywySwiat";
 import { Samouczek } from "./Samouczek";
+import { nowiWKlubie, Prezentacja } from "./Prezentacja";
 import { prognozaMeczu } from "../engine/pogoda";
 import { useState } from "react";
 import { Alert, Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
@@ -98,6 +99,7 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
   return (
     <ScrollView style={st.ekran} contentContainerStyle={{ paddingBottom: 24 }}>
       <Samouczek s={s} odswiez={odswiez} />
+      {s.samouczekZrobiony && (() => { const n = nowiWKlubie(s)[0]; return n ? <Prezentacja s={s} id={n} onClose={() => { s.znaniZawodnicy = [...(s.znaniZawodnicy ?? []), n]; odswiez(); }} /> : null; })()}
       <Pressable style={[st.karta, st.wiersz]} onPress={() => setWidokKlub(klub.id)}>
         <Herb klub={klub} rozmiar={52} />
         <View style={{ marginLeft: 14, flex: 1 }}>
