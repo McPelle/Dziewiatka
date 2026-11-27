@@ -9,6 +9,7 @@ import { generujKariere, kontraktTyp, dlugoscKontraktu, nowyZawodnik, pensjaDla,
 import { okresyDlaPoziomu } from "./kalendarz";
 import { obserwujTestowanych, odswiezRynekTestow } from "./testy";
 import type { StanGry, Zawodnik } from "./types";
+import { opisAkt, planNa, wykonajAktywnosc } from "./planDnia";
 
 export type FazaOkresu = "urlop" | "przygotowania";
 export interface Sparing { dzien: number; rywal: string; typ: "klub" | "zagraniczny" | "orlik" | "test"; wynik?: string; wyroznieni?: string[] }
@@ -151,7 +152,7 @@ export function dzienOkresu(s: StanGry): { tytul: string; ikona: string; wpisy: 
   const o = s.okres; if (!o) return null;
   if (o.dzien >= dniRazem(o)) { s.okres = undefined; return null; }
   const kadra = s.kluby[s.mojKlub].zawodnicy.map((id) => s.zawodnicy[id]).filter(Boolean) as Zawodnik[];
-  let wynik: { tytul: string; ikona: string; wpisy: string[] };
+  let wynik: { tytul: string; ikona: string; wpisy: string[] } | undefined;
   if (o.dzien < o.dniUrlopu) {
     o.faza = "urlop";
     for (const z of kadra) { z.kondycja = Math.max(55, z.kondycja - 0.8); z.forma = z.forma * 0.97; z.morale = Math.min(100, z.morale + 0.3); }
@@ -168,6 +169,12 @@ export function dzienOkresu(s: StanGry): { tytul: string; ikona: string; wpisy: 
       if (n) wpisy.push(`🧪 Na testy zgłosiło się ${n} zawodników bez klubu — weź ich na testy (Transfery → Testy). Będą trenować i grać sparingi z drużyną.`);
     }
     if (sp) { wpisy.push(...rozegrajSparing(s, sp)); wpisy.push(...obserwujTestowanych(s, 1)); }
+    else if (!ob && planNa(s, dataOkresu(s)) && planNa(s, dataOkresu(s))!.rodzaj !== "sparing") {
+      const akt = planNa(s, dataOkresu(s))!;
+      wpisy.push(...obserwujTestowanych(s, 0.5));
+      wpisy.push(...wykonajAktywnosc(s, akt, () => { const w: string[] = []; for (const z of kadra) { if (z.kontuzja === 0) rozwojTreningowy(s, z, 0.1, kontekstTreningu(s, z), (m) => w.push(m)); z.kondycja = Math.min(100, z.kondycja + 1.5); } return w; }));
+      wynik = { tytul: `Plan dnia: ${opisAkt(akt).replace(/^\S+\s/, "")}`, ikona: "📝", wpisy };
+    }
     else {
       wpisy.push(...obserwujTestowanych(s, 0.5));
       const frac = 0.1 + (ob?.rozwoj ?? 0) * 0.1;
@@ -176,9 +183,9 @@ export function dzienOkresu(s: StanGry): { tytul: string; ikona: string; wpisy: 
       wpisy.push(ob ? `${ob.nazwa}: dzień ${o.dzien - o.oboz!.od + 1}/${o.oboz!.dni} — ${ob.opis}` : "Trening przygotowawczy: wytrzymałość, siła, gierki.");
     }
     if ((o.dzien + 1) % 7 === 0) wpisy.push(`📊 Kondycja drużyny: ${Math.round(kadra.reduce((a, z) => a + z.kondycja, 0) / Math.max(1, kadra.length))}% · zgranie ${Math.round(kadra.reduce((a, z) => a + (z.zgranie ?? 70), 0) / Math.max(1, kadra.length))}%`);
-    wynik = { tytul: sp ? `Sparing: ${sp.rywal}` : ob ? `Obóz — ${ob.nazwa}` : `Przygotowania (dzień ${o.dzien - o.dniUrlopu + 1}/${o.dniPrzygotowan})`, ikona: sp ? "🤝" : ob ? "⛺" : "🏃", wpisy };
+    wynik ??= { tytul: sp ? `Sparing: ${sp.rywal}` : ob ? `Obóz — ${ob.nazwa}` : `Przygotowania (dzień ${o.dzien - o.dniUrlopu + 1}/${o.dniPrzygotowan})`, ikona: sp ? "🤝" : ob ? "⛺" : "🏃", wpisy };
   }
   o.dzien++;
-  if (o.dzien >= dniRazem(o)) { wynik.wpisy.push(`✅ Koniec okresu przygotowawczego — ${o.rodzaj === "lato" ? "start nowego sezonu" : "start rundy wiosennej"}!`); s.okres = undefined; }
-  return wynik;
+  if (o.dzien >= dniRazem(o)) { wynik!.wpisy.push(`✅ Koniec okresu przygotowawczego — ${o.rodzaj === "lato" ? "start nowego sezonu" : "start rundy wiosennej"}!`); s.okres = undefined; }
+  return wynik!;
 }

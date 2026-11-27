@@ -6,6 +6,7 @@ import { CZCIONKA, K, st } from "./styl";
 import { PanelOkresu } from "./PanelOkresu";
 import { MeczNaZywo, zapisanyMecz } from "./MeczNaZywo";
 import { KalendarzMiesiac } from "./KalendarzMiesiac";
+import { KartaDnia } from "./KartaDnia";
 import { paraMojegoMeczu } from "../engine/meczNaZywo";
 
 /** Panel kalendarza na pulpicie: dzisiejszy dzień, plan tygodnia, raport ostatniego dnia, przyciski Dalej / Do meczu. */
@@ -13,6 +14,7 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
   const [rozwin, setRozwin] = useState(true);
   const [naZywo, setNaZywo] = useState<[string, string] | null>(null);
   const [miesiac, setMiesiac] = useState(false);
+  const [karta, setKarta] = useState<number | null>(null);
   if (s.okres) return <PanelOkresu s={s} odswiez={odswiez} />;
   const plan = planTygodnia(s);
   const d = dzisiaj(s);
@@ -27,16 +29,16 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
         </View>
         <Pressable onPress={() => setMiesiac(true)} style={[st.przyciskMaly, { paddingVertical: 6 }]}><Text style={st.przyciskMalyTekst}>📅 Miesiąc</Text></Pressable>
       </View>
-      {/* pasek tygodnia */}
+      {/* pasek tygodnia — dotknij dnia, by go zaplanować */}
       <View style={[st.wiersz, { marginTop: 10, gap: 4 }]}>
         {plan.map((p) => {
           const teraz = p.idx === d.idx, minal = p.idx < d.idx;
           return (
-            <View key={p.idx} style={{ flex: 1, alignItems: "center", paddingVertical: 6, borderRadius: 8, backgroundColor: teraz ? "rgba(255,206,71,0.18)" : K.karta2, borderWidth: teraz ? 1 : 0, borderColor: K.akcent, opacity: minal ? 0.45 : 1 }}>
+            <Pressable key={p.idx} onPress={() => setKarta(p.idx)} style={{ flex: 1, alignItems: "center", paddingVertical: 6, borderRadius: 8, backgroundColor: teraz ? "rgba(255,206,71,0.18)" : K.karta2, borderWidth: teraz ? 1 : p.akt ? 1 : 0, borderColor: p.akt ? K.niebieski : K.akcent, opacity: minal ? 0.45 : 1 }}>
               <Text style={{ fontSize: 10, color: K.szary, fontWeight: "800", fontFamily: CZCIONKA }}>{p.nazwa.slice(0, 3)}</Text>
               <Text style={{ fontSize: 15 }}>{p.ikona}</Text>
               <Text style={{ fontSize: 9.5, color: K.szary, fontFamily: CZCIONKA }}>{p.data.getDate()}</Text>
-            </View>
+            </Pressable>
           );
         })}
       </View>
@@ -62,6 +64,10 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
         )}
       </View>
       <KalendarzMiesiac s={s} widoczny={miesiac} onClose={() => setMiesiac(false)} />
+      {karta !== null && <KartaDnia s={s} data={plan[karta]?.data ?? null} dzis={d.data} odswiez={odswiez}
+        wydarzenia={plan[karta] ? [{ ikona: plan[karta].ikona, tekst: plan[karta].tytul }] : []}
+        zablokowany={plan[karta]?.typ === "mecz" ? "Dzień meczu — rozruch i mecz." : plan[karta]?.typ === "puchar" ? "Mecz pucharowy." : karta < d.idx ? "Ten dzień już minął." : null}
+        onClose={() => setKarta(null)} />}
       {naZywo && <MeczNaZywo s={s} para={naZywo} onAnuluj={() => setNaZywo(null)} onKoniec={(m) => { s.meczLive = m; setNaZywo(null); const mecz = dalejDzien(s); odswiez(); if (mecz) pokazMecz(); }} />}
     </View>
   );

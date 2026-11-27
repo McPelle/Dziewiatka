@@ -373,6 +373,7 @@ export interface Europa {
 }
 
 export interface StanGry {
+  planDni?: Record<string, import("./planDnia").Aktywnosc>; // zaplanowane zajęcia drużyny na dni kalendarza (rrrr-mm-dd)
   archiwumMeczow?: import("./zywySwiat").MeczArchiwum[]; // wszystkie mecze Twojego klubu w karierze
   fetaSezon?: number; // sezon, którego fetę już pokazano
   prasa?: import("./zywySwiat").Artykul[]; // lokalna prasa: artykuły po meczach

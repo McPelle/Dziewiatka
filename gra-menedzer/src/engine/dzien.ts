@@ -2,6 +2,7 @@
 // a gracz przechodzi przez dni tygodnia: regeneracja → treningi (z raportami) → [środa: puchar] → odprawa → MECZ → odpoczynek.
 // Każdy dzień treningowy nalicza 1/3 tygodniowego treningu (reszta dolicza się przy meczu, gdy przeskoczysz do meczu).
 import { postepBudow } from "./budowy";
+import { KATALOG, kluczDnia, opisAkt, wykonajAktywnosc } from "./planDnia";
 import { godzinaMeczu } from "./zywySwiat";
 import { dateKolejki, kalendarzSzczebla } from "./kalendarz";
 import { moznaPuchar } from "./puchar";
@@ -12,7 +13,7 @@ import { przetworzNegocjacje } from "./transfery";
 import type { StanGry, Zawodnik } from "./types";
 
 export type TypDnia = "regeneracja" | "trening" | "puchar" | "odprawa" | "mecz" | "wolne";
-export interface Dzien { idx: number; nazwa: string; data: Date; typ: TypDnia; tytul: string; ikona: string }
+export interface Dzien { idx: number; nazwa: string; data: Date; typ: TypDnia; tytul: string; ikona: string; akt?: import("./planDnia").Aktywnosc }
 const DNI = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"];
 const MIES = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
 export const fmtData = (d: Date) => `${d.getDate()} ${MIES[d.getMonth()]} ${d.getFullYear()}`;
@@ -45,7 +46,10 @@ export function planTygodnia(s: StanGry): Dzien[] {
     else if (i === mecz - 1) { typ = "odprawa"; tytul = "Odprawa przedmeczowa · rozruch"; ikona = "📋"; }
     else if (treningow < 3) { typ = "trening"; treningow++; tytul = treningow === 1 ? "Trening — przygotowanie fizyczne" : treningow === 2 ? "Trening — taktyka i fokus tygodnia" : "Trening — gra w małych grach i stałe fragmenty"; ikona = "🏋"; }
     else { typ = "wolne"; tytul = "Dzień wolny"; ikona = "☕"; }
-    plan.push({ idx: i, nazwa: DNI[i], data, typ, tytul, ikona });
+    // zaplanowane przez trenera zajęcia zastępują domyślne (poza meczem i pucharem)
+    const akt = typ !== "mecz" && typ !== "puchar" ? s.planDni?.[kluczDnia(data)] : undefined;
+    if (akt) { tytul = opisAkt(akt).replace(/^\S+\s/, ""); ikona = KATALOG[akt.rodzaj].ikona; if (akt.rodzaj === "trening") typ = "trening"; }
+    plan.push({ idx: i, nazwa: DNI[i], data, typ, tytul, ikona, akt });
   }
   return plan;
 }
@@ -123,7 +127,8 @@ export function dalejDzien(s: StanGry): boolean {
     return true;
   }
   let wpisy: string[] = [];
-  if (d.typ === "regeneracja") wpisy = raportMedyczny(s);
+  if (d.akt) { wpisy = wykonajAktywnosc(s, d.akt, () => treningDnia(s, d)); if (d.akt.rodzaj !== "trening") s.treningiDni = Math.min(3, (s.treningiDni ?? 0) + 1); } // dzień bez treningu nie „dolicza się" przy meczu
+  else if (d.typ === "regeneracja") wpisy = raportMedyczny(s);
   else if (d.typ === "trening") wpisy = treningDnia(s, d);
   else if (d.typ === "puchar") wpisy = ["Mecz pucharowy zostanie rozegrany w ramach tej kolejki — wynik w wiadomościach po weekendzie."];
   else if (d.typ === "odprawa") wpisy = [`Skład na mecz: ${s.taktyka.sklad.length}/11 · formacja ${s.taktyka.formacja} · nastawienie ${s.taktyka.nastawienie}.`, s.taktyka.auto ? "Asystent ustawi skład automatycznie." : "Skład ustawiony ręcznie — sprawdź go przed meczem."];
