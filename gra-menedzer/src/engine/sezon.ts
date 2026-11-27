@@ -1,3 +1,4 @@
+import { dotacjaGminy, poMeczu, wyjazdBusem } from "./zywySwiat";
 import { czasNaKadre, przerwaNaKadre } from "./reprezentacje";
 import { utrudnieniaMeczu } from "./budowy";
 import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj";
@@ -849,6 +850,8 @@ export function zagrajKolejke(s: StanGry) {
       const atutGosci = 1 - Math.min(0.08, (gosci / Math.max(1, widzowie)) * 0.25);
       const w = zagrajMecz(s, druz(dom, gosc), druz(gosc, dom), moj, { domAtut: atutBoiska(widzowie, kd.pojemnosc, !!derbyNazwa) * pog.atut * atutGosci, derby: !!derbyNazwa, mojTrening: moj ? s.trening : undefined, mojaStrona: dom === s.mojKlub ? "dom" : "gosc", pogoda: pog.gole });
       if (moj) {
+        { const bus = wyjazdBusem(s, dom); if (bus) wiadomosc(s, bus); }
+        poMeczu(s, w, derbyNazwa ?? null);
         if (pog.gole < 1) wiadomosc(s, `${pog.ikona} ${pog.nazwa} w ${kd.miasto} — trudne warunki do gry${pog.frek < 0.9 ? ", część kibiców została w domach" : ""}.`);
         if (terminWieczorny && !zakazTeraz) {
           const premia = Math.round((WIDZOWIE[kd.poziom - 1] * 4) / 500) * 500;
@@ -2113,6 +2116,7 @@ export function nowySezon(s: StanGry) {
   rozwojSztabuILicencji(s);  // sztab rośnie, trener zdobywa licencje
   realizujUmowyWstepne(s); // umowy wstępne: wolne transfery latem
   s.sezon++;
+  dotacjaGminy(s); // klub amatorski: dotacja z gminy na nowy sezon
   if (!s.zwolniony) rozpocznijOkres(s, "lato"); // okres letni: urlop + przygotowania (sparingi, obóz, testy)
   // Jubileusz klubu: okrągła rocznica założenia (25/50/75/100…) — mecz gali, oprawa kibiców, zastrzyk entuzjazmu.
   { const mk = s.kluby[s.mojKlub];

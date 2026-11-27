@@ -5,6 +5,7 @@ import { dzisiaj } from "../engine/dzien";
 import { FORMACJE } from "../engine/mecz";
 import { dograjDoKonca, krokMinuty, mowaWPrzerwie, NAZWA_NAST, okrzyk, OKRZYKI, podpowiedzi, przerwa, rozpocznijMeczNaZywo, zmianaGracza, zmienTaktyke, type MeczLive, type Mowa, type Okrzyk } from "../engine/meczNaZywo";
 import { maOswietlenie } from "../engine/sezon";
+import { jestDerby } from "../engine/derby";
 import type { Nastawienie, StanGry } from "../engine/types";
 import { Herb } from "./Herb";
 import { LogoLigi } from "./LogoLigi";
@@ -20,16 +21,17 @@ type Zakl = "relacja" | "staty" | "sklady" | "taktyka" | "zmiany";
 const KAMERY: [Kamera, string][] = [["auto", "🎬 Reżyser"], ["tv", "📺 TV"], ["bramka", "🥅 Zza bramki"], ["gora", "🛰 Z góry"], ["blisko", "🔍 Zbliżenie"]];
 
 /** Warunki meczu: pora (wieczór pod reflektorami), pogoda wg miesiąca, frekwencja wg renomy. */
-function warunki(s: StanGry, domId: string): Ustawienia3D {
+function warunki(s: StanGry, domId: string, goscId: string): Ustawienia3D {
   const k = s.kluby[domId];
   const d = dzisiaj(s).data, mies = d.getMonth() + 1;
   const h = (s.sezon * 31 + s.kolejka * 7 + domId.length) % 100;
   const noc = maOswietlenie(k) && (mies >= 10 || mies <= 3 ? h < 55 : h < (k.poziom <= 3 ? 40 : 15));
   const zima = mies === 12 || mies <= 2, jesien = mies >= 10 && mies <= 11;
   const pogoda: Ustawienia3D["pogoda"] = zima && h % 3 === 0 ? "snieg" : (jesien || mies === 3 || mies === 4) && h % 4 === 1 ? "deszcz" : jesien && h % 9 === 2 ? "mgla" : h % 11 === 3 ? "deszcz" : "slonce";
-  const widzowie = Math.round(k.pojemnosc * Math.min(0.95, 0.3 + k.renoma * 0.55));
+  const pusto = domId === s.mojKlub && (s.zakazTrybun ?? 0) > 0; // kara ZPN: mecz przy pustych trybunach
+  const widzowie = pusto ? 0 : Math.round(k.pojemnosc * Math.min(0.95, 0.3 + k.renoma * 0.55));
   const lekka = typeof window !== "undefined" && (window as any).localStorage?.getItem("dz_lekka") === "1";
-  return { noc, pogoda, widzowie, lekka };
+  return { noc, pogoda, widzowie, lekka, derby: !!jestDerby(s, domId, goscId), pusto };
 }
 
 const KLUCZ_LIVE = "dz_mecz_live";
@@ -57,7 +59,7 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
     if (z) { for (const [id, k] of Object.entries(z.kond)) if (s.zawodnicy[id]) s.zawodnicy[id].kondycja = k; z.m.komentarz.unshift({ min: `${z.m.min}'`, typ: "info", tekst: "▶ Wznowiono zapisany mecz." }); return z.m; }
     return rozpocznijMeczNaZywo(s, para[0], para[1]);
   });
-  const ust = useMemo(() => warunki(s, para[0]), []);
+  const ust = useMemo(() => warunki(s, para[0], para[1]), []);
   const [wersja, setWersja] = useState(0);
   const [predkosc, setPredkosc] = useState(0);
   const [ostatniaPr, setOstatniaPr] = useState(1);
@@ -165,7 +167,7 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
         <View style={[st.wiersz, { justifyContent: "center", gap: 10, paddingVertical: 4, backgroundColor: "#071710" }]}>
           <LogoLigi nazwa={s.ligi[kd.poziom - 1]?.nazwa ?? ""} poziom={kd.poziom} rozmiar={18} />
           <Text style={{ color: K.akcent, fontWeight: "900", fontFamily: CZCIONKA }}>{minuta}</Text>
-          <Text style={st.maly}>{ust.noc ? "🌙 pod reflektorami" : "☀️ dzień"} · {{ slonce: "pogodnie", deszcz: "🌧 deszcz", snieg: "❄️ śnieg (pomarańczowa piłka)", mgla: "🌫 mgła" }[ust.pogoda]} · {ust.widzowie.toLocaleString("pl")} widzów</Text>
+          <Text style={st.maly}>{ust.noc ? "🌙 pod reflektorami" : "☀️ dzień"} · {{ slonce: "pogodnie", deszcz: "🌧 deszcz", snieg: "❄️ śnieg (pomarańczowa piłka)", mgla: "🌫 mgła" }[ust.pogoda]} · {ust.pusto ? "🚷 puste trybuny (kara ZPN)" : `${ust.widzowie.toLocaleString("pl")} widzów`}{ust.derby ? " · ⚔ DERBY" : ""}</Text>
         </View>
         {/* pasek przewagi */}
         <View style={{ flexDirection: "row", height: 4 }}><View style={{ flex: Math.max(0.05, 0.5 + m.momentum * 0.5), backgroundColor: K.akcent }} /><View style={{ flex: Math.max(0.05, 0.5 - m.momentum * 0.5), backgroundColor: K.niebieski }} /></View>
@@ -176,6 +178,27 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
             {!bez3D ? (
               <Mecz3D key={wyborStroju.join("-")} s={s} m={m} stroje={stroje} wersja={wersja} predkosc={predkosc} kamera={kamera} ust={ust} onKoniecSekwencji={krok} onPowtorka={setPowt} onBlad={() => setBez3D(true)} />
             ) : <Boisko2D s={s} m={m} />}
+            {(() => {
+              const k = m.kartki[m.kartki.length - 1], z = m.zmianyLog[m.zmianyLog.length - 1];
+              const swiezaK = k && m.min - k.min <= 1 && !m.koniec, swiezaZ = z && m.min - z.min <= 1 && !m.koniec;
+              if (!swiezaK && !swiezaZ) return null;
+              const pokazZmiane = swiezaZ && (!swiezaK || z.min >= k.min);
+              const klub = s.kluby[pokazZmiane ? z.klubId : k.klubId];
+              return (
+                <View style={{ position: "absolute", left: 8, bottom: 10, flexDirection: "row", alignItems: "center", backgroundColor: "rgba(8,14,30,0.88)", borderRadius: 6, overflow: "hidden" }}>
+                  <View style={{ width: 6, alignSelf: "stretch", backgroundColor: pokazZmiane ? "#2fb5e8" : k.typ === "czerwona" ? "#e01010" : "#ffd600" }} />
+                  <Herb klub={klub} rozmiar={22} />
+                  {pokazZmiane ? (
+                    <View style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
+                      <Text style={{ color: "#3fd47f", fontSize: 12, fontWeight: "900" }}>▲ {s.zawodnicy[z.wchodzi]?.numer} {s.zawodnicy[z.wchodzi]?.nazwisko?.toUpperCase()}</Text>
+                      <Text style={{ color: "#ff6470", fontSize: 12, fontWeight: "900" }}>▼ {s.zawodnicy[z.schodzi]?.numer} {s.zawodnicy[z.schodzi]?.nazwisko?.toUpperCase()}</Text>
+                    </View>
+                  ) : (
+                    <Text style={{ color: "#fff", fontSize: 13, fontWeight: "900", paddingHorizontal: 8, paddingVertical: 6 }}>{k.typ === "czerwona" ? "🟥" : "🟨"} {s.zawodnicy[k.id]?.nazwisko?.toUpperCase()} <Text style={{ color: "#bbb", fontWeight: "600", fontSize: 11 }}>{k.opis}</Text></Text>
+                  )}
+                </View>
+              );
+            })()}
             {powt && <View style={{ position: "absolute", top: 8, left: 8, backgroundColor: "#c8102e", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4 }}><Text style={{ color: "#fff", fontWeight: "900", fontSize: 11 }}>⟲ POWTÓRKA</Text></View>}
             {m.wazne?.typ === "gol" && predkosc > 0 && <View style={{ position: "absolute", top: "38%", alignSelf: "center", backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 18, paddingVertical: 6, borderRadius: 8 }}><Text style={{ color: K.akcent, fontWeight: "900", fontSize: 28, fontFamily: CZCIONKA }}>GOOOL!</Text></View>}
             {startTxt && <Pressable onPress={() => graj(1)} style={{ position: "absolute", inset: 0, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.35)" } as any}><Text style={{ color: "#fff", fontWeight: "900", fontSize: 20 }}>▶ Rozpocznij mecz</Text><Text style={[st.maly, { color: "#ddd" }]}>{m.zasady.opis}</Text></Pressable>}
@@ -233,6 +256,20 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
               <Stat et="Obrony bramkarza" a={m.staty.obrony[0]} b={m.staty.obrony[1]} />
               <Text style={[st.naglowek, { marginTop: 8 }]}>Mapa strzałów</Text>
               <MapaStrzalow m={m} />
+              <Text style={[st.naglowek, { marginTop: 8 }]}>Aktywność zawodników (kontakty z piłką)</Text>
+              {[m.dom, m.gosc].map((z, j) => (
+                <View key={j} style={{ marginTop: 4 }}>
+                  <Text style={st.maly}>{s.kluby[z.klubId].nazwa}</Text>
+                  {z.zagrali.map((id) => ({ id, n: m.dotkniecia[id] ?? 0 })).sort((a, b) => b.n - a.n).slice(0, 5).map(({ id, n }) => {
+                    const max = Math.max(1, ...Object.values(m.dotkniecia));
+                    return (<View key={id} style={[st.wiersz, { gap: 6, marginVertical: 1.5 }]}>
+                      <Text style={[st.maly, { width: 110 }]} numberOfLines={1}>{s.zawodnicy[id]?.nazwisko}</Text>
+                      <View style={{ flex: 1, height: 7, borderRadius: 4, backgroundColor: K.karta2 }}><View style={{ width: `${(n / max) * 100}%`, height: 7, borderRadius: 4, backgroundColor: j ? K.niebieski : K.akcent }} /></View>
+                      <Text style={[st.maly, { width: 26, textAlign: "right" }]}>{n}</Text>
+                    </View>);
+                  })}
+                </View>
+              ))}
             </>)}
             {zakl === "sklady" && <View style={[st.wiersz, { alignItems: "flex-start", gap: 10 }]}><Sklad z={m.dom} nazwa={kd.nazwa} /><Sklad z={m.gosc} nazwa={kg.nazwa} /></View>}
             {zakl === "taktyka" && (<>

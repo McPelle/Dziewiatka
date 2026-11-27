@@ -65,7 +65,7 @@ const html = `<!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, shrink-to-fit=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <meta name="apple-mobile-web-app-title" content="Dziewiątka" />
 <meta name="theme-color" content="#0c5230" />
 <title>Dziewiątka — Menedżer Piłkarski</title>
@@ -73,7 +73,7 @@ ${ikonaTagi}
 <style id="expo-reset">
   html, body { height: 100%; background: #06130d; }
   body { overflow: hidden; margin: 0; }
-  #root { display: flex; height: 100%; flex: 1; }
+  #root { display: flex; height: calc(100% - env(safe-area-inset-bottom, 0px)); flex: 1; } /* pasek „home" iPhone'a nie zasłania menu */
 </style>
 </head>
 <body>

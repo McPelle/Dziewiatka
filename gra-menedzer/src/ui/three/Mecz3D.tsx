@@ -19,7 +19,7 @@ import { animuj, stworzPostac, wyglad3D, type Postac } from "./zawodnik3d";
 import { gwizdek, kopniecie, napiecie, reakcjaTrybun } from "./dzwiek";
 
 export type Kamera = "auto" | "tv" | "bramka" | "gora" | "blisko";
-export interface Ustawienia3D { noc: boolean; pogoda: "slonce" | "deszcz" | "snieg" | "mgla"; widzowie: number; lekka: boolean }
+export interface Ustawienia3D { noc: boolean; pogoda: "slonce" | "deszcz" | "snieg" | "mgla"; widzowie: number; lekka: boolean; derby?: boolean; pusto?: boolean }
 
 /** Ustawienie slotu: [głębokość od własnej bramki 0–100, pozycja boczna 0–100]. */
 const SLOT_XY: Record<PozycjaSzczegolowa, [number, number]> = {
@@ -75,6 +75,16 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       opady = new THREE.Points(gm, new THREE.PointsMaterial({ color: ust.pogoda === "snieg" ? 0xffffff : 0xaac4e0, size: ust.pogoda === "snieg" ? 0.35 : 0.12, transparent: true, opacity: 0.8 }));
       scena.add(opady);
     }
+    // race i dym (derby): świecące punkty nad trybuną + chmura dymu, zapalane na start i po golu gospodarzy
+    let race: THREE.Points | undefined, dym: THREE.Mesh | undefined, raceT = ust.derby ? 8 : 0;
+    if (ust.derby && !ust.pusto) {
+      const n = 60, pos = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) { pos[i * 3] = -30 + Math.random() * 60; pos[i * 3 + 1] = 3 + Math.random() * 6; pos[i * 3 + 2] = SZ / 2 + 9 + Math.random() * 10; }
+      const gm = new THREE.BufferGeometry(); gm.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      race = new THREE.Points(gm, new THREE.PointsMaterial({ color: 0xff3010, size: 0.9, transparent: true, opacity: 1 })); scena.add(race);
+      dym = new THREE.Mesh(new THREE.SphereGeometry(12, 12, 8), new THREE.MeshBasicMaterial({ color: 0xbfb6b0, transparent: true, opacity: 0.0, depthWrite: false }));
+      dym.scale.set(2.6, 0.7, 0.9); dym.position.set(0, 12, SZ / 2 + 14); scena.add(dym);
+    }
     // piłka (zimą pomarańczowa) + cień
     const pilka = new THREE.Mesh(new THREE.SphereGeometry(0.22, 18, 14), new THREE.MeshStandardMaterial({ color: ust.pogoda === "snieg" ? 0xff6a1a : 0xffffff, roughness: 0.4 }));
     pilka.castShadow = true; scena.add(pilka);
@@ -101,6 +111,30 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     const sedzia = stworzPostac({ ...kS, nr: 0, seed: 5, sedzia: true }); scena.add(sedzia.g);
     const asystenci = [stworzPostac({ ...kS, nr: 0, seed: 11 }), stworzPostac({ ...kS, nr: 0, seed: 17 })];
     asystenci.forEach((a, i) => { a.g.position.set(i ? 25 : -25, 0, i ? -SZ / 2 - 1 : SZ / 2 + 1); scena.add(a.g); });
+    // chorągiewki asystentów (podnoszone przy spalonym)
+    const choragiewki = asystenci.map((a) => {
+      const g = new THREE.Group();
+      const kij = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.55), new THREE.MeshStandardMaterial({ color: 0x222222 })); kij.position.y = -0.3; g.add(kij);
+      const fl = new THREE.Mesh(new THREE.PlaneGeometry(0.28, 0.2), new THREE.MeshStandardMaterial({ color: 0xff3b1f, side: THREE.DoubleSide, emissive: new THREE.Color(0x441100) })); fl.position.set(0.14, -0.08, 0); g.add(fl);
+      g.position.y = -0.45; a.ramiona[1].add(g); return g;
+    });
+    let flagaT = 0, kartkaT = 0, ostKartek = m.kartki.length;
+    const kartka = new THREE.Mesh(new THREE.PlaneGeometry(0.09, 0.13), new THREE.MeshBasicMaterial({ color: 0xffd600, side: THREE.DoubleSide }));
+    kartka.position.set(0, -0.5, 0.05); kartka.visible = false; sedzia.ramiona[1].add(kartka);
+    // ławki rezerwowych: rezerwowi siedzą, trenerzy stoją w strefie technicznej
+    const lawkowi: Postac[] = [];
+    for (const [zz, sd] of [[m.dom, "dom"], [m.gosc, "gosc"]] as const) {
+      zz.lawka.slice(0, 7).forEach((id, i) => {
+        const p = postac(id, sd);
+        p.g.position.set((sd === "dom" ? -12 : 6) + i * 0.85, -0.38, SZ / 2 + 2.6); p.g.rotation.y = Math.PI;
+        p.uda.forEach((u) => (u.rotation.x = -1.45)); p.lydki.forEach((l) => (l.rotation.x = 1.45)); lawkowi.push(p);
+      });
+    }
+    const trenerzy = (["dom", "gosc"] as const).map((sd) => {
+      const t = stworzPostac({ koszulka: "#1d2536", spodenki: "#1d2536", getry: "#1d2536", nr: 0, seed: sd === "dom" ? 21 : 44 });
+      t.g.position.set(sd === "dom" ? -9 : 9, 0, SZ / 2 + 1.2); t.g.rotation.y = Math.PI; scena.add(t.g); return { t, sd };
+    });
+    let radoscTrenera: "dom" | "gosc" | null = null, radoscT = 0;
     const predk = new Map<Postac, THREE.Vector3>();
     // stan odtwarzania
     let segs: Seg[] = [], si = 0, czekaNaKrok = false, koniecSeg = false;
@@ -187,8 +221,10 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
             if (z === "obrona") { const gk = [...postacie].find(([id]) => s.zawodnicy[id]?.poz === "BR" && Math.sign(postacie.get(id)!.g.position.x) === Math.sign(sg.b.x))?.[1]; if (gk) { gk.poza = "rzut"; gk.pozaT = 0.7; gk.faza = sg.b.z > gk.g.position.z ? 1 : -1; } reakcjaTrybun("ooo"); emocje = 0.6; }
             if (z === "slupek") { reakcjaTrybun("ooo"); emocje = 0.7; }
             if (z === "faul" || z === "spalony") gwizdek();
+            if (z === "spalony") flagaT = 2.2;
             if (z === "gol") {
               const domGol = sg.b.x > 0; strzelec = sg.p.nosnik; celebracja = 3.2; gwizdek();
+              radoscTrenera = domGol ? "dom" : "gosc"; radoscT = 4; if (domGol && race) raceT = 7;
               reakcjaTrybun(domGol ? "gol" : "zawod", domGol); // gospodarze mają większość na trybunach
               koniecSeg = true;
             }
@@ -227,11 +263,27 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         }
         if (najblizszyObr && gra) { tmp.set(bx - najblizszyObr.g.position.x, 0, bz - najblizszyObr.g.position.z); const d = tmp.length(); if (d > 1.4) najblizszyObr.g.position.add(tmp.normalize().multiplyScalar(Math.min(d - 1.4, 9 * dtg))); }
         // zawodnicy, którzy zeszli z boiska, schodzą do ławki
-        for (const [id, p] of postacie) if (!m.dom.naBoisku.includes(id) && !m.gosc.naBoisku.includes(id)) { p.g.position.lerp(tmp.set(strona.get(id) === "dom" ? -9 : 9, 0, SZ / 2 + 3), dt * 0.6); animuj(p, 2, dt); if (p.g.position.z > SZ / 2 + 2.5) p.g.visible = false; }
+        for (const [id, p] of postacie) if (!m.dom.naBoisku.includes(id) && !m.gosc.naBoisku.includes(id) && !lawkowi.includes(p)) { p.g.position.lerp(tmp.set(strona.get(id) === "dom" ? -9 : 9, 0, SZ / 2 + 3), dt * 0.6); animuj(p, 2, dt); if (p.g.position.z > SZ / 2 + 2.5) p.g.visible = false; }
         // sędzia i asystenci
         tmp.set(bx - 7 - sedzia.g.position.x, 0, bz + 6 - sedzia.g.position.z); const ds = tmp.length();
         if (ds > 0.3) sedzia.g.position.add(tmp.normalize().multiplyScalar(Math.min(ds, 8 * Math.max(dt, dtg))));
         sedzia.g.rotation.y = Math.atan2(bx - sedzia.g.position.x, bz - sedzia.g.position.z); animuj(sedzia, ds > 1 ? 4 : 0, dt);
+        // kartka: nowa w meczu → sędzia podnosi ją w górę
+        if (m.kartki.length > ostKartek) { const k = m.kartki[m.kartki.length - 1]; (kartka.material as THREE.MeshBasicMaterial).color.set(k.typ === "czerwona" ? 0xe01010 : 0xffd600); kartkaT = 2.2; ostKartek = m.kartki.length; gwizdek(); }
+        kartkaT = Math.max(0, kartkaT - dt); kartka.visible = kartkaT > 0;
+        if (kartkaT > 0) { sedzia.ramiona[1].rotation.x = -2.9; sedzia.ramiona[1].rotation.z = 0.15; }
+        flagaT = Math.max(0, flagaT - dt);
+        asystenci.forEach((a) => { a.ramiona[1].rotation.x = flagaT > 0 ? -2.8 : -0.2; });
+        choragiewki.forEach((c) => { c.rotation.z = flagaT > 0 ? Math.sin(czas * 18) * 0.25 : 0; });
+        // trenerzy przy linii: gesty przez cały mecz, radość po golu, złapanie się za głowę po straconym
+        radoscT = Math.max(0, radoscT - dt);
+        for (const { t, sd } of trenerzy) {
+          const cieszy = radoscT > 0 && radoscTrenera === sd, smutny = radoscT > 0 && radoscTrenera && radoscTrenera !== sd;
+          if (cieszy) { t.poza = "radosc"; t.pozaT = 0.2; animuj(t, 0, dt); }
+          else { t.poza = "stoi"; animuj(t, 0, dt); t.ramiona[0].rotation.x = smutny ? -2.9 : -0.6 - Math.max(0, Math.sin(czas * 1.3 + (sd === "dom" ? 0 : 2))) * 0.9; t.ramiona[1].rotation.x = smutny ? -2.9 : -0.3; }
+          t.g.position.x = (sd === "dom" ? -9 : 9) + Math.sin(czas * 0.4 + (sd === "dom" ? 0 : 1)) * 1.5; t.g.rotation.y = Math.PI + Math.atan2(bx - t.g.position.x, 30) * 0.5;
+        }
+        for (const p of lawkowi) { if (m.dom.naBoisku.some((x) => postacie.get(x) === p) || m.gosc.naBoisku.some((x) => postacie.get(x) === p)) continue; p.tulow.rotation.x = 0.1 + Math.sin(czas + p.faza) * 0.03; }
         asystenci[0].g.position.x += (Math.min(-2, Math.max(-DL / 2, bx - 6)) - asystenci[0].g.position.x) * dt * 2; asystenci[0].g.rotation.y = Math.PI; animuj(asystenci[0], 2, dt);
         asystenci[1].g.position.x += (Math.max(2, Math.min(DL / 2, bx + 6)) - asystenci[1].g.position.x) * dt * 2; asystenci[1].g.rotation.y = 0; animuj(asystenci[1], 2, dt);
         // nagrywanie do powtórki (ostatnie ~4 s)
@@ -240,6 +292,13 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         const doBramki = Math.max(0, (Math.abs(bx) - 25) / 27);
         emocje = Math.max(emocje * (1 - dt * 0.8), doBramki * 0.35);
         napiecie(Math.min(1, doBramki + emocje * 0.5), bx / 52);
+      }
+      if (race && dym) {
+        raceT = Math.max(0, raceT - dt);
+        (race.material as THREE.PointsMaterial).opacity = raceT > 0 ? 0.6 + Math.random() * 0.4 : 0;
+        (dym.material as THREE.MeshBasicMaterial).opacity = Math.max(0, Math.min(0.45, raceT > 0 ? 0.45 : (dym.material as THREE.MeshBasicMaterial).opacity - dt * 0.03));
+        dym.position.y = 12 + Math.sin(czas * 0.3) * 1.5;
+        if (raceT > 0) emocje = Math.max(emocje, 0.5);
       }
       cienP.position.set(pilka.position.x, 0.02, pilka.position.z); cienP.scale.setScalar(1 + pilka.position.y * 0.15);
       stad.aktualizuj(czas, emocje);

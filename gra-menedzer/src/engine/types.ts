@@ -373,6 +373,8 @@ export interface Europa {
 }
 
 export interface StanGry {
+  prasa?: import("./zywySwiat").Artykul[]; // lokalna prasa: artykuły po meczach
+  social?: import("./zywySwiat").Wpis[]; // wpisy kibiców w sieci
   kadraOkna?: string[]; // przerwy FIFA już rozegrane („sezon-miesiąc")
   kadraMecze?: import("./reprezentacje").MeczKadry[]; // ostatnie mecze reprezentacji
   meczLive?: import("./meczNaZywo").MeczLive; // mecz obejrzany na żywo — czeka na rozliczenie w kolejce
