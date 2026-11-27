@@ -1259,6 +1259,9 @@ export const BARWY_KLUBOW: Record<string, [string, string]> = {
   "GKS Małdyty": ["#000000", "#ffffff"],
   "UKS Rozwój Iława": ["#0050b5", "#ffffff"],
   "GSZS Delfin Rybno": ["#d00000", "#ffffff"],
+  // Pomorskie (runda 2) — barwy z regiowyniki.pl / pl.wikipedia (odcienie przybliżone wg opisu barw)
+  "Norda Karwia": ["#0000ff", "#ffd300"],
+  "Powiśle Pawlice-Rakowiec": ["#d7141a", "#000000"],
 };
 
 // Słowa-kolory w nazwie → barwa (gdy klubu nie ma w słowniku). Sprawdzane po kolei.

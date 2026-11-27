@@ -74,6 +74,15 @@ export const PRZYDOMKI: Record<string, string> = {
   "Wel Lidzbark": "„Welowcy”",
   // Warmińsko-mazurskie (runda 2) — przydomki potwierdzone w źródłach
   "Constract Lubawa": "Konstruktorzy",
+  // Pomorskie (runda 2) — przydomki potwierdzone w źródłach
+  "Pogoń Lębork": "Sprinterzy",
+  "Gryf Słupsk": "Rycerze Księstwa Słupskiego",
+  "KP Starogard Gdański": "Duma Kociewia",
+  "Stoczniowiec Gdańsk": "Stoczniowcy",
+  "Pomezania Malbork": "Pomka",
+  "Kaszubia Kościerzyna": "Duma Kaszub",
+  "Rodło Kwidzyn": "Rodełko",
+  "Bytovia Bytów": "Czarne Wilki",
 };
 
 export function przydomek(nazwa: string): string | undefined {

@@ -985,6 +985,27 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "GKS Kozłowo": 2004,
   "Naki Olsztyn": 1996,
   "UKS Rozwój Iława": 2010,
+  // Pomorskie (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Anioły Garczegorze": 2007,
+  "Osiczanka Osice": 2015,
+  "Norda Karwia": 1994,
+  "Mady Ostaszewo": 2005,
+  "DSPN Supra Kwidzyn": 2016,
+  "Czarni Przemysław": 1992,
+  "Zenit Łęczyce": 2012,
+  "UKS Klukowo": 2002,
+  "Huragan Nowe Polaszki": 1994,
+  "Powiśle Pawlice-Rakowiec": 2011,
+  "Amatorka Mikołajki Pomorskie": 2020,
+  "Oldboys Kwidzyn": 2023,
+  "Skra Kończewice": 2015,
+  "Real Myszewo": 2016,
+  "Lew Lębork": 2010,
+  "Unison Machowino": 2015,
+  "Garbarnia Kępice": 1946,
+  "Rowokół Smołdzino": 1964,
+  "KS Bytów": 2021,
+  "Motor Zwartowo": 2025,
 };
 
 /** Rok założenia klubu (jeśli znany). */
