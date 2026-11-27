@@ -42,10 +42,12 @@ const wojSciezki = (nazwa: string): Woj | undefined => PREFIKS_WOJ.find(([p]) =>
 type Wezel = { nazwa: string; poziom: number; woj?: Woj; dzieci: Set<string>; miasta: Set<string>; kluby: Set<string> };
 let _drzewo: Map<string, Wezel> | null = null;
 let _klubWoj: Map<string, Woj> | null = null;
+let _miastoWoj: Map<string, Woj> | null = null;
 function drzewo(): Map<string, Wezel> {
   if (_drzewo) return _drzewo;
   const m = new Map<string, Wezel>();
   const kw = new Map<string, Woj>();
+  const mw = new Map<string, Woj>();
   for (const sc of SCIEZKI) {
     const woj = wojSciezki(sc.nazwa);
     sc.ligi.forEach((l, i) => {
@@ -53,7 +55,7 @@ function drzewo(): Map<string, Wezel> {
       if (i >= 4 && woj) w.woj = woj; // IV liga i niżej — liga jednego województwa
       const dz = sc.ligi[i + 1];
       if (dz) w.dzieci.add(dz.nazwa);
-      for (const k of l.kluby ?? []) { w.kluby.add(k.nazwa); if (i >= 4) w.miasta.add(k.miasto); if (i >= 4 && woj) kw.set(k.nazwa, woj); }
+      for (const k of l.kluby ?? []) { w.kluby.add(k.nazwa); if (i >= 4) w.miasta.add(k.miasto); if (i >= 4 && woj) { kw.set(k.nazwa, woj); if (!mw.has(k.miasto)) mw.set(k.miasto, woj); } }
       m.set(l.nazwa, w);
     });
   }
@@ -65,14 +67,14 @@ function drzewo(): Map<string, Wezel> {
     return out;
   };
   for (const w of m.values()) if (w.poziom >= 5) w.miasta = zbierz(w.nazwa);
-  _drzewo = m; _klubWoj = kw;
+  _drzewo = m; _klubWoj = kw; _miastoWoj = mw;
   return m;
 }
 
 /** Województwo klubu (miasto lig centralnych/III ligi albo liga regionalna, w której występuje w danych). */
 export function wojKlubu(k: Pick<Klub, "nazwa" | "miasto">): Woj | undefined {
   drzewo();
-  return WOJ_MIASTA[k.miasto] ?? _klubWoj!.get(k.nazwa) ?? _klubWoj!.get(k.nazwa.replace(/\s+(II|III|IV)(?=\s|$)/, ""));
+  return WOJ_MIASTA[k.miasto] ?? _klubWoj!.get(k.nazwa) ?? _klubWoj!.get(k.nazwa.replace(/\s+(II|III|IV)(?=\s|$)/, "")) ?? _miastoWoj!.get(k.miasto);
 }
 /** Województwa obsługiwane przez ligę (III liga: grupa; IV liga i niżej: jedno). */
 export function wojLigi(nazwaLigi: string): Woj[] | null {

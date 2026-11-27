@@ -1,6 +1,8 @@
 import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj";
 import { AFILIACJE, PRZYJAZNIE } from "../data/derby";
 import { klubyLigiZDanych, rodzenstwo, trafiaDo } from "./regiony";
+import { rozliczObietnice } from "./rozmowy";
+import { konferencjaPo, konferencjaPrzed } from "./konferencje";
 import { autoSklad, raportAsystenta, dostepny, FORMACJE, ileSpozaUE, limitSpozaUE, zagrajMecz } from "./mecz";
 import { pogodaMeczu, gorskie } from "./pogoda";
 import { rozwinAtrybuty } from "./atrybuty";
@@ -27,7 +29,7 @@ export function prowizjaAgenta(pensjaKol: number, dlugosc: number): number {
 import { atutBoiska, frekwencja, jestDerby, jestPrzyjazn } from "./derby";
 import { europaNaKolejke, kwalifikacjaEuropejska, nowaEuropa, rundaEuropy } from "./europa";
 import { moznaPuchar, nowyPuchar, rundaPucharu } from "./puchar";
-import type { GraczXI, Historia, Klub, Liga, Nastawienie, Sponsor, SponsorTyp, StanGry, WlasnoscKlubu, WpisTrenera, Zawodnik } from "./types";
+import type { GraczXI, Historia, Klub, Konferencja, Wynik, Liga, Nastawienie, Sponsor, SponsorTyp, StanGry, WlasnoscKlubu, WpisTrenera, Zawodnik } from "./types";
 
 /** Najlepsza jedenastka kolejki w danej lidze (1 BR, 4 OBR, 4 POM, 2 NAP) wg ocen meczu. */
 function liczXIKolejki(s: StanGry, liga: Liga, przedMecze: Map<string, number>, kolejkaNr: number) {
@@ -321,6 +323,8 @@ export function rozpocznijKariere(s: StanGry, klubId: string) {
 /** Losuje nieobecności amatorów (klasa okręgowa i niżej) przed kolejką i ustawia skład. */
 export function przygotujKolejke(s: StanGry) {
   sprawdzPropozycjeTrenera(s);
+  if (s.mojKlub && !s.zwolniony) rozliczObietnice(s, (t) => wiadomosc(s, t));
+  konferencjaPrzedKolejka(s);
   s.niedostepni = {};
   const poziom = s.kluby[s.mojKlub].poziom;
   if (poziom >= 6) { // V liga i niżej (amatorzy/półamatorzy)
@@ -519,21 +523,39 @@ const KONF_DERBY_P: KonfSzablon[] = [
     { tekst: "Bez dramatów, to tylko trzy punkty.", morale: 0, zarzad: 0, kibice: -4, odzew: "Bagatelizowanie derbów rozwścieczyło trybuny." } ] },
 ];
 
-/** Po meczu gracza czasem pojawia się konferencja prasowa — wariant wg wyniku, przewagi i derbów. */
-function generujKonferencje(s: StanGry, moje: number, ich: number, derby: boolean) {
+/** Po meczu gracza czasem pojawia się konferencja prasowa — 3–4 pytania: wynik, sędzia, zawodnik meczu, kibice. */
+function generujKonferencje(s: StanGry, moje: number, ich: number, derby: boolean, w?: Wynik) {
+  s.motywacjaMeczu = 0; // efekt konferencji przedmeczowej wykorzystany
   if (s.konferencja) return;
   const roznica = moje - ich;
   const pewna = derby || Math.abs(roznica) >= 3; // po derbach i wysokich wynikach prawie zawsze
-  if (!pewna && !szansa(0.45)) return;
+  if (!pewna && !szansa(0.55)) return;
   let pula: KonfSzablon[];
   if (roznica > 0) pula = derby ? KONF_DERBY_W : roznica >= 3 ? KONF_WYSOKA : KONF_WYGRANA;
   else if (roznica < 0) pula = derby ? KONF_DERBY_P : roznica <= -3 ? KONF_WYSOKA_PORAZKA : KONF_PORAZKA;
   else pula = KONF_REMIS;
   const k = wybierz(pula);
-  s.konferencja = { kontekst: k.kontekst, pytanie: k.pytanie, opcje: k.opcje };
+  const pakiet = w ? konferencjaPo(s, w, moje, ich, k) : { media: "prasa", pytania: [k] };
+  ustawKonferencje(s, "po", pakiet.media, pakiet.pytania);
+}
+function ustawKonferencje(s: StanGry, typ: "przed" | "po", media: string, pytania: { kontekst: string; pytanie: string; opcje: Konferencja["opcje"] }[]) {
+  if (!pytania.length) return;
+  const [p0, ...reszta] = pytania;
+  s.konferencja = { ...p0, typ, media, kolejne: reszta, nr: 1, ile: pytania.length };
+}
+/** Konferencja przed meczem (wywoływana przy przygotowaniu kolejki). */
+function konferencjaPrzedKolejka(s: StanGry) {
+  if (s.konferencja || s.zwolniony || !s.mojKlub) return;
+  const liga = s.ligi[s.kluby[s.mojKlub].poziom - 1];
+  const para = liga?.terminarz[s.kolejka]?.find(([a, b]) => a === s.mojKlub || b === s.mojKlub);
+  if (!para) return;
+  const rywal = para[0] === s.mojKlub ? para[1] : para[0];
+  if (!s.kluby[rywal]) return;
+  const k = konferencjaPrzed(s, rywal, moznaPuchar(s));
+  if (k) ustawKonferencje(s, "przed", k.media, k.pytania);
 }
 
-/** Odpowiedź na konferencji: wpływ na morale kadry i zaufanie zarządu. */
+/** Odpowiedź na pytanie konferencji: morale (drużyna i zawodnik), zarząd, kibice, motywacja; potem kolejne pytanie. */
 export function odpowiedzKonferencja(s: StanGry, idx: number) {
   const k = s.konferencja;
   if (!k) return;
@@ -542,9 +564,18 @@ export function odpowiedzKonferencja(s: StanGry, idx: number) {
     for (const id of s.kluby[s.mojKlub].zawodnicy) { const z = s.zawodnicy[id]; z.morale = Math.max(0, Math.min(100, z.morale + o.morale)); }
     s.zarzad = Math.max(0, Math.min(100, s.zarzad + o.zarzad));
     if (o.kibice) s.zaufanieKibicow = Math.max(0, Math.min(100, (s.zaufanieKibicow ?? 60) + o.kibice));
-    wiadomosc(s, `🎙 Konferencja: ${o.odzew}`);
+    if (o.motywacja) s.motywacjaMeczu = Math.max(-0.05, Math.min(0.05, (s.motywacjaMeczu ?? 0) + o.motywacja));
+    if (o.zawodnik && s.zawodnicy[o.zawodnik.id]) { const z = s.zawodnicy[o.zawodnik.id]; z.morale = Math.max(0, Math.min(100, z.morale + o.zawodnik.morale)); }
+    wiadomosc(s, `🎙 ${k.media ? k.media + ": " : ""}${o.odzew}`);
+  } else if (idx < 0 && k.typ) {
+    s.zarzad = Math.max(0, s.zarzad - 1);
+    wiadomosc(s, "🎙 Odmówiłeś odpowiedzi na pytania dziennikarzy — media niezadowolone, zarząd też (−1).");
+    s.konferencja = undefined;
+    return;
   }
-  s.konferencja = undefined;
+  const nast = k.kolejne?.[0];
+  if (nast && idx >= 0) s.konferencja = { ...nast, typ: k.typ, media: k.media, kolejne: k.kolejne!.slice(1), nr: (k.nr ?? 1) + 1, ile: k.ile };
+  else s.konferencja = undefined;
 }
 
 // ——— Bankructwa / wycofania klubów (V liga → B klasa) ———
@@ -813,7 +844,7 @@ export function zagrajKolejke(s: StanGry) {
         }
         s.ostatnieOceny = s.taktyka.sklad.map((id) => ({ id, ocena: s.zawodnicy[id]?.ocenaMeczu ?? 0 }));
         po_meczu(s, w.dom === s.mojKlub, w.gd, w.gg, w.dom, w.gosc);
-        generujKonferencje(s, w.dom === s.mojKlub ? w.gd : w.gg, w.dom === s.mojKlub ? w.gg : w.gd, !!derbyNazwa);
+        generujKonferencje(s, w.dom === s.mojKlub ? w.gd : w.gg, w.dom === s.mojKlub ? w.gg : w.gd, !!derbyNazwa, w);
         // Reakcja mediów na głośny wynik.
         { const uS = w.dom === s.mojKlub, moje = uS ? w.gd : w.gg, ich = uS ? w.gg : w.gd, m = moje - ich;
           if (m >= 3) wiadomosc(s, wybierz([`📰 „${s.kluby[s.mojKlub].nazwa} w gazowym tempie!" — prasa chwali ${moje}:${ich}.`, `📰 Media: „Pokaz siły — ${moje}:${ich}. Kibice zachwyceni."`]));
@@ -1386,7 +1417,11 @@ function awanseZRodzenstwa(s: StanGry, i: number, n: number): string[] {
 /** Wprowadza do piramidy klub z danych (reaktywuje go, jeśli wcześniej z niej wypadł). Kadra generowana na poziomie `poziom`. */
 function wprowadzKlub(s: StanGry, d: { nazwa: string; skrot: string; miasto: string; herb?: string; stadion?: string; adres?: string }, poziom: number): string {
   const stary = Object.values(s.kluby).find((k) => k.nazwa === d.nazwa && k.pozaPiramida);
-  if (stary) { stary.pozaPiramida = false; stary.poziom = poziom; return stary.id; }
+  if (stary) {
+    stary.pozaPiramida = false; stary.poziom = poziom;
+    if (stary.zawodnicy.length < 15) { for (const poz of KADRA) { const z = nowyZawodnik(s, poziom, poz); z.klubId = stary.id; stary.zawodnicy.push(z.id); } nadajNumery(s, stary); }
+    return stary.id;
+  }
   const wzor = Object.values(s.kluby).find((k) => k.poziom === poziom && !k.pozaLiga) ?? s.kluby[s.mojKlub];
   const id = noweId(s, "k");
   const k: Klub = { ...wzor, id, nazwa: d.nazwa, skrot: d.skrot, miasto: d.miasto, herb: d.herb, poziom, zawodnicy: [], prawdziwy: true,
@@ -1403,9 +1438,14 @@ function opuscPiramide(s: StanGry, id: string) {
   if (!k || id === s.mojKlub) return;
   k.pozaPiramida = true;
   s.oferty = s.oferty.filter((o) => o.klubId !== id);
+  // Kadra klubu poza symulacją nie jest potrzebna (zapis nie puchnie) — przy powrocie klub dostaje nową kadrę.
+  const ids = new Set(k.zawodnicy);
+  for (const zid of k.zawodnicy) delete s.zawodnicy[zid];
+  k.zawodnicy = [];
+  s.wolni = s.wolni.filter((x) => !ids.has(x));
 }
 /** Nowe zgłoszenia do najniższej ligi: kluby z grup tej samej klasy w regionie (z danych), których nie ma w grze. */
-function uzupelnijNajnizsza(s: StanGry, ost: number, ile: number): string[] {
+function uzupelnijLige(s: StanGry, ost: number, ile: number): string[] {
   const nazwa = s.ligi[ost].nazwa;
   const wGrze = new Set(s.ligi.flatMap((l) => l.kluby).map((id) => s.kluby[id]?.nazwa));
   const kandydaci = [...klubyLigiZDanych(nazwa), ...(s.ligi[ost - 1] ? rodzenstwo(s.ligi[ost - 1].nazwa, nazwa).flatMap((g) => klubyLigiZDanych(g)) : [])]
@@ -1544,12 +1584,22 @@ export function nowySezon(s: StanGry) {
   // a nadmiar (gdy z góry przybyło więcej) — spada do klasy C (poza symulacją).
   {
     const ost = s.ligi.length - 1;
+    const typowaOst = s.rozmiaryStart?.[ost] ?? tabele[ost].length;
     let docel = tabele[ost].length;
-    if (klasaZmienna(s.ligi[ost].nazwa) && szansa(0.4)) docel = Math.max(8, Math.min(16, docel + (szansa(0.5) ? 1 : -1))); // nowe zgłoszenia / wycofania
+    if (klasaZmienna(s.ligi[ost].nazwa) && szansa(0.4)) docel += szansa(0.5) ? 1 : -1; // nowe zgłoszenia / wycofania
+    docel = Math.max(Math.max(8, typowaOst - 2), Math.min(Math.min(16, typowaOst + 2), docel));
     let lista = nowe[ost].filter((id) => !wGore[ost].includes(id));
     while (lista.length > docel) { const id = lista[lista.length - 1]; if (id === s.mojKlub) break; lista = lista.slice(0, -1); wychodza.push(id); }
-    if (lista.length < docel) lista = lista.concat(uzupelnijNajnizsza(s, ost, docel - lista.length));
+    if (lista.length < docel) lista = lista.concat(uzupelnijLige(s, ost, docel - lista.length));
     nowe[ost] = lista;
+  }
+  // Klasy A/B/C: liczebność waha się, ale wokół typowej (z początku kariery) — gdy grupa za bardzo się skurczy,
+  // uzupełniają ją nowe zgłoszenia klubów z tego okręgu (z danych), gdy za bardzo urośnie — nadmiar spada niżej.
+  if (!s.rozmiaryStart) s.rozmiaryStart = tabele.map((t) => t.length);
+  for (let i = 0; i < s.ligi.length - 1; i++) {
+    if (!klasaZmienna(s.ligi[i].nazwa)) continue;
+    const typowa = s.rozmiaryStart[i] ?? tabele[i].length;
+    if (nowe[i].length < typowa - 1) nowe[i] = nowe[i].concat(uzupelnijLige(s, i, typowa - 1 - nowe[i].length + (szansa(0.5) ? 1 : 0)));
   }
   for (const id of wychodza) opuscPiramide(s, id);
   aktualizujTypyKontraktow(s); // awans: amatorzy → półprofesjonaliści → zawodowcy (wg szczebla, PZPN)

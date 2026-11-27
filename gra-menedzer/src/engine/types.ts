@@ -100,6 +100,9 @@ export interface Zawodnik {
   agent?: string; // agent piłkarski (profesjonaliści) — negocjuje kontrakt
   klauzula?: number; // klauzula wykupu (zł) — zapłacenie jej wymusza negocjacje z zawodnikiem, klub nie może zablokować
   odsprzedaz?: { klubId: string; proc: number }; // klauzula odsprzedaży: % z przyszłego transferu dla klubu-sprzedawcy
+  relacja?: number; // zaufanie zawodnika do trenera 0–100 (rozmowy, dotrzymane/złamane obietnice); brak = 60
+  ostatniaRozmowa?: number; // sezon*100+kolejka ostatniej rozmowy (druga rozmowa w tygodniu waży mniej)
+  obietnica?: { typ: "minuty" | "kontrakt"; doKolejki: number; mecze: number; kontraktDo: number }; // obietnica trenera do rozliczenia
   ocenaMeczu?: number; // ocena z ostatniego rozegranego meczu (1–10)
   rozwoj?: number[]; // historia umiejętności (próbka co sezon) — do wykresu rozwoju
   macierzysty?: string; // klub właściciel, gdy zawodnik jest na wypożyczeniu (klubId)
@@ -316,7 +319,11 @@ export interface WpisTrenera {
 export interface Konferencja {
   pytanie: string;
   kontekst: string; // krótki nagłówek (np. "Po wygranej")
-  opcje: { tekst: string; morale: number; zarzad: number; kibice?: number; odzew: string }[];
+  opcje: { tekst: string; morale: number; zarzad: number; kibice?: number; motywacja?: number; zawodnik?: { id: string; morale: number }; odzew: string }[];
+  typ?: "przed" | "po";
+  media?: string; // redakcja prowadząca pytania
+  kolejne?: { kontekst: string; pytanie: string; opcje: Konferencja["opcje"] }[]; // pozostałe pytania
+  nr?: number; ile?: number;
 }
 
 /** Realne dane europejskiego rywala (fakty publiczne + barwy klubu — bez herbu/składu). */
@@ -397,7 +404,9 @@ export interface StanGry {
   historia: Historia[];
   xiKolejki?: XIKolejki; // najlepsza jedenastka ostatniej kolejki (Twoja liga)
   xiHistoria?: XIKolejki[]; // archiwum jedenastek kolejek z sezonu
-  konferencja?: Konferencja; // oczekująca konferencja prasowa (pytanie + opcje odpowiedzi)
+  konferencja?: Konferencja;
+  motywacjaMeczu?: number;
+  rozmiaryStart?: number[]; // typowe liczebności lig (z początku kariery) — klasy A/B/C wahają się wokół nich // efekt konferencji przedmeczowej (±) na najbliższy mecz gracza // oczekująca konferencja prasowa (pytanie + opcje odpowiedzi)
   europa?: Europa; // europejska kampania w tym sezonie (jeśli zakwalifikowani)
   ostatnieOceny?: { id: string; ocena: number }[]; // oceny Twoich zawodników z ostatniego meczu
   zwolniony: boolean;

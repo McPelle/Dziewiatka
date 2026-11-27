@@ -426,7 +426,8 @@ export function zagrajMecz(s: StanGry, dom: Druzyna, gosc: Druzyna, zZdarzeniami
     const chem = klubId === s.mojKlub ? chemiaMod(linia, formacja) : 1; // zgranie (tylko klub gracza — AI neutralnie)
     // „Zawodnik na wielkie mecze": w derbach/pucharze gracze z cechą bigmecz podkręcają drużynę (~0,4% każdy).
     const big = wielkiMecz ? 1 + linia.reduce((n, id) => n + (s.zawodnicy[id]?.cechy?.includes("bigmecz") ? 1 : 0), 0) * 0.004 : 1;
-    return { atak: (xi.atak * 0.7 + fin.atak * 0.3 + bc.atak + rb.atak) * lid * chem * big, obrona: (xi.obrona * 0.7 + fin.obrona * 0.3 + bc.obrona + rb.obrona) * lid * chem * big };
+    const mot = klubId === s.mojKlub ? 1 + (s.motywacjaMeczu ?? 0) : 1; // konferencja przedmeczowa: nakręcona / zlekceważona drużyna
+    return { atak: (xi.atak * 0.7 + fin.atak * 0.3 + bc.atak + rb.atak) * lid * chem * big * mot, obrona: (xi.obrona * 0.7 + fin.obrona * 0.3 + bc.obrona + rb.obrona) * lid * chem * big * mot };
   };
   const sd = sila(dom.sklad, pD.linia, dom.formacja, dom.klubId);
   const sg = sila(gosc.sklad, pG.linia, gosc.formacja, gosc.klubId);
