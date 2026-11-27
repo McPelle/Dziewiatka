@@ -10,7 +10,7 @@ import { godzinaMeczu } from "../engine/zywySwiat";
 import type { Nastawienie, StanGry } from "../engine/types";
 import { Herb } from "./Herb";
 import { LogoLigi } from "./LogoLigi";
-import { CZCIONKA, K, st } from "./styl";
+import { CZCIONKA, K, st, G, web } from "./styl";
 import { dobierzStroje, dostepneStroje, kity, type Kit } from "./strojeDane";
 import { Mecz3D, type Kamera, type Ustawienia3D } from "./three/Mecz3D";
 import { Szatnia3D } from "./three/Szatnia3D";
@@ -224,14 +224,15 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
 
   return (
     <Modal visible animationType="slide" onRequestClose={() => {}}>
-      <View style={{ flex: 1, backgroundColor: K.tlo }}>
-        {/* grafika wyniku jak w TV */}
-        <View style={[st.wiersz, { padding: 10, paddingTop: 14, gap: 8, backgroundColor: "#0a1f14", borderBottomWidth: 1, borderBottomColor: K.linia }]}>
-          <Herb klub={kd} rozmiar={30} />
+      <View style={[{ flex: 1, backgroundColor: K.tlo }, web({ backgroundImage: G.tlo })]}>
+        {/* grafika wyniku jak w TV — szklana belka 3D w barwach drużyn */}
+        <View style={[st.wiersz, { padding: 10, paddingTop: 14, gap: 8, backgroundColor: "#0a1f14", borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.12)" },
+          web({ backgroundImage: `linear-gradient(90deg, ${barwyKlubu(kd.nazwa)[0]}99 0%, rgba(6,19,13,0.9) 32%, rgba(6,19,13,0.9) 68%, ${barwyKlubu(kg.nazwa)[0]}99 100%)`, boxShadow: "0 8px 22px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.18)" })]}>
+          <Herb klub={kd} rozmiar={34} />
           <Text style={{ flex: 1, color: K.tekst, fontWeight: "800", fontSize: 13, fontFamily: CZCIONKA }} numberOfLines={1}>{kd.nazwa}</Text>
-          <View style={{ backgroundColor: "#000", borderRadius: 6, paddingHorizontal: 10, paddingVertical: 3 }}><Text style={{ color: "#fff", fontWeight: "900", fontSize: 22, fontFamily: CZCIONKA }}>{m.gd}:{m.gg}</Text></View>
+          <View style={[{ backgroundColor: "#000", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 4, borderWidth: 1, borderColor: "rgba(255,255,255,0.25)" }, web({ backgroundImage: "linear-gradient(180deg, #2a2f36 0%, #07090c 55%, #000 100%)", boxShadow: "0 4px 0 #000, 0 8px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.25)" })]}><Text style={[{ color: "#fff", fontWeight: "900", fontSize: 24, fontFamily: CZCIONKA, letterSpacing: 1 }, web({ textShadow: "0 0 10px rgba(255,255,255,0.35)" })]}>{m.gd}:{m.gg}</Text></View>
           <Text style={{ flex: 1, color: K.tekst, fontWeight: "800", fontSize: 13, textAlign: "right", fontFamily: CZCIONKA }} numberOfLines={1}>{kg.nazwa}</Text>
-          <Herb klub={kg} rozmiar={30} />
+          <Herb klub={kg} rozmiar={34} />
         </View>
         <View style={[st.wiersz, { justifyContent: "center", gap: 10, paddingVertical: 4, backgroundColor: "#071710" }]}>
           {m.puchar ? <Text style={{ color: K.akcent, fontSize: 11, fontWeight: "800" }}>🏆 {m.puchar.nazwa}</Text> : <LogoLigi nazwa={s.ligi[kd.poziom - 1]?.nazwa ?? ""} poziom={kd.poziom} rozmiar={18} />}

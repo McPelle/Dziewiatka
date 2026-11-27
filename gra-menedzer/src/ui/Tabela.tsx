@@ -7,7 +7,7 @@ import { BoiskoXI } from "./BoiskoXI";
 import { Herb } from "./Herb";
 import { LogoLigi } from "./LogoLigi";
 import { WidokKlubu } from "./WidokKlubu";
-import { K, st } from "./styl";
+import { K, st, web } from "./styl";
 
 type Widok = "tabela" | "strzelcy" | "asysty" | "konta" | "xi";
 const WIDOKI: [Widok, string][] = [["tabela", "Tabela"], ["strzelcy", "Strzelcy"], ["asysty", "Asysty"], ["konta", "Czyste konta"], ["xi", "⭐ XI kolejki"]];
@@ -88,17 +88,20 @@ export function Tabela({ s }: { s: StanGry }) {
                 const moj = w.klubId === s.mojKlub;
                 const kolor = i < awans ? K.zielony : i >= tabela.length - spadek ? K.czerwony : "transparent";
                 return (
-                  <Pressable key={w.klubId} onPress={() => setPodglad(w.klubId)} style={[st.wiersz, { paddingVertical: 6, borderTopWidth: 1, borderTopColor: K.linia, backgroundColor: moj ? K.karta2 : undefined }]}>
-                    <View style={{ width: 3, alignSelf: "stretch", backgroundColor: kolor, marginRight: 4 }} />
-                    <Text style={[st.tekst, { width: 22 }]}>{i + 1}</Text>
-                    <Herb klub={k} rozmiar={20} />
+                  <Pressable key={w.klubId} onPress={() => setPodglad(w.klubId)} style={[st.wiersz, { paddingVertical: 7, marginVertical: 1.5, borderRadius: 10, backgroundColor: moj ? "rgba(255,206,71,0.12)" : i % 2 ? "rgba(255,255,255,0.025)" : "transparent" },
+                    web(moj ? { backgroundImage: "linear-gradient(90deg, rgba(255,206,71,0.28), rgba(255,206,71,0.06))", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.18), 0 0 14px rgba(255,206,71,0.25)" } : { boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" })]}>
+                    <View style={[{ width: 24, height: 24, borderRadius: 7, alignItems: "center", justifyContent: "center", marginRight: 6, backgroundColor: kolor === "transparent" ? "rgba(255,255,255,0.06)" : kolor },
+                      web({ backgroundImage: kolor === K.zielony ? "linear-gradient(180deg,#6ff0a4,#1f9a52)" : kolor === K.czerwony ? "linear-gradient(180deg,#ff8a93,#c22b38)" : "linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.03))", boxShadow: "0 2px 0 rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35)" })]}>
+                      <Text style={{ color: kolor === "transparent" ? K.tekst : "#08130c", fontWeight: "900", fontSize: 12 }}>{i + 1}</Text>
+                    </View>
+                    <Herb klub={k} rozmiar={22} />
                     <Text numberOfLines={1} style={[st.tekst, { flex: 1, marginLeft: 6, fontWeight: moj ? "800" : "400", fontSize: 14 }]}>{k.nazwa}{k.karaPunktowa ? ` (−${k.karaPunktowa} pkt)` : ""}</Text>
                     <Text style={{ width: 32, textAlign: "center", color: K.akcent, fontWeight: "800", fontSize: 12.5 }}>{silaKlubu(s, w.klubId).toFixed(0)}</Text>
                     {[w.m, w.w, w.r, w.p].map((x, j) => (
                       <Text key={j} style={[st.maly, { width: 26, textAlign: "center" }]}>{x}</Text>
                     ))}
                     <Text style={[st.maly, { width: 46, textAlign: "center" }]}>{w.bz}:{w.bs}</Text>
-                    <Text style={[st.tekst, { width: 26, textAlign: "center", fontWeight: "800" }]}>{w.pkt}</Text>
+                    <Text style={[st.tekst, { width: 30, textAlign: "center", fontWeight: "900", color: moj ? K.akcent : K.tekst, fontSize: 15 }, web({ textShadow: "0 1px 4px rgba(0,0,0,0.6)" })]}>{w.pkt}</Text>
                   </Pressable>
                 );
               })}

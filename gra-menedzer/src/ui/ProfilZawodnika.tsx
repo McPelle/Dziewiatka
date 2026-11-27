@@ -21,7 +21,7 @@ import { EdytorZawodnika } from "./EdytorZawodnika";
 import { Rozmowa } from "./Rozmowa";
 import { StrojZawodnika } from "./Stroje";
 import { Twarz } from "./Twarz";
-import { K, KOLOR_POZ, st } from "./styl";
+import { K, KOLOR_POZ, st, G, web } from "./styl";
 
 const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Alert.alert("", t));
 const NOGA_NAZWA: Record<string, string> = { prawa: "prawa", lewa: "lewa", obie: "obie (oburęczny)" };
@@ -119,11 +119,12 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
   return (
     <Modal visible={widoczny} transparent animationType="slide" onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "88%", paddingBottom: 20 }}>
+        <View style={[{ backgroundColor: K.tlo, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: "88%", paddingBottom: 20, borderTopWidth: 2, borderColor: K.akcent }, web({ backgroundImage: G.tlo, boxShadow: "0 -12px 40px rgba(0,0,0,0.6)" })]}>
           {z && (
             <ScrollView contentContainerStyle={{ padding: 18 }}>
-              <View style={[st.wiersz, { justifyContent: "space-between", alignItems: "flex-start", gap: 10 }]}>
-                <Twarz seed={z.imie + z.nazwisko} rozmiar={54} zdjecie={z.zdjecie} cechy={z.twarz} kraj={z.kraj} jersey={z.klubId && s.kluby[z.klubId] ? barwyKlubu(s.kluby[z.klubId].nazwa)[0] : "#1f7a43"} />
+              <View style={[st.wiersz, { justifyContent: "space-between", alignItems: "flex-start", gap: 10, padding: 12, borderRadius: 18, borderWidth: 1, borderColor: "rgba(255,255,255,0.12)" },
+                web({ backgroundImage: `linear-gradient(135deg, ${(z.klubId && s.kluby[z.klubId] ? barwyKlubu(s.kluby[z.klubId].nazwa)[0] : "#1f7a43")}88 0%, rgba(0,0,0,0) 55%), ${G.karta}`, boxShadow: "0 14px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15)" })]}>
+                <Twarz seed={z.imie + z.nazwisko} rozmiar={64} zdjecie={z.zdjecie} cechy={z.twarz} kraj={z.kraj} jersey={z.klubId && s.kluby[z.klubId] ? barwyKlubu(s.kluby[z.klubId].nazwa)[0] : "#1f7a43"} />
                 <View style={{ flex: 1 }}>
                   <Text style={st.tytul}>#{z.numer || "—"} {z.imie} {z.nazwisko}</Text>
                   <Text style={[st.maly, { marginTop: 2 }]}>
@@ -138,10 +139,16 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
                   <Text style={[st.maly, { marginTop: 2 }]}>
                     🎂 ur. <Text style={{ fontWeight: "700", color: K.tekst }}>{dataUrodzenia(z, s.sezon)}</Text> ({z.wiek} {z.wiek % 10 >= 2 && z.wiek % 10 <= 4 && (z.wiek % 100 < 12 || z.wiek % 100 > 14) ? "lata" : "lat"}){z.wzrost ? ` · ${z.wzrost} cm` : ""}{z.realny && z.wartoscReal ? ` · realna wycena (start gry): ${z.wartoscReal >= 1e6 ? (z.wartoscReal / 1e6).toLocaleString("pl-PL") + " mln €" : Math.round(z.wartoscReal / 1e3) + " tys. €"}` : ""}
                   </Text>
-                  <View style={[st.wiersz, { marginTop: 8, gap: 4, alignItems: "flex-end" }]}>
-                    <Text style={{ color: K.akcent, fontSize: 26, fontWeight: "900" }}>{Math.floor(z.umiej)}</Text>
-                    <Text style={[st.maly, { fontSize: 10, marginBottom: 3 }]}>OVERALL</Text>
-                    <Text style={[st.maly, { fontSize: 11, marginBottom: 3 }]}>/ pot. {Math.floor(z.potencjal)}</Text>
+                  <View style={[st.wiersz, { marginTop: 10, gap: 10, alignItems: "center" }]}>
+                    <View style={[{ width: 58, height: 64, borderRadius: 12, borderBottomLeftRadius: 29, borderBottomRightRadius: 29, alignItems: "center", justifyContent: "center", backgroundColor: K.akcent, borderWidth: 1, borderColor: "#b47a08" },
+                      web({ backgroundImage: G.zloto, boxShadow: "0 5px 0 #8a5d06, 0 10px 18px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.7)" })]}>
+                      <Text style={[{ color: "#2a1a00", fontSize: 26, fontWeight: "900", lineHeight: 28 }, web({ textShadow: "0 1px 0 rgba(255,255,255,0.6)" })]}>{Math.floor(z.umiej)}</Text>
+                      <Text style={{ color: "#4a3000", fontSize: 8.5, fontWeight: "900", letterSpacing: 1 }}>OVR</Text>
+                    </View>
+                    <View>
+                      <Text style={[st.maly, { fontSize: 11 }]}>POTENCJAŁ</Text>
+                      <Text style={{ color: K.zielony, fontSize: 20, fontWeight: "900" }}>{Math.floor(z.potencjal)}</Text>
+                    </View>
                   </View>
                   {z.cechy && z.cechy.length > 0 && (
                     <View style={[st.wiersz, { flexWrap: "wrap", gap: 4, marginTop: 6 }]}>
