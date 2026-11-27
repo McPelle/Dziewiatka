@@ -82,6 +82,18 @@ Ikona aplikacji: `assets/ikona/` (źródło SVG + PNG 180/512/1024). `build-html
 ## PLAN (zatwierdzony przez użytkownika) — 141 punktów
 6 zaległych z pierwszej listy (reprezentacje, 64 herby, logo lig, grafika/stroje, kalendarz miesiąca, dokończenie meczu) + 135 nowych (3D, realizm, żywy świat, przepisy PZPN). Lista zadań: #24–#32 w sesji; robione etapami, po każdym etapie plik index.html dla użytkownika.
 
+
+## PUBLIKACJA GRY (od 27.11.2026) — GitHub Pages
+- Adres gry: **https://mcpelle.github.io/Dziewiatka/** (publiczny, bez logowania, bez znaczka hostingu).
+- Gra jest aplikacją webową (PWA): ikona na ekranie, pełny ekran, offline, aktualizacje w tle (komunikat „Nowa wersja gotowa").
+- Wydanie nowej wersji:
+  1. `cd gra-menedzer && rm -rf dist && npx expo export --platform web && node scripts/build-strona.mjs dist ../strona && node scripts/build-html.mjs dist ../index.html && rm -rf dist`
+  2. commit + push gałęzi roboczej,
+  3. skopiować zawartość `strona/` do osobnego repo-katalogu i wypchnąć jako gałąź **gh-pages** (root = zawartość strony, z plikiem `.nojekyll`). GitHub Pages publikuje sam w 1–2 min.
+- Ścieżki w buildzie są WZGLĘDNE (`./assets/...`, `./sw.js`) — gra działa w podkatalogu `/Dziewiatka/`.
+- Netlify (tubular-torrone-fda949) — stara strona, NIE aktualizujemy (kredyty, znaczek „Powered by Netlify" na darmowym koncie). Użytkownik usunie ją po przeniesieniu zapisu.
+- iPhone: aplikacja z ekranu ma osobną pamięć niż Safari → zapisy przenosi się eksportem/importem.
+
 ## CO JEST W TOKU
 Nic otwartego — użytkownik ma listę kolejnych poprawek, zapytać o nie.
 
