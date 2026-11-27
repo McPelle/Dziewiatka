@@ -24,19 +24,32 @@ function Stadion3DV2({ s, klub, tlo, wysokosc, noc }: { s: StanGry | null; klub:
     try { renderer = new THREE.WebGLRenderer({ antialias: !lekka }); } catch { return; }
     const W = () => el.clientWidth || 360, H = () => el.clientHeight || 240;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lekka ? 1 : tlo ? 1.5 : 2)); renderer.setSize(W(), H());
-    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.shadowMap.enabled = false; // tło menu: bez cieni — błyskawiczne przygotowanie grafiki na iPhonie renderer.toneMapping = THREE.ACESFilmicToneMapping;
     Object.assign(renderer.domElement.style, { width: "100%", height: "100%", display: "block", touchAction: "none" });
     el.appendChild(renderer.domElement);
     const godz = new Date().getHours();
     const jestNoc = noc ?? (godz >= 19 || godz < 6);
     const scena = new THREE.Scene();
-    swiatla(scena, jestNoc, false, lekka);
+    // lekkie światło (bez reflektorów-spotów i cieni): kilka prostych shaderów zamiast kilkunastu ciężkich
+    scena.background = new THREE.Color(jestNoc ? 0x0b1226 : 0x8fbbe8);
+    scena.fog = new THREE.Fog(scena.background as THREE.Color, 160, 520);
+    scena.add(new THREE.HemisphereLight(jestNoc ? 0x8a9ac8 : 0xdfeeff, jestNoc ? 0x1a2a1a : 0x445533, jestNoc ? 1.1 : 1.3));
+    { const sl = new THREE.DirectionalLight(jestNoc ? 0xfff4dd : 0xfff2d8, jestNoc ? 1.4 : 2.2); sl.position.set(60, 80, 45); scena.add(sl); }
     const mies = new Date().getMonth() + 1;
     const stad = zbudujStadion(s, klub, { noc: jestNoc, snieg: mies === 12 || mies <= 2 ? new Date().getDate() % 3 === 0 : false, deszcz: false, widzowie: tlo ? klub.pojemnosc * 0.5 : 0, lekka, budowy: s?.budowy });
+    // materiały „lekkie" (Lambert): wygląd prawie ten sam, a iPhone przygotowuje je w ułamku sekundy
+    const cache = new Map<THREE.Material, THREE.Material>();
+    stad.grupa.traverse((o) => {
+      const m = (o as THREE.Mesh).material as THREE.Material | THREE.Material[] | undefined;
+      if (!m || Array.isArray(m) || !(m instanceof THREE.MeshStandardMaterial)) return;
+      let n = cache.get(m);
+      if (!n) { n = new THREE.MeshLambertMaterial({ color: m.color, map: m.map, transparent: m.transparent, opacity: m.opacity, side: m.side, emissive: m.emissive, emissiveIntensity: m.emissiveIntensity, depthWrite: m.depthWrite }); cache.set(m, n); }
+      (o as THREE.Mesh).material = n; (o as THREE.Mesh).castShadow = false; (o as THREE.Mesh).receiveShadow = false;
+    });
     scena.add(stad.grupa);
     const cam = new THREE.PerspectiveCamera(40, W() / H(), 0.5, 1000);
     const composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scena, cam));
-    if (!lekka) composer.addPass(new UnrealBloomPass(new THREE.Vector2(W(), H()), jestNoc ? 0.8 : 0.15, 0.6, jestNoc ? 0.8 : 0.95));
+    // bez poświaty w tle menu (oszczędza czas przygotowania)
     composer.addPass(new OutputPass());
     const rozmiar = 70 + Math.sqrt(klub.pojemnosc) * 0.9;
     let kat = 0.6, wys = tlo ? 0.45 : 0.6, przeciaganie = false, px = 0, py = 0, tiltX = 0, tiltY = 0;
@@ -58,7 +71,7 @@ function Stadion3DV2({ s, klub, tlo, wysokosc, noc }: { s: StanGry | null; klub:
       cam.position.set(Math.cos(kat + tiltX * 0.25) * r, 18 + wys * r * 0.55 + tiltY * 6, Math.sin(kat + tiltX * 0.25) * r);
       cam.lookAt(0, 2, 0);
       stad.aktualizuj(t, tlo ? 0.15 : 0);
-      composer.render(dt);
+      renderer.render(scena, cam); void composer;
     };
     raf = requestAnimationFrame(petla);
     const resize = () => { renderer.setSize(W(), H()); composer.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); };
