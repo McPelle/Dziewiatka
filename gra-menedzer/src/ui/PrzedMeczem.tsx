@@ -65,7 +65,7 @@ export function PrzedMeczem({ s, m, stroje, ust, wyborStrojow, onGotowe }: { s: 
   const naRozgrzewke = () => { zamilknij(); setKwestie([]); setIle(0); setEtap("rozgrzewka"); gwizdek(); };
   const poRozgrzewce = (r: Rozgrzewka) => { const w = zastosujRozgrzewke(s, m, r); setWpisy(w); zamilknij(); setEtap("mowa"); setKwestie(rozmowySzatni(s, m, "wyjscie")); setIle(0); };
   const powiedzMowe = (t: MowaPrzed) => {
-    const r = mowaPrzedMeczem(s, m, t, { derby: ust.derby }); setMowa(t);
+    const r = mowaPrzedMeczem(s, m, t, { derby: ust.derby }); setMowa(t); s.osiagnieciaFlagi = { ...(s.osiagnieciaFlagi ?? {}), mowa: true };
     setMowiTrener(true); mow(r.tekst, "trener", { kto: trener, plec: plecZImienia(trener), przerwij: true });
     setWpisy((w) => [`🗣 ${r.opis}`, ...w]);
     setTimeout(() => { setMowiTrener(false); setNastroj(Math.max(-1, Math.min(1, r.efekt * 20))); setKwestie([{ id: "trener", tekst: r.tekst }, ...r.reakcje]); setIle(1); }, Math.min(9000, 1500 + r.tekst.length * 55));

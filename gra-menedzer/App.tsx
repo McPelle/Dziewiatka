@@ -7,6 +7,7 @@ import type { StanGry } from "./src/engine/types";
 import { HerbGry, MurawaTlo, PlakietkaBeta } from "./src/ui/Grafika";
 import { Herb } from "./src/ui/Herb";
 import { MenuGlowne } from "./src/ui/MenuGlowne";
+import { SzybkiMecz } from "./src/ui/SzybkiMecz";
 import { metaMenu } from "./src/ui/zapis";
 import { NowaGra } from "./src/ui/NowaGra";
 import { Pulpit } from "./src/ui/Pulpit";
@@ -20,7 +21,7 @@ import { Wiecej } from "./src/ui/Wiecej";
 import { usunZapis, wczytaj, zapisz } from "./src/ui/zapis";
 
 type Zakladka = "pulpit" | "sklad" | "tabela" | "mecze" | "transfery" | "wiecej";
-type Ekran = "menu" | "nowa" | "gra" | "wczytaj";
+type Ekran = "szybki" | "menu" | "nowa" | "gra" | "wczytaj";
 const ZAKLADKI: [Zakladka, string, string][] = [
   ["pulpit", "🏟", "Klub"],
   ["sklad", "👕", "Skład"],
@@ -83,7 +84,8 @@ export default function App() {
   return (
     <SafeAreaView style={st.ekran}>
       <StatusBar style="light" />
-      {ekran === "menu" && <MenuGlowne stan={stan} meta={laduje ? metaMenu() : null} czeka={czekaNaZapis} naKontynuuj={() => (laduje ? setCzekaNaZapis(true) : wejdzDoGry())} naNowa={() => setEkran("nowa")} naWczytaj={() => setEkran("wczytaj")} />}
+      {ekran === "menu" && <MenuGlowne stan={stan} meta={laduje ? metaMenu() : null} czeka={czekaNaZapis} naKontynuuj={() => (laduje ? setCzekaNaZapis(true) : wejdzDoGry())} naNowa={() => setEkran("nowa")} naWczytaj={() => setEkran("wczytaj")} naSzybki={() => setEkran("szybki")} />}
+      {ekran === "szybki" && <SzybkiMecz onWstecz={() => setEkran("menu")} />}
       {ekran === "wczytaj" && <WczytajGre onWczytaj={(s) => { setStan(s); zapisz(s); wejdzDoGry(); }} onWstecz={() => setEkran("menu")} />}
       {ekran === "nowa" && (
         <>

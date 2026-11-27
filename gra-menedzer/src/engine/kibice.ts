@@ -38,7 +38,7 @@ export function akcjeKibicow(s: StanGry, kd: Klub, kg: Klub, derby: boolean, ryz
   // oflagowanie płotu: flagi dzielnic, fanklubów, grup; młyn z gniazdowym
   const kd0 = kulturaTrybun(s, kd), kg0 = kulturaTrybun(s, kg);
   if (kd0.flagi.length >= 3) out.push({ min: 0, sektor: "gospodarzy", tekst: `🚩 Płot obwieszony flagami (${kd0.flagi.length}): ${kd0.flagi.slice(1, 5).map((f) => `„${f.tekst}”`).join(", ")}… ${kd0.gniazdowy ? `W ${kd0.mlyn.toLowerCase()} gniazdowy z megafonem i bęben.` : ""}` });
-  if (goscie && kg0.flagi.length >= 2) out.push({ min: 0, sektor: "gosci", tekst: `🚩 W klatce gości zawisły flagi ${kg.nazwa}: ${kg0.flagi.slice(0, 3).map((f) => `„${f.tekst}”`).join(", ")}.` });
+  if (goscie && kg0.flagi.length >= 1) { const ek = kg0.flagi.filter((f) => f.typ === "ekipa"); const fl = [...ek, ...kg0.flagi.filter((f) => f.typ !== "ekipa").slice(0, Math.max(1, 3 - ek.length))]; out.push({ min: 0, sektor: "gosci", tekst: `🚩 W klatce gości zawisły flagi ${kg.nazwa}: ${fl.map((f) => `„${f.tekst}”`).join(", ")}${ek.length ? " — ekipa jak zawsze na wyjeździe" : ""}.` }); }
   if (derby && szansa(0.12)) {
     const kto = szansa(0.5) ? "gosci" : "gospodarzy";
     const fl = (kto === "gosci" ? kd0 : kg0).flagi.find((f) => f.typ === "dzielnica" || f.typ === "fanklub") ?? (kto === "gosci" ? kd0 : kg0).flagi[0];

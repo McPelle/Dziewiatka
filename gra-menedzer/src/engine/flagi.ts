@@ -25,7 +25,7 @@ export const DZIELNICE: Record<string, string[]> = {
 function rng(seed: string) { let h = 2166136261; for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 100000) / 100000; }; }
 const krot = (k: Klub) => k.nazwa.split(" ").filter((w) => w.length > 2 && !/^(KS|MKS|GKS|LKS|LZS|TS|SKS|KP|MZKS|ZKS|FC|II|III|Sp)$/.test(w))[0] ?? k.nazwa;
 
-export type TypFlagi = "klub" | "dzielnica" | "fanklub" | "grupa" | "zgoda" | "haslo";
+export type TypFlagi = "klub" | "ekipa" | "dzielnica" | "fanklub" | "grupa" | "zgoda" | "haslo";
 export interface Flaga { tekst: string; typ: TypFlagi; kolory: [string, string] }
 export interface KulturaTrybun { mlyn: string; gniazdowy: boolean; grupy: string[]; flagi: Flaga[]; pirotechnika: number /* 0–1 skłonność */; zgody?: string[]; realne?: boolean }
 
@@ -53,8 +53,10 @@ export function kulturaTrybun(s: StanGry, k: Klub, kolory: [string, string] = ba
   if (real) {
     // prawdziwe nazwy z danych: trybuna, grupy (ultras + ekipy), fankluby, zgody — flagi na płocie
     const gr = [...(real.ultras ?? []), ...(real.chuligani ?? [])];
-    const fl: Flaga[] = [{ tekst: k.nazwa.toUpperCase(), typ: "klub", kolory }];
-    for (const g of gr) fl.push({ tekst: g.toUpperCase(), typ: "grupa", kolory: ["#111111", kolory[0]] });
+    // flagi ekip chuligańskich wiszą ZAWSZE — na każdym meczu klubu (u siebie i w klatce gości), jako pierwsze
+    const fl: Flaga[] = [...(real.chuligani ?? []).map((g) => ({ tekst: g.toUpperCase(), typ: "ekipa" as TypFlagi, kolory: ["#0b0b0b", kolory[0]] as [string, string] })), { tekst: k.nazwa.toUpperCase(), typ: "klub", kolory }];
+    for (const g of real.ultras ?? []) fl.push({ tekst: g.toUpperCase(), typ: "grupa", kolory: ["#111111", kolory[0]] });
+    for (const f of real.flagi ?? []) fl.push({ tekst: f.toUpperCase(), typ: "grupa", kolory });
     for (const f of real.fanklub ?? []) fl.push({ tekst: f.toUpperCase(), typ: "fanklub", kolory: [kolory[1], kolory[0]] });
     for (const d of dz) fl.push({ tekst: d.toUpperCase(), typ: "dzielnica", kolory });
     for (const m of okolica.slice(0, 10)) fl.push({ tekst: `FANKLUB ${m.toUpperCase()}`, typ: "fanklub", kolory: [kolory[1], kolory[0]] });

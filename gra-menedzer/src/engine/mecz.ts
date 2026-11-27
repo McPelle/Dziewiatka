@@ -1,3 +1,4 @@
+import { bonusTrudnosci } from "./osiagniecia";
 import { los, losInt, poisson, szansa, wybierz, wybierzWazone } from "./losuj";
 import { jestMlodziezowcem, wymogMlodziezowca } from "./swiat";
 import { narodowoscKraju } from "../data/narodowosci";
@@ -208,7 +209,10 @@ export function silaSkladu(s: StanGry, sklad: string[], formacja: string, reczne
   // liczba graczy w liniach też ma znaczenie
   const atak = nap * 0.5 + pom * 0.35 + obr * 0.15 + (f.NAP - 2) * 1.2 + (f.POM - 4) * 0.5;
   const obrona = obr * 0.45 + br * 0.3 + pom * 0.25 + (f.OBR - 4) * 1.2 + (f.POM - 4) * 0.4;
-  return { atak, obrona };
+  // poziom trudności: dodatek do siły Twojej drużyny
+  const moj = sklad.some((id) => s.zawodnicy[id]?.klubId === s.mojKlub);
+  const bt = moj ? bonusTrudnosci(s) : 0;
+  return { atak: atak + bt, obrona: obrona + bt };
 }
 
 const NAST: Record<Nastawienie, { swoje: number; rywala: number }> = {

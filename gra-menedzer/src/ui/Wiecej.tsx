@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Osiagniecia } from "./Osiagniecia";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 import type { StanGry } from "../engine/types";
 import { ZapiszGre } from "./ZapiszGre";
@@ -67,6 +68,7 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
           <Text style={[st.maly, { marginTop: 3 }]}>{klub.nazwa} — wszystkie działy w jednym miejscu.</Text>
         </View>
         {Platform.OS === "web" && <UstawieniaGrafiki />}
+        <Osiagniecia s={s} odswiez={odswiez} />
         <PrasaKibice s={s} />
         <Reprezentacja s={s} />
         <View style={{ flexDirection: "row", gap: 8, marginHorizontal: 12, marginTop: 10 }}>

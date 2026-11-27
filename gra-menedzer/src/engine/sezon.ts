@@ -36,6 +36,7 @@ import { atutBoiska, frekwencja, jestDerby, jestPrzyjazn } from "./derby";
 import { europaNaKolejke, kwalifikacjaEuropejska, nowaEuropa, rundaEuropy } from "./europa";
 import { moznaPuchar, nowyPuchar, rundaPucharu } from "./puchar";
 import { tydzienJezykow } from "./jezyki";
+import { bonusTrudnosci, sprawdzOsiagniecia } from "./osiagniecia";
 import { nalozSankcje, losujIncydent, rozliczBezpieczenstwo, rozliczWyjazd, zuzyjSankcje } from "./bezpieczenstwo";
 import { akcjeKibicow, karaZaAkcje, sektorGosci, szkodyZaAkcje, zgodaKibicow } from "./kibice";
 import { planOpraw } from "./oprawy";
@@ -305,6 +306,7 @@ export function ustalWlasciciela(s: StanGry, k: Klub): WlasnoscKlubu {
 }
 
 export function rozpocznijKariere(s: StanGry, klubId: string) {
+  s.startPoziom ??= s.kluby[klubId]?.poziom;
   s.mojKlub = klubId;
   if (!s.trenerAgent) s.trenerAgent = losujAgenta(s.kluby[klubId]?.poziom);
   otworzKarieraTrenera(s, s.kluby[klubId].nazwa);
@@ -1003,6 +1005,7 @@ export function zagrajKolejke(s: StanGry) {
   liczXIKolejki(s, mojaL, przedMecze, r + 1);
   if (moznaPuchar(s)) rundaPucharu(s);
   for (const w of tydzienJezykow(s)) wiadomosc(s, w); // nauka polskiego cudzoziemców, kurs, tłumacz
+  for (const w of sprawdzOsiagniecia(s)) wiadomosc(s, w); // osiągnięcia trenera
   { const ml = s.ligi[s.kluby[s.mojKlub].poziom - 1]; for (const id of ml?.kluby ?? []) { const t = noweFlagiTydzien(s, s.kluby[id]); if (t && id === s.mojKlub) wiadomosc(s, t); } } // flagi dorabiane z czasem
   if (europaNaKolejke(s)) rundaEuropy(s);
   tydzien(s);

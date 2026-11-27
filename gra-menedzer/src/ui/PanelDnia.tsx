@@ -82,7 +82,7 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
         wydarzenia={plan[karta] ? [{ ikona: plan[karta].ikona, tekst: plan[karta].tytul }] : []}
         zablokowany={plan[karta]?.typ === "mecz" ? "Dzień meczu — rozruch i mecz." : plan[karta]?.typ === "puchar" ? "Mecz pucharowy." : karta < d.idx ? "Ten dzień już minął." : null}
         onClose={() => setKarta(null)} />}
-      {treningLive && <TreningNaZywo s={s} dzien={d} onAnuluj={() => setTreningLive(false)} onKoniec={(ses) => { s.treningLive = ses; setTreningLive(false); dalejDzien(s); odswiez(); }} />}
+      {treningLive && <TreningNaZywo s={s} dzien={d} onAnuluj={() => setTreningLive(false)} onKoniec={(ses) => { s.treningLive = ses; s.osiagnieciaFlagi = { ...(s.osiagnieciaFlagi ?? {}), trening: true }; setTreningLive(false); dalejDzien(s); odswiez(); }} />}
       {pucharLive && <MeczNaZywo s={s} para={pucharLive.para} puchar={pucharLive} onAnuluj={() => setPucharLive(null)} onKoniec={(m) => { s.meczLivePuchar = m; setPucharLive(null); dalejDzien(s); odswiez(); }} />}
       {naZywo && <MeczNaZywo s={s} para={naZywo} onAnuluj={() => setNaZywo(null)} onKoniec={(m) => { s.meczLive = m; setNaZywo(null); const mecz = dalejDzien(s); odswiez(); if (mecz) pokazMecz(); }} />}
     </View>

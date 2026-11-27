@@ -12,7 +12,7 @@ const KLUB_DEMO = { id: "demo", nazwa: "Dziewiątka", pojemnosc: 9000, poziom: 2
 import { CZCIONKA, cien, K } from "./styl";
 
 // Ekran tytułowy „DZIEWIĄTKA" — wektorowa scena stadionowa w tle, herb, nazwa i przyciski.
-export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj }: { stan: StanGry | null; meta?: { nazwa: string; herb?: string; liga: string; sezon: number } | null; czeka?: boolean; naKontynuuj: () => void; naNowa: () => void; naWczytaj: () => void }) {
+export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj, naSzybki }: { stan: StanGry | null; meta?: { nazwa: string; herb?: string; liga: string; sezon: number } | null; czeka?: boolean; naKontynuuj: () => void; naNowa: () => void; naWczytaj: () => void; naSzybki?: () => void }) {
   // zapis jeszcze się wczytuje → wizytówka klubu z szybkiego „meta" (menu od razu gotowe)
   const klub = stan ? stan.kluby[stan.mojKlub] : meta ? ({ nazwa: meta.nazwa, herb: meta.herb } as unknown as Klub) : null;
   const liga = stan ? mojaLiga(stan) : meta ? { nazwa: meta.liga } : null;
@@ -72,6 +72,18 @@ export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj }
           </View>
           <Text style={{ color: K.akcent, fontSize: 22, fontWeight: "900" }}>›</Text>
         </Pressable>
+
+        {/* Szybki mecz */}
+        {naSzybki && <Pressable onPress={naSzybki} style={({ pressed }) => [{ marginTop: 12, backgroundColor: K.karta, borderRadius: 16, padding: 15, flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: K.liniaMocna, opacity: pressed ? 0.9 : 1, ...cien }]}>
+          <View style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: K.karta2, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: K.linia }}>
+            <Text style={{ fontSize: 20 }}>⚡</Text>
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Text style={{ color: K.tekst, fontSize: 17, fontWeight: "900", fontFamily: CZCIONKA }}>Szybki mecz</Text>
+            <Text style={{ color: K.szary, fontSize: 12, fontWeight: "700", marginTop: 1, fontFamily: CZCIONKA }}>Dowolne dwie drużyny, mecz na żywo w 3D</Text>
+          </View>
+          <Text style={{ color: K.akcent, fontSize: 22, fontWeight: "900" }}>›</Text>
+        </Pressable>}
 
         {stan && <Text style={{ color: K.szary, fontSize: 11, textAlign: "center", marginTop: 12, opacity: 0.8, fontFamily: CZCIONKA }}>Nowa kariera nadpisze obecny autozapis (zapisy w „Wczytaj grę" zostają).</Text>}
         <Text style={{ color: K.szary, fontSize: 10.5, textAlign: "center", marginTop: 22, opacity: 0.55, fontFamily: CZCIONKA }}>
