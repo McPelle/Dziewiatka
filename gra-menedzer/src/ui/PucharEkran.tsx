@@ -182,7 +182,7 @@ export function PucharEkran({ s }: { s: StanGry }) {
       <Europa s={s} />
       <View style={st.karta}>
         <View style={[st.wiersz, { gap: 12 }]}>
-          <LogoLigi nazwa={p.faza === "glowny" || p.faza === "zdobyty" ? "Puchar Polski" : "Puchar regionalny ZPN"} rozmiar={p.faza === "glowny" || p.faza === "zdobyty" ? 56 : 40} />
+          <LogoLigi nazwa={p.faza === "glowny" || p.faza === "zdobyty" ? "Puchar Polski" : pucharRegion(s).nom} rozmiar={p.faza === "glowny" || p.faza === "zdobyty" ? 56 : 40} />
           <View style={{ flex: 1 }}>
             <Text style={st.naglowek}>{p.faza === "glowny" || p.faza === "zdobyty" ? "STS Puchar Polski" : pucharRegion(s).nom}</Text>
             <Text style={[st.tytul, { color: kolor }]}>{etapPucharu(s)}</Text>

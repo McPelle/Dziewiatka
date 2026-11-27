@@ -1,3 +1,4 @@
+import { EdytorZawodnika } from "./EdytorZawodnika";
 import { ZespolyKlubu } from "./ZespolyKlubu";
 import { useState } from "react";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
@@ -19,6 +20,7 @@ import { K, KOLOR_POZ, st } from "./styl";
 const NASTAWIENIA: [Nastawienie, string][] = [["autobus", "Autobus"], ["obronne", "Obronne"], ["zrownowazone", "Zrównoważone"], ["ofensywne", "Ofensywne"]];
 
 export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
+  const [tworz, setTworz] = useState(false);
   const [profil, setProfil] = useState<string | null>(null);
   const [akademia, setAkademia] = useState(false);
   const [trening, setTrening] = useState(false);
@@ -44,6 +46,10 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
 
   return (
     <ScrollView style={st.ekran} contentContainerStyle={{ paddingBottom: 30 }}>
+      {tworz && <EdytorZawodnika s={s} zawodnikId={null} nowy onClose={() => setTworz(false)} odswiez={odswiez} />}
+      <Pressable onPress={() => setTworz(true)} style={[st.przyciskMaly, { marginHorizontal: 12, marginTop: 12, alignItems: "center" }]}>
+        <Text style={st.przyciskMalyTekst}>➕ Stwórz zawodnika (kreator twarzy albo własne zdjęcie)</Text>
+      </Pressable>
       <Pressable onPress={() => setBoisko(true)} style={({ pressed }) => [st.karta, st.wiersz, { backgroundColor: K.murawa, borderColor: K.akcent, opacity: pressed ? 0.9 : 1, justifyContent: "space-between" }]}>
         <View style={{ flex: 1 }}>
           <Text style={{ color: "#fff", fontSize: 16, fontWeight: "900", fontFamily: undefined }}>⚽ Ustaw skład na boisku</Text>

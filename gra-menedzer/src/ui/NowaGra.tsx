@@ -226,7 +226,7 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
         <Pasek tytul={woj.label} pod="Wybierz szczebel (IV liga → klasa B)" onBack={() => setWidok({ typ: "root" })} />
         <ScrollView contentContainerStyle={{ padding: 10, paddingBottom: 26 }}>
           {poziomy.map((p) => (
-            <Pozycja key={p.label} herb={<View style={{ width: 46, height: 38, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={p.label} rozmiar={30} /></View>} tytul={p.label} pod={p.grupy.length > 1 ? `${p.grupy.length} grup` : p.grupy[0].nazwa}
+            <Pozycja key={p.label} herb={<View style={{ width: 46, height: 38, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={`${p.label} ${woj.label}`} rozmiar={30} /></View>} tytul={p.label} pod={p.grupy.length > 1 ? `${p.grupy.length} grup` : p.grupy[0].nazwa}
               onPress={() => p.grupy.length > 1 ? setWidok({ typ: "wojLevel", wi: widok.wi, label: p.label, grupy: p.grupy }) : otworzKluby(p.grupy[0].sciezkaId, p.grupy[0].idx, p.grupy[0].nazwa, { typ: "woj", wi: widok.wi })} />
           ))}
         </ScrollView>

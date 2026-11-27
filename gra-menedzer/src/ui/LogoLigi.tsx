@@ -1,5 +1,7 @@
 import { Image, Text, View } from "react-native";
 import { CZCIONKA } from "./styl";
+import { kluczLogoLigi } from "./logoKlucz";
+export { kluczLogoLigi };
 
 // Oryginalne logo rozgrywek szczebla centralnego (PKO BP Ekstraklasa, Betclic 1./2./3. Liga) — z Transfermarktu (użytek prywatny).
 // Niższe ligi (IV liga → klasa B) nie mają jednolitych logotypów — prowadzą je wojewódzkie ZPN: pokazujemy plakietkę ligi.
@@ -13,23 +15,15 @@ const LOGA = {
   lm: require("../../assets/ligi/ligamistrzow.png"),
   le: require("../../assets/ligi/ligaeuropy.png"),
   lk: require("../../assets/ligi/ligakonferencji.png"),
+  zpnPom: require("../../assets/ligi/zpn_pomorski.png"),
+  zpnKp: require("../../assets/ligi/zpn_kujawsko.png"),
+  zpnZach: require("../../assets/ligi/zpn_zachodnio.png"),
+  zpnMal: require("../../assets/ligi/zpn_malopolski.png"),
+  l4Kp: require("../../assets/ligi/4liga_kujawsko.png"),
+  l4Zach: require("../../assets/ligi/4liga_zachodnio.png"),
 };
 // proporcje (szerokość / wysokość) wyciętych logo — bez tła, jasne wersje dla ciemnego interfejsu
-const PROP: Record<keyof typeof LOGA, number> = { ekstraklasa: 4.65, l1: 0.92, l2: 0.92, l3: 0.92, superpuchar: 0.835, pucharpolski: 0.575, lm: 1.05, le: 0.685, lk: 1.01 };
-export function kluczLogoLigi(nazwa: string, poziom?: number): keyof typeof LOGA | null {
-  if (/Liga Mistrz|Champions|\bLM\b|UCL/i.test(nazwa)) return "lm";
-  if (/Liga Europy|Europa League|\bLE\b|UEL/i.test(nazwa)) return "le";
-  if (/Liga Konferencji|Conference|\bLK\b|UECL/i.test(nazwa)) return "lk";
-  if (/Superpuchar/i.test(nazwa)) return "superpuchar";
-  if (/Puchar Polski/i.test(nazwa)) return "pucharpolski";
-  if (/Ekstraklasa/i.test(nazwa) || poziom === 1) return "ekstraklasa";
-  if (/(^|\s)1\.?\s*Liga|^I liga/i.test(nazwa) || poziom === 2) return "l1";
-  if (/(^|\s)2\.?\s*Liga|^II liga/i.test(nazwa) || poziom === 3) return "l2";
-  if (/(^|\s)3\.?\s*Liga|^III liga/i.test(nazwa) || poziom === 4) return "l3";
-  if (/Superpuchar/i.test(nazwa)) return "superpuchar";
-  if (/Puchar Polski/i.test(nazwa)) return "pucharpolski";
-  return null;
-}
+const PROP: Record<keyof typeof LOGA, number> = { ekstraklasa: 4.65, l1: 0.92, l2: 0.92, l3: 0.92, superpuchar: 0.835, pucharpolski: 0.575, lm: 1.05, le: 0.685, lk: 1.01, zpnPom: 1, zpnKp: 0.985, zpnZach: 1, zpnMal: 0.835, l4Kp: 0.775, l4Zach: 3.37 };
 export function LogoLigi({ nazwa, poziom, rozmiar = 28 }: { nazwa: string; poziom?: number; rozmiar?: number }) {
   const k = kluczLogoLigi(nazwa, poziom);
   if (k) {
