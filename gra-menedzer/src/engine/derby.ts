@@ -1,12 +1,14 @@
 import { AFILIACJE, DERBY, PRZYJAZNIE, RYWALE_PATRONOW } from "../data/derby";
 import type { StanGry } from "./types";
 import { RELACJE_KIBICOW } from "../data/relacjeKibicow";
+import { AFILIACJE_DODATKOWE, WROGIE_OBOZY, ZGODNE_OBOZY } from "../data/obozy";
+const afil = (n: string): string | undefined => AFILIACJE_DODATKOWE[n] ?? AFILIACJE[n] ?? (Object.values(AFILIACJE_DODATKOWE).includes(n) || Object.values(AFILIACJE).includes(n) ? n : undefined); // patron sam dla siebie
 import { los } from "./losuj";
 import { tabelaLigi, WIDZOWIE } from "./swiat";
 
 /** Czy dwaj patroni (np. Arka vs Lechia) to wrogie obozy kibicowskie. */
 function wrogiePatrony(x: string, y: string): boolean {
-  return RYWALE_PATRONOW.some(([p, q]) => (p === x && q === y) || (p === y && q === x));
+  return [...RYWALE_PATRONOW, ...WROGIE_OBOZY].some(([p, q]) => (p === x && q === y) || (p === y && q === x));
 }
 
 /** Zwraca nazwę derbów, jeśli mecz dwóch klubów to mecz podwyższonego ryzyka (albo null). */
@@ -16,7 +18,7 @@ export function jestDerby(s: StanGry, domId: string, goscId: string): string | n
   for (const d of DERBY) if ((d.a === a && d.b === b) || (d.a === b && d.b === a)) return d.nazwa;
   for (const r of RELACJE_KIBICOW) if (r.typ === "kosa" && ((r.a === a && r.b === b) || (r.a === b && r.b === a))) return r.nazwa ?? `Mecz podwyższonego ryzyka (kosa kibicowska ${a} – ${b})`;
   // Patronat kibicowski: wrogie obozy (np. Arka vs Lechia, Wisła vs Cracovia) = mecz podwyższonego ryzyka.
-  const pa = AFILIACJE[a], pb = AFILIACJE[b];
+  const pa = afil(a), pb = afil(b);
   if (pa && pb && pa !== pb && wrogiePatrony(pa, pb)) return `Mecz podwyższonego ryzyka (kibice: ${pa} vs ${pb})`;
   // Niższe ligi: ten sam ośrodek = lokalne derby (ale nie klub ze swoimi rezerwami).
   const kd = s.kluby[domId], kg = s.kluby[goscId];
@@ -38,8 +40,9 @@ export function jestPrzyjazn(s: StanGry, domId: string, goscId: string): string 
   for (const p of PRZYJAZNIE) if ((p.a === a && p.b === b) || (p.a === b && p.b === a)) return p.nazwa;
   for (const r of RELACJE_KIBICOW) if (r.typ !== "kosa" && ((r.a === a && r.b === b) || (r.a === b && r.b === a))) return r.nazwa ?? (r.typ === "zgoda" ? `Zgoda kibicowska ${a} – ${b}` : `Układ kibicowski ${a} – ${b}`);
   // Patronat kibicowski: ten sam obóz (np. oba kluby kibicują Arce) = zgoda kibicowska.
-  const pa = AFILIACJE[a], pb = AFILIACJE[b];
-  if (pa && pb && pa === pb) return `Mecz przyjaźni (wspólny patronat: ${pa})`;
+  const pa = afil(a), pb = afil(b);
+  if (pa && pb && pa === pb && a !== pb && b !== pa) return `Mecz przyjaźni (wspólny patronat: ${pa})`;
+  if (pa && pb && pa !== pb && ZGODNE_OBOZY.some(([p, q]) => (p === pa && q === pb) || (p === pb && q === pa))) return `Mecz zgodowych obozów (${pa} & ${pb})`;
   return null;
 }
 
