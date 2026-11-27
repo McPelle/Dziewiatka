@@ -100,6 +100,8 @@ export interface Zawodnik {
   agent?: string; // agent piłkarski (profesjonaliści) — negocjuje kontrakt
   klauzula?: number; // klauzula wykupu (zł) — zapłacenie jej wymusza negocjacje z zawodnikiem, klub nie może zablokować
   odsprzedaz?: { klubId: string; proc: number }; // klauzula odsprzedaży: % z przyszłego transferu dla klubu-sprzedawcy
+  jun?: { sezon: number; kat: KatJun; m: number; g: number; a: number; oc: number; wyr: number }; // statystyki w lidze juniorów (sezon): mecze, gole, asysty, suma ocen, wyróżnienia
+  junKariera?: { sezon: number; kat: KatJun; m: number; g: number; a: number; sr: number }[]; // historia sezonów juniorskich
   relacja?: number; // zaufanie zawodnika do trenera 0–100 (rozmowy, dotrzymane/złamane obietnice); brak = 60
   ostatniaRozmowa?: number; // sezon*100+kolejka ostatniej rozmowy (druga rozmowa w tygodniu waży mniej)
   obietnica?: { typ: "minuty" | "kontrakt"; doKolejki: number; mecze: number; kontraktDo: number }; // obietnica trenera do rozliczenia
@@ -164,6 +166,7 @@ export interface Klub {
   kasa: number;
   zawodnicy: string[];
   prawdziwy: boolean;
+  wycofany?: { sezon: number; powrot: number }; // wycofał się z rozgrywek (finanse) — może reaktywować się w sezonie `powrot` (od najniższej klasy)
   wlasny?: boolean; // klub stworzony przez gracza
   barwyWlasne?: [string, string]; // barwy klubu gracza (podstawowa, dodatkowa)
   pozaPiramida?: boolean; // klub spadł/awansował do ligi swojego regionu poza symulowaną piramidą (gra dalej, ale nie w Twoich ligach)
@@ -406,7 +409,8 @@ export interface StanGry {
   xiHistoria?: XIKolejki[]; // archiwum jedenastek kolejek z sezonu
   konferencja?: Konferencja;
   motywacjaMeczu?: number;
-  rozmiaryStart?: number[]; // typowe liczebności lig (z początku kariery) — klasy A/B/C wahają się wokół nich // efekt konferencji przedmeczowej (±) na najbliższy mecz gracza // oczekująca konferencja prasowa (pytanie + opcje odpowiedzi)
+  rozmiaryStart?: number[];
+  meczeJun?: { kat: KatJun; sezon: number; kolejka: number; rywal: string; dom: boolean; moje: number; ich: number; strzelcy: string[]; najlepszy?: string }[]; // ostatnie mecze juniorów Twojego klubu // typowe liczebności lig (z początku kariery) — klasy A/B/C wahają się wokół nich // efekt konferencji przedmeczowej (±) na najbliższy mecz gracza // oczekująca konferencja prasowa (pytanie + opcje odpowiedzi)
   europa?: Europa; // europejska kampania w tym sezonie (jeśli zakwalifikowani)
   ostatnieOceny?: { id: string; ocena: number }[]; // oceny Twoich zawodników z ostatniego meczu
   zwolniony: boolean;

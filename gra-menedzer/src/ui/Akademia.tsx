@@ -4,7 +4,7 @@ import { zl } from "../engine/losuj";
 import { kosztAkademii, naborAkademii, poziomAkademii, rozbudujAkademie, wychowankowie } from "../engine/sezon";
 import { promujJuniora, skladJun, wypozyczJuniora, zwolnijJuniora } from "../engine/juniorzy";
 import { oknoOtwarte } from "../engine/sezon";
-import { mojPucharJun, mojaLigaJun, mojeWynikiJun, tabelaJun, wPucharzeJun } from "../engine/ligaJuniorow";
+import { mojPucharJun, mojaLigaJun, mojeWynikiJun, najblizszeMeczeJun, raportAkademii, tabelaJun, wPucharzeJun } from "../engine/ligaJuniorow";
 import type { KatJun, StanGry } from "../engine/types";
 import { SKROT_POZ } from "../data/pozycje";
 import { ProfilZawodnika } from "./ProfilZawodnika";
@@ -119,7 +119,7 @@ function KategoriaWidok({ s, kat, odswiez, otworz }: { s: StanGry; kat: KatJun; 
             <Text style={{ color: KOLOR_POZ[z.poz], width: 34, fontWeight: "700", fontSize: 12 }}>{z.pozS ? SKROT_POZ[z.pozS as keyof typeof SKROT_POZ] : z.poz}</Text>
             <View style={{ flex: 1 }}>
               <Text style={[st.tekst, { fontSize: 14 }]} numberOfLines={1}>{z.imie} {z.nazwisko}{z.potencjal - z.umiej >= 18 ? " 🌟" : ""}</Text>
-              <Text style={st.maly}>{z.wiek} l. · OVR {Math.floor(z.umiej)} / pot. {Math.floor(z.potencjal)}</Text>
+              <Text style={st.maly}>{z.wiek} l. · OVR {Math.floor(z.umiej)} / pot. {Math.floor(z.potencjal)} · #{[...sklad].sort((a, b) => b.potencjal - a.potencjal).findIndex((x) => x.id === z.id) + 1} w kategorii{z.jun && z.jun.sezon === s.sezon && z.jun.m ? ` · ${z.jun.m} m., ${z.jun.g} g.` : ""}</Text>
             </View>
           </Pressable>
           <View style={{ gap: 4 }}>
@@ -136,6 +136,52 @@ function KategoriaWidok({ s, kat, odswiez, otworz }: { s: StanGry; kat: KatJun; 
           </View>
         </View>
       ))}
+
+      {(() => {
+        const zSt = sklad.filter((z) => z.jun && z.jun.sezon === s.sezon && z.jun.kat === kat && z.jun.m > 0)
+          .sort((a, b) => b.jun!.g - a.jun!.g || b.jun!.oc / b.jun!.m - a.jun!.oc / a.jun!.m);
+        if (!zSt.length) return null;
+        return (
+          <>
+            <Text style={[st.naglowek, { marginTop: 16 }]}>📊 Statystyki sezonu {kat}</Text>
+            <View style={[st.wiersz, { paddingVertical: 3 }]}>
+              <Text style={[st.maly, { flex: 1 }]}>Zawodnik</Text>
+              {["M", "G", "A", "Śr.", "⭐"].map((h) => <Text key={h} style={[st.maly, { width: 34, textAlign: "center", fontWeight: "800" }]}>{h}</Text>)}
+            </View>
+            {zSt.map((z, i) => (
+              <Pressable key={z.id} onPress={() => otworz(z.id)} style={[st.wiersz, { paddingVertical: 4, borderTopWidth: 1, borderTopColor: K.linia }]}>
+                <Text style={[st.tekst, { flex: 1, fontSize: 13 }]} numberOfLines={1}>{i === 0 && z.jun!.g > 0 ? "👟 " : ""}{z.imie[0]}. {z.nazwisko}</Text>
+                <Text style={[st.maly, { width: 34, textAlign: "center" }]}>{z.jun!.m}</Text>
+                <Text style={[st.tekst, { width: 34, textAlign: "center", fontWeight: "800" }]}>{z.jun!.g}</Text>
+                <Text style={[st.maly, { width: 34, textAlign: "center" }]}>{z.jun!.a}</Text>
+                <Text style={[st.maly, { width: 34, textAlign: "center", color: z.jun!.oc / z.jun!.m >= 7 ? K.zielony : K.szary }]}>{(z.jun!.oc / z.jun!.m).toFixed(1)}</Text>
+                <Text style={[st.maly, { width: 34, textAlign: "center", color: K.akcent }]}>{z.jun!.wyr || ""}</Text>
+              </Pressable>
+            ))}
+            <Text style={[st.maly, { fontSize: 10.5 }]}>⭐ = ile razy talent kolejki. Dobre występy (ocena 7,5+) przyspieszają rozwój.</Text>
+          </>
+        );
+      })()}
+
+      {(() => {
+        const mecze = (s.meczeJun ?? []).filter((m) => m.kat === kat && m.sezon === s.sezon).slice(0, 5);
+        const nast = najblizszeMeczeJun(s, kat);
+        return (
+          <>
+            {nast.length > 0 && <Text style={[st.naglowek, { marginTop: 16 }]}>📅 Najbliższe mecze</Text>}
+            {nast.map((m) => <Text key={m.kolejka} style={st.maly}>Kolejka {m.kolejka}: {m.dom ? "u siebie" : "wyjazd"} — {m.rywal}</Text>)}
+            {mecze.length > 0 && <Text style={[st.naglowek, { marginTop: 12 }]}>🧾 Ostatnie mecze</Text>}
+            {mecze.map((m, i) => (
+              <View key={i} style={{ paddingVertical: 4, borderTopWidth: i ? 1 : 0, borderTopColor: K.linia }}>
+                <Text style={[st.tekst, { fontSize: 13.5, color: m.moje > m.ich ? K.zielony : m.moje < m.ich ? K.czerwony : K.tekst }]}>{m.moje}:{m.ich} {m.dom ? "vs" : "@"} {m.rywal}</Text>
+                <Text style={st.maly}>{m.strzelcy.length ? `⚽ ${m.strzelcy.map((id) => s.zawodnicy[id]?.nazwisko ?? "?").join(", ")}` : "bez goli"}{m.najlepszy && s.zawodnicy[m.najlepszy] ? ` · ⭐ ${s.zawodnicy[m.najlepszy].nazwisko}` : ""}</Text>
+              </View>
+            ))}
+            <Text style={[st.naglowek, { marginTop: 14 }]}>📝 Raport trenera akademii</Text>
+            {raportAkademii(s, kat).map((r) => <Pressable key={r.id} onPress={() => otworz(r.id)}><Text style={[st.maly, { paddingVertical: 2 }]}>• {r.tekst}</Text></Pressable>)}
+          </>
+        );
+      })()}
 
       {liga && (
         <>

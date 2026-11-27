@@ -2,10 +2,10 @@
 // wzorowane na realiach (Pomorska/Małopolska Liga Juniorów + Puchar ZPN Juniorów). Zgodnie z PZPN kluby od
 // klasy A wzwyż mają zespoły juniorskie — uczestnikami są kluby Twojego szczebla (bez najniższej klasy B).
 // Twój zespół wystawia realny skład akademii; rywale — siła z renomy i akademii klubu.
-import { los, poisson, tasuj } from "./losuj";
+import { los, poisson, szansa, tasuj, wybierzWazone } from "./losuj";
 import { zakresUmiej } from "./swiat";
 import { skladJun } from "./juniorzy";
-import type { KatJun, LigaJun, PucharJun, StanGry, WierszJun, WynikJun } from "./types";
+import type { KatJun, LigaJun, PucharJun, StanGry, WierszJun, WynikJun, Zawodnik } from "./types";
 
 const KAT: KatJun[] = ["U19", "U17"];
 
@@ -161,7 +161,10 @@ export function juniorKolejka(s: StanGry, r: number): void {
         const uSiebie = mj.dom === s.mojKlub, moje = uSiebie ? mj.gd : mj.gg, ich = uSiebie ? mj.gg : mj.gd;
         const rywal = s.kluby[uSiebie ? mj.gosc : mj.dom]?.nazwa ?? "rywal";
         const wynik = moje > ich ? "Wygrana" : moje < ich ? "Porażka" : "Remis";
-        s.wiadomosci.push({ sezon: s.sezon, kolejka: s.kolejka, tekst: `🧒 ${liga.kat}: ${wynik} ${moje}:${ich} z ${rywal} (${uSiebie ? "dom" : "wyjazd"}).` });
+        const det = statystykiMeczuJun(s, liga.kat, moje, ich, rywal, uSiebie);
+        const strz = det.strzelcy.map((id) => s.zawodnicy[id]?.nazwisko).filter(Boolean);
+        s.wiadomosci.push({ sezon: s.sezon, kolejka: s.kolejka, tekst: `🧒 ${liga.kat}: ${wynik} ${moje}:${ich} z ${rywal} (${uSiebie ? "dom" : "wyjazd"})${strz.length ? ` — gole: ${strz.join(", ")}` : ""}${det.najlepszy ? `. ⭐ Talent kolejki: ${s.zawodnicy[det.najlepszy]?.imie} ${s.zawodnicy[det.najlepszy]?.nazwisko}` : ""}.` });
+        if (r > 0 && r % 4 === 0) juniorMiesiaca(s, liga.kat);
       }
     }
   }
@@ -225,4 +228,68 @@ export function wPucharzeJun(s: StanGry, kat: KatJun): boolean {
   const p = mojPucharJun(s, kat); if (!p) return false;
   if (p.zwyciezca) return p.zwyciezca === s.mojKlub;
   return p.pary.some((x) => x.a === s.mojKlub || x.b === s.mojKlub);
+}
+
+
+// ——— Statystyki juniorów Twojego klubu ———
+const WAGA_GOLA: Record<string, number> = { BR: 0, OBR: 0.6, POM: 1.6, NAP: 3.2 };
+function wpis(s: StanGry, z: Zawodnik, kat: KatJun) {
+  if (!z.jun || z.jun.sezon !== s.sezon || z.jun.kat !== kat) {
+    if (z.jun && z.jun.m > 0) (z.junKariera ??= []).push({ sezon: z.jun.sezon, kat: z.jun.kat, m: z.jun.m, g: z.jun.g, a: z.jun.a, sr: Math.round((z.jun.oc / z.jun.m) * 10) / 10 });
+    z.jun = { sezon: s.sezon, kat, m: 0, g: 0, a: 0, oc: 0, wyr: 0 };
+  }
+  return z.jun;
+}
+/** Rozkłada gole/asysty na juniorów Twojej drużyny i wystawia oceny; dobre mecze lekko przyspieszają rozwój. */
+function statystykiMeczuJun(s: StanGry, kat: KatJun, moje: number, ich: number, rywal: string, dom: boolean): { strzelcy: string[]; najlepszy?: string } {
+  const xi = skladJun(s, s.mojKlub, kat).slice(0, 11);
+  if (!xi.length) return { strzelcy: [] };
+  const strzelcy: string[] = [], asyst: string[] = [];
+  for (let g = 0; g < moje; g++) {
+    const st = wybierzWazone(xi, (z) => (WAGA_GOLA[z.poz] ?? 1) * (0.6 + z.umiej / 60));
+    strzelcy.push(st.id);
+    if (szansa(0.7)) { const as = wybierzWazone(xi.filter((z) => z.id !== st.id), (z) => (z.poz === "POM" ? 2 : z.poz === "NAP" ? 1.5 : 0.7)); if (as) asyst.push(as.id); }
+  }
+  const baza = 6 + (moje - ich) * 0.35;
+  let best: { id: string; oc: number } | undefined;
+  for (const z of xi) {
+    const w = wpis(s, z, kat);
+    const oc = Math.max(3.5, Math.min(10, baza + strzelcy.filter((x) => x === z.id).length * 0.9 + asyst.filter((x) => x === z.id).length * 0.5 + (z.umiej - xi.reduce((a, x) => a + x.umiej, 0) / xi.length) * 0.05 + los(-0.8, 0.8)));
+    w.m++; w.oc += oc;
+    w.g += strzelcy.filter((x) => x === z.id).length;
+    w.a += asyst.filter((x) => x === z.id).length;
+    if (oc >= 7.5 && z.potencjal > z.umiej) z.umiej = Math.min(z.potencjal, z.umiej + 0.08); // dobry występ = doświadczenie
+    if (!best || oc > best.oc) best = { id: z.id, oc };
+  }
+  if (best) { const z = s.zawodnicy[best.id]; if (z.jun) z.jun.wyr++; }
+  (s.meczeJun ??= []).unshift({ kat, sezon: s.sezon, kolejka: s.kolejka, rywal, dom, moje, ich, strzelcy, najlepszy: best?.id });
+  s.meczeJun = s.meczeJun.slice(0, 24);
+  return { strzelcy, najlepszy: best?.id };
+}
+/** Junior miesiąca (co 4 kolejki): najwyższa średnia ocen (min. 3 mecze) — morale i reputacja w górę. */
+function juniorMiesiaca(s: StanGry, kat: KatJun) {
+  const xi = skladJun(s, s.mojKlub, kat).filter((z) => z.jun && z.jun.sezon === s.sezon && z.jun.m >= 3);
+  if (!xi.length) return;
+  const z = xi.sort((a, b) => b.jun!.oc / b.jun!.m - a.jun!.oc / a.jun!.m)[0];
+  z.morale = Math.min(100, z.morale + 6);
+  s.wiadomosci.push({ sezon: s.sezon, kolejka: s.kolejka, tekst: `🏅 Junior miesiąca ${kat}: ${z.imie} ${z.nazwisko} (${z.wiek} l.) — średnia ${(z.jun!.oc / z.jun!.m).toFixed(1)}, ${z.jun!.g} goli, ${z.jun!.a} asyst. Trener akademii: „${z.potencjal - z.umiej >= 15 ? "To materiał na pierwszy zespół." : "Solidnie się rozwija."}"` });
+}
+/** Raport trenera akademii: najwięksi talenci kategorii z oceną perspektyw. */
+export function raportAkademii(s: StanGry, kat: KatJun): { id: string; tekst: string }[] {
+  return skladJun(s, s.mojKlub, kat).slice().sort((a, b) => b.potencjal - a.potencjal).slice(0, 3).map((z) => {
+    const zapas = z.potencjal - z.umiej;
+    const ocena = z.potencjal >= 75 ? "potencjał na Ekstraklasę" : z.potencjal >= 62 ? "może grać w I–II lidze" : z.potencjal >= 50 ? "materiał na III–IV ligę" : "solidny zawodnik niższych lig";
+    return { id: z.id, tekst: `${z.imie} ${z.nazwisko} (${z.wiek} l.) — ${ocena}; ${zapas >= 18 ? "ogromny zapas rozwoju" : zapas >= 10 ? "spory zapas" : "rozwój powoli się wyrównuje"}.` };
+  });
+}
+/** Najbliższe mecze ligi juniorów Twojego klubu. */
+export function najblizszeMeczeJun(s: StanGry, kat: KatJun, ile = 3): { rywal: string; dom: boolean; kolejka: number }[] {
+  const l = mojaLigaJun(s, kat);
+  if (!l) return [];
+  const out: { rywal: string; dom: boolean; kolejka: number }[] = [];
+  for (let r = l.wyniki.length; r < l.terminarz.length && out.length < ile; r++) {
+    const p = l.terminarz[r].find(([a, b]) => a === s.mojKlub || b === s.mojKlub);
+    if (p) out.push({ rywal: s.kluby[p[0] === s.mojKlub ? p[1] : p[0]]?.nazwa ?? "?", dom: p[0] === s.mojKlub, kolejka: r + 1 });
+  }
+  return out;
 }

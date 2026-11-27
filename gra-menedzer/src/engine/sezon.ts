@@ -1445,7 +1445,7 @@ function zalozNowyKlub(s: StanGry, ost: number): string | null {
     const id = wprowadzKlub(s, { nazwa, skrot: nazwa.split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase(), miasto, stadion: `Boisko w ${miasto}` }, ost + 1);
     const k = s.kluby[id];
     k.prawdziwy = false; k.zalozony = s.sezon + 1; k.renoma = 0.05; k.kasa = Math.round(k.kasa * 0.5); k.pojemnosc = 100;
-    wiadomosc(s, `🆕 Nowy klub w ${s.ligi[ost].nazwa}: ${nazwa} (założony ${s.sezon + 1}) — zaczyna od najniższej klasy.`);
+    wiadomosc(s, `🆕 Nowy klub: ${nazwa} (założony ${s.sezon + 1}) — zgłoszony do rozgrywek ${s.ligi[ost].nazwa}, zaczyna od najniższej klasy.`);
     return id;
   }
   return null;
@@ -1543,6 +1543,7 @@ export function nowySezon(s: StanGry) {
       const k = s.kluby[id];
       nowe[i] = nowe[i].filter((x) => x !== id);
       wychodza.push(id);
+      k.wycofany = { sezon: s.sezon, powrot: s.sezon + 1 + (szansa(0.3) ? 1 : szansa(0.5) ? 2 : szansa(0.6) ? 3 : 4) }; // reaktywacja po 1–4 sezonach (gdy spłacą długi)
       if (!klasaZmienna(s.ligi[i].nazwa)) {
         const kolejny = dolnaE.find((x) => !awansuja.includes(x));
         if (kolejny) {
@@ -1626,6 +1627,16 @@ export function nowySezon(s: StanGry) {
     const ost = s.ligi.length - 1;
     if (/klasa (b|c)\b/i.test(s.ligi[ost].nazwa)) {
       const typowa = s.rozmiaryStart?.[ost] ?? tabele[ost].length;
+      // Reaktywacje: kluby wycofane z rozgrywek wracają pod tą samą nazwą (herb, barwy, stadion, historia) — od najniższej klasy.
+      const doReaktywacji = Object.values(s.kluby).filter((k) => k.pozaPiramida && k.wycofany && k.wycofany.powrot <= s.sezon + 1 && trafiaDo(k, s.ligi[ost - 1]?.nazwa ?? s.ligi[ost].nazwa, s.ligi[ost].nazwa));
+      for (const k of doReaktywacji.slice(0, 2)) {
+        if (nowe[ost].length >= typowa + 3) break;
+        const przerwa = s.sezon + 1 - k.wycofany!.sezon;
+        k.wycofany = undefined;
+        const id = wprowadzKlub(s, { nazwa: k.nazwa, skrot: k.skrot, miasto: k.miasto, herb: k.herb }, ost + 1);
+        nowe[ost].push(id);
+        wiadomosc(s, `🔁 Reaktywacja! ${k.nazwa} wraca do gry po ${przerwa} ${przerwa === 1 ? "sezonie" : "sezonach"} przerwy — długi spłacone, klub startuje w rozgrywkach: ${s.ligi[ost].nazwa}.`);
+      }
       let ile = (szansa(0.45) ? 1 : 0) + (szansa(0.15) ? 1 : 0);
       ile = Math.min(ile, Math.max(0, typowa + 2 - nowe[ost].length));
       for (let j = 0; j < ile; j++) {
