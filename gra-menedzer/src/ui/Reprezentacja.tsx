@@ -1,20 +1,23 @@
+import { useState } from "react";
+import { ProfilZawodnika } from "./ProfilZawodnika";
 import { Text, View } from "react-native";
 import type { StanGry } from "../engine/types";
 import { K, st } from "./styl";
 
 /** Reprezentacje: ostatnie mecze kadry Polski i U-21, Twoi reprezentanci i ich kariera w kadrze. */
 export function Reprezentacja({ s }: { s: StanGry }) {
+  const [profil, setProfil] = useState<string | null>(null); const [, setT] = useState(0);
   const mecze = s.kadraMecze ?? [];
   const moi = s.kluby[s.mojKlub].zawodnicy.map((id) => s.zawodnicy[id]).filter((z) => z?.kadraStat && z.kadraStat.mecze > 0);
   const legendy = Object.values(s.zawodnicy).filter((z) => z.kadraStat && (z.kadraStat.kraj === "Polska") && z.kadraStat.mecze > 0)
     .sort((a, b) => b.kadraStat!.mecze - a.kadraStat!.mecze).slice(0, 8);
-  return (
+  return (<>
     <View style={[st.karta, { marginTop: 10 }]}>
       <Text style={st.naglowek}>🇵🇱 Reprezentacje</Text>
       <Text style={st.maly}>Przerwy na kadrę: wrzesień, październik, listopad, marzec. Powołania dostają najlepsi Polacy z całej gry (seniorzy i U-21) oraz wyróżniający się obcokrajowcy z Twojego klubu.</Text>
       {moi.length > 0 && (<>
         <Text style={[st.naglowek, { marginTop: 10 }]}>Twoi reprezentanci</Text>
-        {moi.map((z) => <Text key={z.id} style={[st.tekst, { fontSize: 13.5, marginVertical: 2 }]}>🏅 {z.imie} {z.nazwisko} — {z.kadraStat!.kraj}: {z.kadraStat!.mecze} meczów, {z.kadraStat!.gole} goli{z.kadraStat!.debiut ? ` · debiut ${z.kadraStat!.debiut}` : ""}</Text>)}
+        {moi.map((z) => <Text key={z.id} onPress={() => setProfil(z.id)} style={[st.tekst, { fontSize: 13.5, marginVertical: 2 }]}>🏅 {z.imie} {z.nazwisko} — {z.kadraStat!.kraj}: {z.kadraStat!.mecze} meczów, {z.kadraStat!.gole} goli{z.kadraStat!.debiut ? ` · debiut ${z.kadraStat!.debiut}` : ""}</Text>)}
       </>)}
       <Text style={[st.naglowek, { marginTop: 10 }]}>Ostatnie mecze</Text>
       {mecze.length === 0 ? <Text style={st.maly}>Pierwsza przerwa na kadrę we wrześniu.</Text> : mecze.slice(0, 12).map((m, i) => (
@@ -25,8 +28,9 @@ export function Reprezentacja({ s }: { s: StanGry }) {
         </View>))}
       {legendy.length > 0 && (<>
         <Text style={[st.naglowek, { marginTop: 10 }]}>Najwięcej występów w kadrze Polski (w grze)</Text>
-        {legendy.map((z, i) => <Text key={z.id} style={[st.maly, { marginVertical: 1 }]}>{i + 1}. {z.imie} {z.nazwisko} ({z.klubId ? s.kluby[z.klubId]?.nazwa : "bez klubu"}) — {z.kadraStat!.mecze} m., {z.kadraStat!.gole} g.</Text>)}
+        {legendy.map((z, i) => <Text key={z.id} onPress={() => setProfil(z.id)} style={[st.maly, { marginVertical: 1 }]}>{i + 1}. {z.imie} {z.nazwisko} ({z.klubId ? s.kluby[z.klubId]?.nazwa : "bez klubu"}) — {z.kadraStat!.mecze} m., {z.kadraStat!.gole} g.</Text>)}
       </>)}
     </View>
-  );
+    <ProfilZawodnika s={s} zawodnikId={profil} onClose={() => setProfil(null)} odswiez={() => setT((x) => x + 1)} />
+  </>);
 }

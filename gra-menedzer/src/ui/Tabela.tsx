@@ -1,3 +1,4 @@
+import { ProfilZawodnika } from "./ProfilZawodnika";
 import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { silaKlubu, tabelaLigi } from "../engine/swiat";
@@ -15,6 +16,8 @@ export function Tabela({ s }: { s: StanGry }) {
   const [poziom, setPoziom] = useState(s.kluby[s.mojKlub].poziom);
   const [widok, setWidok] = useState<Widok>("tabela");
   const [podglad, setPodglad] = useState<string | null>(null);
+  const [profil, setProfil] = useState<string | null>(null);
+  const [, setT] = useState(0);
   const [xiIdx, setXiIdx] = useState<number | null>(null);
   const liga = s.ligi[poziom - 1];
   const tabela = tabelaLigi(s, liga);
@@ -122,7 +125,7 @@ export function Tabela({ s }: { s: StanGry }) {
                   <Text style={[st.maly, { width: 24 }]}>{i + 1}.</Text>
                   {z.klubId && <Herb klub={s.kluby[z.klubId]} rozmiar={18} />}
                   <View style={{ flex: 1, marginLeft: 6 }}>
-                    <Text numberOfLines={1} style={[st.tekst, { fontSize: 14, fontWeight: z.klubId === s.mojKlub ? "800" : "400" }]}>{z.imie} {z.nazwisko}</Text>
+                    <Text numberOfLines={1} onPress={() => setProfil(z.id)} style={[st.tekst, { fontSize: 14, fontWeight: z.klubId === s.mojKlub ? "800" : "400" }]}>{z.imie} {z.nazwisko}</Text>
                     <Text style={st.maly} numberOfLines={1}>{z.klubId ? s.kluby[z.klubId].nazwa : ""}</Text>
                   </View>
                   <Text style={{ color: K.akcent, fontSize: 18, fontWeight: "900", width: 36, textAlign: "right" }}>
@@ -134,7 +137,8 @@ export function Tabela({ s }: { s: StanGry }) {
           </View>
         )}
       </ScrollView>
-      <WidokKlubu s={s} klubId={podglad} onClose={() => setPodglad(null)} odswiez={() => {}} />
+      <WidokKlubu s={s} klubId={podglad} onClose={() => setPodglad(null)} odswiez={() => setT((x) => x + 1)} />
+      <ProfilZawodnika s={s} zawodnikId={profil} onClose={() => setProfil(null)} odswiez={() => setT((x) => x + 1)} />
     </View>
   );
 }

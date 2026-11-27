@@ -1,3 +1,4 @@
+import { ProfilZawodnika } from "./ProfilZawodnika";
 import { grafika3D, Stadion3DWidok } from "./three/Stadion3DWidok";
 import { BazaTreningowa3D, LegendaBazy } from "./three/BazaTreningowa3D";
 import { Extranet } from "./Extranet";
@@ -44,6 +45,9 @@ function Info({ etyk, wart }: { etyk: string; wart: string }) {
 
 export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: StanGry; klubId: string | null; onClose: () => void; odswiez: () => void; onZawodnik?: (id: string) => void }) {
   const [edycja, setEdycja] = useState(false);
+  const [profil, setProfil] = useState<string | null>(null); // podgląd zawodnika (pełne dane, kariera, oferta) — gdy wywołujący nie obsługuje sam
+  const [, setT] = useState(0);
+  const odsw = () => { odswiez(); setT((x) => x + 1); };
   const klub = klubId ? s.kluby[klubId] : undefined;
   const moj = klubId === s.mojKlub;
   const real = klub ? STADIONY[klub.nazwa] : undefined;
@@ -56,7 +60,7 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
   const [baza3D, setBaza3D] = useState(false);
   const akcja = (f: () => string | null) => { const b = f(); odswiez(); if (b) komunikat(b); };
 
-  return (
+  return (<>
     <Modal visible={!!klub} transparent animationType="slide" onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
         <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "92%", paddingBottom: 20 }}>
@@ -244,7 +248,7 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
 
               <Text style={[st.naglowek, { marginTop: 18 }]}>Kadra ({kadra.length})</Text>
               {kadra.map((z) => (
-                <Pressable key={z.id} onPress={() => onZawodnik?.(z.id)} style={[st.wiersz, { paddingVertical: 5, borderTopWidth: 1, borderTopColor: K.linia }]}>
+                <Pressable key={z.id} onPress={() => (onZawodnik ? onZawodnik(z.id) : setProfil(z.id))} style={[st.wiersz, { paddingVertical: 5, borderTopWidth: 1, borderTopColor: K.linia }]}>
                   <Text style={{ color: KOLOR_POZ[z.poz], width: 30, fontWeight: "700", fontSize: 12 }}>{z.poz}</Text>
                   <Text style={{ width: 28, color: K.szary }}>{z.numer || ""}</Text>
                   <Text style={[st.tekst, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{z.imie} {z.nazwisko}</Text>
@@ -268,5 +272,6 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
       </View>
       <EdytorKlubu s={s} klubId={edycja ? klubId : null} onClose={() => setEdycja(false)} odswiez={odswiez} />
     </Modal>
-  );
+    {!onZawodnik && <ProfilZawodnika s={s} zawodnikId={profil} onClose={() => setProfil(null)} odswiez={odsw} />}
+  </>);
 }

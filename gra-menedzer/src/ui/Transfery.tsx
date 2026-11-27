@@ -1,3 +1,4 @@
+import { ProfilZawodnika } from "./ProfilZawodnika";
 import { przelaczObserwowanego, wypozyczZWykupem, zlozOferte } from "../engine/transfery";
 import { NegocjacjePanel } from "./NegocjacjePanel";
 import { useState } from "react";
@@ -36,6 +37,7 @@ function FChip({ akt, label, onPress }: { akt: boolean; label: string; onPress: 
 }
 
 export function Transfery({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
+  const [profil, setProfil] = useState<string | null>(null); // pełny profil zawodnika z rynku (dane, kariera, oferta)
   const [zrodlo, setZrodlo] = useState<Zrodlo>("wolni");
   const [kat, setKat] = useState<Pozycja | "wszyscy">("wszyscy");
   const [pozS, setPozS] = useState<PozycjaSzczegolowa | null>(null);
@@ -267,7 +269,7 @@ export function Transfery({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
     </View>
   );
 
-  return (
+  return (<>
     <View style={st.ekran}>
       <FlatList
         style={{ flex: 1 }}
@@ -279,15 +281,16 @@ export function Transfery({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
         renderItem={({ item: z }) =>
           sprzedaz
             ? <WierszSprzedazy s={s} z={z} odswiez={odswiez} />
-            : <WierszRynku s={s} z={z} wyp={wyp} cena={cenaZa(z)} onKup={() => kupuj(z)} onNeg={() => setNeg(z)} onWykup={(o) => wypZWykupem(z, o)} />
+            : <WierszRynku s={s} z={z} wyp={wyp} cena={cenaZa(z)} onKup={() => kupuj(z)} onNeg={() => setNeg(z)} onWykup={(o) => wypZWykupem(z, o)} onProfil={() => setProfil(z.id)} />
         }
       />
       <NegocjacjeModal s={s} z={neg} onClose={() => setNeg(null)} odswiez={odswiez} />
     </View>
-  );
+      <ProfilZawodnika s={s} zawodnikId={profil} onClose={() => setProfil(null)} odswiez={odswiez} />
+  </>);
 }
 
-function WierszRynku({ s, z, wyp, cena, onKup, onNeg, onWykup }: { s: StanGry; z: Zawodnik; wyp: boolean; cena: number; onKup: () => void; onNeg: () => void; onWykup: (obowiazek: boolean) => void }) {
+function WierszRynku({ s, z, wyp, cena, onKup, onNeg, onWykup, onProfil }: { s: StanGry; z: Zawodnik; wyp: boolean; cena: number; onKup: () => void; onNeg: () => void; onWykup: (obowiazek: boolean) => void; onProfil?: () => void }) {
   const klub = s.kluby[s.mojKlub];
   const parent = z.klubId ? s.kluby[z.klubId] : undefined;
   const pensja = pensjaPoTransferze(s, z.id);
@@ -300,7 +303,7 @@ function WierszRynku({ s, z, wyp, cena, onKup, onNeg, onWykup }: { s: StanGry; z
         {z.pozS && <Text style={{ color: K.szary, fontSize: 10, fontWeight: "700" }}>{SKROT_POZ[z.pozS]}</Text>}
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={st.tekst}>{z.imie} {z.nazwisko} <Text style={st.maly}>({z.wiek} l.)</Text></Text>
+        <Text style={st.tekst} onPress={onProfil}>{z.imie} {z.nazwisko} <Text style={st.maly}>({z.wiek} l.)</Text>{onProfil ? <Text style={[st.maly, { color: K.niebieski }]}>  ⓘ profil</Text> : null}</Text>
         <Text style={st.maly}>
           {parent ? parent.nazwa : "wolny zawodnik"} · {wyp ? `wypożyczenie ${cena ? zl(cena) : "za darmo"}` : (cena ? zl(cena) : "za darmo")} · pensja {zl(z.pensja)}
         </Text>
