@@ -7,6 +7,7 @@ import type { StanGry } from "./src/engine/types";
 import { HerbGry, MurawaTlo, PlakietkaBeta } from "./src/ui/Grafika";
 import { Herb } from "./src/ui/Herb";
 import { MenuGlowne } from "./src/ui/MenuGlowne";
+import { metaMenu } from "./src/ui/zapis";
 import { NowaGra } from "./src/ui/NowaGra";
 import { Pulpit } from "./src/ui/Pulpit";
 import { Sklad } from "./src/ui/Sklad";
@@ -38,16 +39,24 @@ export default function App() {
   const [wczytywanie, setWczytywanie] = useState(false);
   const czasZapisu = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => { wczytaj().then((s) => { setStan(s); setLaduje(false); }); }, []);
+  const [czekaNaZapis, setCzekaNaZapis] = useState(false);
+  // zapis wczytuje się w tle — menu jest od razu gotowe do klikania
+  useEffect(() => { const t = setTimeout(() => wczytaj().then((s) => { setStan(s); setLaduje(false); }), 30); return () => clearTimeout(t); }, []);
 
   const odswiez = useCallback(() => {
     setWersja((w) => w + 1);
     if (czasZapisu.current) clearTimeout(czasZapisu.current);
-    czasZapisu.current = setTimeout(() => { if (stan) zapisz(stan); }, 400);
+    // autozapis w wolnej chwili (bez przycięć przy klikaniu)
+    czasZapisu.current = setTimeout(() => {
+      if (!stan) return;
+      const ric = (window as any).requestIdleCallback as ((f: () => void, o?: { timeout: number }) => number) | undefined;
+      if (Platform.OS === "web" && ric) ric(() => zapisz(stan), { timeout: 3000 }); else zapisz(stan);
+    }, 1500);
   }, [stan]);
 
   // Krótki ekran wczytywania przy wejściu do gry (jak w grach na PC).
-  const wejdzDoGry = () => { setZakladka("pulpit"); setWczytywanie(true); setTimeout(() => { setWczytywanie(false); setEkran("gra"); }, 1000); };
+  const wejdzDoGry = () => { setZakladka("pulpit"); setWczytywanie(true); setTimeout(() => { setWczytywanie(false); setEkran("gra"); }, 120); };
+  useEffect(() => { if (czekaNaZapis && !laduje) { setCzekaNaZapis(false); if (stan) wejdzDoGry(); } }, [czekaNaZapis, laduje, stan]);
 
   const doMenu = async (nowa?: boolean) => {
     if (nowa) {
@@ -57,13 +66,13 @@ export default function App() {
     } else setEkran("menu");
   };
 
-  if (laduje) return <View style={[st.ekran, { justifyContent: "center" }]}><ActivityIndicator color={K.akcent} /></View>;
+  if (laduje && ekran !== "menu") return <View style={[st.ekran, { justifyContent: "center" }]}><ActivityIndicator color={K.akcent} /></View>;
   if (wczytywanie) return <EkranWczytywania />;
 
   return (
     <SafeAreaView style={st.ekran}>
       <StatusBar style="light" />
-      {ekran === "menu" && <MenuGlowne stan={stan} naKontynuuj={wejdzDoGry} naNowa={() => setEkran("nowa")} naWczytaj={() => setEkran("wczytaj")} />}
+      {ekran === "menu" && <MenuGlowne stan={stan} meta={laduje ? metaMenu() : null} czeka={czekaNaZapis} naKontynuuj={() => (laduje ? setCzekaNaZapis(true) : wejdzDoGry())} naNowa={() => setEkran("nowa")} naWczytaj={() => setEkran("wczytaj")} />}
       {ekran === "wczytaj" && <WczytajGre onWczytaj={(s) => { setStan(s); zapisz(s); wejdzDoGry(); }} onWstecz={() => setEkran("menu")} />}
       {ekran === "nowa" && (
         <>

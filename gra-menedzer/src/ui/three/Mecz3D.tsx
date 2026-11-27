@@ -324,11 +324,14 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     };
     const wersjaRef = { current: wersja };
     (sterowanie.current as any).wersjaRef = wersjaRef;
-    raf = requestAnimationFrame(petla);
+    // shadery kompilowane w tle (bez zamrażania ekranu przy otwieraniu meczu)
+    const r2 = renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
+    let anul = false; const go = () => { if (!anul) raf = requestAnimationFrame(petla); };
+    if (r2.compileAsync) r2.compileAsync(scena, cam).then(go, go); else go();
     const resize = () => { renderer.setSize(W(), H()); composer.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); };
     window.addEventListener("resize", resize); setTimeout(resize, 50);
     gwizdek(false, 1);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); renderer.dispose(); composer.dispose?.(); if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement); scena.clear(); };
+    return () => { anul = true; cancelAnimationFrame(raf); window.removeEventListener("resize", resize); renderer.dispose(); composer.dispose?.(); if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement); scena.clear(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [m]);
   // nowa minuta z silnika → nowa sekwencja

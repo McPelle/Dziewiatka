@@ -11,15 +11,17 @@ const KLUB_DEMO = { id: "demo", nazwa: "Dziewiątka", pojemnosc: 9000, poziom: 2
 import { CZCIONKA, cien, K } from "./styl";
 
 // Ekran tytułowy „DZIEWIĄTKA" — wektorowa scena stadionowa w tle, herb, nazwa i przyciski.
-export function MenuGlowne({ stan, naKontynuuj, naNowa, naWczytaj }: { stan: StanGry | null; naKontynuuj: () => void; naNowa: () => void; naWczytaj: () => void }) {
-  const klub = stan ? stan.kluby[stan.mojKlub] : null;
-  const liga = stan ? mojaLiga(stan) : null;
+export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj }: { stan: StanGry | null; meta?: { nazwa: string; herb?: string; liga: string; sezon: number } | null; czeka?: boolean; naKontynuuj: () => void; naNowa: () => void; naWczytaj: () => void }) {
+  // zapis jeszcze się wczytuje → wizytówka klubu z szybkiego „meta" (menu od razu gotowe)
+  const klub = stan ? stan.kluby[stan.mojKlub] : meta ? ({ nazwa: meta.nazwa, herb: meta.herb } as unknown as Klub) : null;
+  const liga = stan ? mojaLiga(stan) : meta ? { nazwa: meta.liga } : null;
+  const sezonMenu = stan ? stan.sezon : meta?.sezon;
 
   return (
     <View style={{ flex: 1, backgroundColor: K.tlo }}>
       {/* SCENA TYTUŁOWA */}
       <View style={{ height: "56%", borderBottomWidth: 2, borderBottomColor: K.akcent, overflow: "hidden" }}>
-        <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>{Platform.OS === "web" && grafika3D() ? <Stadion3DWidok s={stan} klub={klub ?? KLUB_DEMO} tlo /> : <TloStadion />}</View>
+        <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>{Platform.OS === "web" && grafika3D() ? <Stadion3DWidok s={stan} klub={stan ? klub! : KLUB_DEMO} tlo /> : <TloStadion />}</View>
         <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(4,12,8,0.35)" }} />
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingTop: Platform.OS === "android" ? 20 : 0 }}>
           <HerbGry rozmiar={112} />
@@ -35,13 +37,13 @@ export function MenuGlowne({ stan, naKontynuuj, naNowa, naWczytaj }: { stan: Sta
 
       {/* PRZYCISKI */}
       <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 26, flexGrow: 1, justifyContent: "center" }}>
-        {stan && klub ? (
+        {klub ? (
           <Pressable onPress={naKontynuuj} style={({ pressed }) => [{ backgroundColor: K.akcent, borderRadius: 16, padding: 15, flexDirection: "row", alignItems: "center", opacity: pressed ? 0.92 : 1, ...cien }]}>
             <View style={{ borderRadius: 10, backgroundColor: "rgba(0,0,0,0.12)", padding: 3 }}><Herb klub={klub} rozmiar={36} /></View>
             <View style={{ flex: 1, marginLeft: 12 }}>
               <Text style={{ color: "#15300c", fontSize: 11.5, fontWeight: "900", letterSpacing: 1, textTransform: "uppercase", fontFamily: CZCIONKA }}>Kontynuuj karierę</Text>
               <Text numberOfLines={1} style={{ color: "#15300c", fontSize: 17, fontWeight: "900", fontFamily: CZCIONKA }}>{klub.nazwa}</Text>
-              <Text numberOfLines={1} style={{ color: "rgba(21,48,12,0.72)", fontSize: 12, fontWeight: "700", fontFamily: CZCIONKA }}>{liga?.nazwa ?? ""} · sezon {stan.sezon}</Text>
+              <Text numberOfLines={1} style={{ color: "rgba(21,48,12,0.72)", fontSize: 12, fontWeight: "700", fontFamily: CZCIONKA }}>{liga?.nazwa ?? ""} · sezon {sezonMenu}{czeka ? " · wczytywanie…" : ""}</Text>
             </View>
             <Text style={{ color: "#15300c", fontSize: 24, fontWeight: "900" }}>▶</Text>
           </Pressable>

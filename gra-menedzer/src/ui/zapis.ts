@@ -107,8 +107,13 @@ function migrujTrenera(s: StanGry) {
   }
 }
 
+/** Krótka wizytówka zapisu (klub, liga, sezon) — menu pokazuje ją od razu, zanim wczyta się cała kariera. */
+export type MetaMenu = { nazwa: string; herb?: string; liga: string; sezon: number };
+export function metaMenu(): MetaMenu | null { try { return JSON.parse(window.localStorage.getItem("dz_meta") ?? "null"); } catch { return null; } }
 export async function zapisz(s: StanGry) {
   try {
+    const k = s.kluby[s.mojKlub];
+    try { if (k) window.localStorage.setItem("dz_meta", JSON.stringify({ nazwa: k.nazwa, herb: k.herb, liga: s.ligi[k.poziom - 1]?.nazwa ?? "", sezon: s.sezon })); } catch { /* */ }
     await wstaw(KLUCZ, JSON.stringify(s));
   } catch {
     // autozapis nieudany — gra działa dalej; ręczny zapis zgłosi błąd
@@ -116,6 +121,7 @@ export async function zapisz(s: StanGry) {
 }
 
 export async function usunZapis() {
+  try { window.localStorage.removeItem("dz_meta"); } catch { /* */ }
   await usun(KLUCZ);
 }
 
