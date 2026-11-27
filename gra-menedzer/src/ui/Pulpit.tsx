@@ -8,6 +8,7 @@ import { pogodaMeczu } from "../engine/pogoda";
 import { dataKolejki } from "../engine/kalendarz";
 import type { StanGry } from "../engine/types";
 import { KarieraTrenera } from "./KarieraTrenera";
+import { KontraktTrenera } from "./KontraktTrenera";
 import { KonferencjaEkran } from "./Konferencja";
 import { Finanse } from "./Finanse";
 import { Scouting } from "./Scouting";
@@ -55,6 +56,21 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
         <Pressable style={[st.przyciskMaly, { marginHorizontal: 12, marginTop: 10, alignItems: "center", borderColor: K.niebieski }]} onPress={() => setKariera(true)}>
           <Text style={[st.przyciskMalyTekst, { color: K.niebieski }]}>📋 Twoja kariera trenera</Text>
         </Pressable>
+        {(s.ofertyTrenera ?? []).length > 0 && (
+          <View>
+            <Text style={[st.naglowek, { marginHorizontal: 14, marginTop: 14 }]}>📨 Oferty pracy (agent)</Text>
+            {(s.ofertyTrenera ?? []).map((o, i) => { const kl = s.kluby[o.klubId]; if (!kl) return null; return (
+              <Pressable key={o.klubId} style={[st.karta, st.wiersz, { marginTop: 8, borderColor: o.obecny ? K.akcent : K.linia, borderWidth: o.obecny ? 1 : 0 }]} onPress={() => { const b = przyjmijOferteTrenera(s, i); setKariera(false); odswiez(); if (b) komunikat(b); }}>
+                <Herb klub={kl} rozmiar={40} />
+                <View style={{ marginLeft: 12, flex: 1 }}>
+                  <Text style={st.tekst}>{kl.nazwa}{o.obecny ? "  · obecny klub" : ""}</Text>
+                  <Text style={st.maly}>{s.ligi[kl.poziom - 1]?.nazwa} · {zl(o.pensja)}/sezon{o.lata ? ` · ${o.lata} sez.` : ""}</Text>
+                </View>
+                <Text style={{ color: K.akcent, fontWeight: "700" }}>{o.obecny ? "Zostań ›" : "Podpisz ›"}</Text>
+              </Pressable>
+            ); })}
+          </View>
+        )}
         <Text style={[st.naglowek, { marginHorizontal: 14, marginTop: 14 }]}>Kluby bez trenera</Text>
         {oferty.map((id) => (
           <Pressable key={id} style={[st.karta, st.wiersz, { marginTop: 8 }]} onPress={() => { przejmijKlub(s, id); setKariera(false); odswiez(); }}>
@@ -119,6 +135,8 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
         <Text style={[st.tekst, { fontWeight: "700" }]}>💰 Finanse{s.kluby[s.mojKlub]?.karaPunktowa ? "  ⚖️" : ""}</Text>
         <Text style={{ color: K.akcent, fontWeight: "700" }}>Podgląd ›</Text>
       </Pressable>
+
+      <KontraktTrenera s={s} odswiez={odswiez} />
 
       {s.ofertyTrenera && s.ofertyTrenera.length > 0 && (
         <View style={[st.karta, { borderColor: K.akcent, borderWidth: 1 }]}>

@@ -86,6 +86,92 @@ export function przedluzKontraktTrenera(s: StanGry): string | null {
   return null;
 }
 
+// ——— Przedłużenie kontraktu trenera: propozycja zarządu + negocjacje przez agenta ———
+/** Jak daleko zarząd może się posunąć (pensja zł/sezon, maks. długość umowy) — zależy od zaufania. */
+function granicaZarzadu(s: StanGry): { maxPensja: number; maxLata: number; baza: number } {
+  const k = s.kluby[s.mojKlub];
+  const baza = s.trenerPensja ?? wartoscKontraktuTrenera(k.poziom, k.renoma);
+  return { baza, maxPensja: Math.round((baza * (0.95 + s.zarzad * 0.004)) / 100) * 100, maxLata: s.zarzad >= 80 ? 4 : s.zarzad >= 60 ? 3 : 2 };
+}
+/** Raz na kolejkę: w ostatnim sezonie umowy, od półmetka, zarząd składa propozycję przedłużenia (gdy ufa trenerowi). */
+export function sprawdzPropozycjeTrenera(s: StanGry) {
+  if (s.zwolniony || latTrenera(s) > 0) return;
+  const polowa = Math.floor(ileKolejek(s) / 2);
+  if (s.kolejka < polowa) return;
+  if (s.propozycjaTrenera) return;
+  if (s.zarzad < 45) {
+    if (s.kolejka === polowa) wiadomosc(s, `⏳ Ostatni sezon Twojego kontraktu, a zarząd (zaufanie ${Math.round(s.zarzad)}%) wstrzymuje się z decyzją o przedłużeniu. Popraw wyniki — inaczej po sezonie umowa wygaśnie.`);
+    return;
+  }
+  const { baza, maxLata } = granicaZarzadu(s);
+  const pensja = Math.round((baza * (1 + Math.max(0, s.zarzad - 50) * 0.002)) / 100) * 100;
+  const lata = Math.min(maxLata, s.zarzad >= 70 ? 3 : 2);
+  s.propozycjaTrenera = { pensja, lata, rundy: 0, status: "otwarta" };
+  wiadomosc(s, `📝 Zarząd proponuje przedłużenie Twojego kontraktu o ${lata} ${lata === 1 ? "sezon" : "sezony"} za ${zl(pensja)}/sezon. Przyjmij, negocjuj przez agenta albo odrzuć — szczegóły na pulpicie.`);
+}
+/** Przyjęcie propozycji zarządu bez negocjacji. */
+export function przyjmijPropozycjeTrenera(s: StanGry): string | null {
+  const p = s.propozycjaTrenera;
+  if (!p || p.status !== "otwarta") return "Brak aktualnej propozycji.";
+  podpiszPrzedluzenie(s, p.pensja, p.lata);
+  return null;
+}
+function podpiszPrzedluzenie(s: StanGry, pensja: number, lata: number) {
+  s.trenerKontraktDo = s.sezon + lata;
+  s.trenerPensja = pensja;
+  s.propozycjaTrenera = undefined;
+  s.zarzad = Math.min(100, s.zarzad + 3);
+  wiadomosc(s, `✍ Podpisałeś nowy kontrakt: do ${s.trenerKontraktDo + 1} r. (sezon ${s.trenerKontraktDo}/${(s.trenerKontraktDo + 1) % 100}), ${zl(pensja)}/sezon.`);
+}
+/** Negocjacje przez agenta: żądanie pensji i długości. Zarząd przyjmuje, daje kontrofertę albo (po 3 rundach) zrywa rozmowy. */
+export function negocjujKontraktTrenera(s: StanGry, pensja: number, lata: number): { status: "przyjeta" | "kontra" | "zerwane"; tekst: string } {
+  const p = s.propozycjaTrenera;
+  if (!p || p.status !== "otwarta") return { status: "zerwane", tekst: "Brak aktualnej propozycji do negocjacji." };
+  const agent = s.trenerAgent ?? "Twój agent";
+  const { maxPensja, maxLata } = granicaZarzadu(s);
+  // Agent negocjuje lepiej, gdy klub jest zadowolony — mała premia „na otarcie" przy wysokim zaufaniu.
+  const prog = maxPensja * (s.zarzad >= 80 ? 1.03 : 1);
+  if (pensja <= prog && lata <= maxLata) {
+    podpiszPrzedluzenie(s, Math.round(pensja / 100) * 100, lata);
+    return { status: "przyjeta", tekst: `${agent}: „Załatwione! Zarząd przyjął nasze warunki — ${zl(pensja)}/sezon na ${lata} ${lata === 1 ? "sezon" : "sezony"}."` };
+  }
+  p.rundy++;
+  p.ostatniaProsba = { pensja, lata };
+  s.zarzad = Math.max(0, s.zarzad - 1); // twarde negocjacje lekko irytują zarząd
+  if (p.rundy >= 3) {
+    p.status = "wycofana";
+    wiadomosc(s, `🚪 Zarząd zerwał rozmowy o przedłużeniu kontraktu po ${p.rundy} rundach negocjacji. Po sezonie umowa wygaśnie.`);
+    return { status: "zerwane", tekst: `${agent}: „Przesadziliśmy — zarząd zerwał rozmowy. Po sezonie będziemy szukać nowego klubu."` };
+  }
+  const kontraPensja = Math.round(Math.min(maxPensja, (pensja + p.pensja) / 2) / 100) * 100;
+  const kontraLata = Math.min(lata, maxLata);
+  p.pensja = Math.max(p.pensja, kontraPensja);
+  p.lata = kontraLata;
+  return { status: "kontra", tekst: `${agent}: „Zarząd nie zgodził się na ${zl(pensja)}${lata > maxLata ? ` i ${lata} sezony` : ""}. Kontroferta: ${zl(p.pensja)}/sezon na ${p.lata} ${p.lata === 1 ? "sezon" : "sezony"}. ${3 - p.rundy === 1 ? "Została 1 runda" : `Zostały ${3 - p.rundy} rundy`} rozmów."` };
+}
+/** Odrzucenie propozycji — po sezonie umowa wygaśnie, a agent poszuka ofert. */
+export function odrzucPropozycjeTrenera(s: StanGry) {
+  if (s.propozycjaTrenera) s.propozycjaTrenera.status = "odrzucona";
+  wiadomosc(s, "Odrzuciłeś propozycję przedłużenia. Po sezonie umowa wygaśnie — agent zbierze oferty z innych klubów.");
+}
+/** Oferty pracy po wygaśnięciu kontraktu: obecny klub (jeśli dalej chce) + kluby zainteresowane wg dorobku. */
+function ofertyPoWygasnieciu(s: StanGry) {
+  const obecny = s.kluby[s.mojKlub];
+  const lista: NonNullable<StanGry["ofertyTrenera"]> = [];
+  if (s.zarzad >= 40 && s.propozycjaTrenera?.status !== "wycofana") {
+    lista.push({ klubId: obecny.id, sezon: s.sezon, pensja: wartoscKontraktuTrenera(obecny.poziom, obecny.renoma), lata: 2, obecny: true });
+  }
+  const dorobek = (s.trenerKariera ?? []).reduce((a, w) => a + w.tytuly + w.awanse, 0);
+  const gora = dorobek >= 2 ? 2 : dorobek >= 1 || s.zarzad >= 60 ? 1 : 0;
+  const kand = Object.values(s.kluby).filter((k) => !k.pozaLiga && !k.rezerwaDla && k.id !== obecny.id
+    && k.poziom >= Math.max(1, obecny.poziom - gora) && k.poziom <= Math.min(s.ligi.length, obecny.poziom + 1));
+  for (const k of tasuj(kand).slice(0, losInt(2, 5))) {
+    lista.push({ klubId: k.id, sezon: s.sezon, pensja: wartoscKontraktuTrenera(k.poziom, k.renoma), lata: losInt(1, 3) });
+  }
+  s.ofertyTrenera = lista;
+  if (lista.length) wiadomosc(s, `📨 ${s.trenerAgent ?? "Agent"} zebrał ${lista.length} ofert pracy${lista.some((o) => o.obecny) ? ` (w tym ${obecny.nazwa} — chcą Cię zatrzymać)` : ""}. Wybierz klub na pulpicie.`);
+}
+
 /** Lata do końca kontraktu trenera (0 = ostatni sezon). */
 export function latTrenera(s: StanGry): number {
   return Math.max(0, (s.trenerKontraktDo ?? s.sezon) - s.sezon);
@@ -233,6 +319,7 @@ export function rozpocznijKariere(s: StanGry, klubId: string) {
 
 /** Losuje nieobecności amatorów (klasa okręgowa i niżej) przed kolejką i ustawia skład. */
 export function przygotujKolejke(s: StanGry) {
+  sprawdzPropozycjeTrenera(s);
   s.niedostepni = {};
   const poziom = s.kluby[s.mojKlub].poziom;
   if (poziom >= 6) { // V liga i niżej (amatorzy/półamatorzy)
@@ -1788,7 +1875,9 @@ export function nowySezon(s: StanGry) {
     s.powodWolny = s.zarzad <= 5 ? "zwolniony" : "wygasl";
     wiadomosc(s, s.zarzad <= 5
       ? "Zarząd stracił cierpliwość — zostałeś zwolniony. Znajdź nowy klub bez trenera."
-      : "Twój kontrakt wygasł i nie został przedłużony. Jesteś bez klubu — znajdź klub bez trenera.");
+      : "Twój kontrakt wygasł i nie został przedłużony. Jesteś bez klubu — sprawdź oferty pracy.");
+    s.propozycjaTrenera = undefined;
+    if (s.powodWolny === "wygasl") ofertyPoWygasnieciu(s);
   } else {
     wiadomosc(s, `Sezon ${s.sezon}/${(s.sezon + 1) % 100}: ${s.ligi[nowyPoziom - 1].nazwa}. Cel zarządu: ${s.cel}.`);
   }
@@ -3078,12 +3167,13 @@ export function przejmijKlub(s: StanGry, klubId: string) {
 export function przyjmijOferteTrenera(s: StanGry, idx: number): string | null {
   const o = s.ofertyTrenera?.[idx];
   if (!o) return "Oferta wygasła.";
-  if (s.zwolniony) return "Jesteś bez pracy — wybierz klub z listy wolnych.";
   const klub = s.kluby[o.klubId];
   if (!klub) return "Klub już niedostępny.";
   s.ofertyTrenera = [];
+  s.propozycjaTrenera = undefined;
   przejmijKlub(s, o.klubId);
   s.trenerPensja = o.pensja;
+  if (o.lata) s.trenerKontraktDo = s.sezon + o.lata - 1;
   wiadomosc(s, `Przyjąłeś ofertę ${klub.nazwa} (${s.ligi[klub.poziom - 1].nazwa}). Nowy rozdział w karierze trenerskiej!`);
   return null;
 }
