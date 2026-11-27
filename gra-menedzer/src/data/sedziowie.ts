@@ -1,8 +1,10 @@
 // Kadra sędziowska świata wg realiów PZPN.
 // • Szczebel centralny (Ekstraklasa, I liga, II liga, Puchar Polski) — REALNI sędziowie z uprawnieniami (odznaka FIFA).
 // • Reprezentacje i puchary europejskie — REALNI sędziowie międzynarodowi (patrz sedziowie-intl.ts).
-// • III liga → klasa B oraz puchary wojewódzkie (Małopolski/Pomorski ZPN) — GENEROWANI, przydzieleni do województwa gry.
-import { losInt, szansa, wybierz } from "../engine/losuj";
+// • III liga (szczebel centralny, obsada KS PZPN — w grze generowani), IV liga → klasa B oraz puchary wojewódzkie — GENEROWANI, przydzieleni do województwa gry.
+//   Szczegóły obsady wg szczebla (asystenci społeczni w klasach A/B/C): engine/obsadaSedziowska.ts.
+import { wybierz } from "../engine/losuj";
+import { klasaWgSzczebla, szczebelPoziomu, tylkoSedziaGlowny } from "../engine/obsadaSedziowska";
 import { IMIONA, NAZWISKA } from "./nazwy";
 import type { Sedziowie, SedziaOsoba, StanGry, Wynik } from "../engine/types";
 
@@ -63,7 +65,7 @@ export function klasaSedziego(poziom: number, region: Region): string {
     case 1: return "Ekstraklasa (szczebel centralny)";
     case 2: return "I liga (szczebel centralny)";
     case 3: return "II liga (szczebel centralny)";
-    case 4: return "III liga (szczebel makroregionalny)";
+    case 4: return "III liga (szczebel centralny — obsada KS PZPN)"; // Konwencja Sędziowska PZPN: III liga = sędziowie szczebla centralnego
     case 5: return `klasa wojewódzka (${ZPN[region]?.mian ?? "Małopolski ZPN"})`;
     case 6: return "klasa okręgowa";
     case 7: return "klasa A (okręg)";
@@ -96,7 +98,7 @@ export function generujPuleSedziow(s: StanGry): void {
   for (let p = 4; p <= 9; p++) {
     const klasa = klasaSedziego(p, region);
     for (let i = 0; i < ile[p]; i++) {
-      regionPula.push({ imie: wybierz(IMIONA), nazwisko: wybierz(NAZWISKA), klasa: `${klasa} — kolegium ${wybierz(okregi)} (${woj})`, region });
+      regionPula.push({ imie: wybierz(IMIONA), nazwisko: wybierz(NAZWISKA), klasa: p === 4 ? `${klasa} — sędzia z ${woj}` : `${klasa} — kolegium ${wybierz(okregi)} (${woj})`, region });
     }
   }
   s.sedziowie = {
@@ -220,10 +222,13 @@ export function obsadaMeczu(s: StanGry, poziom: number, sedziaSur: number, opts:
   const zpn = ZPN[region].mian;
   const klasa = klasaSedziego(poziom, region);
   const regionPula = s.sedziowie?.region ?? [];
-  const pula = regionPula.filter((o) => o.klasa.startsWith(klasa));
+  const rdzen = (k: string) => k.split(" (")[0]; // odporność na zmianę etykiety klasy (np. III liga) w starych zapisach
+  const pula = regionPula.filter((o) => rdzen(o.klasa) === rdzen(klasa));
   const glowny = dobierz(pula, uzyte);
-  // Liczba asystentów wg szczebla (PZPN): III–V liga/okręgowa komplet 2; klasa A 1–2; klasa B/C 0–2 (sędziowie z klubów).
-  const asystIle = poziom <= 6 ? 2 : poziom <= 7 ? (szansa(0.7) ? 2 : 1) : (szansa(0.5) ? 2 : 0);
+  // Liczba asystentów wg szczebla (nazwy ligi, nie numeru poziomu — klasa B bywa poziomem 8 albo 9): komplet 2,
+  // a w klasach A/B/C czasem ZPN deleguje tylko sędziego głównego — wtedy chorągiewki trzymają asystenci społeczni
+  // z klubów (dopisywani po meczu: engine/obsadaSedziowska.ts). Decyzja deterministyczna (spójna z meczem na żywo).
+  const asystIle = tylkoSedziaGlowny(s, poziom) ? 0 : 2;
   const asy = Array.from({ length: asystIle }, () => fmt(dobierz(pula.length ? pula : regionPula, uzyte)));
   // Sędzia techniczny (4.) w III lidze oraz w meczach pucharowych od szczebla IV ligi wzwyż.
   const wPucharze = opts.cupWoj || opts.cupPolski;
@@ -232,12 +237,13 @@ export function obsadaMeczu(s: StanGry, poziom: number, sedziaSur: number, opts:
     ? `Puchar Polski (szczebel ${zpn}) — obsada ${klasa}`
     : opts.cupWoj
     ? `${ZPN[region].puchar} — obsada ${klasa}`
-    : (glowny?.klasa ?? `${klasa} (${zpn})`);
+    : (glowny?.klasa ?? `${klasa}${klasaWgSzczebla(szczebelPoziomu(s, poziom), zpn).includes(zpn) ? "" : ` (${zpn})`}`);
+  const klasaW = klasaWgSzczebla(szczebelPoziomu(s, poziom), zpn); // nazwa klasy wg ligi (nie numeru poziomu)
   return {
     glowny: fmt(glowny), styl, asystenci: asy,
     techniczny: maTech ? fmt(dobierz(pula.length ? pula : regionPula, uzyte)) : undefined,
     var: false, avar: false,
-    klasa: etykietaPuchar,
-    real: false, region: zpn,
+    klasa: etykietaPuchar.replace(klasa, klasaW),
+    real: false, region: poziom === 4 && !opts.cupWoj && !opts.cupPolski ? "szczebel centralny (KS PZPN)" : zpn,
   };
 }

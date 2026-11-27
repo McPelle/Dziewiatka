@@ -2,6 +2,7 @@
 // trening (temat + intensywność), regeneracja, dzień wolny, analiza wideo rywala, sparing w tygodniu, wyjazd
 // integracyjny, spotkanie z zarządem, dzień otwarty dla kibiców, badania medyczne. Szablon tygodnia powiela plan.
 import { losInt, szansa, wybierz } from "./losuj";
+import { badaniaCalejKadry } from "./extranet";
 import type { Intensywnosc, StanGry, Trening } from "./types";
 
 export type RodzajAkt = "trening" | "regeneracja" | "wolne" | "wideo" | "sparing" | "integracja" | "zarzad" | "kibice" | "badania";
@@ -16,7 +17,7 @@ export const KATALOG: Record<RodzajAkt, { nazwa: string; ikona: string; opis: st
   integracja: { nazwa: "Wyjazd integracyjny", ikona: "🎳", opis: "Kręgle, grill, paintball: morale i zgranie drużyny w górę.", koszt: (s) => [20000, 12000, 6000, 3000, 1500, 800, 500, 300, 200][Math.min(8, s.kluby[s.mojKlub].poziom - 1)] },
   zarzad: { nazwa: "Spotkanie z zarządem", ikona: "🤵", opis: "Rozmowa o celach i budżecie: przy dobrych wynikach zarząd ufa bardziej, przy złych — ostrzega." },
   kibice: { nazwa: "Dzień otwarty dla kibiców", ikona: "🎉", opis: "Autografy, trening otwarty, sklepik: zaufanie kibiców i drobny przychód." },
-  badania: { nazwa: "Badania medyczne", ikona: "🩺", opis: "Testy wydolnościowe i profilaktyka: mniejsza podatność na urazy przez kilka tygodni." },
+  badania: { nazwa: "Badania medyczne", ikona: "🩺", opis: "Testy wydolnościowe i profilaktyka: mniejsza podatność na urazy przez kilka tygodni. Odnawia orzeczenia lekarskie kadry (Extranet)." },
 };
 export const FOKUSY: [Trening, string][] = [["kondycja", "Kondycja"], ["zgranie", "Taktyka i zgranie"], ["stale", "Stałe fragmenty"], ["atak", "Atak"], ["obrona", "Obrona"], ["technika", "Technika"], ["ogolny", "Gra w małych grach"], ["wykonczenie", "Wykończenie"], ["szybkosc", "Szybkość"], ["bramkarski", "Bramkarze"]];
 export const INTENSYWNOSCI: [Intensywnosc, string][] = [["lekki", "Lekka"], ["normalny", "Średnia"], ["intensywny", "Mocna"]];
@@ -107,7 +108,7 @@ export function wykonajAktywnosc(s: StanGry, a: Aktywnosc, trening: () => string
     }
     case "badania":
       for (const z of kadra) z.podatnosc = Math.max(0.7, (z.podatnosc ?? 1) * 0.96);
-      return ["🩺 Badania i profilaktyka: wykryto drobne przeciążenia, zalecono indywidualne ćwiczenia — mniejsze ryzyko urazów."];
+      return ["🩺 Badania i profilaktyka: wykryto drobne przeciążenia, zalecono indywidualne ćwiczenia — mniejsze ryzyko urazów.", badaniaCalejKadry(s)].filter(Boolean); // + odnowienie orzeczeń w Extranecie
   }
   return wp;
 }

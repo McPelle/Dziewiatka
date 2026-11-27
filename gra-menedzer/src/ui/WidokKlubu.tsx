@@ -1,4 +1,5 @@
 import { grafika3D, Stadion3DWidok } from "./three/Stadion3DWidok";
+import { Extranet } from "./Extranet";
 import { budowyKlubu, oglosPrzetarg, opisUtrudnien, trwaBudowa } from "../engine/budowy";
 import { PrzetargPanel, TrwajaceBudowy } from "./Budowy";
 import { useState } from "react";
@@ -147,6 +148,7 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
               </View>
               {moj && <View style={{ marginTop: 10 }}><Sponsorzy s={s} odswiez={odswiez} /></View>}
               {moj && <View style={{ marginTop: 10 }}><Bezpieczenstwo s={s} odswiez={odswiez} /></View>}
+              {moj && <View style={{ marginTop: 10 }}><Extranet s={s} odswiez={odswiez} /></View>}
 
               <View style={{ marginTop: 18 }}>
                 <Text style={st.naglowek}>🏟 Stadion z lotu ptaka</Text>

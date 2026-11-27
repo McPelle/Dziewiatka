@@ -1,3 +1,4 @@
+import { zakazTransferow } from "./wydzialGier";
 // Transfery rozłożone w czasie (dni kalendarza), z realiami polskiego futbolu:
 // oferta → odpowiedź klubu po 1–3 dniach (akceptacja / kontra / odmowa / konkurencja) → negocjacje z zawodnikiem lub agentem
 // (pensja, długość, premia za podpis, premie za gole i występy, klauzula, obiecana rola) → badania medyczne →
@@ -43,6 +44,8 @@ export function zadaniaKontraktowe(s: StanGry, z: Zawodnik): WarunkiKontraktu {
 
 /** Rozpoczęcie: oferta dla klubu (albo od razu negocjacje z zawodnikiem, gdy wolny / amator / umowa wstępna). */
 export function zlozOferte(s: StanGry, zId: string, oferta: OfertaTransferu, opcje: { wstepna?: boolean } = {}): string | null {
+  if (zakazTransferow(s)) return "⛔ Zakaz transferów (Izba PZPN) — najpierw spłać zaległości wobec zawodników.";
+
   const z = s.zawodnicy[zId];
   if (!z) return "Brak zawodnika.";
   if ((s.negocjacje ?? []).some((n) => n.zawodnikId === zId && n.etap !== "zakonczona" && n.etap !== "zerwana")) return "Już negocjujesz z tym zawodnikiem.";
@@ -193,6 +196,8 @@ export function realizujUmowyWstepne(s: StanGry) {
 
 /** Wypożyczenie z opcją lub obowiązkiem wykupu. */
 export function wypozyczZWykupem(s: StanGry, zId: string, kwotaWykupu: number, obowiazek: boolean): string | null {
+  if (zakazTransferow(s)) return "⛔ Zakaz transferów (Izba PZPN) — najpierw spłać zaległości wobec zawodników.";
+
   const z = s.zawodnicy[zId]; const parent = z?.klubId;
   const b = wypozyczDoSiebie(s, zId);
   if (b) return b;

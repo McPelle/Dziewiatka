@@ -404,6 +404,8 @@ export interface StanGry {
   dziennik?: import("./dziennik").DziennikKariery; // dziennik kariery trenera (kluczowe momenty)
   muzeum?: Record<string, import("./muzeum").MuzeumKlubu>; // muzeum klubów (legendy, zastrzeżone numery)
   zdjeciaDruzyny?: import("./zdjeciaDruzyny").ZdjecieDruzyny[]; // zdjęcia drużyny (jedno na sezon i klub)
+  extranet?: import("./extranet").StanExtranetu; // Extranet PZPN: karty zawodników, badania lekarskie, ITC
+  zgloszenie?: import("./zgloszenie").StanZgloszenia; // zgłoszenie drużyny do rozgrywek (opłata wpisowa, wycofania)
   kartyKolekcja?: import("./karty").StanKart; // karty kolekcjonerskie: zdobyte karty specjalne
   sklepKlubowy?: import("./sklep").StanSklepu; // sklep klubowy: projekt szalika/koszulki, ceny, statystyki sezonów
   budzetSezonu?: import("./budzetZarzadu").BudzetSezonu; // budżet sezonu uzgodniony z zarządem + rozliczenia kwartalne

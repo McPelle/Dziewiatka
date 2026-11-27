@@ -1,3 +1,4 @@
+import { zakazTransferow } from "./wydzialGier";
 // Zawodnicy na testach (realia niższych lig, IV liga → klasa B). Testowani to WOLNI zawodnicy (wolna karta):
 // klub bierze ich na okres próbny, poznaje prawdziwą jakość STOPNIOWO (przedział szacunkowy zwęża się z
 // obserwacjami/treningiem), skaut dodaje werdykt — po kilkunastu tygodniach decyzja: podpisz albo odeślij.
@@ -112,6 +113,8 @@ export function rozwojTestow(s: StanGry): void {
 
 /** Podpisz testowanego do kadry. */
 export function podpiszZTestow(s: StanGry, id: string): string | null {
+  if (zakazTransferow(s)) return "⛔ Zakaz transferów (Izba PZPN) — najpierw spłać zaległości wobec zawodników.";
+
   const moj = s.kluby[s.mojKlub];
   if (!(moj.testowani ?? []).includes(id)) return "Ten zawodnik nie jest na testach.";
   if (moj.zawodnicy.length >= 26) return "Kadra jest pełna (max 26).";

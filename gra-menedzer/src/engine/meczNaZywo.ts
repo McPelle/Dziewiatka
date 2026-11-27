@@ -13,6 +13,7 @@ import { okrzykMlyna } from "./flagi";
 import { improwizacja, przyspiewka } from "./przyspiewki";
 import { los, losInt, szansa, wybierz, wybierzWazone } from "./losuj";
 import { autoSklad, dostepny, efektywna, FORMACJE, silaSkladu } from "./mecz";
+import { bledySpalonego } from "./obsadaSedziowska";
 import { formacjaAI } from "./sezon";
 import type { Nastawienie, Pozycja, StanGry, Zawodnik } from "./types";
 
@@ -55,6 +56,8 @@ export interface MeczLive {
   oceny: Record<string, number>; momentum: number; sekwencja: PunktAkcji[]; wazne: Wazne | null;
   okrzyk?: { typ: Okrzyk; do: number }; mowa?: Mowa; motMoj: number; var: boolean; poziom: number;
   dotkniecia: Record<string, number>; // ile razy był przy piłce (heatmapa / aktywność)
+  cieplo?: { dom: number[]; gosc: number[] }; // heatmapa: siatka 12×8 (gdzie toczyła się gra każdej drużyny)
+  skroty?: { min: string; tekst: string; sek: PunktAkcji[]; gol: boolean }[]; // najważniejsze akcje do skrótu meczu
   /** Mecz pucharowy: przy remisie dogrywka (2×15) albo od razu rzuty karne — wg regulaminu ZPN / PZPN. */
   puchar?: { nazwa: string; dogrywka: boolean };
   /** Przedmecz: wybrana mowa w szatni i rozgrzewka (gotowe = można wyjść z tunelu). */
@@ -110,6 +113,7 @@ export function rozpocznijMeczNaZywo(s: StanGry, domId: string, goscId: string):
   }
   const kd = s.kluby[domId], kg = s.kluby[goscId];
   m.komentarz.unshift({ min: "0'", typ: "info", tekst: `Witamy na ${kd.stadion ?? `stadionie w ${kd.miasto}`}! ${kd.nazwa} podejmuje ${kg.nazwa}. Ustawienia: ${m.dom.formacja} kontra ${m.gosc.formacja}.` });
+  if (!m.var && bledySpalonego(s, poziom)) m.komentarz.unshift({ min: "0'", typ: "info", tekst: "🚩 ZPN delegował tylko sędziego głównego — przy liniach asystenci społeczni z obu klubów (sygnalizują wyłącznie auty, spalone ocenia sam arbiter)." });
   m.komentarz.unshift({ min: "1'", typ: "info", tekst: `Sędzia ${m.var ? "(z wozem VAR) " : ""}gwiżdże — zaczynamy! ${poziom >= 7 ? "Kameralna atmosfera, kibice przy barierkach." : poziom <= 3 ? "Trybuny pełne, doping niesie się po stadionie." : "Na trybunach spora grupa miejscowych kibiców."}` });
   for (const k of [kd, kg]) if (k.trenerKraj && k.id !== s.mojKlub && (k.trenerPolski ?? 0) < 55) {
     m.komentarz.unshift({ min: "0'", typ: "info", tekst: `🌍 Na ławce ${k.nazwa} trener ${k.trenerImie ?? ""} ${k.trenerNazwisko ?? ""} (${k.trenerKraj}) — wskazówki z ławki płyną ${PO_JEZYKU[jezykKraju(k.trenerKraj)]}, asystent tłumaczy zawodnikom.` });
@@ -288,11 +292,12 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
     if (st && Math.random() < pGol) {
       m.staty.celne[i]++;
       // gol nieuznany: spalony / faul (VAR w Ekstraklasie i I lidze, niżej decyzja asystenta)
-      const nieuznany = szansa(m.var ? 0.07 : 0.035);
+      const bs = m.var ? null : bledySpalonego(s, m.poziom); // klasa A/B/C: sam sędzia, asystenci społeczni z klubów → więcej pomyłek
+      const nieuznany = szansa(m.var ? 0.07 : bs ? bs.nieuznany : 0.035);
       if (nieuznany) {
         m.staty.spalone[i]++;
         sek.push({ x: X(100), y: los(42, 58), h: los(0, 2), nosnik: st.id, zdarzenie: "spalony" });
-        m.komentarz.unshift({ min: minTxt, typ: "var", strona, tekst: m.var ? `📺 VAR sprawdza… GOL ANULOWANY! ${nz(s, st.id)} był na spalonym o kilka centymetrów.` : `🚩 Piłka w siatce, ale chorągiewka asystenta w górze — spalony, gol ${nz(s, st.id)} nieuznany.` });
+        m.komentarz.unshift({ min: minTxt, typ: "var", strona, tekst: m.var ? `📺 VAR sprawdza… GOL ANULOWANY! ${nz(s, st.id)} był na spalonym o kilka centymetrów.` : bs ? `🚩 Piłka w siatce, ale sędzia — sam, ze środka boiska — gwiżdże spalonego. Gol ${nz(s, st.id)} nieuznany, a z ławki krzyczą, że był metr przed obrońcą!` : `🚩 Piłka w siatce, ale chorągiewka asystenta w górze — spalony, gol ${nz(s, st.id)} nieuznany.` });
         m.wazne = { typ: "var", strona, tekst: "Gol nieuznany!" };
       } else {
         const samo = szansa(0.022);
@@ -300,6 +305,7 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
         zapiszGol(s, m, atak, strona, sid, samo ? undefined : szansa(0.75) ? asystent?.id : undefined, samo ? "samoboj" : "gol", minZap, minTxt,
           samo ? `⚽ GOL SAMOBÓJCZY! ${nz(s, sid)} niefortunnie pakuje piłkę do własnej siatki` : `⚽ GOOOL! ${nz(s, st.id)} — ${nazwaSyt}${asystent ? ` (asysta: ${nz(s, asystent.id)})` : ""}`);
         if (m.var && szansa(0.25)) m.komentarz.unshift({ min: minTxt, typ: "var", strona, tekst: "📺 Krótka weryfikacja VAR — bramka uznana." });
+        else if (bs && szansa(bs.spalonyUznany)) m.komentarz.unshift({ min: minTxt, typ: "var", strona, tekst: "🚩 Protesty! Asystent społeczny rywali macha chorągiewką, ale on sygnalizuje tylko auty — sędzia sam nie widział spalonego i bramkę uznaje." });
         sek.push({ x: X(100), y: los(42, 58), h: rodz === "glowka" ? 1.5 : los(0, 1.8), nosnik: st.id, zdarzenie: "gol" });
         gol = true;
       }
@@ -320,7 +326,7 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
     // ——— akcja bez strzału: strata, aut, rożny, spalony ———
     const r = Math.random();
     if (r < 0.1) { m.staty.rozne[i]++; sek.push({ x: X(100), y: szansa(0.5) ? 0 : 100, nosnik: wykonawca(s, atak, "rozne")?.id, zdarzenie: "rozny" }); sek.push({ x: X(92), y: los(40, 60), h: 2.5 }); sek.push({ x: X(78), y: los(30, 70) }); }
-    else if (r < 0.16) { m.staty.spalone[i]++; sek.push({ x: X(los(80, 88)), y: los(30, 70), nosnik: nosnik(["NAP"]), zdarzenie: "spalony" }); }
+    else if (r < 0.1 + 0.06 * (m.var ? 1 : bledySpalonego(s, m.poziom)?.odgwizdany ?? 1)) { m.staty.spalone[i]++; sek.push({ x: X(los(80, 88)), y: los(30, 70), nosnik: nosnik(["NAP"]), zdarzenie: "spalony" }); }
     else if (r < 0.3) sek.push({ x: X(los(40, 75)), y: szansa(0.5) ? 0 : 100, zdarzenie: "aut" });
     else sek.push({ x: X(los(55, 75)), y: los(15, 85), nosnik: nosnik(["POM", "NAP"]) });
     if (szansa(0.04)) m.komentarz.unshift({ min: minTxt, typ: "kibice", tekst: wybierz([
@@ -328,6 +334,10 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
       "Gwizdy trybun po decyzji sędziego.", m.poziom >= 7 ? "Piłka wylądowała za płotem — chwila przerwy, zanim ktoś ją odrzuci." : "Kamera pokazuje ławkę rezerwowych — trener daje wskazówki."]) });
   }
   for (const p of sek) dotknij(m, p.nosnik);
+  { const c = (m.cieplo ??= { dom: Array(96).fill(0), gosc: Array(96).fill(0) }); const arr = strona === "dom" ? c.dom : c.gosc;
+    for (const p of sek) { const gx = Math.max(0, Math.min(11, Math.floor(p.x / 8.34))), gy = Math.max(0, Math.min(7, Math.floor(p.y / 12.5))); arr[gy * 12 + gx]++; } }
+  { const z = sek.find((p) => p.zdarzenie === "gol" || p.zdarzenie === "slupek" || p.zdarzenie === "obrona" || p.zdarzenie === "karny");
+    if (z && sek.length > 1) { (m.skroty ??= []).push({ min: minTxt, tekst: m.komentarz.find((c) => c.min === minTxt && (c.typ === "gol" || c.typ === "akcja" || c.typ === "karny"))?.tekst ?? (z.zdarzenie === "gol" ? "Gol!" : "Groźna akcja"), sek: sek.map((p) => ({ ...p })), gol: z.zdarzenie === "gol" }); if (m.skroty.length > 14) m.skroty = [...m.skroty.filter((x) => x.gol), ...m.skroty.filter((x) => !x.gol).slice(-6)]; } }
   m.sekwencja = sek;
   const ost = sek[sek.length - 1];
   m.pilka = { x: Math.max(0, Math.min(100, ost.x)), y: Math.max(0, Math.min(100, ost.y)), strona };

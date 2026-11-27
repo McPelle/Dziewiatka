@@ -22,7 +22,7 @@ import { DL, SZ, swiatla, uproscMaterialy, zbudujStadion } from "./stadion3d";
 import { animuj, stworzPostac, wyglad3D, type Postac } from "./zawodnik3d";
 import { gwizdek, kopniecie, napiecie, reakcjaTrybun } from "./dzwiek";
 
-export type Kamera = "auto" | "tv" | "bramka" | "gora" | "blisko";
+export type Kamera = "auto" | "tv" | "bramka" | "gora" | "blisko" | "zawodnik";
 export interface Ustawienia3D { noc: boolean; pogoda: "slonce" | "deszcz" | "snieg" | "mgla"; widzowie: number; lekka: boolean; derby?: boolean; pusto?: boolean; godz?: string }
 
 /** Ustawienie slotu: [głębokość od własnej bramki 0–100, pozycja boczna 0–100]. */
@@ -97,6 +97,20 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       (pilka.material as THREE.MeshStandardMaterial).map = new THREE.CanvasTexture(c); }
     const cienP = new THREE.Mesh(new THREE.CircleGeometry(0.3, 14), new THREE.MeshBasicMaterial({ color: 0, transparent: true, opacity: 0.35, depthWrite: false }));
     cienP.rotation.x = -Math.PI / 2; scena.add(cienP);
+    // ślady na murawie po deszczu: błoto i ślizgi zostają w polach karnych
+    if (ust.pogoda === "deszcz") {
+      const mat = new THREE.MeshBasicMaterial({ color: 0x3b2a17, transparent: true, opacity: 0.42, depthWrite: false });
+      for (const sd of [-1, 1]) for (let i = 0; i < 10; i++) {
+        const sl = new THREE.Mesh(new THREE.CircleGeometry(1, 10), mat); sl.rotation.x = -Math.PI / 2; sl.rotation.z = Math.random() * Math.PI;
+        const slizg = Math.random() < 0.5; sl.scale.set(slizg ? 2 + Math.random() * 1.8 : 0.7 + Math.random(), slizg ? 0.3 : 0.5 + Math.random() * 0.6, 1);
+        sl.position.set(sd * (DL / 2 - 3 - Math.random() * 13), 0.016, (Math.random() - 0.5) * 28); scena.add(sl);
+      }
+    }
+    // cienie od reflektorów: wieczorem każdy zawodnik ma 4 cienie (cztery maszty w narożnikach), jak w telewizji
+    const cienie4 = new Map<string, THREE.Mesh[]>();
+    const matCien = new THREE.MeshBasicMaterial({ color: 0, transparent: true, opacity: 0.2, depthWrite: false });
+    const geoCien = new THREE.PlaneGeometry(0.5, 2.4); geoCien.translate(0, 1.2, 0);
+    const KIER4 = [[1, 1], [1, -1], [-1, 1], [-1, -1]].map(([x, z]) => Math.atan2(x, z));
     // postacie
     const postacie = new Map<string, Postac>();
     const strona = new Map<string, "dom" | "gosc">();
@@ -673,6 +687,11 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         }
       }
       cienP.position.set(pilka.position.x, 0.02, pilka.position.z); cienP.scale.setScalar(1 + pilka.position.y * 0.15);
+      if (ust.noc && !ust.lekka) for (const [id, p] of postacie) {
+        if (lawkowi.includes(p) || !p.g.visible) { const c = cienie4.get(id); if (c) c.forEach((x) => (x.visible = false)); continue; }
+        let c = cienie4.get(id); if (!c) { c = KIER4.map((k) => { const mm = new THREE.Mesh(geoCien, matCien); mm.rotation.order = "YXZ"; mm.rotation.set(-Math.PI / 2, k, 0); scena.add(mm); return mm; }); cienie4.set(id, c); }
+        for (const x of c) { x.visible = true; x.position.set(p.g.position.x, 0.013, p.g.position.z); }
+      }
       stad.aktualizuj(czas, emocje);
       if (opady) { const a = opady.geometry.getAttribute("position") as THREE.BufferAttribute; const spd = ust.pogoda === "snieg" ? 2.5 : 22;
         for (let i = 0; i < a.count; i++) { let y = a.getY(i) - spd * dt; if (y < 0) y = 50; a.setY(i, y); if (ust.pogoda === "snieg") a.setX(i, a.getX(i) + Math.sin(czas + i) * dt * 0.4); } a.needsUpdate = true; }
@@ -687,6 +706,10 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       else if (m.koniec && celebracja <= 0 && stan.current.kamera === "auto") { camPoz.set(-4, 9, SZ / 2 + 22); camCel.set(0, 1, SZ / 2 - 6); }
       else if (tryb === "tv" || tryb === "auto") { camPoz.set(bx * 0.78, 30, SZ / 2 + 52); camCel.set(bx * 0.86, 0, bz * 0.35); }
       else if (tryb === "bramka") { const sd = Math.sign(bx || 1); camPoz.set(sd * (DL / 2 + 22), 9, bz * 0.3 + 6); camCel.set(bx * 0.8, 1, bz * 0.6); }
+      else if (tryb === "zawodnik") { // kamera zawodnika: z perspektywy piłkarza najbliżej piłki, patrzy na piłkę
+        let best: Postac | null = null, bd = 1e9; for (const p of postacie.values()) { if (lawkowi.includes(p)) continue; const d = (p.g.position.x - bx) ** 2 + (p.g.position.z - bz) ** 2; if (d < bd) { bd = d; best = p; } }
+        if (best) { const dx = bx - best.g.position.x, dz = bz - best.g.position.z, L = Math.hypot(dx, dz) || 1; camPoz.set(best.g.position.x - (dx / L) * 2.2, 1.75, best.g.position.z - (dz / L) * 2.2); camCel.set(bx + (dx / L) * 8, 0.8, bz + (dz / L) * 8); }
+      }
       else if (tryb === "gora") { camPoz.set(bx * 0.4, 105, 18); camCel.set(bx * 0.4, 0, 0); }
       else { camPoz.set(bx - Math.sign(bx || 1) * 12, 10, bz + 19); camCel.set(bx, 1, bz); }
       // płynne prowadzenie kamery liczone z prawdziwego czasu (niezależne od liczby klatek)

@@ -29,7 +29,7 @@ import { czyWyciszony, gwizdek, startDzwieku, stopDzwieku, wycisz } from "./thre
 import { glosDostepny, glosWlaczony, mow, plecZImienia, ustawGlos, zamilknij } from "./three/glos";
 
 type Zakl = "relacja" | "staty" | "sklady" | "taktyka" | "zmiany";
-const KAMERY: [Kamera, string][] = [["auto", "🎬 Reżyser"], ["tv", "📺 TV"], ["bramka", "🥅 Zza bramki"], ["gora", "🛰 Z góry"], ["blisko", "🔍 Zbliżenie"]];
+const KAMERY: [Kamera, string][] = [["auto", "🎬 Reżyser"], ["tv", "📺 TV"], ["bramka", "🥅 Zza bramki"], ["gora", "🛰 Z góry"], ["blisko", "🔍 Zbliżenie"], ["zawodnik", "👁 Kamera zawodnika"]];
 
 /** Warunki meczu: pora (wieczór pod reflektorami), pogoda wg miesiąca, frekwencja wg renomy. */
 function warunki(s: StanGry, domId: string, goscId: string, puchar?: boolean): Ustawienia3D {
@@ -379,6 +379,11 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
             </>)}
           </View>
 
+          {m.koniec && !bez3D && (m.skroty ?? []).length > 0 && (
+            <View style={{ marginTop: 6 }}>
+              <Text style={[st.maly, { fontWeight: "800" }]}>📽 Skróty meczu — odtwórz w 3D (kamera zza bramki)</Text>
+              <View style={[st.wiersz, { flexWrap: "wrap" }]}>{(m.skroty ?? []).map((k, i) => <Btn key={i} t={`${k.gol ? "⚽" : "🔥"} ${k.min}`} on={() => { m.sekwencja = k.sek.map((p) => ({ ...p })); setKamera(i % 2 ? "blisko" : "bramka"); setKom(k.tekst); setWersja((w) => w + 1); }} />)}</View>
+            </View>)}
           {m.koniec ? (
             <Pressable style={st.przycisk} onPress={() => { stopDzwieku(); zamilknij(); usunZapisMeczu(); onKoniec(m); }}><Text style={st.przyciskTekst}>✅ Zakończ i zapisz wynik ({m.gd}:{m.gg})</Text></Pressable>
           ) : m.min > 0 ? (
@@ -416,12 +421,23 @@ function Boisko2D({ s, m }: { s: StanGry; m: MeczLive }) {
   );
 }
 function MapaStrzalow({ m }: { m: MeczLive }) {
+  const [tryb, setTryb] = useState<"strzaly" | "dom" | "gosc">("strzaly");
+  const c = m.cieplo; const arr = c ? (tryb === "dom" ? c.dom : c.gosc) : []; const mx = Math.max(1, ...arr);
   return (
-    <Svg width="100%" viewBox="0 0 105 68" style={{ aspectRatio: 105 / 68, backgroundColor: "#245f37", borderRadius: 6 }}>
-      <Rect x={0.5} y={0.5} width={104} height={67} fill="none" stroke="#cfe" strokeWidth={0.3} />
-      <Line x1={52.5} y1={0.5} x2={52.5} y2={67.5} stroke="#cfe" strokeWidth={0.3} />
-      {m.staty.strzaly.map((p, i) => <Circle key={i} cx={p.x * 1.05} cy={p.y * 0.68} r={0.8 + p.xg * 4} fill={p.gol ? "#ffce47" : "none"} stroke={p.strona === "dom" ? "#ffce47" : "#5aa9ff"} strokeWidth={0.4} />)}
-    </Svg>
+    <View>
+      <View style={{ flexDirection: "row", gap: 6, marginBottom: 4 }}>
+        {([["strzaly", "🎯 Strzały"], ["dom", "🔥 Heatmapa gosp."], ["gosc", "🔥 Heatmapa gości"]] as const).map(([k, n]) => (
+          <Pressable key={k} onPress={() => setTryb(k)} style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10, borderWidth: 1, borderColor: tryb === k ? K.akcent : K.linia }}><Text style={{ color: tryb === k ? K.akcent : K.szary, fontSize: 11 }}>{n}</Text></Pressable>))}
+      </View>
+      <Svg width="100%" viewBox="0 0 105 68" style={{ aspectRatio: 105 / 68, backgroundColor: "#245f37", borderRadius: 6 }}>
+        {tryb !== "strzaly" && arr.map((v, i) => v > 0 ? <Rect key={`h${i}`} x={(i % 12) * 8.75} y={Math.floor(i / 12) * 8.5} width={8.75} height={8.5} fill={v / mx > 0.66 ? "#ff3b30" : v / mx > 0.33 ? "#ff9500" : "#ffd60a"} opacity={0.15 + 0.6 * (v / mx)} /> : null)}
+        <Rect x={0.5} y={0.5} width={104} height={67} fill="none" stroke="#cfe" strokeWidth={0.3} />
+        <Line x1={52.5} y1={0.5} x2={52.5} y2={67.5} stroke="#cfe" strokeWidth={0.3} />
+        <Rect x={0.5} y={13.85} width={16.5} height={40.3} fill="none" stroke="#cfe" strokeWidth={0.3} />
+        <Rect x={88} y={13.85} width={16.5} height={40.3} fill="none" stroke="#cfe" strokeWidth={0.3} />
+        {tryb === "strzaly" && m.staty.strzaly.map((p, i) => <Circle key={i} cx={p.x * 1.05} cy={p.y * 0.68} r={0.8 + p.xg * 4} fill={p.gol ? "#ffce47" : "none"} stroke={p.strona === "dom" ? "#ffce47" : "#5aa9ff"} strokeWidth={0.4} />)}
+      </Svg>
+    </View>
   );
 }
 

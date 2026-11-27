@@ -1,3 +1,5 @@
+import { zakazTransferow } from "./wydzialGier";
+import { pzpnPoKolejce, pzpnPrzedKolejka, pzpnPrzedSkladem } from "./pzpnCykl";
 import { aktualizujKronike } from "./dziennik";
 import { serwisKolejki } from "./serwisKraj";
 import { tydzienSklepu } from "./sklep";
@@ -374,6 +376,7 @@ export function przygotujKolejke(s: StanGry) {
     const p = poziom >= 8 ? 0.14 : poziom >= 7 ? 0.09 : 0.07; // poziom 6 = V liga
     for (const id of s.kluby[s.mojKlub].zawodnicy) if (szansa(p)) s.niedostepni[id] = losujPowod(poziom);
   }
+  pzpnPrzedSkladem(s); // Extranet: badania lekarskie, ITC, potwierdzenia — niedostępni
   const zle = s.taktyka.sklad.filter((id) => !s.kluby[s.mojKlub].zawodnicy.includes(id) || !dostepny(s, s.zawodnicy[id]));
   if (s.taktyka.auto) {
     const przed = [...s.taktyka.sklad];
@@ -721,6 +724,7 @@ export function ileKolejek(s: StanGry) {
 /** Rozgrywa najbliższą kolejkę we wszystkich ligach. */
 export function zagrajKolejke(s: StanGry) {
   if (s.koniecSezonu || s.zwolniony) return;
+  pzpnPrzedKolejka(s); // wpisowe / wycofania
   const r = s.kolejka;
   { const mk = s.kluby[s.mojKlub]; if (mk && (mk.rezerwaDla || mk.rezerwaId)) {
     (s.ostatnieSklady ??= {})[s.mojKlub] = [...s.taktyka.sklad];
@@ -1049,6 +1053,7 @@ export function zagrajKolejke(s: StanGry) {
   } else {
     przygotujKolejke(s);
   }
+  pzpnPoKolejce(s);
   aktualizujKronike(s); // dziennik kariery, muzeum (legendy), zdjęcie drużyny
 }
 
@@ -3064,6 +3069,8 @@ function doplataProc(poziomMacierzysty: number, poziomDocelowy: number): number 
 
 /** Wypożyczenie zawodnika z innego klubu do siebie (na jeden sezon). Wyższa liga może dopłacać do pensji. */
 export function wypozyczDoSiebie(s: StanGry, zawodnikId: string): string | null {
+  if (zakazTransferow(s)) return "⛔ Zakaz transferów (Izba PZPN) — najpierw spłać zaległości wobec zawodników.";
+
   const z = s.zawodnicy[zawodnikId];
   const moj = s.kluby[s.mojKlub];
   if (!oknoOtwarte(s)) return "Okno transferowe jest zamknięte.";
@@ -3359,6 +3366,8 @@ export function zdejmijZeSprzedazy(s: StanGry, zawodnikId: string): string | nul
 }
 
 export function kup(s: StanGry, zawodnikId: string): string | null {
+  if (zakazTransferow(s)) return "⛔ Zakaz transferów (Izba PZPN) — najpierw spłać zaległości wobec zawodników.";
+
   const z = s.zawodnicy[zawodnikId];
   const moj = s.kluby[s.mojKlub];
   const wolny = !z.klubId;
