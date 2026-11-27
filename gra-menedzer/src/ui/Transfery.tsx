@@ -369,7 +369,7 @@ function WierszSprzedazy({ s, z, odswiez }: { s: StanGry; z: Zawodnik; odswiez: 
   );
 }
 
-function NegocjacjeModal({ s, z, onClose, odswiez }: { s: StanGry; z: Zawodnik | null; onClose: () => void; odswiez: () => void }) {
+export function NegocjacjeModal({ s, z, onClose, odswiez }: { s: StanGry; z: Zawodnik | null; onClose: () => void; odswiez: () => void }) {
   return (
     <Modal visible={!!z} transparent animationType="slide" onRequestClose={onClose}>
       {z ? <NegocjacjeTresc key={z.id} s={s} z={z} onClose={onClose} odswiez={odswiez} /> : null}

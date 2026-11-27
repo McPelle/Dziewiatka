@@ -194,7 +194,7 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
 
               <Text style={[st.naglowek, { marginTop: 18 }]}>Kadra ({kadra.length})</Text>
               {kadra.map((z) => (
-                <Pressable key={z.id} onPress={() => moj && onZawodnik?.(z.id)} style={[st.wiersz, { paddingVertical: 5, borderTopWidth: 1, borderTopColor: K.linia }]}>
+                <Pressable key={z.id} onPress={() => onZawodnik?.(z.id)} style={[st.wiersz, { paddingVertical: 5, borderTopWidth: 1, borderTopColor: K.linia }]}>
                   <Text style={{ color: KOLOR_POZ[z.poz], width: 30, fontWeight: "700", fontSize: 12 }}>{z.poz}</Text>
                   <Text style={{ width: 28, color: K.szary }}>{z.numer || ""}</Text>
                   <Text style={[st.tekst, { flex: 1, fontSize: 14 }]} numberOfLines={1}>{z.imie} {z.nazwisko}</Text>

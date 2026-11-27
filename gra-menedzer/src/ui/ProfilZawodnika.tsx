@@ -1,3 +1,4 @@
+import { NegocjacjeModal } from "./Transfery";
 import { useState } from "react";
 import { Alert, Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
@@ -110,6 +111,7 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
   const [rozmowa, setRozmowa] = useState(false);
   const widoczny = !!z;
   const mojKlubowicz = z?.klubId === s.mojKlub;
+  const [oferta, setOferta] = useState(false);
   const moraleKolor = !z ? K.tekst : z.morale > 65 ? K.zielony : z.morale > 35 ? K.akcent : K.czerwony;
 
   return (
@@ -157,6 +159,13 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
                   <Text style={[st.przyciskMalyTekst, { color: K.niebieski }]}>✎ Edytuj zawodnika</Text>
                 </Pressable>
               </View>
+
+              {!mojKlubowicz && !s.zwolniony && (z.klubId ? !s.kluby[z.klubId]?.pozaLiga : true) && (
+                <Pressable style={[st.przyciskMaly, { marginTop: 10, alignItems: "center", borderColor: K.zielony }]} onPress={() => setOferta(true)}>
+                  <Text style={[st.przyciskMalyTekst, { color: K.zielony }]}>💼 Złóż ofertę {z.klubId ? `(${s.kluby[z.klubId]?.nazwa})` : "(wolny zawodnik)"}</Text>
+                </Pressable>
+              )}
+              <NegocjacjeModal s={s} z={oferta ? z : null} onClose={() => setOferta(false)} odswiez={odswiez} />
 
               {!mojKlubowicz && z.klauzula && z.klubId && oknoOtwarte(s) && (
                 <Pressable style={[st.przyciskMaly, { marginTop: 10, alignItems: "center", borderColor: K.akcent }]}

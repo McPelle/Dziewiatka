@@ -12,6 +12,7 @@ import { WidokKlubu } from "./WidokKlubu";
 import { Sponsorzy } from "./Sponsorzy";
 import { Stroje } from "./Stroje";
 import { PucharEkran } from "./PucharEkran";
+import { PrzegladLig } from "./PrzegladLig";
 import { CZCIONKA, cien, K, st } from "./styl";
 
 // Hub „Więcej" — pełne menu wszystkich działów klubu. Karty pogrupowane, z ikoną i krótkim opisem.
@@ -28,6 +29,7 @@ const WPISY: Wpis[] = [
   { key: "klub", ikona: "🏟", nazwa: "Mój klub", opis: "Stadion, infrastruktura, dane", grupa: "Klub", tryb: "modal" },
   { key: "kariera", ikona: "📈", nazwa: "Kariera trenera", opis: "Historia, trofea i licencja", grupa: "Klub", tryb: "modal" },
   { key: "puchar", ikona: "🏆", nazwa: "Puchar", opis: "Drabinka i wyniki pucharów", grupa: "Rozgrywki", tryb: "inline" },
+  { key: "ligi", ikona: "🌍", nazwa: "Wszystkie ligi", opis: "Każda liga, klub i zawodnik", grupa: "Rozgrywki", tryb: "modal" },
 ];
 const GRUPY = ["Zespół", "Klub", "Rozgrywki"];
 
@@ -116,6 +118,7 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
       <Akademia s={s} widoczny={otw === "akademia"} onClose={zamknij} odswiez={odswiez} />
       <KarieraTrenera s={s} widoczny={otw === "kariera"} onClose={zamknij} odswiez={odswiez} />
       <WidokKlubu s={s} klubId={otw === "klub" ? s.mojKlub : null} onClose={zamknij} odswiez={odswiez} />
+      <PrzegladLig s={s} widoczny={otw === "ligi"} onClose={zamknij} odswiez={odswiez} />
     </View>
   );
 }
