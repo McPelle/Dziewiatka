@@ -10,6 +10,7 @@ import { KartaDnia } from "./KartaDnia";
 import { paraMojegoMeczu } from "../engine/meczNaZywo";
 import { meczPucharuGracza } from "../engine/puchar";
 import { TreningNaZywo } from "./TreningNaZywo";
+import { dzwiekUI } from "./muzyka";
 
 /** Panel kalendarza na pulpicie: dzisiejszy dzień, plan tygodnia, raport ostatniego dnia, przyciski Dalej / Do meczu. */
 export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => void; pokazMecz: () => void }) {
@@ -53,7 +54,7 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
         </Pressable>
       )}
       <View style={[st.wiersz, { gap: 8, marginTop: 12 }]}>
-        <Pressable style={[st.przycisk, { flex: 1, marginHorizontal: 0, marginTop: 0 }]} onPress={dalej}>
+        <Pressable style={[st.przycisk, { flex: 1, marginHorizontal: 0, marginTop: 0 }]} onPress={() => { dzwiekUI(d.typ === "mecz" ? "gwizdek" : "klik"); dalej(); }}>
           <Text style={st.przyciskTekst}>{d.typ === "mecz" ? "⚽ Rozegraj mecz ›" : `Dalej › ${plan[d.idx + 1]?.nazwa ?? ""}`}</Text>
         </Pressable>
         {d.typ === "mecz" && paraMojegoMeczu(s) && (

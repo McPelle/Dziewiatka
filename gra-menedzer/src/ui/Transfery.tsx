@@ -11,6 +11,7 @@ import { KAT_POZ, SKROT_POZ, ETYKIETA_POZ } from "../data/pozycje";
 import type { OfertaTransferu, WynikNegocjacji } from "../engine/sezon";
 import type { Pozycja, PozycjaSzczegolowa, StanGry, Zawodnik } from "../engine/types";
 import { K, KOLOR_POZ, st } from "./styl";
+import { dzwiekUI } from "./muzyka";
 
 const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Alert.alert("Transfer", t));
 
@@ -115,7 +116,7 @@ export function Transfery({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
                 <Text style={[st.maly, { flex: 1, color: K.tekst }]}>
                   {s.kluby[o.klubId].nazwa}: {z.imie} {z.nazwisko} ({Math.floor(z.umiej)}) za {zl(o.kwota)}{(z.wystawiony ?? 0) > 0 ? " · wystawiony" : ""}
                 </Text>
-                <Pressable style={st.przyciskMaly} onPress={() => { const b = przyjmijOferte(s, i); odswiez(); if (b) komunikat(b); }}>
+                <Pressable style={st.przyciskMaly} onPress={() => { const b = przyjmijOferte(s, i); dzwiekUI("kasa"); odswiez(); if (b) komunikat(b); }}>
                   <Text style={st.przyciskMalyTekst}>Sprzedaj</Text>
                 </Pressable>
               </View>
@@ -166,7 +167,7 @@ export function Transfery({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
                 <Text style={[st.tekst, { fontSize: 14 }]} numberOfLines={1}>{z.poz} {z.imie} {z.nazwisko} · {z.wiek} l.</Text>
                 <Text style={st.maly}>{raportTestu(z)}</Text>
                 <View style={[st.wiersz, { gap: 6, marginTop: 4 }]}>
-                  <Pressable style={[st.przyciskMaly, { borderColor: K.zielony }]} onPress={() => { const b = podpiszZTestow(s, z.id); odswiez(); if (b) komunikat(b); }}>
+                  <Pressable style={[st.przyciskMaly, { borderColor: K.zielony }]} onPress={() => { const b = podpiszZTestow(s, z.id); dzwiekUI("kartka"); odswiez(); if (b) komunikat(b); }}>
                     <Text style={[st.przyciskMalyTekst, { color: K.zielony }]}>✍️ Podpisz</Text>
                   </Pressable>
                   <Pressable style={[st.przyciskMaly, { borderColor: K.czerwony }]} onPress={() => { odeslijZTestow(s, z.id); odswiez(); }}>
@@ -315,7 +316,7 @@ function WierszRynku({ s, z, wyp, cena, onKup, onNeg, onWykup }: { s: StanGry; z
         <Text style={[st.maly, { fontSize: 11 }]}>pot. {Math.floor(z.potencjal)}</Text>
       </View>
       <View style={{ gap: 6 }}>
-        <Pressable style={st.przyciskMaly} onPress={onKup}>
+        <Pressable style={st.przyciskMaly} onPress={() => { dzwiekUI("kartka"); onKup(); }}>
           <Text style={st.przyciskMalyTekst}>{wyp ? "Wypożycz" : cena ? "Kup" : "Podpisz"}</Text>
         </Pressable>
         {wyp && z.kontraktTyp !== "amator" && (

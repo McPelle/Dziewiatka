@@ -9,6 +9,7 @@ import { Herb } from "./src/ui/Herb";
 import { MenuGlowne } from "./src/ui/MenuGlowne";
 import { SzybkiMecz } from "./src/ui/SzybkiMecz";
 import { Wyzwania } from "./src/ui/Wyzwania";
+import { losowaCiekawostka } from "./src/data/ciekawostki";
 import { metaMenu } from "./src/ui/zapis";
 import { NowaGra } from "./src/ui/NowaGra";
 import { Pulpit } from "./src/ui/Pulpit";
@@ -123,6 +124,7 @@ function EkranWczytywania() {
         <ActivityIndicator color={K.akcent} />
         <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, marginLeft: 10, fontWeight: "700", fontFamily: CZCIONKA }}>Wczytywanie…</Text>
       </View>
+      <Text style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, marginTop: 18, marginHorizontal: 30, textAlign: "center", fontFamily: CZCIONKA }}>💡 {losowaCiekawostka()}</Text>
     </View>
   );
 }
