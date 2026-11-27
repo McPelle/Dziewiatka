@@ -139,6 +139,9 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       g.position.y = -0.45; a.ramiona[1].add(g); return g;
     });
     let flagaT = 0, kartkaT = 0, ostKartek = m.kartki.length;
+    // linia spalonego VAR (Ekstraklasa / I liga): przy anulowanym golu dwie linie przez całą szerokość boiska
+    let varT = 0;
+    const linieVar = [0x3aa0ff, 0xff3b30].map((c) => { const l = new THREE.Mesh(new THREE.PlaneGeometry(0.12, SZ), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.9, depthWrite: false })); l.rotation.x = -Math.PI / 2; l.position.y = 0.03; l.visible = false; scena.add(l); return l; });
     const kartka = new THREE.Mesh(new THREE.PlaneGeometry(0.09, 0.13), new THREE.MeshBasicMaterial({ color: 0xffd600, side: THREE.DoubleSide }));
     kartka.position.set(0, -0.5, 0.05); kartka.visible = false; sedzia.ramiona[1].add(kartka);
     // ławki rezerwowych: rezerwowi siedzą, trenerzy stoją w strefie technicznej
@@ -503,7 +506,14 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
             if (n && (sg.p.zdarzenie === "strzal" || sg.p.zdarzenie === "gol" || sg.p.zdarzenie === "spalony")) { n.poza = "strzal"; n.pozaT = 0.45; } }
           sg.t += dtg / sg.dur * 1.6;
           const t = Math.min(1, sg.t);
-          pilka.position.lerpVectors(sg.a, sg.b, t); pilka.position.y = 0.22 + Math.sin(t * Math.PI) * sg.h + (sg.p.zdarzenie === "gol" && t > 0.9 ? 0 : 0);
+          pilka.position.lerpVectors(sg.a, sg.b, t);
+          { // fizyka piłki: podkręcenie długich podań i strzałów (łuk w bok), kozłowanie płaskich podań (na mokrej murawie piłka niżej i ślizga się)
+            const dl = sg.a.distanceTo(sg.b), mokro = ust.pogoda === "deszcz";
+            const pod = dl > 18 ? Math.sin(t * Math.PI) * Math.min(2.2, dl * 0.045) * ((si * 7919) % 3 - 1) : 0;
+            if (pod) { const nx = -(sg.b.z - sg.a.z) / (dl || 1), nz = (sg.b.x - sg.a.x) / (dl || 1); pilka.position.x += nx * pod; pilka.position.z += nz * pod; }
+            const koz = sg.h < 0.6 && dl > 8 ? Math.abs(Math.sin(t * Math.PI * 3)) * (1 - t) * (mokro ? 0.08 : 0.35) : 0;
+            pilka.position.y = 0.22 + Math.sin(t * Math.PI) * sg.h + koz;
+          }
           pilka.rotation.x += dtg * 12;
           if (t >= 1) {
             const z = sg.p.zdarzenie;
@@ -513,7 +523,10 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
             if (z === "wolny" && !m.karne) { gwizdek(); trzymaj = 1.3; murPkt = sg.b.clone(); murSi = si + 1; murIds = [];
               const bramkaX = Math.sign(murPkt.x || 1) * DL / 2; const broni: "dom" | "gosc" = bramkaX > 0 ? "gosc" : "dom";
               murIds = ukladCache.filter((u) => u.sd === broni && !u.br).map((u) => ({ id: u.id, d: postac(u.id, u.sd).g.position.distanceTo(murPkt!) })).sort((a, b) => a.d - b.d).slice(0, 4).map((x) => x.id); }
-            if (z === "spalony") flagaT = 2.2;
+            if (z === "spalony") { flagaT = 2.2;
+              if (m.var && Math.abs(sg.b.x) > DL / 2 - 1) { // anulowany gol → VAR rysuje linie: obrońca (niebieska) i napastnik (czerwona)
+                const sd = Math.sign(sg.b.x || 1), xo = sd * (DL / 2 - 14 - Math.random() * 10);
+                linieVar[0].position.x = xo; linieVar[1].position.x = xo + sd * (0.06 + Math.random() * 0.25); linieVar.forEach((l) => (l.visible = true)); varT = 3.5; } }
             if (z === "gol") {
               const domGol = m.karne ? m.pilka.strona === "dom" : sg.b.x > 0; strzelec = sg.p.nosnik; celebracja = m.karne ? 1.3 : 3.2; if (!m.karne) gwizdek();
               radoscTrenera = domGol ? "dom" : "gosc"; radoscT = 4; if (domGol && race) raceT = 7;
@@ -650,6 +663,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         kartkaT = Math.max(0, kartkaT - dt); kartka.visible = kartkaT > 0;
         if (kartkaT > 0) { sedzia.ramiona[1].rotation.x = -2.9; sedzia.ramiona[1].rotation.z = 0.15; }
         flagaT = Math.max(0, flagaT - dt);
+        if (varT > 0) { varT -= dt; if (varT <= 0) linieVar.forEach((l) => (l.visible = false)); }
         asystenci.forEach((a) => { a.ramiona[1].rotation.x = flagaT > 0 ? -2.8 : -0.2; });
         choragiewki.forEach((c) => { c.rotation.z = flagaT > 0 ? Math.sin(czas * 18) * 0.25 : 0; });
         // trenerzy przy linii: gesty przez cały mecz, radość po golu, złapanie się za głowę po straconym
