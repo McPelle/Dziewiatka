@@ -20,15 +20,18 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
   const [proba, setProba] = useState(0);
   const [start, setStart] = useState(!tlo); // tło menu: start 3D dopiero gdy gra jest już gotowa do klikania
   const [widoczny, setWidoczny] = useState(!tlo);
+  const [diag, setDiag] = useState(false);
+  const etap = useRef("czeka na start");
   useEffect(() => {
     if (!tlo) return;
-    const ric = (window as any).requestIdleCallback as ((f: () => void, o?: { timeout: number }) => number) | undefined;
-    const t = setTimeout(() => (ric ? ric(() => setStart(true), { timeout: 1500 }) : setStart(true)), 900);
-    return () => clearTimeout(t);
+    const t = setTimeout(() => setStart(true), 700); // bez requestIdleCallback — na iPhonie potrafi nigdy nie zadziałać
+    const diag = setTimeout(() => setDiag(true), 9000);
+    return () => { clearTimeout(t); clearTimeout(diag); };
   }, [tlo]);
   useEffect(() => {
     const el = host.current as HTMLElement | null;
     if (!el || typeof document === "undefined" || !start) return;
+    etap.current = "tworzenie grafiki";
     const lekka = lekkaGrafika();
     let renderer: THREE.WebGLRenderer;
     try { renderer = new THREE.WebGLRenderer({ antialias: !lekka, failIfMajorPerformanceCaveat: false }); } catch (e) { setAwaria("brak WebGL: " + String((e as Error)?.message ?? e).slice(0, 60)); return; }
@@ -47,6 +50,7 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
     const scena = new THREE.Scene();
     swiatla(scena, jestNoc, false, lekka);
     const mies = new Date().getMonth() + 1;
+    etap.current = "budowa stadionu";
     let stad: ReturnType<typeof zbudujStadion>;
     try { stad = zbudujStadion(s, klub, { noc: jestNoc, snieg: mies === 12 || mies <= 2 ? new Date().getDate() % 3 === 0 : false, deszcz: false, widzowie: tlo ? klub.pojemnosc * 0.5 : 0, lekka: lekka || !!tlo, budowy: s?.budowy }); } catch (e) { clearTimeout(straznik); renderer.dispose(); renderer.domElement.remove(); setAwaria("budowa sceny: " + String((e as Error)?.message ?? e).slice(0, 60)); return; }
     scena.add(stad.grupa);
@@ -74,11 +78,12 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
       cam.position.set(Math.cos(kat + tiltX * 0.25) * r, 18 + wys * r * 0.55 + tiltY * 6, Math.sin(kat + tiltX * 0.25) * r);
       cam.lookAt(0, 2, 0);
       stad.aktualizuj(t, tlo ? 0.15 : 0);
-      try { if (zEfektami) composer.render(dt); else renderer.render(scena, cam); klatki++; }
+      try { if (zEfektami) composer.render(dt); else renderer.render(scena, cam); klatki++; if (klatki === 3) etap.current = "OK"; }
       catch (e) { if (zEfektami) zEfektami = false; else { cancelAnimationFrame(raf); setAwaria("rysowanie: " + String((e as Error)?.message ?? e).slice(0, 60)); } } // bez poświaty, a gdy i to nie działa — 2D
     };
     let anulowano = false;
-    const uruchom = () => { if (anulowano) return; raf = requestAnimationFrame(petla); setTimeout(() => !anulowano && setWidoczny(true), 120); };
+    etap.current = "kompilacja";
+    const uruchom = () => { etap.current = "rysowanie"; if (anulowano) return; raf = requestAnimationFrame(petla); setTimeout(() => !anulowano && setWidoczny(true), 120); };
     const r2 = renderer as THREE.WebGLRenderer & { compileAsync?: (s: THREE.Object3D, c: THREE.Camera) => Promise<unknown> };
     { let ruszyl = false; const raz = () => { if (!ruszyl) { ruszyl = true; uruchom(); } };
       setTimeout(raz, 2000); // iPhone: gdy kompilacja w tle się nie kończy — startujemy i tak (jak dawniej)
@@ -97,6 +102,7 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
     <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 } as any}>
       <TloStadion />
       <View ref={host} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, opacity: widoczny ? 1 : 0, transitionProperty: "opacity", transitionDuration: "900ms" } as any} />
+      {diag && !widoczny && <Text style={{ position: "absolute", left: 6, bottom: 4, color: "rgba(255,255,255,0.6)", fontSize: 9 }}>3D: {etap.current}{start ? "" : " (start=nie)"}</Text>}
     </View>
   );
   return <View ref={host} style={{ width: "100%", height: wysokosc ?? 260, borderRadius: 10, overflow: "hidden", backgroundColor: "#0b1226" }} />;

@@ -49,8 +49,7 @@ export default function App() {
     // autozapis w wolnej chwili (bez przycięć przy klikaniu)
     czasZapisu.current = setTimeout(() => {
       if (!stan) return;
-      const ric = (window as any).requestIdleCallback as ((f: () => void, o?: { timeout: number }) => number) | undefined;
-      if (Platform.OS === "web" && ric) ric(() => zapisz(stan), { timeout: 3000 }); else zapisz(stan);
+      zapisz(stan); // zwykły zapis po 1,5 s spokoju (requestIdleCallback na iPhonie bywa martwy)
     }, 1500);
   }, [stan]);
 
