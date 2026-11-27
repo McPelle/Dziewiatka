@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert, Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
 import { latDoKonca, oknoOtwarte, przedluzKontrakt, wykupKlauzula, wypozyczNaZewnatrz, zakonczWypozyczenieTeraz, zwolnijZawodnika } from "../engine/sezon";
-import { dataKontraktu, NAZWA_KONTRAKTU } from "../engine/swiat";
+import { dataKontraktu, dataUrodzenia, NAZWA_KONTRAKTU } from "../engine/swiat";
 import type { Cecha, StanGry, Zawodnik } from "../engine/types";
 import { ETYKIETA_ATRYB, kluczoweAtryby, SKILL } from "../engine/atrybuty";
 import {
@@ -123,7 +123,10 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
                 <View style={{ flex: 1 }}>
                   <Text style={st.tytul}>#{z.numer || "—"} {z.imie} {z.nazwisko}</Text>
                   <Text style={[st.maly, { marginTop: 2 }]}>
-                    <Text style={{ color: KOLOR_POZ[z.poz], fontWeight: "700" }}>{etykietaPoz(z.poz, z.pozS)}</Text>{z.pozycjeDodatkowe?.length ? <Text style={{ color: K.niebieski }}> (też: {z.pozycjeDodatkowe.map((p) => SKROT_POZ[p]).join(", ")})</Text> : null} · {z.wiek} lat · {narodowoscKraju(z.kraj)?.flaga ?? "🇵🇱"} {z.kraj ?? "Polska"}{z.kraj && !narodowoscKraju(z.kraj)?.ue ? " (spoza UE)" : ""} · noga {NOGA_NAZWA[z.noga]}
+                    <Text style={{ color: KOLOR_POZ[z.poz], fontWeight: "700" }}>{etykietaPoz(z.poz, z.pozS)}</Text>{z.pozycjeDodatkowe?.length ? <Text style={{ color: K.niebieski }}> (też: {z.pozycjeDodatkowe.map((p) => SKROT_POZ[p]).join(", ")})</Text> : null} · {narodowoscKraju(z.kraj)?.flaga ?? "🇵🇱"} {z.kraj ?? "Polska"}{z.kraj && !narodowoscKraju(z.kraj)?.ue ? " (spoza UE)" : ""} · noga {NOGA_NAZWA[z.noga]}
+                  </Text>
+                  <Text style={[st.maly, { marginTop: 2 }]}>
+                    🎂 ur. <Text style={{ fontWeight: "700", color: K.tekst }}>{dataUrodzenia(z, s.sezon)}</Text> ({z.wiek} {z.wiek % 10 >= 2 && z.wiek % 10 <= 4 && (z.wiek % 100 < 12 || z.wiek % 100 > 14) ? "lata" : "lat"}){z.wzrost ? ` · ${z.wzrost} cm` : ""}{z.realny && z.wartoscReal ? ` · realna wycena (start gry): ${z.wartoscReal >= 1e6 ? (z.wartoscReal / 1e6).toLocaleString("pl-PL") + " mln €" : Math.round(z.wartoscReal / 1e3) + " tys. €"}` : ""}
                   </Text>
                   <View style={[st.wiersz, { marginTop: 8, gap: 4, alignItems: "flex-end" }]}>
                     <Text style={{ color: K.akcent, fontSize: 26, fontWeight: "900" }}>{Math.floor(z.umiej)}</Text>

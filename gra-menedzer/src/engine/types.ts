@@ -67,6 +67,10 @@ export interface Zawodnik {
   cechy?: Cecha[]; // cechy specjalne (snajper, egzekutor, lider…)
   atrybuty?: Atrybuty; // oceny składowe (overall = ich ważone złożenie wg pozycji)
   wiek: number;
+  realny?: boolean; // prawdziwy zawodnik (Ekstraklasa → II liga) — oryginalne dane osobowe i numer
+  dataUr?: string; // prawdziwa data urodzenia „DD.MM.RRRR" (zawodnicy Ekstraklasa → II liga; źródło: Transfermarkt)
+  wzrost?: number; // wzrost w cm (prawdziwy, gdy znany)
+  wartoscReal?: number; // realna wartość rynkowa w EUR w chwili startu gry (Transfermarkt) — tylko informacyjnie
   umiej: number; // OVERALL 1–100 — liczony z atrybutów (ułamki = postęp treningu)
   potencjal: number;
   kondycja: number; // 0–100

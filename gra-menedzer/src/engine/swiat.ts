@@ -9,13 +9,47 @@ import { losujAgentaReal } from "../data/agenci";
 import { IMIONA, MIANA, MIEJSCOWOSCI, NAZWISKA, NAZWISKA_KASZUBSKIE, NAZWISKA_GORALSKIE, PRZEDROSTKI } from "../data/nazwy";
 import ROSTERY_JSON from "../../assets/rostery.json";
 import ROSTERY_POZ_JSON from "../../assets/rostery-poz.json";
+import ROSTERY_PELNE_JSON from "../../assets/rostery-pelne.json";
 
 const ROSTERY = ROSTERY_JSON as unknown as Record<string, [string, string][]>;
 // Realne składy z pozycjami (herb → [imię, nazwisko, kategoria BR/OBR/POM/NAP]); źródło: Wikipedia.
 const ROSTERY_POZ = ROSTERY_POZ_JSON as unknown as Record<string, [string, string, Pozycja][]>;
+/** Pełne realne kadry Ekstraklasa → II liga (sezon 2026/27, źródło: Transfermarkt), klucz = nazwa klubu w grze.
+ *  Wiersz: [imię, nazwisko, pozycja szczegółowa, data ur. DD.MM.RRRR, numer, kraj ("" = Polska), noga, kontrakt do (sezon, 0 = brak),
+ *  wartość rynkowa EUR (0 = brak), wzrost cm (0 = brak)]. */
+type WierszKadry = [string, string, PozycjaSzczegolowa, string, number, string, "" | "prawa" | "lewa" | "obie", number, number, number];
+export const ROSTERY_PELNE = ROSTERY_PELNE_JSON as unknown as Record<string, WierszKadry[]>;
+/** Wiek w dniu startu sezonu (1 lipca) na podstawie daty urodzenia „DD.MM.RRRR". */
+/** Data urodzenia do pokazania w profilu: prawdziwa (jeśli znana) albo wygenerowana — stała dla zawodnika
+ *  (dzień i miesiąc z jego id) i zgodna z wiekiem; rok nie zmienia się, bo wiek i sezon rosną razem. */
+export function dataUrodzenia(z: { id: string; wiek: number; dataUr?: string }, sezon: number): string {
+  if (z.dataUr) return z.dataUr;
+  let h = 0;
+  for (let i = 0; i < z.id.length; i++) h = (h * 31 + z.id.charCodeAt(i)) >>> 0;
+  const m = (h % 12) + 1;
+  const d = ((h >>> 5) % [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1]) + 1;
+  const r = sezon - z.wiek - (m > 7 || (m === 7 && d > 1) ? 1 : 0);
+  return `${String(d).padStart(2, "0")}.${String(m).padStart(2, "0")}.${r}`;
+}
+/** Percentyl (0..1) realnej wyceny wśród prawdziwych zawodników danego poziomu (1–3). */
+const _percentyle: Record<number, number[]> = {};
+function percentylWartosci(poziom: number, wart: number): number {
+  if (!_percentyle[poziom]) {
+    const nazwy = new Set((KLUBY_PRAWDZIWE[poziom] ?? []).map((k) => k.nazwa));
+    _percentyle[poziom] = Object.entries(ROSTERY_PELNE).filter(([n]) => nazwy.has(n)).flatMap(([, w]) => w.map((x) => x[8]).filter((v) => v > 0)).sort((a, b) => a - b);
+  }
+  const arr = _percentyle[poziom];
+  if (!arr.length) return 0.5;
+  let lo = 0; while (lo < arr.length && arr[lo] < wart) lo++;
+  return lo / arr.length;
+}
+export function wiekNaStartSezonu(dataUr: string, sezon: number): number {
+  const [d, m, r] = dataUr.split(".").map(Number);
+  return sezon - r - (m > 7 || (m === 7 && d > 1) ? 1 : 0);
+}
 import { los, losInt, szansa, tasuj, wybierz, wybierzWazone } from "./losuj";
 import { generujAtrybuty, overall, rozwinAtrybuty } from "./atrybuty";
-import { POZ_WAGI } from "../data/pozycje";
+import { KAT_POZ, POZ_WAGI } from "../data/pozycje";
 import { losujNarodowosc } from "../data/narodowosci";
 import type { Cecha, Klub, KontraktTyp, Liga, Pozycja, PozycjaSzczegolowa, StanGry, WpisKariery, Zawodnik } from "./types";
 
@@ -288,10 +322,17 @@ export function przejscieDoKlubu(s: StanGry, z: Zawodnik, klubNazwa: string) {
 /** Nadaje numery na koszulki całej kadrze klubu (bramkarze 1/12/22, reszta 2–33). */
 export function nadajNumery(s: StanGry, klub: Klub) {
   const uzyte = new Set<number>(klub.numeryZastrzezone ?? []); // numery zastrzeżone po legendach pomijamy
+  // Oryginalne numery realnych zawodników (z danymi urodzenia) zostają — rezerwujemy je najpierw.
+  const zachowaj = new Set<string>();
+  for (const id of klub.zawodnicy) {
+    const z = s.zawodnicy[id];
+    if (z.realny && z.numer > 0 && !uzyte.has(z.numer)) { uzyte.add(z.numer); zachowaj.add(id); }
+  }
   const wolny = (od: number) => { let n = od; while (uzyte.has(n)) n++; uzyte.add(n); return n; };
   const brNumery = [1, 12, 22, 30];
   let bi = 0;
   for (const id of klub.zawodnicy) {
+    if (zachowaj.has(id)) continue;
     const z = s.zawodnicy[id];
     z.numer = z.poz === "BR" ? wolny(brNumery[bi++] ?? 30) : wolny(2);
   }
@@ -470,8 +511,51 @@ export function nowaGra(trener: string, sciezka: Sciezka = SCIEZKA_DOMYSLNA): St
         z.kariera = generujKariere(s, z, klub.nazwa);
         klub.zawodnicy.push(z.id);
       };
+      const pelny = (poziom <= 3 && ROSTERY_PELNE[klub.nazwa]) || null;
       const rosterP = (poziom <= 3 && klub.herb && ROSTERY_POZ[klub.herb]) || null;
-      if (rosterP && rosterP.length >= 11) {
+      if (pelny && pelny.length >= 11) {
+        // PEŁNY REALNY SKŁAD: imię, nazwisko, konkretna pozycja, data urodzenia (→ wiek), oryginalny numer,
+        // narodowość, lepsza noga, wzrost, koniec kontraktu. Siła zależy od realnej wartości rynkowej względem ligi.
+        const wartosci = pelny.map((w) => w[8]).filter((v) => v > 0).sort((a, b) => a - b);
+        const mediana = wartosci.length ? wartosci[Math.floor(wartosci.length / 2)] : 0;
+        for (const [imie, nazw, pozS, dataUr, numer, kraj, noga, kDo, wart, wzrost] of pelny) {
+          const kat = KAT_POZ[pozS];
+          const wiek = dataUr ? wiekNaStartSezonu(dataUr, s.sezon) : undefined;
+          const z = nowyZawodnik(s, poziom, kat, { wiek: wiek !== undefined ? Math.max(15, wiek) : undefined });
+          z.pozS = pozS;
+          z.realny = true;
+          z.imie = imie;
+          z.nazwisko = nazw;
+          if (dataUr) z.dataUr = dataUr;
+          if (kraj) z.kraj = kraj; else delete z.kraj;
+          if (noga) z.noga = noga;
+          if (wzrost) z.wzrost = wzrost;
+          if (wart) z.wartoscReal = wart;
+          if (numer > 0) z.numer = numer;
+          if (kDo >= s.sezon) z.kontraktDo = kDo;
+          // OVR wg realnej wyceny: percentyl wartości wśród wszystkich prawdziwych zawodników tej ligi
+          // (gwiazdy ligi u góry, rezerwowi i juniorzy bez wyceny u dołu) + lekki wpływ renomy klubu + mały szum.
+          const [ua, ub] = zakresUmiej(poziom);
+          const p = wart > 0 ? percentylWartosci(poziom, wart) : Math.max(0, 0.12 - (z.wiek <= 19 ? 0.08 : 0));
+          let cel = ua - 3 + (ub - ua + 6) * p + premia * 0.4 + los(-1.5, 1.5);
+          // Wycena młodych to w dużej mierze potencjał — obecny OVR niższy, zapas idzie w potencjał.
+          const mlodyMinus = z.wiek <= 21 ? (22 - z.wiek) * 1.6 : 0;
+          cel -= mlodyMinus;
+          z.potencjal = Math.min(93, Math.max(cel + (z.wiek <= 21 ? mlodyMinus + los(1, 6) : z.wiek <= 25 ? los(0, 4) : 0), cel));
+          const d = cel - z.umiej;
+          rozwinAtrybuty(z, d);
+          z.potencjal = Math.max(z.potencjal, z.umiej);
+          z.pensja = pensjaDla(z.umiej, poziom);
+          if (z.klauzula) z.klauzula = Math.max(10000, Math.round((wartosc(z) * los(1.5, 2.8)) / 1000) * 1000);
+          z.klubId = klub.id;
+          z.kariera = generujKariere(s, z, klub.nazwa);
+          klub.zawodnicy.push(z.id);
+        }
+        const ileP = (p: Pozycja) => klub.zawodnicy.filter((id) => s.zawodnicy[id].poz === p).length;
+        for (const [p, minN] of [["BR", 2], ["OBR", 5], ["POM", 5], ["NAP", 2]] as [Pozycja, number][]) {
+          while (ileP(p) < minN) dodajZaw(p);
+        }
+      } else if (rosterP && rosterP.length >= 11) {
         // Realny skład z prawdziwymi pozycjami (kategoria z danych, pozycja szczegółowa dobrana w jej obrębie).
         for (const [imie, nazw, poz] of rosterP) dodajZaw(poz, imie, nazw);
         // Dopełnij brakujące kategorie do minimum rozgrywkowego (gdyby źródło miało wąski skład).

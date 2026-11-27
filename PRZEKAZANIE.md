@@ -10,8 +10,8 @@ Gra **wyłącznie po polsku**. Silnik w czystym TypeScript (`src/engine/`), inte
 Działa jako jeden plik `index.html` (cała gra + herby + ikona w środku) — otwiera się w przeglądarce bez instalacji.
 
 ## Gdzie co żyje
-- **Kod źródłowy (warsztat do poprawek):** repo GitHub `TheKacperos4/system-sprzedawcy`, folder `gra-menedzer/`,
-  gałąź **`claude/relaxed-archimedes-89sen1`** (na tę gałąź commitujemy).
+- **Kod źródłowy (warsztat do poprawek):** repo GitHub `McPelle/Dziewiatka`, folder `gra-menedzer/`,
+  gałąź **`claude/zrodla-gry`** (na tę gałąź commitujemy).
 - **Gra do grania (gotowiec):** `index.html` — jeden samowystarczalny plik (buduje go `scripts/build-html.mjs`).
 - **Hosting publiczny:** Netlify `tubular-torrone-fda949.netlify.app` (aktualizacja: Netlify → + → „Upload a new version" → wybierz nowy `index.html`; ten sam adres, za darmo).
 - **Podgląd prywatny:** Artifact Claude `https://claude.ai/artifact/6N8xYFx3618RTpYqoagVU4` (ostatnio Wersja 12) — przypięty do starego konta; na nowym koncie nieistotny, bo gra jest w repo + pliku.
@@ -33,7 +33,7 @@ Ikona aplikacji: `assets/ikona/` (źródło SVG + PNG 180/512/1024). `build-html
 - **Tylko język polski** w całej grze.
 - **Nie ruszać** strony/rzeczy RB Home / `rbhome.pl` ani reszty systemu sprzedawcy — pracujemy wyłącznie w `gra-menedzer/`.
 - Nie zmyślać realnych danych — jeśli brak źródła, zostaje generowane (oznaczyć).
-- Commity na gałąź `claude/relaxed-archimedes-89sen1`. Nie commitować `node_modules`, `dist`, `*.db`, `.env`.
+- Commity na gałąź `claude/zrodla-gry`. Nie commitować `node_modules`, `dist`, `*.db`, `.env`.
 - Stopka commitów: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>` + `Claude-Session: ...`.
 
 ## CO JUŻ ZROBIONE (najważniejsze z ostatnich sesji)
@@ -53,37 +53,25 @@ Ikona aplikacji: `assets/ikona/` (źródło SVG + PNG 180/512/1024). `build-html
   (PanResponder na webie miał zawodne współrzędne); przycisk „‹ Wstecz" + „⬇ Na ławkę".
 - **Ikona aplikacji** „9" (złota na murawie) — `assets/ikona/`.
 
-## CO JEST W TOKU (tu stanęliśmy — następny krok)
-**Realne nazwiska + konkretne pozycje + aktualny wiek dla wszystkich klubów II liga → Ekstraklasa (poziom 1–3).**
-Stan:
-- Większość klubów poziomu 1–3 ma już realne **nazwiska** w `assets/rostery.json`, ALE **~70 klubów NIE MA** (stąd zmyślone nazwiska).
-  Brakuje m.in.: **Legia Warszawa (herb 305), Lechia Gdańsk (313), Pogoń Szczecin (317), Ruch Chorzów (304), Piast Gliwice (310),
-  Zagłębie Lubin (314), Stal Mielec (301), Warta Poznań (332), ŁKS Łódź (3948), Arka Gdynia (329), Miedź Legnica (327)** i inne.
-- **Pozycje** realne są tylko dla 7 klubów w `assets/rostery-poz.json`. **Wiek** realny — jeszcze nigdzie (teraz generowany).
-- Jak policzyć listę braków:
-  ```
-  cd gra-menedzer && python3 -c "
-  import json,re
-  rost=set(json.load(open('assets/rostery.json')).keys())
-  src=open('src/data/malopolska.ts').read()   # ligi krajowe 1-3 są tu zdefiniowane
-  pairs=re.findall(r'nazwa:\s*\"([^\"]+)\"[^}]*?herb:\s*\"([^\"]+)\"', src)
-  for n,h in pairs:
-      if h not in rost: print(h, n)"
-  ```
+## ZROBIONE 27.11.2026 — PRAWDZIWE SKŁADY Ekstraklasa → II liga
+- **Nowe repo:** GitHub `McPelle/Dziewiatka`, gałąź robocza **`claude/zrodla-gry`** (kod w `gra-menedzer/`, gotowa gra `index.html` w katalogu głównym).
+  Stare repo `TheKacperos4/system-sprzedawcy` jest już nieaktualne.
+- **Wszystkie 54 kluby poziomu 1–3, 1595 prawdziwych zawodników** (sezon 2026/27, źródło: Transfermarkt `/kader/.../plus/1`):
+  imię i nazwisko, **konkretna pozycja** (BR/SO/LO/PO/DP/SP/OP/LP/PP/LS/PS/NAP/DN), **pełna data urodzenia** (→ wiek),
+  **oryginalny numer**, narodowość (80 krajów z flagami i statusem UE), lepsza noga, wzrost, koniec kontraktu.
+  Plik: `assets/rostery-pelne.json` (klucz = nazwa klubu w grze). Ma pierwszeństwo przed `rostery.json`/`rostery-poz.json`.
+- 4 daty brakujące na Transfermarkcie uzupełnione z regiowyniki.pl. **Brak daty w żadnym źródle:** Patryk Pieślak (Świt Szczecin),
+  Witold Wałęga (Sandecja) — mają wiek juniora i wygenerowaną datę.
+- Numery: rezerwy (Legia II, Śląsk II) nie mają numerów u źródła (~30 zawodników w całej lidze) → gra nadaje wolne numery.
+- **Siła (OVR)** realnych zawodników = percentyl ich realnej wyceny w lidze + renoma klubu (młodzi: niższy OVR, wyższy potencjał).
+  Balans sprawdzony: 3,95 gola/mecz.
+- **Profil zawodnika:** linia „🎂 ur. DD.MM.RRRR (wiek) · wzrost · realna wycena”. **III liga → klasa B (zawodnicy generowani):**
+  data urodzenia generowana, stała i zgodna z wiekiem (`dataUrodzenia()` w `swiat.ts`).
+- Odświeżenie danych w przyszłości: pobrać strony kadr TM → `scripts/dane/kadry-tm-parsuj.py <katalog> parsed.json` →
+  `scripts/dane/kadry-tm-zbuduj.py parsed.json <lista id|slug|nazwa> assets/rostery-pelne.json`. Test: `npx tsx scripts/test-realne-sklady.ts`.
 
-### Źródło danych i mechanika
-- `herb` w danych klubów (np. `src/data/malopolska.ts`) = **ID flagi na regiowyniki.pl** (`/static/flags/<id>.jpg`).
-- `assets/rostery.json` = `{ "<idHerbu>": [["Imię","Nazwisko"], ...] }`. Klucz = herb.
-- `assets/rostery-poz.json` = `{ "<idHerbu|nazwaHerbu>": [["Imię","Nazwisko","POZ"], ...] }` (POZ = BR/OBR/POM/NAP).
-- Silnik (`src/engine/swiat.ts`, ~linia 484): dla `poziom<=3` jeśli jest `ROSTERY_POZ[klub.herb]` → buduje z realnych pozycji;
-  w przeciwnym razie `ROSTERY[klub.herb]` → realne nazwiska na szablonie `KADRA`. **Wiek trzeba będzie dołożyć** do danych i użyć w `nowyZawodnik`.
-- **Źródło na żywo:** regiowyniki.pl, strona kadry klubu:
-  `https://regiowyniki.pl/druzyna/Pilka_Nozna/<Województwo>/<Nazwa_Klubu>/<liga>/kadra/`
-  Tabela `id="playerstable"`: pierwsza kolumna „Nazwisko Imię", druga kolumna **data urodzenia** `RRRR/MM/DD` (→ wiek).
-  **DO USTALENIA:** która kolumna trzyma pozycję (sprawdzone: Legia odpowiada 200, tabela się czyta; trzeba dojrzeć kolumnę pozycji — ostatni test to pokazywał).
-  regiowyniki jest osiągalne z tego środowiska (HTTP 200). Scraper bazowy: `scripts/dane/rostery.py` (czyta zapisane strony grup z `REGIO_CACHE`, pobiera `/kadra/`).
-- **Plan dokończenia:** dla ~54 klubów poziomu 1–3 pobrać `/kadra/` z regiowyniki → wyciągnąć nazwisko + pozycję + datę urodzenia →
-  zapisać wzbogacony `rostery-poz.json` z wiekiem (np. `[[imie, nazwisko, poz, rokUrodzenia]]`) → podpiąć w `swiat.ts` (nazwisko+pozycja+wiek dla poziom≤3) → build → wysłać nowy `index.html`.
+## CO JEST W TOKU
+Nic otwartego — użytkownik ma listę kolejnych poprawek, zapytać o nie.
 
 ## Następne drobne pomysły (po realnych składach)
 - Dodać realny wiek także tam, gdzie są same nazwiska (ROSTERY) — jeśli regiowyniki poda datę urodzenia.
