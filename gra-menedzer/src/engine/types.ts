@@ -401,7 +401,7 @@ export interface StanGry {
   trudnosc?: string; // poziom trudności: latwy | normalny | trudny | legendarny
   osiagniecia?: Record<string, number>; // id osiągnięcia → sezon odblokowania
   osiagnieciaFlagi?: { trening?: boolean; mowa?: boolean; [k: string]: boolean | undefined };
-  barazeGracza?: { sezon: number; kontekst: "awans" | "utrzymanie"; nazwa: string; mecze: { runda: string; dom: string; gosc: string; wynik?: string; zwyc?: string }[] }; // Twoje baraże (mecze do rozegrania na żywo)
+  barazeGracza?: { sezon: number; kontekst: "awans" | "utrzymanie"; nazwa: string; dogrywka?: boolean; mecze: { runda: string; dom: string; gosc: string; wynik?: string; zwyc?: string }[] }; // Twoje baraże (mecze do rozegrania na żywo)
   dziennik?: import("./dziennik").DziennikKariery; // dziennik kariery trenera (kluczowe momenty)
   muzeum?: Record<string, import("./muzeum").MuzeumKlubu>; // muzeum klubów (legendy, zastrzeżone numery)
   zdjeciaDruzyny?: import("./zdjeciaDruzyny").ZdjecieDruzyny[]; // zdjęcia drużyny (jedno na sezon i klub)

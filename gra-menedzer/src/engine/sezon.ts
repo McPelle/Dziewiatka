@@ -686,11 +686,18 @@ function regulyBarazy(poziomGorny: number, n: number): { b: number; rb: number }
 /** Jeden mecz barażowy wg PZPN: na boisku WYŻEJ sklasyfikowanego (przewaga własnego boiska).
  * Remis → dogrywka, dalej remis → rzuty karne (lekko po stronie gospodarza). Zwraca zwycięzcę (awansuje/zostaje). */
 let ostatniBaraz = ""; // tekst wyniku ostatniego meczu barażowego (do komunikatu)
-function meczBarazowy(s: StanGry, wyzej: string, nizej: string): string {
+/** Czy w barażu przy remisie gra się dogrywkę (regulaminy 2026/27): baraże PZPN (o I, II, III ligę) i K-PZPN — dogrywka
+ *  i karne; Pomorski, Zachodniopomorski i Małopolski ZPN (o IV/V ligę) — przy remisie od razu rzuty karne. */
+export function dogrywkaWBarazu(s: StanGry, poziomGorny: number): boolean {
+  if (poziomGorny <= 4) return true;
+  const sc = s.sciezka ?? "";
+  return /^Kujawsko/.test(sc);
+}
+function meczBarazowy(s: StanGry, wyzej: string, nizej: string, poziomGorny = 1): string {
   // mecz rozegrany wcześniej przez gracza (na żywo albo symulowany z ekranu baraży) — liczy się jego wynik
   const z = s.barazeGracza?.mecze.find((m) => m.dom === wyzej && m.gosc === nizej && m.zwyc);
   if (z) { ostatniBaraz = z.wynik ?? ""; return z.zwyc!; }
-  const r = rozstrzygnij(silaKlubu(s, wyzej), silaKlubu(s, nizej), { dogrywka: true }); // 90' → dogrywka → karne (PZPN)
+  const r = rozstrzygnij(silaKlubu(s, wyzej), silaKlubu(s, nizej), { dogrywka: dogrywkaWBarazu(s, poziomGorny) }); // 90' → (dogrywka) → karne
   ostatniBaraz = r.tekst;
   return r.zwyciezca === "dom" ? wyzej : nizej;
 }
@@ -705,7 +712,7 @@ function baraz(s: StanGry, klubIds: string[], ileZostaje: number, kontekst: "awa
     const next: string[] = [];
     for (let i = 0; i < polowa; i++) {
       const wyzej = pula[i], nizej = pula[pula.length - 1 - i]; // rozstawienie: lepszy ↔ gorszy
-      const zwyc = meczBarazowy(s, wyzej, nizej);
+      const zwyc = meczBarazowy(s, wyzej, nizej, kontekst === "awans" ? s.kluby[wyzej].poziom - 1 : s.kluby[wyzej].poziom);
       if (s.mojKlub === wyzej || s.mojKlub === nizej) {
         const rywal = s.mojKlub === wyzej ? nizej : wyzej;
         const uSiebie = s.mojKlub === wyzej;
@@ -3594,13 +3601,13 @@ export function przygotujBarazeGracza(s: StanGry) {
   const mecze: NonNullable<StanGry["barazeGracza"]>["mecze"] = [];
   const polowa = Math.floor(pula.length / 2);
   for (let i = 0; i < polowa; i++) mecze.push({ runda: pula.length > 2 ? "Półfinał baraży" : "Finał baraży", dom: pula[i], gosc: pula[pula.length - 1 - i] });
-  s.barazeGracza = { sezon: s.sezon, kontekst, nazwa, mecze };
+  s.barazeGracza = { sezon: s.sezon, kontekst, nazwa, mecze, dogrywka: dogrywkaWBarazu(s, kontekst === "awans" ? p - 1 : p) };
   for (const m of mecze) if (m.dom !== s.mojKlub && m.gosc !== s.mojKlub) rozegrajBarazAI(s, m);
   const moj = mecze.find((m) => m.dom === s.mojKlub || m.gosc === s.mojKlub)!;
-  wiadomosc(s, `⚔️ ${nazwa}! ${moj.runda}: ${s.kluby[moj.dom].nazwa} — ${s.kluby[moj.gosc].nazwa} (${moj.dom === s.mojKlub ? "u siebie" : "na wyjeździe"}). Jeden mecz, przy remisie dogrywka i rzuty karne. Zagraj na żywo z pulpitu albo zasymuluj.`);
+  wiadomosc(s, `⚔️ ${nazwa}! ${moj.runda}: ${s.kluby[moj.dom].nazwa} — ${s.kluby[moj.gosc].nazwa} (${moj.dom === s.mojKlub ? "u siebie" : "na wyjeździe"}). Jeden mecz, przy remisie ${s.barazeGracza.dogrywka ? "dogrywka i rzuty karne" : "od razu rzuty karne (regulamin ZPN)"}. Zagraj na żywo z pulpitu albo zasymuluj.`);
 }
 function rozegrajBarazAI(s: StanGry, m: { dom: string; gosc: string; wynik?: string; zwyc?: string }) {
-  const r = rozstrzygnij(silaKlubu(s, m.dom), silaKlubu(s, m.gosc), { dogrywka: true });
+  const r = rozstrzygnij(silaKlubu(s, m.dom), silaKlubu(s, m.gosc), { dogrywka: s.barazeGracza?.dogrywka ?? true });
   m.wynik = r.tekst; m.zwyc = r.zwyciezca === "dom" ? m.dom : m.gosc;
 }
 /** Najbliższy Twój mecz barażowy do rozegrania. */
@@ -3630,6 +3637,6 @@ export function zapiszBaraz(s: StanGry, gd: number, gg: number, dogrywka: boolea
 /** Symulacja Twojego meczu barażowego (90' → dogrywka → karne). */
 export function symulujBarazGracza(s: StanGry) {
   const m = barazDoRozegrania(s); if (!m) return;
-  const r = rozstrzygnij(silaKlubu(s, m.dom), silaKlubu(s, m.gosc), { dogrywka: true });
+  const r = rozstrzygnij(silaKlubu(s, m.dom), silaKlubu(s, m.gosc), { dogrywka: s.barazeGracza?.dogrywka ?? true });
   zapiszBaraz(s, r.gd, r.gg, r.dogrywka, r.karne);
 }
