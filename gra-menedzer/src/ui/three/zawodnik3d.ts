@@ -17,7 +17,7 @@ function teksturaNumeru(nr: number, kolor: string, tlo: string, nazwisko?: strin
 }
 const kontrast = (hex: string) => { const c = new THREE.Color(hex); return c.r * 0.3 + c.g * 0.59 + c.b * 0.11 > 0.55 ? "#111111" : "#ffffff"; };
 
-export function stworzPostac(o: { skora?: string; wlosy?: string; lysy?: boolean; twarz?: boolean; koszulka: string; dodatek?: string; spodenki: string; getry: string; nr: number; nazwisko?: string; seed: number; sedzia?: boolean; wzor?: "pasy" | "rekaw" | "jednolity" }): Postac {
+export function stworzPostac(o: { skora?: string; wlosy?: string; lysy?: boolean; styl?: number; zarost?: boolean; siwy?: boolean; twarz?: boolean; koszulka: string; dodatek?: string; spodenki: string; getry: string; nr: number; nazwisko?: string; seed: number; sedzia?: boolean; wzor?: "pasy" | "rekaw" | "jednolity" }): Postac {
   const g = new THREE.Group();
   const skora = new THREE.MeshStandardMaterial({ color: o.skora ?? SKORA[o.seed % 3], roughness: 0.7 });
   const kosz = new THREE.MeshStandardMaterial({ color: o.koszulka, roughness: 0.75 });
@@ -34,8 +34,15 @@ export function stworzPostac(o: { skora?: string; wlosy?: string; lysy?: boolean
   { const kol = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.018, 6, 14), dod); kol.rotation.x = Math.PI / 2; kol.position.y = 0.68; tulow.add(kol); } // kołnierzyk w kolorze dodatku
   const szyja = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.1), skora); szyja.position.y = 0.72; tulow.add(szyja);
   const glowa = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 12), skora); glowa.position.y = 0.88; glowa.scale.set(0.95, 1.08, 1); glowa.castShadow = true; tulow.add(glowa);
-  const wl = new THREE.Mesh(new THREE.SphereGeometry(0.137, 14, 10, 0, Math.PI * 2, 0, Math.PI * (0.3 + (o.seed % 4) * 0.06)), new THREE.MeshStandardMaterial({ color: o.wlosy ?? WLOSY[(o.seed >> 2) % WLOSY.length], roughness: 0.9 }));
+  // fryzura wg stylu (0 krótkie, 1 bardzo krótkie, 2 dłuższe z przedziałkiem, 3 łysy, 4 kręcone), siwienie z wiekiem, zarost
+  const kolW = o.siwy ? "#a7a7a2" : o.wlosy ?? WLOSY[(o.seed >> 2) % WLOSY.length];
+  const matW = new THREE.MeshStandardMaterial({ color: kolW, roughness: 0.9 });
+  const zasieg = o.styl === 1 ? 0.34 : o.styl === 2 ? 0.5 : o.styl === 4 ? 0.42 : 0.3 + (o.seed % 4) * 0.06;
+  const wl = new THREE.Mesh(new THREE.SphereGeometry(o.styl === 4 ? 0.15 : o.styl === 1 ? 0.133 : 0.137, 14, 10, 0, Math.PI * 2, 0, Math.PI * zasieg), matW);
   wl.visible = !o.lysy; wl.position.y = 0.9; wl.rotation.x = -0.25; tulow.add(wl);
+  if (o.styl === 4 && !o.lysy) for (let i = 0; i < 7; i++) { const k = new THREE.Mesh(new THREE.SphereGeometry(0.045, 6, 5), matW); const a = (i / 7) * Math.PI * 2; k.position.set(Math.cos(a) * 0.1, 0.97 + (i % 2) * 0.03, Math.sin(a) * 0.1 - 0.02); tulow.add(k); }
+  if (o.styl === 2 && !o.lysy) { const tyl = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.13, 10, 1, true, Math.PI * 0.6, Math.PI * 0.8), matW); tyl.position.set(0, 0.84, -0.02); tyl.rotation.y = Math.PI; tulow.add(tyl); }
+  if (o.zarost) { const br = new THREE.Mesh(new THREE.SphereGeometry(0.134, 12, 8, Math.PI * 0.15, Math.PI * 0.7, Math.PI * 0.64, Math.PI * 0.24), new THREE.MeshStandardMaterial({ color: kolW, roughness: 1 })); br.position.y = 0.88; br.scale.set(0.96, 1.08, 1.02); tulow.add(br); }
   // twarz z mimiką (zbliżenia: rozmowy, konferencje, szatnia)
   let twarz: Twarz3D | undefined;
   if (o.twarz) {
@@ -123,8 +130,10 @@ export function minka(p: Postac, emocja: number, t: number, mowi = false) {
 import { domyslneCechy, SKORY, WLOSY as WLOSY_2D } from "../Twarz";
 import type { Zawodnik } from "../../engine/types";
 /** Kolor skóry i włosów 3D zgodny z portretem zawodnika w grze (karnacja wg kraju). */
-export function wyglad3D(z?: Zawodnik): { skora?: string; wlosy?: string; lysy?: boolean } {
+export function wyglad3D(z?: Zawodnik): { skora?: string; wlosy?: string; lysy?: boolean; styl?: number; zarost?: boolean; siwy?: boolean } {
   if (!z) return {};
   const c = z.twarz ?? domyslneCechy(z.imie + z.nazwisko, z.kraj);
-  return { skora: SKORY[c.skora % SKORY.length], wlosy: WLOSY_2D[c.wlosy % WLOSY_2D.length], lysy: c.stylWlosow === 3 };
+  let h = 0; for (const ch of z.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const lysy = c.stylWlosow === 3 || (z.wiek >= 33 && h % 5 === 0); // z wiekiem łysienie i siwizna
+  return { skora: SKORY[c.skora % SKORY.length], wlosy: WLOSY_2D[c.wlosy % WLOSY_2D.length], lysy, styl: c.stylWlosow, zarost: !!c.zarost || (z.wiek >= 28 && h % 4 === 1), siwy: z.wiek >= 34 && h % 3 === 0 };
 }
