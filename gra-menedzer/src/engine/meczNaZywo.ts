@@ -57,6 +57,7 @@ export interface MeczLive {
   okrzyk?: { typ: Okrzyk; do: number }; mowa?: Mowa; motMoj: number; var: boolean; poziom: number;
   dotkniecia: Record<string, number>; // ile razy był przy piłce (heatmapa / aktywność)
   cieplo?: { dom: number[]; gosc: number[] }; // heatmapa: siatka 12×8 (gdzie toczyła się gra każdej drużyny)
+  pewnosc?: Record<string, number>; // pamięć meczu: pewność siebie zawodników (−1..1)
   reakcjaAI?: number; // minuta, w której trener rywala zareaguje na Twoją zmianę taktyki
   skroty?: { min: string; tekst: string; sek: PunktAkcji[]; gol: boolean }[]; // najważniejsze akcje do skrótu meczu
   /** Mecz pucharowy: przy remisie dogrywka (2×15) albo od razu rzuty karne — wg regulaminu ZPN / PZPN. */
@@ -84,7 +85,17 @@ export interface MeczLive {
 
 const nz = (s: StanGry, id: string) => { const z = s.zawodnicy[id]; return z ? `${z.imie[0]}. ${z.nazwisko}` : "?"; };
 const nastAI = (s: StanGry, a: string, b: string): Nastawienie => { const d = s.kluby[a].renoma - s.kluby[b].renoma; return d > 0.25 ? "ofensywne" : d < -0.25 ? "obronne" : "zrownowazone"; };
-const at = (z: Zawodnik | undefined, k: keyof NonNullable<Zawodnik["atrybuty"]>) => z?.atrybuty?.[k] ?? z?.umiej ?? 40;
+// Pamięć meczu: pewność siebie zawodnika w tym meczu (−1..1) — po błędzie gra niepewnie, po golu bierze więcej na siebie.
+let PEW: Record<string, number> | null = null;
+const pew = (id?: string) => (id && PEW?.[id]) || 0;
+const at = (z: Zawodnik | undefined, k: keyof NonNullable<Zawodnik["atrybuty"]>) => (z?.atrybuty?.[k] ?? z?.umiej ?? 40) * (1 + 0.06 * pew(z?.id));
+function pamiec(m: MeczLive, id: string | undefined, d: number, s?: StanGry, minTxt?: string) {
+  if (!id) return; const p = (m.pewnosc ??= {}); const przed = p[id] ?? 0; p[id] = Math.max(-1, Math.min(1, przed + d));
+  if (s && minTxt && Math.random() < 0.5) {
+    if (przed > -0.5 && p[id] <= -0.5) m.komentarz.unshift({ min: minTxt, typ: "akcja", tekst: `😟 ${nz(s, id)} po tym błędzie wyraźnie gra niepewnie — unika piłki.` });
+    else if (przed < 0.55 && p[id] >= 0.55) m.komentarz.unshift({ min: minTxt, typ: "akcja", tekst: `😤 ${nz(s, id)} złapał wiatr w żagle — domaga się piłki przy każdej akcji.` });
+  }
+}
 
 /** Start meczu na żywo (nie zmienia stanu gry poza kondycją zawodników w trakcie — rozliczenie przy zapisie wyniku). */
 export function rozpocznijMeczNaZywo(s: StanGry, domId: string, goscId: string): MeczLive {
@@ -172,6 +183,7 @@ const wykonawca = (s: StanGry, z: ZespolLive, r: "karne" | "wolne" | "rozne") =>
 /** Jedna minuta meczu. Zwraca true, gdy padł gol. W `m.wazne` zostaje ważne zdarzenie (gol, czerwona, uraz, VAR…) do auto-pauzy. */
 export function krokMinuty(s: StanGry, m: MeczLive): boolean {
   if (m.koniec) return false;
+  PEW = (m.pewnosc ??= {});
   m.wazne = null;
   m.min++;
   const kon1 = 45 + m.dolicz[0], kon2 = 90 + m.dolicz[1];
@@ -248,6 +260,7 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
     sek.push({ x: X(86), y: los(40, 60), nosnik: nosnik(["NAP"]), zdarzenie: "faul" });
     m.komentarz.unshift({ min: minTxt, typ: "karny", strona, tekst: `❗ Faul w polu karnym — ${faulujacy ? nz(s, faulujacy.id) : "obrońca"} przewraca rywala. RZUT KARNY dla ${s.kluby[atak.klubId].nazwa}!` });
     if (faulujacy && szansa(0.35)) dajKartke(s, m, obr, faulujacy.id, minZap, minTxt, szansa(0.12) ? "czerwona" : "zolta", "faul w polu karnym");
+    pamiec(m, faulujacy?.id, -0.55, s, minTxt);
     if (wyk) {
       const pGol = Math.max(0.6, Math.min(0.9, 0.76 + (at(wyk, "str") - at(gk, "br")) / 300));
       m.staty.strz[i]++; m.staty.xg[i] += 0.76;
@@ -274,7 +287,7 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
     const r = Math.random(); let acc = 0, syt = SYTUACJE[0];
     for (const t of SYTUACJE) { acc += t[1] * (okr === "skrzydla" && mojeAtak && t[0] === "glowka" ? 1.6 : 1); if (r < acc) { syt = t; break; } }
     const [rodz, , xgB] = syt;
-    const st = wybierzZ(s, atak.naBoisku, (z) => ({ NAP: 5, POM: 2.2, OBR: rodz === "glowka" ? 2 : 0.6, BR: 0.02 })[z.poz] * (z.cechy?.includes("snajper") ? 1.6 : 1) * Math.max(5, rodz === "glowka" ? at(z, "fiz") : at(z, "str")));
+    const st = wybierzZ(s, atak.naBoisku, (z) => ({ NAP: 5, POM: 2.2, OBR: rodz === "glowka" ? 2 : 0.6, BR: 0.02 })[z.poz] * (z.cechy?.includes("snajper") ? 1.6 : 1) * (1 + 0.5 * pew(z.id)) * Math.max(5, rodz === "glowka" ? at(z, "fiz") : at(z, "str")));
     const gk = bramkarz(s, obr);
     const kandA = atak.naBoisku.filter((x) => x !== st?.id);
     const asystent = wybierzZ(s, kandA, (z) => ({ NAP: 3, POM: 4, OBR: rodz === "glowka" ? 2.5 : 1.2, BR: 0.05 })[z.poz] * Math.max(5, at(z, "pod")));
@@ -506,6 +519,8 @@ function zapiszGol(s: StanGry, m: MeczLive, z: ZespolLive, strona: "dom" | "gosc
   if (strona === "dom") m.gd++; else m.gg++;
   if (typ !== "samoboj") { ocena(m, sid, 1.1); ocena(m, asysta, 0.7); } else ocena(m, sid, -1);
   const obr = strona === "dom" ? m.gosc : m.dom;
+  if (typ === "samoboj") pamiec(m, sid, -0.8, s, minTxt); else { pamiec(m, sid, 0.6, s, minTxt); pamiec(m, asysta, 0.3); }
+  pamiec(m, bramkarz(s, obr)?.id, -0.25, s, minTxt);
   ocena(m, bramkarz(s, obr)?.id, -0.35);
   for (const id of obr.naBoisku) if (s.zawodnicy[id]?.poz === "OBR") ocena(m, id, -0.12);
   m.staty.strzaly.push({ x: m.pilka.x, y: m.pilka.y, strona, gol: true, xg: typ === "karny" ? 0.76 : 0.2 });
