@@ -1,3 +1,6 @@
+import { Gablota3D } from "./three/Trofea3D";
+import { grafika3D } from "./three/Stadion3DWidok";
+import { rekordyKlubu } from "../engine/zywySwiat";
 import { Alert, Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
 import { latTrenera, przedluzKontraktTrenera } from "../engine/sezon";
@@ -35,6 +38,15 @@ export function KarieraTrenera({ s, widoczny, onClose, odswiez }: { s: StanGry; 
       <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
         <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "92%", paddingBottom: 20 }}>
           <ScrollView contentContainerStyle={{ padding: 18 }}>
+            {Platform.OS === "web" && grafika3D() && <View style={{ marginBottom: 12 }}><Gablota3D historia={s.historia ?? []} /></View>}
+            {(() => { const r = rekordyKlubu(s); return r.mecze > 0 ? (
+              <View style={[st.karta, { marginHorizontal: 0, marginBottom: 10 }]}>
+                <Text style={st.naglowek}>🏅 Rekordy (Twoja kariera)</Text>
+                <Text style={st.maly}>Mecze: {r.mecze} · najdłuższa seria zwycięstw: {r.maxSeria} · bez porażki: {r.maxBez}</Text>
+                {r.najwyzszaWygrana && <Text style={st.maly}>Najwyższa wygrana: {r.najwyzszaWygrana.my}:{r.najwyzszaWygrana.oni} z {r.najwyzszaWygrana.rywal} ({r.najwyzszaWygrana.sezon})</Text>}
+                {r.najwyzszaPorazka && <Text style={st.maly}>Najwyższa porażka: {r.najwyzszaPorazka.my}:{r.najwyzszaPorazka.oni} z {r.najwyzszaPorazka.rywal} ({r.najwyzszaPorazka.sezon})</Text>}
+                {r.krol && <Text style={st.maly}>Najlepszy strzelec za Twojej kadencji: {r.krol[0]} — {r.krol[1]} goli</Text>}
+              </View>) : null; })()}
             <View style={[st.wiersz, { gap: 14 }]}>
               <Twarz seed={s.trener} rozmiar={54} zdjecie={s.trenerZdjecie} jersey="#2b2f45" />
               <View style={{ flex: 1 }}>

@@ -66,12 +66,28 @@ const html = `<!doctype html>
 </head>
 <body>
 <noscript>Włącz JavaScript, aby uruchomić grę.</noscript>
-<div id="start"><img src="./ikona-180.png" width="96" height="96" style="border-radius:22px" alt="" /><div style="margin-top:14px">DZIEWIĄTKA</div><div style="font-size:12px;color:#9fb3a6;margin-top:6px">Ładowanie gry…</div></div>
+<div id="start"><img src="./ikona-180.png" width="96" height="96" style="border-radius:22px" alt="" /><div style="margin-top:14px">DZIEWIĄTKA</div><div style="font-size:12px;color:#9fb3a6;margin-top:6px">Ładowanie gry…</div>
+  <div id="blad" style="display:none;margin:14px 22px 0;font:600 12px -apple-system,system-ui,sans-serif;color:#ff8a8a;text-align:center;word-break:break-word"></div>
+  <button id="napraw" style="display:none;margin-top:16px;background:#ffce47;color:#15300c;border:0;border-radius:12px;padding:12px 16px;font:800 14px -apple-system,system-ui,sans-serif">Napraw i uruchom ponownie</button>
+  <div id="naprawOpis" style="display:none;margin:8px 26px 0;font:500 11px -apple-system,system-ui,sans-serif;color:#9fb3a6;text-align:center">Pobiera grę od nowa. Twoje zapisy kariery zostają.</div>
+</div>
 <div id="root"></div>
 <div id="nowa-wersja"><button id="nw-ok">Uruchom ponownie</button>⚽ Nowa wersja gry jest gotowa. Zapisz grę i uruchom ponownie — albo włączy się sama przy następnym otwarciu.</div>
 <script>
   (function () {
     var start = document.getElementById("start");
+    // diagnostyka: błąd uruchomienia widoczny na ekranie ładowania + przycisk naprawy
+    function pokazBlad(t) { var b = document.getElementById("blad"); if (b && start.isConnected) { b.style.display = "block"; b.textContent = "Błąd: " + t; } pokazNaprawe(); }
+    function pokazNaprawe() { if (!start.isConnected) return; document.getElementById("napraw").style.display = "inline-block"; document.getElementById("naprawOpis").style.display = "block"; }
+    window.addEventListener("error", function (e) { pokazBlad((e && (e.message || (e.error && e.error.message))) || "nieznany"); });
+    window.addEventListener("unhandledrejection", function (e) { if (!document.getElementById("root").children.length) pokazBlad(String(e && e.reason && (e.reason.message || e.reason))); });
+    setTimeout(pokazNaprawe, 9000);
+    document.getElementById("napraw").onclick = function () {
+      var p = [];
+      if ("serviceWorker" in navigator) p.push(navigator.serviceWorker.getRegistrations().then(function (r) { return Promise.all(r.map(function (x) { return x.unregister(); })); }));
+      if (window.caches) p.push(caches.keys().then(function (k) { return Promise.all(k.map(function (x) { return caches.delete(x); })); }));
+      Promise.all(p).catch(function () {}).then(function () { location.reload(); });
+    };
     var obs = new MutationObserver(function () { if (document.getElementById("root").children.length) { start.remove(); obs.disconnect(); } });
     obs.observe(document.getElementById("root"), { childList: true });
     if (!("serviceWorker" in navigator)) return;
@@ -117,7 +133,11 @@ self.addEventListener("message", (e) => { if (e.data === "AKTUALIZUJ") self.skip
 self.addEventListener("fetch", (e) => {
   const r = e.request;
   if (r.method !== "GET" || new URL(r.url).origin !== location.origin) return;
-  if (r.mode === "navigate") { e.respondWith(caches.match("./index.html").then((c) => c || fetch(r))); return; }
+  if (r.mode === "navigate") {
+    const zSieci = new Promise((ok, nie) => { const t = setTimeout(nie, 3500); fetch(r).then((res) => { clearTimeout(t); res.ok ? ok(res) : nie(); }, nie); });
+    e.respondWith(zSieci.catch(() => caches.match("./index.html")).then((x) => x || caches.match("./")));
+    return;
+  }
   e.respondWith(caches.match(r).then((c) => c || fetch(r).then((res) => { const kopia = res.clone(); caches.open(WERSJA).then((ca) => ca.put(r, kopia)); return res; })));
 });
 `;

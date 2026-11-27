@@ -1,7 +1,9 @@
 import { CoDzisWazne } from "./ZywySwiat";
+import { Feta3D } from "./three/Trofea3D";
+import { grafika3D } from "./three/Stadion3DWidok";
 import { bilansZRywalem } from "../engine/zywySwiat";
 import { useState } from "react";
-import { Alert, Platform, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
 import { jestDerby, jestPrzyjazn } from "../engine/derby";
 import { bilansKolejki, ileKolejek, kosztObozu, latTrenera, mojaLiga, nowySezon, OBOZY, obozDostepny, premiaZaCel, przejmijKlub, przyjmijOferteTrenera, stylRywala, wolneKlubyDlaZwolnionego, wyslijNaOboz, zagrajKolejke } from "../engine/sezon";
@@ -25,6 +27,7 @@ import { K, st } from "./styl";
 const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Alert.alert("", t));
 
 export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => void; pokazMecz: () => void }) {
+  const [feta, setFeta] = useState<string | null>(null);
   const [widokKlub, setWidokKlub] = useState<string | null>(null);
   const [kariera, setKariera] = useState(false);
   const [scout, setScout] = useState<string | null>(null);
@@ -297,11 +300,20 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
       })()}
 
       {s.koniecSezonu ? (
-        <Pressable style={st.przycisk} onPress={() => { nowySezon(s); odswiez(); }}>
+        <Pressable style={st.przycisk} onPress={() => { nowySezon(s); const h = s.historia?.[s.historia.length - 1]; if (h && (h.wynik === "awans" || h.wynik === "mistrz" || h.puchar) && s.fetaSezon !== h.sezon) { s.fetaSezon = h.sezon; setFeta(h.wynik === "mistrz" ? "MISTRZOSTWO" : h.wynik === "awans" ? "AWANS" : h.puchar === "glowny" ? "PUCHAR POLSKI" : "PUCHAR ZPN"); } odswiez(); }}>
           <Text style={st.przyciskTekst}>Zakończ sezon — awanse i spadki ›</Text>
         </Pressable>
       ) : (
         <>
+          {feta && Platform.OS === "web" && grafika3D() && (
+            <Modal visible transparent animationType="fade" onRequestClose={() => setFeta(null)}>
+              <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.85)", justifyContent: "center", padding: 14 }}>
+                <Text style={{ color: K.akcent, fontSize: 30, fontWeight: "900", textAlign: "center", marginBottom: 8 }}>🏆 {feta}!</Text>
+                <Feta3D s={s} klub={s.kluby[s.mojKlub]} tytul={feta === "AWANS" ? "Awans" : feta === "MISTRZOSTWO" ? "Mistrzostwo" : feta === "PUCHAR POLSKI" ? "Puchar Polski" : "Puchar"} />
+                <Pressable style={st.przycisk} onPress={() => setFeta(null)}><Text style={st.przyciskTekst}>Świętujemy — dalej ›</Text></Pressable>
+              </View>
+            </Modal>
+          )}
           <PanelDnia s={s} odswiez={odswiez} pokazMecz={() => { if (rywalId) pokazMecz(); }} />
           <CoDzisWazne s={s} />
         </>
