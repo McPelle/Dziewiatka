@@ -98,7 +98,7 @@ function sila(s: StanGry, z: ZespolLive) {
 const tempoMn = (s: StanGry, id: string) => id !== s.mojKlub ? 1 : s.taktyka.tempo === "szybkie" ? 1.08 : s.taktyka.tempo === "wolne" ? 0.93 : 1;
 const pressMn = (s: StanGry, id: string) => id !== s.mojKlub ? 1 : s.taktyka.pressing === "wysoki" ? 1.05 : s.taktyka.pressing === "niski" ? 0.96 : 1;
 const okrz = (m: MeczLive) => (m.okrzyk && m.okrzyk.do >= m.min ? m.okrzyk.typ : undefined);
-const KALIBRACJA = 1.1; // dopasowanie średniej goli do zwykłej symulacji (~3,9 na mecz)
+const KALIBRACJA = 1.15; // dopasowanie średniej goli do zwykłej symulacji (~3,9 na mecz)
 
 /** Oczekiwane gole na minutę dla obu stron przy obecnych składach, taktyce, okrzykach i mowie z przerwy. */
 export function tempoGoli(s: StanGry, m: MeczLive): [number, number] {

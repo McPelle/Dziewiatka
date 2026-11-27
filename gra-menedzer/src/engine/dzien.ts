@@ -115,6 +115,8 @@ export function dalejDzien(s: StanGry): boolean {
   const d = dzisiaj(s);
   if (d.typ === "mecz") {
     zagrajKolejke(s);
+    // Mecz oglądany na żywo nie odbył się (walkower / przełożenie) — scenariusz przepada.
+    if (s.meczLive) { s.meczLive = undefined; s.wiadomosci.unshift({ sezon: s.sezon, kolejka: s.kolejka, tekst: "⚠ Mecz obejrzany na żywo nie został zaliczony — decyzja wydziału gier (walkower / przełożenie). Sprawdź wiadomości." }); }
     zapiszRaport(s, d, ["Mecz rozegrany — szczegóły w relacji i wiadomościach."]);
     s.dzien = 0; // nowy tydzień zaczyna się od poniedziałku (kolejna kolejka)
     return true;
