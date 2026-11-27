@@ -62,6 +62,7 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
           <Text style={st.tytul}>Centrum klubu</Text>
           <Text style={[st.maly, { marginTop: 3 }]}>{klub.nazwa} — wszystkie działy w jednym miejscu.</Text>
         </View>
+        {Platform.OS === "web" && <UstawieniaGrafiki />}
         <View style={{ flexDirection: "row", gap: 8, marginHorizontal: 12, marginTop: 10 }}>
           <Pressable
             onPress={async () => {
@@ -131,6 +132,26 @@ function PasekPowrotu({ tytul, ikona, onBack }: { tytul: string; ikona: string; 
         <Text style={{ color: K.tekst, fontSize: 13, fontWeight: "700", fontFamily: CZCIONKA }}>Wstecz</Text>
       </Pressable>
       <Text style={{ color: K.tekst, fontSize: 16, fontWeight: "800", marginLeft: 12, fontFamily: CZCIONKA }}>{ikona} {tytul}</Text>
+    </View>
+  );
+}
+
+/** Ustawienia grafiki: 3D (stadion, menu, mecz) i tryb lekki dla słabszych telefonów. */
+function UstawieniaGrafiki() {
+  const ls = typeof window !== "undefined" ? window.localStorage : undefined;
+  const [g3d, setG3d] = useState(ls?.getItem("dz_3d") !== "0");
+  const [lekka, setLekka] = useState(ls?.getItem("dz_lekka") === "1");
+  const Prz = ({ t, opis, on, v }: { t: string; opis: string; on: () => void; v: boolean }) => (
+    <Pressable onPress={on} style={[st.wiersz, { paddingVertical: 8, borderTopWidth: 1, borderTopColor: K.linia }]}>
+      <View style={{ flex: 1 }}><Text style={st.tekst}>{t}</Text><Text style={st.maly}>{opis}</Text></View>
+      <View style={{ width: 44, height: 26, borderRadius: 13, backgroundColor: v ? K.zielony : K.karta2, justifyContent: "center", padding: 3 }}><View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: "#fff", alignSelf: v ? "flex-end" : "flex-start" }} /></View>
+    </Pressable>
+  );
+  return (
+    <View style={[st.karta, { marginTop: 10 }]}>
+      <Text style={st.naglowek}>🎨 Grafika</Text>
+      <Prz t="Grafika 3D" opis="Stadion 3D w menu i w zakładce klubu, mecz na żywo w 3D." v={g3d} on={() => { const n = !g3d; ls?.setItem("dz_3d", n ? "1" : "0"); setG3d(n); }} />
+      <Prz t="Lekka grafika" opis="Mniej kibiców i detali, bez poświaty i rozmycia — płynniej na starszych telefonach." v={lekka} on={() => { const n = !lekka; ls?.setItem("dz_lekka", n ? "1" : "0"); setLekka(n); }} />
     </View>
   );
 }

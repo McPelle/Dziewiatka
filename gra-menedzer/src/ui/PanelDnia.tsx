@@ -4,7 +4,7 @@ import { dalejDzien, doMeczu, dzisiaj, fmtData, planTygodnia } from "../engine/d
 import type { StanGry } from "../engine/types";
 import { CZCIONKA, K, st } from "./styl";
 import { PanelOkresu } from "./PanelOkresu";
-import { MeczNaZywo } from "./MeczNaZywo";
+import { MeczNaZywo, zapisanyMecz } from "./MeczNaZywo";
 import { paraMojegoMeczu } from "../engine/meczNaZywo";
 
 /** Panel kalendarza na pulpicie: dzisiejszy dzień, plan tygodnia, raport ostatniego dnia, przyciski Dalej / Do meczu. */
@@ -49,7 +49,7 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
         </Pressable>
         {d.typ === "mecz" && paraMojegoMeczu(s) && (
           <Pressable style={[st.przyciskMaly, { justifyContent: "center", borderColor: K.akcent }]} onPress={() => setNaZywo(paraMojegoMeczu(s))}>
-            <Text style={[st.przyciskMalyTekst, { color: K.akcent }]}>📺 Na żywo</Text>
+            <Text style={[st.przyciskMalyTekst, { color: K.akcent }]}>{zapisanyMecz(s, paraMojegoMeczu(s)!) ? `▶ Wznów (${zapisanyMecz(s, paraMojegoMeczu(s)!)!.m.min}')` : "📺 Na żywo"}</Text>
           </Pressable>
         )}
         {d.typ !== "mecz" && (

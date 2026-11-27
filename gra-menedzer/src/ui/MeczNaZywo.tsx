@@ -28,8 +28,31 @@ function warunki(s: StanGry, domId: string): Ustawienia3D {
   return { noc, pogoda, widzowie, lekka };
 }
 
+const KLUCZ_LIVE = "dz_mecz_live";
+/** Zapisany mecz w trakcie (ta sama kariera, sezon, kolejka i para) — do wznowienia po zamknięciu przeglądarki. */
+export function zapisanyMecz(s: StanGry, para: [string, string]): { m: MeczLive; kond: Record<string, number> } | null {
+  try {
+    const raw = typeof window !== "undefined" ? window.localStorage.getItem(KLUCZ_LIVE) : null; if (!raw) return null;
+    const z = JSON.parse(raw);
+    if (z.kariera !== (s.slotId ?? s.mojKlub) || z.sezon !== s.sezon || z.kolejka !== s.kolejka || z.para[0] !== para[0] || z.para[1] !== para[1]) return null;
+    return { m: z.m, kond: z.kond };
+  } catch { return null; }
+}
+export const usunZapisMeczu = () => { try { window.localStorage.removeItem(KLUCZ_LIVE); } catch { /* */ } };
+function zapiszMecz(s: StanGry, para: [string, string], m: MeczLive) {
+  try {
+    const kond: Record<string, number> = {};
+    for (const id of [...m.dom.zagrali, ...m.dom.lawka, ...m.gosc.zagrali, ...m.gosc.lawka]) kond[id] = s.zawodnicy[id]?.kondycja ?? 0;
+    window.localStorage.setItem(KLUCZ_LIVE, JSON.stringify({ kariera: s.slotId ?? s.mojKlub, sezon: s.sezon, kolejka: s.kolejka, para, m, kond }));
+  } catch { /* brak miejsca — mecz i tak trwa */ }
+}
+
 export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: [string, string]; onKoniec: (m: MeczLive) => void; onAnuluj: () => void }) {
-  const [m] = useState<MeczLive>(() => rozpocznijMeczNaZywo(s, para[0], para[1]));
+  const [m] = useState<MeczLive>(() => {
+    const z = zapisanyMecz(s, para);
+    if (z) { for (const [id, k] of Object.entries(z.kond)) if (s.zawodnicy[id]) s.zawodnicy[id].kondycja = k; z.m.komentarz.unshift({ min: `${z.m.min}'`, typ: "info", tekst: "▶ Wznowiono zapisany mecz." }); return z.m; }
+    return rozpocznijMeczNaZywo(s, para[0], para[1]);
+  });
   const ust = useMemo(() => warunki(s, para[0]), []);
   const [wersja, setWersja] = useState(0);
   const [predkosc, setPredkosc] = useState(0);
@@ -43,7 +66,7 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
   const [schodzi, setSchodzi] = useState<string | null>(null);
   const [kom, setKom] = useState<string | null>(null);
   const [glosno, setGlosno] = useState(!czyWyciszony());
-  const [startTxt, setStartTxt] = useState(true);
+  const [startTxt, setStartTxt] = useState(() => m.min === 0);
   const [wyborStroju, setWyborStroju] = useState<[number, number]>(() => { const st0 = dobierzStroje(s.kluby[para[0]], s.kluby[para[1]], para[0] === s.mojKlub ? "dom" : "gosc"); return para[0] === s.mojKlub ? st0.wyborDom : st0.wyborGosc; });
   const stroje = useMemo(() => dobierzStroje(s.kluby[para[0]], s.kluby[para[1]], para[0] === s.mojKlub ? "dom" : "gosc", wyborStroju), [wyborStroju]);
   const kd = s.kluby[m.dom.klubId], kg = s.kluby[m.gosc.klubId];
@@ -53,6 +76,7 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
   const krok = () => {
     if (m.koniec) return;
     krokMinuty(s, m);
+    if (m.min % 3 === 0 || m.wazne) zapiszMecz(s, para, m); // zapis w trakcie meczu
     if (tylkoAkcje) { let n = 0; while (!m.koniec && !m.wazne && n++ < 12 && !m.sekwencja.some((p) => p.zdarzenie && p.zdarzenie !== "aut")) krokMinuty(s, m); }
     const w = m.wazne;
     if (w) {
@@ -76,7 +100,7 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
       m.komentarz.unshift({ min: "0'", typ: "info", tekst: `👕 Stroje: ${kd.nazwa} — ${stroje.dom.pole.nazwa.toLowerCase()}, ${kg.nazwa} — ${stroje.gosc.pole.nazwa.toLowerCase()}. Sędzia w kolorze: ${stroje.sedzia.nazwa}.` });
     }
   };
-  const dograj = (doPrzerwy: boolean) => { dograjDoKonca(s, m, doPrzerwy); setPredkosc(0); odswiez(); };
+  const dograj = (doPrzerwy: boolean) => { dograjDoKonca(s, m, doPrzerwy); setPredkosc(0); zapiszMecz(s, para, m); odswiez(); };
   const minuta = m.koniec ? "KONIEC" : przerwa(m) ? "PRZERWA" : m.polowa === 1 && m.min > 45 ? `45+${m.min - 45}'` : m.min > 90 ? `90+${m.min - 90}'` : `${m.min}'`;
   const posD = m.staty.posN ? Math.round((m.staty.posD / m.staty.posN) * 100) : 50;
   const nz = (id: string) => { const z = s.zawodnicy[id]; return z ? `${z.nazwisko}` : "?"; };
@@ -220,7 +244,11 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
           </View>
 
           {m.koniec ? (
-            <Pressable style={st.przycisk} onPress={() => { stopDzwieku(); onKoniec(m); }}><Text style={st.przyciskTekst}>✅ Zakończ i zapisz wynik ({m.gd}:{m.gg})</Text></Pressable>
+            <Pressable style={st.przycisk} onPress={() => { stopDzwieku(); usunZapisMeczu(); onKoniec(m); }}><Text style={st.przyciskTekst}>✅ Zakończ i zapisz wynik ({m.gd}:{m.gg})</Text></Pressable>
+          ) : m.min > 0 ? (
+            <Pressable onPress={() => { zapiszMecz(s, para, m); for (const [id, k] of Object.entries(m.kondStart)) if (s.zawodnicy[id]) s.zawodnicy[id].kondycja = k; stopDzwieku(); onAnuluj(); }} style={{ alignItems: "center", marginTop: 8 }}>
+              <Text style={[st.maly, { color: K.niebieski }]}>⏏ Wyjdź — mecz zapisany, dokończysz później („▶ Wznów")</Text>
+            </Pressable>
           ) : m.min === 0 ? (
             <Pressable onPress={() => { stopDzwieku(); onAnuluj(); }} style={{ alignItems: "center", marginTop: 8 }}><Text style={[st.maly, { color: K.czerwony }]}>Wróć bez oglądania (mecz zostanie zasymulowany)</Text></Pressable>
           ) : null}
