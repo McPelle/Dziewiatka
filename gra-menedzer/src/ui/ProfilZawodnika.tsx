@@ -189,7 +189,8 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
               <View style={{ marginTop: 14 }}>
                 {z.wychowanek && <Wiersz etyk="Wychowanek" wart={`🎓 ${z.wychowanek}${z.pochodzenie ? ` · ${z.pochodzenie}` : ""}`} kolor={K.zielony} />}
                 {!z.wychowanek && z.pochodzenie && <Wiersz etyk="Pochodzenie" wart={z.pochodzenie} />}
-                {z.reprezentant && <Wiersz etyk="Reprezentacja" wart={`🏟 ${z.reprezentant}`} kolor={K.akcent} />}
+                {z.reprezentant && <Wiersz etyk="Reprezentacja" wart={`🏟 ${z.reprezentant}${z.kadraStat?.mecze ? ` · ${z.kadraStat.mecze} m., ${z.kadraStat.gole} g.` : ""}`} kolor={K.akcent} />}
+                {z.kadraStat?.debiut && <Wiersz etyk="Debiut w kadrze" wart={z.kadraStat.debiut} />}
                 {z.jun && z.jun.m > 0 && <Wiersz etyk={`Liga juniorów ${z.jun.kat} (sezon)`} wart={`${z.jun.m} m. · ${z.jun.g} g. · ${z.jun.a} as. · śr. ${(z.jun.oc / z.jun.m).toFixed(1)}${z.jun.wyr ? ` · ⭐×${z.jun.wyr}` : ""}`} kolor={K.zielony} />}
                 {(z.junKariera ?? []).map((j, i) => <Wiersz key={i} etyk={`Juniorzy ${j.kat} ${j.sezon}/${(j.sezon + 1) % 100}`} wart={`${j.m} m. · ${j.g} g. · ${j.a} as. · śr. ${j.sr}`} />)}
                 <Wiersz etyk="Morale" wart={`${Math.round(z.morale)}%${z.prosiOTransfer ? " — chce odejść" : ""}`} kolor={moraleKolor} />

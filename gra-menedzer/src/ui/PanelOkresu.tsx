@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Alert, Platform, Pressable, Text, View } from "react-native";
+import { KalendarzMiesiac } from "./KalendarzMiesiac";
 import { zl } from "../engine/losuj";
 import { dalejDzien, doMeczu, fmtData } from "../engine/dzien";
 import { dataOkresu, dniRazem, kosztObozuPrzyg, nazwaDnia, OBOZY_PRZYG, pozyskajKandydata, rywaleSparingowi, skrocUrlop, testySzczebel, wybierzOboz, zaplanujSparing } from "../engine/okres";
@@ -16,6 +17,7 @@ export function PanelOkresu({ s, odswiez }: { s: StanGry; odswiez: () => void })
   const d = dataOkresu(s);
   const razem = dniRazem(o);
   const raport = s.raportyDni?.[0];
+  const [miesiac, setMiesiac] = useState(false);
   const dzienSparingu = Math.max(o.dzien + 1, o.dniUrlopu + 2);
   const kand = (o.kandydaci ?? []).map((id) => s.zawodnicy[id]).filter((z) => z && !z.klubId);
   return (
@@ -23,6 +25,8 @@ export function PanelOkresu({ s, odswiez }: { s: StanGry; odswiez: () => void })
       <Text style={{ color: K.niebieski, fontWeight: "900", fontSize: 12, letterSpacing: 0.6, fontFamily: CZCIONKA }}>
         {o.rodzaj === "lato" ? "☀️ OKRES LETNI" : "❄️ PRZERWA ZIMOWA"} · {nazwaDnia(d).toUpperCase()} {fmtData(d)}
       </Text>
+      <Pressable onPress={() => setMiesiac(true)} style={[st.przyciskMaly, { position: "absolute", right: 12, top: 10, paddingVertical: 6 }]}><Text style={st.przyciskMalyTekst}>📅 Miesiąc</Text></Pressable>
+      <KalendarzMiesiac s={s} widoczny={miesiac} onClose={() => setMiesiac(false)} />
       <Text style={[st.tekst, { fontSize: 17, fontWeight: "900", marginTop: 2 }]}>
         {o.dzien < o.dniUrlopu ? `🏖 Urlop — dzień ${o.dzien + 1} z ${o.dniUrlopu}` : `🏃 Przygotowania — dzień ${o.dzien - o.dniUrlopu + 1} z ${o.dniPrzygotowan}`}
       </Text>

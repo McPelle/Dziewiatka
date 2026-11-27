@@ -5,12 +5,14 @@ import type { StanGry } from "../engine/types";
 import { CZCIONKA, K, st } from "./styl";
 import { PanelOkresu } from "./PanelOkresu";
 import { MeczNaZywo, zapisanyMecz } from "./MeczNaZywo";
+import { KalendarzMiesiac } from "./KalendarzMiesiac";
 import { paraMojegoMeczu } from "../engine/meczNaZywo";
 
 /** Panel kalendarza na pulpicie: dzisiejszy dzień, plan tygodnia, raport ostatniego dnia, przyciski Dalej / Do meczu. */
 export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => void; pokazMecz: () => void }) {
   const [rozwin, setRozwin] = useState(true);
   const [naZywo, setNaZywo] = useState<[string, string] | null>(null);
+  const [miesiac, setMiesiac] = useState(false);
   if (s.okres) return <PanelOkresu s={s} odswiez={odswiez} />;
   const plan = planTygodnia(s);
   const d = dzisiaj(s);
@@ -23,6 +25,7 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
           <Text style={{ color: K.akcent, fontWeight: "900", fontSize: 12, letterSpacing: 0.6, fontFamily: CZCIONKA }}>{d.nazwa.toUpperCase()} · {fmtData(d.data)}</Text>
           <Text style={[st.tekst, { fontSize: 17, fontWeight: "900", marginTop: 2 }]}>{d.ikona} {d.tytul}</Text>
         </View>
+        <Pressable onPress={() => setMiesiac(true)} style={[st.przyciskMaly, { paddingVertical: 6 }]}><Text style={st.przyciskMalyTekst}>📅 Miesiąc</Text></Pressable>
       </View>
       {/* pasek tygodnia */}
       <View style={[st.wiersz, { marginTop: 10, gap: 4 }]}>
@@ -58,6 +61,7 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
           </Pressable>
         )}
       </View>
+      <KalendarzMiesiac s={s} widoczny={miesiac} onClose={() => setMiesiac(false)} />
       {naZywo && <MeczNaZywo s={s} para={naZywo} onAnuluj={() => setNaZywo(null)} onKoniec={(m) => { s.meczLive = m; setNaZywo(null); const mecz = dalejDzien(s); odswiez(); if (mecz) pokazMecz(); }} />}
     </View>
   );

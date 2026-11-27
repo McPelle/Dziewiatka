@@ -59,6 +59,7 @@ export interface Zawodnik {
   treningIndywidualny?: AtrybutKlucz | null; // atrybut rozwijany w treningu indywidualnym (ponad trening drużyny)
   naukaPozycji?: { poz: PozycjaSzczegolowa; postep: number } | null; // nauka nowej pozycji (postęp 0–100)
   juniorMacierzysty?: boolean; // wypożyczony junior — po powrocie wraca do akademii (jeśli dalej U-19)
+  kadraStat?: { kraj: string; mecze: number; gole: number; debiut?: string }; // kariera reprezentacyjna
   reprezentant?: string; // ostatnie powołanie do kadry (np. „Polska", „Polska U-21", kraj) — prestiż
   wychowanek?: string; // klub, którego jest wychowankiem (homegrown) — prestiż i premia zarządu
   test?: { do: number; obs: number; min: number; max: number; werdykt?: string }; // okres testowy: narastająca ocena skauta (przedział szac. OVR zwęża się z obserwacjami)
@@ -372,6 +373,8 @@ export interface Europa {
 }
 
 export interface StanGry {
+  kadraOkna?: string[]; // przerwy FIFA już rozegrane („sezon-miesiąc")
+  kadraMecze?: import("./reprezentacje").MeczKadry[]; // ostatnie mecze reprezentacji
   meczLive?: import("./meczNaZywo").MeczLive; // mecz obejrzany na żywo — czeka na rozliczenie w kolejce
   przetarg?: import("./budowy").Przetarg; // otwarty przetarg na budowę
   budowy?: import("./budowy").Budowa[]; // trwające budowy na stadionie

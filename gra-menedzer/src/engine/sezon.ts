@@ -1,3 +1,4 @@
+import { czasNaKadre, przerwaNaKadre } from "./reprezentacje";
 import { utrudnieniaMeczu } from "./budowy";
 import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj";
 import { AFILIACJE, PRZYJAZNIE } from "../data/derby";
@@ -18,7 +19,7 @@ import { dojrzewanieTalentow, zakonczMisjeJesliCzas } from "./skauting";
 import { autoFokus, kontuzjaTreningowa, mnoznikFokus, treningGracza, zmeczenieIntensywnosci } from "./trening";
 import { juniorzyNowySezon, naborAkademiiDoJuniorow, naborUlicy, rozwojJuniorow, zasiejAkademie } from "./juniorzy";
 import { awanseSpadkiJun, inicjujRozgrywkiJun, juniorKolejka } from "./ligaJuniorow";
-import { oknoTransferowe, type InfoOkna } from "./kalendarz";
+import { dateKolejki, kalendarzSzczebla, oknoTransferowe, type InfoOkna } from "./kalendarz";
 import { odlegloscDrogowa } from "../data/miasta";
 import { odswiezRynekTestow, rozwojTestow, sprzatnijRynekTestow } from "./testy";
 import {
@@ -959,7 +960,11 @@ export function zagrajKolejke(s: StanGry) {
       for (const id of s.taktyka.sklad) { const z = s.zawodnicy[id]; if (z) z.kondycja = Math.min(100, z.kondycja + 4); }
       wiadomosc(s, `🤝 Zimowy mecz charytatywny ${mk.nazwa} — pełne trybuny dla dobrej sprawy, wpływy ${zl(wplyw)}, kibice wdzięczni, kadra rozruszana.`);
     } }
-  { const half = Math.ceil(ileKolejek(s) / 2); if (r === 3 || r === half + 1) powolaniaReprezentacji(s); } // dwie przerwy na kadrę
+  { // przerwy FIFA (wrzesień, październik, listopad, marzec) — kadra Polski, U-21 i obcokrajowcy z Twojego klubu
+    const lg = s.ligi[s.kluby[s.mojKlub].poziom - 1];
+    const dk = dateKolejki(s.sezon, ileKolejek(s), r, kalendarzSzczebla(lg?.nazwa ?? "", lg?.poziom ?? 1));
+    if (czasNaKadre(s, dk)) przerwaNaKadre(s, dk);
+  }
   { const half = Math.ceil(ileKolejek(s) / 2); if (r === 1 || r === half) rynekAI(s); } // żywy rynek AI w oknach (lato/zima)
   if (r > 0 && r % 4 === 3) zawodnikMiesiaca(s); // co ~miesiąc
   if (r > 0 && r % 5 === 4) szatnia(s); // wydarzenia w szatni
