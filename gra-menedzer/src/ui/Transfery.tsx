@@ -90,7 +90,7 @@ export function Transfery({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
   const pozSWKat = kat === "wszyscy" ? [] : (Object.keys(SKROT_POZ) as PozycjaSzczegolowa[]).filter((p) => KAT_POZ[p] === kat);
 
   const pusteKom =
-    zrodlo === "sprzedaz" ? "Brak zawodników do wystawienia w tym filtrze (amatorów nie sprzedasz za kwotę)."
+    zrodlo === "sprzedaz" ? "Brak zawodników do wystawienia w tym filtrze."
     : zrodlo === "wolni" ? "Brak wolnych zawodników w tym filtrze. Poluzuj filtry albo zaczekaj — pojawią się po wygaśnięciu kontraktów."
     : zrodlo === "wypozyczenia" ? "Brak zawodników do wypożyczenia w tym filtrze."
     : "Brak zawodników z innych klubów w tym filtrze. Zmień pozycję, wiek lub cenę.";
@@ -323,7 +323,7 @@ function WierszRynku({ s, z, wyp, cena, onKup, onNeg }: { s: StanGry; z: Zawodni
 function WierszSprzedazy({ s, z, odswiez }: { s: StanGry; z: Zawodnik; odswiez: () => void }) {
   const sugest = sugerowanaCenaSprzedazy(s, z.id);
   const [kwota, setKwota] = useState(z.wystawiony ?? sugest);
-  const krok = Math.max(10000, Math.round(sugest * 0.1 / 10000) * 10000);
+  const krok = sugest >= 100000 ? Math.max(10000, Math.round(sugest * 0.1 / 10000) * 10000) : Math.max(100, Math.round(sugest * 0.1 / 100) * 100);
   const amator = z.kontraktTyp === "amator";
   const wystaw = () => { const b = wystawNaSprzedaz(s, z.id, kwota); odswiez(); if (b) komunikat(b); };
   const zdejmij = () => { zdejmijZeSprzedazy(s, z.id); odswiez(); };
@@ -344,12 +344,11 @@ function WierszSprzedazy({ s, z, odswiez }: { s: StanGry; z: Zawodnik; odswiez: 
           <Text style={[st.maly, { fontSize: 11 }]}>pot. {Math.floor(z.potencjal)}</Text>
         </View>
       </View>
-      {amator ? (
-        <Text style={[st.maly, { marginTop: 8, color: K.szary }]}>Amator — odchodzi za darmo (bez kwoty transferowej), nie wystawisz go za pieniądze.</Text>
-      ) : (
+      {amator && <Text style={[st.maly, { marginTop: 8, color: K.szary }]}>Amator — kupujący płaci odstępne (zgoda klubu na zmianę barw / ekwiwalent za wyszkolenie). Po awansie na szczebel półprofesjonalny dostanie umowę z kwotą transferową.</Text>}
+      {(
         <View style={[st.wiersz, { justifyContent: "space-between", alignItems: "center", marginTop: 8 }]}>
           <View style={[st.wiersz, { gap: 8, alignItems: "center" }]}>
-            <Pressable style={st.przyciskMaly} onPress={() => setKwota((k) => Math.max(10000, k - krok))}><Text style={st.przyciskMalyTekst}>−</Text></Pressable>
+            <Pressable style={st.przyciskMaly} onPress={() => setKwota((k) => Math.max(amator ? 100 : 1000, k - krok))}><Text style={st.przyciskMalyTekst}>−</Text></Pressable>
             <Text style={[st.tekst, { fontWeight: "800", minWidth: 96, textAlign: "center" }]}>{zl(kwota)}</Text>
             <Pressable style={st.przyciskMaly} onPress={() => setKwota((k) => k + krok)}><Text style={st.przyciskMalyTekst}>+</Text></Pressable>
           </View>
