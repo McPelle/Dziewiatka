@@ -32,6 +32,10 @@ export function stworzPostac(o: { skora?: string; wlosy?: string; lysy?: boolean
   const dod = new THREE.MeshStandardMaterial({ color: o.dodatek ?? o.spodenki, roughness: 0.75 });
   if (o.wzor === "pasy") for (let i = -1; i <= 1; i++) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.52, 0.315), dod); p.position.set(i * 0.13, 0.33, 0); tulow.add(p); }
   { const kol = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.018, 6, 14), dod); kol.rotation.x = Math.PI / 2; kol.position.y = 0.68; tulow.add(kol); } // kołnierzyk w kolorze dodatku
+  // atletyczna sylwetka: szersze barki (kopuły w kolorze koszulki), zwężenie w pasie
+  for (const sx of [-1, 1]) { const bark = new THREE.Mesh(new THREE.SphereGeometry(0.105, 10, 8), kosz); bark.position.set(sx * 0.21, 0.57, 0); bark.scale.set(1, 0.85, 0.9); bark.castShadow = true; tulow.add(bark); }
+  korpus.scale.set(1.22, 1, 0.78);
+  if (o.nr > 0) { const nrP = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.11), new THREE.MeshStandardMaterial({ map: teksturaNumeru(o.nr, kontrast(o.koszulka), o.koszulka), roughness: 0.8, transparent: true })); nrP.position.set(0.075, 0.5, 0.162); tulow.add(nrP); } // mały numer na piersi
   const szyja = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.1), skora); szyja.position.y = 0.72; tulow.add(szyja);
   const glowa = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 12), skora); glowa.position.y = 0.88; glowa.scale.set(0.95, 1.08, 1); glowa.castShadow = true; tulow.add(glowa);
   // fryzura wg stylu (0 krótkie, 1 bardzo krótkie, 2 dłuższe z przedziałkiem, 3 łysy, 4 kręcone), siwienie z wiekiem, zarost
@@ -56,15 +60,20 @@ export function stworzPostac(o: { skora?: string; wlosy?: string; lysy?: boolean
     twarz = { usta, brwi: [brew(-0.045), brew(0.045)], oczy: [oko(-0.045), oko(0.045)], glowa };
   }
   // spodenki
-  const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.2, 0.24, 10), spod); sp.position.y = 0.95; sp.scale.z = 0.75; sp.castShadow = true; g.add(sp);
+  const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.21, 0.26, 12), spod); sp.position.y = 0.95; sp.scale.z = 0.75; sp.castShadow = true; g.add(sp);
+  for (const sx of [-1, 1]) { const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.25, 0.08), dod); lamp.position.set(sx * 0.2, 0.95, 0); g.add(lamp); } // lampasy
   // nogi: udo (pivot w biodrze) → łydka (pivot w kolanie)
   const noga = (x: number): [THREE.Object3D, THREE.Object3D] => {
     const biodro = new THREE.Group(); biodro.position.set(x, 0.92, 0); g.add(biodro);
-    const udo = new THREE.Mesh(new THREE.CapsuleGeometry(0.075, 0.3, 3, 8), spod); udo.position.y = -0.2; udo.castShadow = true; biodro.add(udo);
-    const udoSk = new THREE.Mesh(new THREE.CapsuleGeometry(0.07, 0.16, 3, 8), skora); udoSk.position.y = -0.33; biodro.add(udoSk);
+    const udoSk = new THREE.Mesh(new THREE.CapsuleGeometry(0.072, 0.3, 3, 8), skora); udoSk.position.y = -0.24; udoSk.castShadow = true; biodro.add(udoSk); // udo (skóra)
+    const udo = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.088, 0.16, 10), spod); udo.position.y = -0.07; udo.castShadow = true; biodro.add(udo); // nogawka spodenek
     const kolano = new THREE.Group(); kolano.position.y = -0.45; biodro.add(kolano);
-    const lyd = new THREE.Mesh(new THREE.CapsuleGeometry(0.065, 0.3, 3, 8), getr); lyd.position.y = -0.2; lyd.castShadow = true; kolano.add(lyd);
-    const stopa = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.07, 0.26), but); stopa.position.set(0, -0.42, 0.06); kolano.add(stopa);
+    const lyd = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.05, 0.36, 10), getr); lyd.position.y = -0.2; lyd.castShadow = true; kolano.add(lyd); // łydka zwężająca się ku kostce
+    const mank = new THREE.Mesh(new THREE.CylinderGeometry(0.079, 0.077, 0.05, 10), dod); mank.position.y = -0.03; kolano.add(mank); // mankiet getrów pod kolanem
+    const stopa = new THREE.Mesh(new THREE.BoxGeometry(0.095, 0.06, 0.2), but); stopa.position.set(0, -0.415, 0.03); stopa.castShadow = true; kolano.add(stopa);
+    const czubek = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), but); czubek.scale.set(0.95, 0.6, 1.2); czubek.position.set(0, -0.42, 0.13); kolano.add(czubek);
+    const pasek = new THREE.Mesh(new THREE.BoxGeometry(0.098, 0.012, 0.12), new THREE.MeshStandardMaterial({ color: o.seed % 3 === 0 ? 0x111111 : 0xffffff })); pasek.position.set(0, -0.39, 0.05); kolano.add(pasek); // pasek na korku
+    const podeszwa = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.015, 0.26), new THREE.MeshStandardMaterial({ color: 0x222222 })); podeszwa.position.set(0, -0.448, 0.06); kolano.add(podeszwa);
     return [biodro, kolano];
   };
   const [u1, k1] = noga(-0.1), [u2, k2] = noga(0.1);
@@ -73,6 +82,8 @@ export function stworzPostac(o: { skora?: string; wlosy?: string; lysy?: boolean
     const bark = new THREE.Group(); bark.position.set(x, 0.58, 0); tulow.add(bark);
     const r1 = new THREE.Mesh(new THREE.CapsuleGeometry(0.055, 0.22, 3, 8), o.wzor === "rekaw" ? dod : kosz); r1.position.y = -0.14; bark.add(r1);
     const r2 = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.22, 3, 8), skora); r2.position.y = -0.4; bark.add(r2);
+    const mankR = new THREE.Mesh(new THREE.CylinderGeometry(0.062, 0.062, 0.035, 10), dod); mankR.position.y = -0.26; bark.add(mankR); // mankiet rękawka
+    const dlon = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 6), skora); dlon.position.y = -0.56; dlon.scale.set(0.9, 1.1, 0.8); bark.add(dlon);
     return bark;
   };
   const ramiona: [THREE.Object3D, THREE.Object3D] = [reka(-0.27), reka(0.27)];
