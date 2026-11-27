@@ -1,3 +1,4 @@
+import { ogloszenieReorganizacji, zastosujReorganizacje } from "./reorganizacja";
 import { zakazTransferow } from "./wydzialGier";
 import { pzpnPoKolejce, pzpnPrzedKolejka, pzpnPrzedSkladem } from "./pzpnCykl";
 import { aktualizujKronike } from "./dziennik";
@@ -1029,7 +1030,8 @@ export function zagrajKolejke(s: StanGry) {
   for (const w of sprawdzOsiagniecia(s)) wiadomosc(s, w); // osiągnięcia trenera
   { const t = sprawdzWyzwanieKolejka(s); if (t) wiadomosc(s, t); } // tryb Wyzwania
   { const t = kwartalZarzadu(s, ileKolejek(s)); if (t) wiadomosc(s, t); } // budżet sezonu: rozliczenie kwartalne
-  for (const w of wydarzeniaSezonowe(s, r, ileKolejek(s))) wiadomosc(s, w); // opłatek, plebiscyt, gala ZPN
+  for (const w of wydarzeniaSezonowe(s, r, ileKolejek(s))) wiadomosc(s, w);
+  { const t = ogloszenieReorganizacji(s, r, ileKolejek(s)); if (t) wiadomosc(s, t); } // opłatek, plebiscyt, gala ZPN
   tydzienWydzialu(s); // Wydział Gier, Kolegium Sędziów, Izba PZPN (zaległości płacowe)
   { const t = tydzienZgod(s, s.kluby[s.mojKlub]); if (t) wiadomosc(s, t); }
   { const t = tydzienLicencji(s); if (t) wiadomosc(s, t); } // kurs UEFA, egzamin, wymogi licencyjne ligi // życie zgód: jubileusze, zerwania, nowe układy
@@ -1656,6 +1658,7 @@ export function nowySezon(s: StanGry) {
   // Spadkowicz trafia tylko do ligi swojego województwa / podokręgu. Kto spada „do innego regionu", opuszcza
   // symulowaną piramidę (gra dalej w swojej lidze, poza Twoją ścieżką). Liczba spadających z ligi zależy od tego,
   // ilu klubów z jej regionu spadło z góry (jak „spadek zależny" w regulaminach ZPN), więc rozmiary lig się nie zmieniają.
+  { const t = zastosujReorganizacje(s); if (t) wiadomosc(s, t); } // reorganizacja ZPN (zmiana liczby awansów)
   const zGory: string[][] = s.ligi.map(() => []);   // przybyli z wyższej ligi (zgodni regionalnie)
   const wGore: string[][] = s.ligi.map(() => []);   // awansowali z danej ligi wyżej
   const wychodza: string[] = [];                    // opuszczają symulowaną piramidę
