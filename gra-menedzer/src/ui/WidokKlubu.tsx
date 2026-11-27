@@ -55,7 +55,8 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
                 <View style={{ flex: 1 }}>
                   <Text style={st.tytul}>{klub.nazwa}</Text>
                   {przydomek(klub.nazwa) ? <Text style={[st.maly, { color: K.akcent, fontStyle: "italic" }]}>„{przydomek(klub.nazwa)}"</Text> : null}
-                  <Text style={st.maly}>{liga?.nazwa}{miejsce ? ` · ${miejsce}. miejsce` : ""}</Text>
+                  <Text style={st.maly}>{klub.pozaLiga ? "Drużyna spoza lig — tylko Puchar Polski" : `${liga?.nazwa}${miejsce ? ` · ${miejsce}. miejsce` : ""}`}</Text>
+                  {klub.opisPozaLiga ? <Text style={[st.maly, { color: K.akcent }]}>{klub.opisPozaLiga}</Text> : null}
                 </View>
               </View>
 

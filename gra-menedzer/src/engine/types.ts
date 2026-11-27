@@ -161,6 +161,8 @@ export interface Klub {
   kasa: number;
   zawodnicy: string[];
   prawdziwy: boolean;
+  pozaLiga?: boolean; // drużyna spoza rozgrywek ligowych (zgłoszona tylko do regionalnego Pucharu Polski)
+  opisPozaLiga?: string; // kim jest drużyna spoza lig (orlikowa, firmowa, OSP, oldboje…)
   herb?: string;
   rezerwaId?: string; // id zespołu rezerw (dla pierwszego zespołu)
   juniorzy?: string[]; // skład U-21 (akademia) — id zawodników poza kadrą pierwszego zespołu (Twój klub)

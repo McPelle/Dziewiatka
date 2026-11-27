@@ -1073,7 +1073,7 @@ function tydzien(s: StanGry) {
   // Deadline day: w ostatniej kolejce otwartego okna ofert jest więcej (gorączka transferowa).
   const deadline = oknoOtwarte(s) && !oknoTransferowe(s.sezon, ileKolejek(s), s.kolejka + 1, false, moj.poziom).otwarte;
   if (oknoOtwarte(s) && moj.zawodnicy.length > 14) {
-    const kupcyZa = (z: Zawodnik) => Object.values(s.kluby).filter((k) => k.id !== moj.id && k.poziom <= moj.poziom + 1 && k.poziom >= moj.poziom - 2 && k.zawodnicy.length < 25);
+    const kupcyZa = (z: Zawodnik) => Object.values(s.kluby).filter((k) => !k.pozaLiga && k.id !== moj.id && k.poziom <= moj.poziom + 1 && k.poziom >= moj.poziom - 2 && k.zawodnicy.length < 25);
     // 1) Wystawieni na sprzedaż — oferty tym chętniej, im rozsądniejsza cena wywoławcza.
     const wystawieni = moj.zawodnicy.map((id) => s.zawodnicy[id]).filter((z) => (z.wystawiony ?? 0) > 0 && !z.macierzysty);
     for (const z of wystawieni) {
@@ -1099,7 +1099,7 @@ function tydzien(s: StanGry) {
       if (!z || z.macierzysty || z.kontraktTyp === "amator" || (z.wystawiony ?? 0) > 0 || s.oferty.some((o) => o.zawodnikId === z.id)) continue;
       if (moj.poziom <= 1 || z.umiej < zakresUmiej(moj.poziom - 1)[0] + 2) continue; // gra na poziomie wyższej ligi
       if (!szansa(deadline ? 0.25 : 0.1)) continue;
-      const kupcy = Object.values(s.kluby).filter((k) => k.id !== moj.id && k.poziom < moj.poziom && k.poziom >= moj.poziom - 3 && k.zawodnicy.length < 28);
+      const kupcy = Object.values(s.kluby).filter((k) => !k.pozaLiga && k.id !== moj.id && k.poziom < moj.poziom && k.poziom >= moj.poziom - 3 && k.zawodnicy.length < 28);
       if (!kupcy.length) continue;
       const kupiec = wybierzWazone(kupcy, (k) => wagaBliskosci(s, moj, k) * (1 + k.renoma));
       const baza = wartosc(z);
@@ -1112,7 +1112,7 @@ function tydzien(s: StanGry) {
     if (szansa(deadline ? 0.4 : 0.18)) {
       const z = s.zawodnicy[wybierz(moj.zawodnicy)];
       if (!(z.wystawiony ?? 0) && !z.macierzysty && !s.oferty.some((o) => o.zawodnikId === z.id)) {
-        const kupcy = Object.values(s.kluby).filter((k) => k.id !== moj.id && k.poziom <= moj.poziom && k.poziom >= moj.poziom - 2);
+        const kupcy = Object.values(s.kluby).filter((k) => !k.pozaLiga && k.id !== moj.id && k.poziom <= moj.poziom && k.poziom >= moj.poziom - 2);
         if (kupcy.length) {
           const kupiec = wybierzWazone(kupcy, (k) => wagaBliskosci(s, moj, k) * wieziRynkowe(moj.nazwa, k.nazwa));
           const kwota = Math.round((wartosc(z) * los(0.7, 1.3) * (deadline ? 1.1 : 1)) / 100) * 100;
@@ -1130,7 +1130,7 @@ function tydzien(s: StanGry) {
     if (zKl.length) {
       const zz = s.zawodnicy[wybierz(zKl.map((z) => z.id))];
       const kwota = zz.klauzula!;
-      const kupcy = Object.values(s.kluby).filter((k) => k.id !== moj.id && k.kasa >= kwota && (k.poziom < moj.poziom || (k.poziom === moj.poziom && k.renoma > moj.renoma + 0.04)));
+      const kupcy = Object.values(s.kluby).filter((k) => !k.pozaLiga && k.id !== moj.id && k.kasa >= kwota && (k.poziom < moj.poziom || (k.poziom === moj.poziom && k.renoma > moj.renoma + 0.04)));
       if (kupcy.length) {
         const kupiec = kupcy.sort((a, b) => a.poziom - b.poziom || b.renoma - a.renoma)[0];
         const chce = kupiec.poziom < moj.poziom || kupiec.renoma > moj.renoma + 0.06 || zz.morale < 45;
@@ -1383,7 +1383,7 @@ export function nowySezon(s: StanGry) {
       const mojaRen = s.kluby[s.mojKlub].renoma;
       // kandydaci: wyższa liga (niższy poziom) albo ta sama liga, ale wyraźnie większy klub
       const kand = Object.values(s.kluby)
-        .filter((k) => k.id !== s.mojKlub && !k.rezerwaDla && (k.poziom < nowyPoziom || (k.poziom === nowyPoziom && k.renoma > mojaRen + 0.08)))
+        .filter((k) => k.id !== s.mojKlub && !k.rezerwaDla && !k.pozaLiga && (k.poziom < nowyPoziom || (k.poziom === nowyPoziom && k.renoma > mojaRen + 0.08)))
         .sort((a, b) => a.poziom - b.poziom || b.renoma - a.renoma);
       const ile = (wynik === "mistrz" || pucharWynik) ? 2 : 1;
       for (const k of kand.slice(0, ile)) {
@@ -2654,7 +2654,7 @@ export function wypozyczNaZewnatrz(s: StanGry, zawodnikId: string): string | nul
   if (z.macierzysty) return "Tego zawodnika sam masz na wypożyczeniu — nie możesz go podnająć.";
   if (moj.zawodnicy.length <= 15) return "Za mała kadra, żeby wypożyczać (min 15).";
   // Klub docelowy: najchętniej mniejszy (niższa liga), z miejscem w kadrze.
-  const kandydaci = Object.values(s.kluby).filter((k) => k.id !== moj.id && k.zawodnicy.length < 24);
+  const kandydaci = Object.values(s.kluby).filter((k) => !k.pozaLiga && k.id !== moj.id && k.zawodnicy.length < 24);
   const cel = kandydaci.filter((k) => k.poziom > moj.poziom).sort((a, b) => a.poziom - b.poziom)[0]
     ?? kandydaci.filter((k) => k.poziom >= moj.poziom).sort((a, b) => a.poziom - b.poziom)[0]
     ?? kandydaci[0];
