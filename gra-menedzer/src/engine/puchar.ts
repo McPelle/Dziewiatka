@@ -13,18 +13,15 @@ import { BILET, nadajNumery, noweId, nowyZawodnik } from "./swiat";
 import { wojKlubu } from "./regiony";
 import { odlegloscDrogowa } from "../data/miasta";
 import type { Puchar, StanGry, Wynik } from "./types";
+import { podokregSciezki, zpnSciezki, zpnZnany } from "./zpn";
 
 // Kluby z lig ogólnopolskich (poziomy 1–4: Ekstraklasa, I, II, III liga) grają główny PP od razu.
 // Poziomy 5+ (IV liga i niżej) grają najpierw wojewódzki (regionalny) Puchar Polski — nazwa zależna od regionu.
 /** Nazwa pucharu regionalnego wg regionu (mianownik „nom" + dopełniacz „gen" do rund). */
 export function pucharRegion(s: StanGry): { nom: string; gen: string } {
-  const r = s.sciezka || "";
-  // Uwaga: kolejność — „Zachodniopomorskie" i „Kujawsko-Pomorskie" też zawierają „Pomorsk", więc sprawdzamy je najpierw.
-  if (r.includes("Zachodniopomor")) return { nom: "Puchar Polski na szczeblu Zachodniopomorskiego ZPN", gen: "Pucharu Polski na szczeblu Zachodniopomorskiego ZPN" };
-  if (r.includes("Kujawsko")) return { nom: "Puchar Polski na szczeblu Kujawsko-Pomorskiego ZPN", gen: "Pucharu Polski na szczeblu Kujawsko-Pomorskiego ZPN" };
-  if (r.includes("Pomorsk")) return { nom: "Puchar Polski na szczeblu Pomorskiego ZPN", gen: "Pucharu Polski na szczeblu Pomorskiego ZPN" };
-  if (r.includes("Małopol")) return { nom: "Puchar Polski na szczeblu Małopolskiego ZPN", gen: "Pucharu Polski na szczeblu Małopolskiego ZPN" };
-  return { nom: "regionalny Puchar Polski", gen: "regionalnego Pucharu Polski" };
+  const z = zpnZnany(s.sciezka);
+  if (!z) return { nom: "regionalny Puchar Polski", gen: "regionalnego Pucharu Polski" };
+  return { nom: `Puchar Polski na szczeblu ${z.dop}`, gen: `Pucharu Polski na szczeblu ${z.dop}` };
 }
 /** Podokręg pomorski gracza (Gdańsk / Słupsk / Malbork) — z nazwy ścieżki. Puste dla innych regionów. */
 export function okregPomorski(s: StanGry): string {
@@ -74,7 +71,7 @@ export function wejscieDoPucharu(s: StanGry, klubId: string): number {
 const RUNDY_OKREGOWE = ["I runda (klasa B, drużyny spoza lig)", "II runda — wchodzi klasa A", "III runda — wchodzą klasa okręgowa i V liga", "IV runda — wchodzi IV liga", "Finał etapu okręgowego — wchodzi III liga"];
 function wstepneDla(s: StanGry): string[] {
   const w = wejscieDoPucharu(s, s.mojKlub);
-  const ok = okregPomorski(s) || okregMalopolski(s) || okregKujawski(s);
+  const ok = okregPomorski(s) || okregMalopolski(s) || okregKujawski(s) || (/^(Warmińsko|Podlaskie)/.test(s.sciezka ?? "") ? podokregSciezki(s.sciezka) : "");
   return RUNDY_OKREGOWE.slice(Math.min(w, 4)).map((r) => (ok ? `${r} — okręg ${ok}` : r));
 }
 /** Ile rund fazy okręgowej ma przed sobą klub gracza. */
@@ -83,28 +80,15 @@ export function ileWstepnych(s: StanGry): number { return wstepneDla(s).length; 
 export function nazwyRegion(s: StanGry): string[] {
   return [...wstepneDla(s), ...nazwyRegionGlowne(s)];
 }
-/** Związek (do regulaminów). */
-function zwiazek(s: StanGry): "MZPN" | "POM" | "ZZPN" | "KP" | "?" {
-  const r = s.sciezka || "";
-  if (r.includes("Zachodniopomor")) return "ZZPN";
-  if (r.includes("Kujawsko")) return "KP";
-  if (r.includes("Pomorsk")) return "POM";
-  if (r.includes("Małopol")) return "MZPN";
-  return "?";
-}
-/** Czy przy remisie gra się dogrywkę (2×15), czy od razu rzuty karne — wg regulaminu danego ZPN. */
+/** Czy przy remisie gra się dogrywkę (2×15), czy od razu rzuty karne — wg regulaminu danego ZPN (engine/zpn.ts). */
 export function dogrywkaWRundzie(s: StanGry, runda: number): boolean {
   const n = nazwyRegion(s).length, w = ileWstepnych(s);
   const final = runda === n - 1, etap2 = runda >= w;
-  switch (zwiazek(s)) {
-    case "POM": return true;          // Pomorski ZPN: dogrywka i karne w każdym meczu
-    case "KP": return etap2;          // K-PZPN: od 1/8 dogrywka, wcześniej od razu karne
-    case "MZPN": case "ZZPN": return final; // MZPN, ZZPN: od razu karne, dogrywka tylko w finale
-    default: return final;
-  }
+  const tryb = zpnZnany(s.sciezka)?.dogrywkaPuchar ?? "final";
+  return tryb === "zawsze" ? true : tryb === "od18" ? etap2 : final;
 }
 function nazwyRegionGlowne(s: StanGry): string[] {
-  const z = { MZPN: "Małopolskiego ZPN", POM: "Pomorskiego ZPN", ZZPN: "Zachodniopomorskiego ZPN", KP: "Kujawsko-Pomorskiego ZPN", "?": "ZPN" }[zwiazek(s)];
+  const z = zpnZnany(s.sciezka)?.dop ?? "ZPN";
   return [`1/8 finału Pucharu Polski ${z}`, `Ćwierćfinał Pucharu Polski ${z}`, `Półfinał Pucharu Polski ${z}`, `Finał Pucharu Polski ${z}`];
 }
 const POZIOM_ZAWODOWY = 3;
@@ -384,7 +368,7 @@ export function rundaPucharu(s: StanGry): WynikPucharu {
     if (p.faza === "regionalny") {
       const n = nazwyFazy.length;
       if (p.runda === n - 1) { s.kluby[s.mojKlub].kasa += 25_000; wiadomosc(s, `🥈 Finalista Pucharu Polski na szczeblu ZPN — nagroda PZPN 25 000 zł.`); }
-      else if (p.runda === n - 2 && zwiazek(s) === "POM") { s.kluby[s.mojKlub].kasa += 1_500; wiadomosc(s, "Półfinalista Pucharu Polski Pomorskiego ZPN — nagroda 1 500 zł."); }
+      else if (p.runda === n - 2 && zpnSciezki(s.sciezka).kod === "POM") { s.kluby[s.mojKlub].kasa += 1_500; wiadomosc(s, "Półfinalista Pucharu Polski Pomorskiego ZPN — nagroda 1 500 zł."); }
     }
     p.faza = "odpadl";
     wiadomosc(s, `Puchar: odpadliście z ${rywalNazwa} (${wynikTekst}) w rundzie „${nazwa}". Premia ${zl(nagroda)}.`);

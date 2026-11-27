@@ -7,16 +7,13 @@ import { wybierz } from "../engine/losuj";
 import { klasaWgSzczebla, szczebelPoziomu, tylkoSedziaGlowny } from "../engine/obsadaSedziowska";
 import { IMIONA, NAZWISKA } from "./nazwy";
 import type { Sedziowie, SedziaOsoba, StanGry, Wynik } from "../engine/types";
+import { ZPN as ZPN_REJESTR, zpnGracza, type RegionZpn } from "../engine/zpn";
 
-type Region = "centralny" | "pomorskie" | "malopolskie" | "zachodniopomorskie" | "kujawsko-pomorskie";
+type Region = "centralny" | RegionZpn;
 
 // Dane wojewódzkiego ZPN wg regionu gry (mianownik, dopełniacz, nazwa pucharu, kolegia sędziowskie/okręgi).
-const ZPN: Record<string, { mian: string; dop: string; puchar: string; okregi: string[] }> = {
-  pomorskie: { mian: "Pomorski ZPN", dop: "Pomorskiego ZPN", puchar: "Puchar Pomorski", okregi: ["Gdańsk", "Słupsk", "Malbork", "Gdynia"] },
-  malopolskie: { mian: "Małopolski ZPN", dop: "Małopolskiego ZPN", puchar: "Puchar Małopolski", okregi: ["Kraków", "Tarnów", "Nowy Sącz", "Wadowice"] },
-  zachodniopomorskie: { mian: "Zachodniopomorski ZPN", dop: "Zachodniopomorskiego ZPN", puchar: "Puchar Zachodniopomorski", okregi: ["Szczecin", "Koszalin", "Stargard", "Kołobrzeg"] },
-  "kujawsko-pomorskie": { mian: "Kujawsko-Pomorski ZPN", dop: "Kujawsko-Pomorskiego ZPN", puchar: "Puchar Kujawsko-Pomorski", okregi: ["Bydgoszcz", "Toruń", "Włocławek", "Grudziądz"] },
-};
+const ZPN: Record<string, { mian: string; dop: string; puchar: string; okregi: string[] }> =
+  Object.fromEntries(Object.values(ZPN_REJESTR).map((z) => [z.region, { mian: z.mian, dop: z.dop, puchar: z.pucharKrotki, okregi: z.okregi }]));
 
 // ——— REALNI sędziowie szczebla centralnego (2026/27; źródła: obsady PZPN/etoto, lista FIFA) ———
 const EKSTRAKLASA_GL: { imie: string; nazwisko: string; fifa?: boolean }[] = [
@@ -75,13 +72,8 @@ export function klasaSedziego(poziom: number, region: Region): string {
 }
 
 /** Region świata gry wg nazw lig (pomorskie vs małopolskie). */
-export function regionSwiata(s: StanGry): "pomorskie" | "malopolskie" | "zachodniopomorskie" | "kujawsko-pomorskie" {
-  const nazwy = s.ligi.map((l) => l.nazwa.toLowerCase()).join(" ");
-  // Kolejność ważna: „zachodniopomor" i „kujawsko" też zawierają „pomor".
-  if (/zachodniopomor/.test(nazwy)) return "zachodniopomorskie";
-  if (/kujawsko/.test(nazwy)) return "kujawsko-pomorskie";
-  if (/pomor/.test(nazwy)) return "pomorskie";
-  return "malopolskie";
+export function regionSwiata(s: StanGry): RegionZpn {
+  return zpnGracza(s).region;
 }
 
 const tag = (a: { imie: string; nazwisko: string; fifa?: boolean }[], klasa: string, region: Region): SedziaOsoba[] =>

@@ -56,6 +56,7 @@ import { planOpraw, wedrownaOprawaTydzien } from "./oprawy";
 import { GRUPY_KIBICOW } from "../data/grupyKibicow";
 import { kulturaTrybun, noweFlagiTydzien } from "./flagi";
 import type { GraczXI, Historia, Klub, Konferencja, Wynik, Liga, Nastawienie, Sponsor, SponsorTyp, StanGry, WlasnoscKlubu, WpisTrenera, Zawodnik } from "./types";
+import { zpnSciezki } from "./zpn";
 
 /** Najlepsza jedenastka kolejki w danej lidze (1 BR, 4 OBR, 4 POM, 2 NAP) wg ocen meczu. */
 function liczXIKolejki(s: StanGry, liga: Liga, przedMecze: Map<string, number>, kolejkaNr: number) {
@@ -690,8 +691,7 @@ let ostatniBaraz = ""; // tekst wyniku ostatniego meczu barażowego (do komunika
  *  i karne; Pomorski, Zachodniopomorski i Małopolski ZPN (o IV/V ligę) — przy remisie od razu rzuty karne. */
 export function dogrywkaWBarazu(s: StanGry, poziomGorny: number): boolean {
   if (poziomGorny <= 4) return true;
-  const sc = s.sciezka ?? "";
-  return /^Kujawsko/.test(sc);
+  return zpnSciezki(s.sciezka).dogrywkaBaraz;
 }
 function meczBarazowy(s: StanGry, wyzej: string, nizej: string, poziomGorny = 1): string {
   // mecz rozegrany wcześniej przez gracza (na żywo albo symulowany z ekranu baraży) — liczy się jego wynik

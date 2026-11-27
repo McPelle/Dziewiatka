@@ -20,6 +20,7 @@
 import { obsadaCentralna, szczebelPoziomu, NAZWA_SZCZEBLA, type Szczebel } from "./obsadaSedziowska";
 import { szansa, wybierz, zl } from "./losuj";
 import type { StanGry } from "./types";
+import { zpnSciezki } from "./zpn";
 
 export interface WycofanieDruzyny { klubId: string; poziom: number; kolejka: number; anulowane: boolean; powod: string }
 export interface WalkowerZaplanowany { poziom: number; runda: number; dom: string; gosc: string; wycofany: string }
@@ -45,7 +46,7 @@ export const OPLATA_WPISOWA: Record<Szczebel, number> = {
 function organ(s: StanGry, sz: Szczebel): string {
   if (obsadaCentralna(sz)) return "PZPN (szczebel centralny)";
   const sc = s.sciezka ?? "";
-  return /^Pomorskie/.test(sc) ? "Pomorski ZPN" : /^Zachodnio/.test(sc) ? "Zachodniopomorski ZPN" : /^Kujawsko/.test(sc) ? "Kujawsko-Pomorski ZPN" : "Małopolski ZPN";
+  return zpnSciezki(sc).mian;
 }
 
 /** Zgłoszenie na bieżący sezon (tworzone leniwie: nowy sezon / nowy klub). */

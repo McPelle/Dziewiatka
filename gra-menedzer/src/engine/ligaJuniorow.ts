@@ -6,36 +6,23 @@ import { los, poisson, szansa, tasuj, wybierzWazone } from "./losuj";
 import { zakresUmiej } from "./swiat";
 import { skladJun } from "./juniorzy";
 import type { KatJun, LigaJun, PucharJun, StanGry, WierszJun, WynikJun, Zawodnik } from "./types";
+import { zpnGracza } from "./zpn";
 
 const KAT: KatJun[] = ["U19", "U17"];
 
-function region(s: StanGry): "pomorskie" | "malopolskie" | "zachodniopomorskie" | "kujawsko-pomorskie" {
-  const t = s.sciezka || "";
-  // Kolejność ważna: „zachodniopomor" i „kujawsko" też zawierają „pomor".
-  if (/zachodniopomor/i.test(t)) return "zachodniopomorskie";
-  if (/kujawsko/i.test(t)) return "kujawsko-pomorskie";
-  if (/ma[łl]opol/i.test(t)) return "malopolskie";
-  return "pomorskie";
-}
-const PRZYMIOTNIK_LIGI: Record<string, string> = {
-  pomorskie: "Pomorska", malopolskie: "Małopolska", zachodniopomorskie: "Zachodniopomorska", "kujawsko-pomorskie": "Kujawsko-Pomorska",
-};
-const ZPN_DOP_JUN: Record<string, string> = {
-  pomorskie: "Pomorskiego ZPN", malopolskie: "Małopolskiego ZPN", zachodniopomorskie: "Zachodniopomorskiego ZPN", "kujawsko-pomorskie": "Kujawsko-Pomorskiego ZPN",
-};
 function nazwaLigi(s: StanGry, kat: KatJun, poziom: number): string {
   const u = kat === "U19" ? "U-19" : "U-17";
   // Szczebel centralny i makroregionalny jak w realu (CLJ dla najwyższych klubów).
   if (poziom <= 2) return `Centralna Liga Juniorów ${u}`;
   if (poziom <= 4) return `Makroregionalna Liga Juniorów ${u}`;
-  const reg = PRZYMIOTNIK_LIGI[region(s)];
+  const reg = zpnGracza(s).przymiotnik;
   const katNaz = kat === "U19" ? "Juniorów Starszych A1" : "Juniorów Młodszych B1";
   if (poziom <= 5) return `${reg} Liga ${katNaz}`;        // liga wojewódzka
   const szczebel = poziom <= 6 ? "I" : poziom <= 7 ? "II" : "III";
   return `${reg} ${szczebel} Liga Okręgowa ${katNaz}`;    // niższe szczeble (klasa okręgowa/A/B)
 }
 function nazwaPucharu(s: StanGry, kat: KatJun): string {
-  return `Puchar ${ZPN_DOP_JUN[region(s)]} Juniorów ${kat === "U19" ? "U-19" : "U-17"}`;
+  return `Puchar ${zpnGracza(s).dop} Juniorów ${kat === "U19" ? "U-19" : "U-17"}`;
 }
 
 

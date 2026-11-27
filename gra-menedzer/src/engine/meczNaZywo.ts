@@ -16,6 +16,7 @@ import { autoSklad, dostepny, efektywna, FORMACJE, silaSkladu } from "./mecz";
 import { bledySpalonego } from "./obsadaSedziowska";
 import { formacjaAI } from "./sezon";
 import type { Nastawienie, Pozycja, StanGry, Zawodnik } from "./types";
+import { szczebelRegionalny, zpnSciezki } from "./zpn";
 
 export interface ZasadyZmian { limit: number; okna: number | null; powrotne: boolean; lawka: number; opis: string }
 export function zasadyZmian(s: StanGry): ZasadyZmian {
@@ -23,13 +24,10 @@ export function zasadyZmian(s: StanGry): ZasadyZmian {
   const nazwa = s.ligi[p - 1]?.nazwa ?? "";
   if (p <= 4) return { limit: 5, okna: 3, powrotne: false, lawka: 9, opis: "5 zmian w maks. 3 przerwach w grze (przerwa między połowami się nie liczy) — przepisy PZPN" };
   const sc = s.sciezka ?? "";
-  const woj = /^Pomorskie/.test(sc) ? "POM" : /^Zachodnio/.test(sc) ? "ZZPN" : /^Kujawsko/.test(sc) ? "KP" : "MZPN";
-  const kl = p === 5 ? "IV" : /klasa B|B klasa|B-klas/i.test(nazwa) ? "B" : /klasa A|A klasa|A-klas/i.test(nazwa) ? "A" : "OKR";
-  const T: Record<string, Record<string, number>> = {
-    MZPN: { IV: 5, OKR: 7, A: 7, B: 7 }, POM: { IV: 5, OKR: 5, A: 5, B: 6 }, ZZPN: { IV: 7, OKR: 7, A: 7, B: 99 }, KP: { IV: 5, OKR: 5, A: 5, B: 7 },
-  };
-  const limit = T[woj][kl];
-  const nz = { MZPN: "Małopolski ZPN", POM: "Pomorski ZPN", ZZPN: "Zachodniopomorski ZPN", KP: "Kujawsko-Pomorski ZPN" }[woj];
+  const zpn = zpnSciezki(sc);
+  const kl = szczebelRegionalny(nazwa, p);
+  const limit = zpn.zmiany[kl];
+  const nz = zpn.mian;
   if (limit >= 99) return { limit: 99, okna: null, powrotne: true, lawka: 7, opis: `${nz}, klasa B: zmiany powrotne bez limitu (zawodnik może wrócić na boisko)` };
   return { limit, okna: null, powrotne: false, lawka: 7, opis: `${nz}: ${limit} zmian w meczu` };
 }
