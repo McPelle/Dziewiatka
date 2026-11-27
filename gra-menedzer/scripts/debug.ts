@@ -1,0 +1,11 @@
+import { nowaGra, silaKlubu } from "../src/engine/swiat";
+import { rozpocznijKariere, zagrajKolejke, rynek, kup } from "../src/engine/sezon";
+import { silaSkladu, autoSklad } from "../src/engine/mecz";
+const s = nowaGra("Bot"); rozpocznijKariere(s, s.ligi[8].kluby[0]);
+const liga = s.ligi[8];
+const sily = liga.kluby.map(id => silaKlubu(s, id).toFixed(1));
+console.log("siły ligi C", sily.join(" "));
+const sk = silaSkladu(s, s.taktyka.sklad, s.taktyka.formacja); console.log("mój skład", sk);
+const r = rynek(s);
+console.log("wolni top", r.wolni.sort((a,b)=>b.umiej-a.umiej).slice(0,5).map(z=>`${z.poz} ${z.umiej.toFixed(0)} ${z.pensja}`).join(" | "));
+const rywal = liga.kluby[1]; console.log("rywal", silaSkladu(s, autoSklad(s, rywal, "4-4-2"), "4-4-2"));

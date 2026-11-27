@@ -1,0 +1,417 @@
+{
+  "Biegoniczanka Nowy Sącz": {
+    "rok": 1292
+  },
+  "Chełmianka Chełm": {
+    "adres": "ul. 1 Pułku Szwoleżerów 15, 22-100 Chełm",
+    "pelna": "Chełmski Klub Sportowy Chełmianka Chełm",
+    "rok": 1955
+  },
+  "Chojniczanka Chojnice": {
+    "adres": "ul. A. Mickiewicza 12, Chojnice",
+    "pelna": "Miejski Klub Sportowy „Chojniczanka 1930” Spółka Akcyjna w Chojnicach",
+    "rok": 1930
+  },
+  "BKS Bochnia": {
+    "adres": "ulica Parkowa 3 32-700 Bochnia",
+    "pelna": "Bocheński Klub Sportowy",
+    "rok": 1921
+  },
+  "Bronowianka Kraków": {
+    "adres": "ul. Zarzecze 124a 30-134 Kraków",
+    "pelna": "Klub Sportowy Bronowianka Kraków",
+    "rok": 1935
+  },
+  "Beskid Andrychów": {
+    "adres": "ul. Kościuszki 1 34-120 Andrychów",
+    "pelna": "Klub Sportowy Beskid Andrychów",
+    "rok": 1919
+  },
+  "Bruk-Bet Termalica Nieciecza": {
+    "adres": "Nieciecza 199, 33-240 Żabno",
+    "pelna": "Bruk-Bet Termalica Nieciecza Klub Sportowy",
+    "rok": 1922
+  },
+  "Clepardia Kraków": {
+    "adres": "ul. Fieldorfa Nila 5 31-209 Kraków",
+    "pelna": "Klub Sportowy Clepardia Kraków",
+    "rok": 1909
+  },
+  "Górnik Zabrze": {
+    "adres": "ul. Franklina Roosevelta 81 41-800 Zabrze",
+    "pelna": "Górnik Zabrze Spółka Akcyjna",
+    "rok": 1948,
+    "stadion": "Arena Zabrze",
+    "pojemnosc": 28236
+  },
+  "Górnik Łęczna": {
+    "adres": "al. Jana Pawła II 13, 21-010 Łęczna",
+    "pelna": "Górnik Łęczna Spółka Akcyjna",
+    "rok": 1979
+  },
+  "Garbarnia Kraków": {
+    "stadion": "Boisko YMCA na Błoniach, Kraków",
+    "adres": "ul. Rydlówka 21G 30-363 Kraków",
+    "pelna": "Robotniczy Klub Sportowy Garbarnia",
+    "rok": 1921
+  },
+  "Dalin Myślenice": {
+    "pelna": "K.S. Dalin Myślenice",
+    "rok": 1921
+  },
+  "Górnik Wieliczka": {
+    "pelna": "Klub Sportowy Górnik Wieliczka",
+    "rok": 1947
+  },
+  "Glinik Gorlice": {
+    "adres": "ul. Sienkiewicza 15 38-300 Gorlice",
+    "pelna": "Gorlicki Klub Sportowy Glinik Gorlice",
+    "rok": 1921
+  },
+  "Harnaś Tymbark": {
+    "adres": "Tymbark 249, 34-650 Tymbark",
+    "pelna": "Klub Sportowy Harnaś Tymbark",
+    "rok": 1949
+  },
+  "Kalwarianka Kalwaria Zebrzydowska": {
+    "rok": 1617
+  },
+  "Jagiellonia Białystok": {
+    "adres": "ul. Jurowiecka 21 15-101 Białystok",
+    "pelna": "Jagiellonia Białystok Sportowa Spółka Akcyjna",
+    "rok": 1920,
+    "stadion": "Chorten Arena (Stadion Miejski)",
+    "pojemnosc": 22372
+  },
+  "KSZO Ostrowiec Świętokrzyski": {
+    "adres": "ul. Świętokrzyska 11",
+    "pelna": "Klub Sportowy Zakładów Ostrowieckich Ostrowiec Świętokrzyski",
+    "rok": 1929
+  },
+  "Korona Kielce": {
+    "adres": "Ulica Piotra Ściegiennego w Kielcach",
+    "pelna": "Korona Kielce Spółka Akcyjna",
+    "rok": 1973,
+    "stadion": "Suzuki Arena",
+    "pojemnosc": 15550
+  },
+  "Hutnik Kraków": {
+    "adres": "ul. Tadeusza Ptaszyckiego 4 31-979 Kraków",
+    "pelna": "Hutnik Kraków spółka z ograniczoną odpowiedzialnością",
+    "rok": 1950
+  },
+  "Hetman Zamość": {
+    "adres": "ul. Królowej Jadwigi 8 22-400 Zamość",
+    "pelna": "Klub Sportowy Hetman Zamość",
+    "rok": 1934
+  },
+  "Kabel Kraków": {
+    "adres": "ul. Parkowa 12a, 30-504 Kraków",
+    "pelna": "Klub Sportowy Kabel Kraków Sp. z o.o.",
+    "rok": 1929
+  },
+  "Kolejarz Stróże": {
+    "adres": "Stróże 503, 33-331 Stróże",
+    "pelna": "Klub Sportowy Kolejarz Stróże",
+    "rok": 1949
+  },
+  "JKS 1909 Jarosław": {
+    "adres": "ul. Bandurskiego 2/11 37-500 Jarosław (województwo podkarpackie)",
+    "pelna": "Jarosławski Klub Sportowy 1909 Jarosław",
+    "rok": 1909
+  },
+  "KS Chełmek": {
+    "adres": "ul. Krakowska 22 32-660 Chełmek",
+    "pelna": "Klub Sportowy Chełmek",
+    "rok": 1932
+  },
+  "Karpaty Siepraw": {
+    "adres": "Siepraw 1075, 32-447",
+    "pelna": "Ludowy Klub Sportowy Karpaty Siepraw",
+    "rok": 1948
+  },
+  "Lech Poznań": {
+    "adres": "ul. Bułgarska 17, 60-320 Poznań",
+    "pelna": "KKS Lech Poznań Spółka Akcyjna",
+    "rok": 1920,
+    "stadion": "Enea Stadion",
+    "pojemnosc": 42837
+  },
+  "Lechia Zielona Góra": {
+    "adres": "ul. Sulechowska 37 65-147 Zielona Góra",
+    "pelna": "Klub Sportowy Lechia Zielona Góra",
+    "rok": 1946
+  },
+  "Legia II Warszawa": {
+    "adres": "ul. Łazienkowska 3 00-449 Warszawa",
+    "pelna": "Legia Warszawa Spółka Akcyjna"
+  },
+  "Limanovia Limanowa": {
+    "adres": "Marka 34 Limanowa",
+    "pelna": "Miejski Klub Sportowy Limanovia Limanowa",
+    "rok": 1924
+  },
+  "Odra Opole": {
+    "adres": "ul. L. Olejnika 1 45-839 Opole",
+    "pelna": "OKS Odra Opole Spółka Akcyjna",
+    "rok": 1945
+  },
+  "Okocimski KS Brzesko": {
+    "pelna": "Stowarzyszenie Sportowe Okocimski Klub Sportowy Brzesko",
+    "rok": 1933
+  },
+  "Olimpia Grudziądz": {
+    "adres": "Piłsudskiego 14, 86-300 Grudziądz",
+    "pelna": "Grudziądzki Klub Sportowy Olimpia Grudziądz Spółka Akcyjna",
+    "rok": 1923
+  },
+  "MKP Pogoń Siedlce": {
+    "adres": "ul. Jana Pawła II 6, 08-110 Siedlce",
+    "pelna": "Miejski Klub Piłkarski Pogoń Siedlce",
+    "rok": 1944
+  },
+  "Naprzód Jędrzejów": {
+    "adres": "ul. Sportowa 1, 28-300 Jędrzejów",
+    "pelna": "Klub Sportowy Naprzód Jędrzejów {{cytuj stronę",
+    "rok": 1928
+  },
+  "MKS Trzebinia": {
+    "adres": "ulica Kościuszki 33 32-540 Trzebinia",
+    "pelna": "Miejski Klub Sportowy Trzebinia",
+    "rok": 2000
+  },
+  "Poprad Muszyna": {
+    "rok": 1209
+  },
+  "Pogoń Szczecin": {
+    "adres": "ul. Karłowicza 28 71-102 Szczecin",
+    "pelna": "Pogoń Szczecin Spółka Akcyjna",
+    "rok": 1948,
+    "stadion": "Stadion im. Floriana Krygiera",
+    "pojemnosc": 21163
+  },
+  "Podbeskidzie Bielsko-Biała": {
+    "adres": "ul. Rychlińskiego 21, 43-300 Bielsko-Biała",
+    "pelna": "Towarzystwo Sportowe Podbeskidzie Bielsko-Biała Spółka Akcyjna",
+    "rok": 1995
+  },
+  "Piast Gliwice": {
+    "adres": "ul. Stefana Okrzei 20, 44-100 Gliwice",
+    "pelna": "Gliwicki Klub Sportowy „Piast” Spółka Akcyjna",
+    "rok": 1945,
+    "stadion": "Stadion im. Piotra Wieczorka",
+    "pojemnosc": 9913
+  },
+  "Proszowianka Proszowice": {
+    "adres": "ul. Parkowa 10, 32-100 Proszowice , Polska",
+    "pelna": "Miejski Klub Sportowy Nowa Proszowianka Proszowice",
+    "rok": 1916
+  },
+  "Podgórze Kraków": {
+    "adres": "ul. Dekerta 21, 30-703 Kraków",
+    "pelna": "Klub Sportowy Podgórze Kraków",
+    "rok": 1913
+  },
+  "Pogoń Grodzisk Mazowiecki": {
+    "adres": "Al. Mokronoskich 4 05-825 Grodzisk Mazowiecki",
+    "pelna": "Grodziski Klub Sportowy Pogoń Grodzisk Mazowiecki",
+    "rok": 1922
+  },
+  "Przebój II Wolbrom": {
+    "adres": "ul. Leśna 2 32-340 Wolbrom",
+    "pelna": "Wolbromski Klub Sportowy Przebój Wolbrom",
+    "rok": 1937
+  },
+  "Podlasie Biała Podlaska": {
+    "adres": "ul. Piłsudskiego 38 21-500 Biała Podlaska",
+    "pelna": "Miejski Klub Sportowy Podlasie Biała Podlaska",
+    "rok": 1957
+  },
+  "Pogoń-Sokół Lubaczów": {
+    "adres": "37-600 Lubaczów (biuro) {{cytuj stronę",
+    "pelna": "Pogoń-Sokół Lubaczów sp. z o. o. KRS: {{KRS",
+    "rok": 1945
+  },
+  "Ruch Chorzów": {
+    "adres": "ul. Cicha 6 41-506 Chorzów",
+    "pelna": "Ruch Chorzów Spółka Akcyjna",
+    "rok": 1920
+  },
+  "Sandecja Nowy Sącz": {
+    "adres": "ul. Jana Kilińskiego 47 33-300 Nowy Sącz",
+    "pelna": "Miejski Klub Sportowy \"Sandecja\" S.A.",
+    "rok": 1910
+  },
+  "Sokół Kleczew": {
+    "adres": "Aleja 600 lecia 21, 62-540 Kleczew",
+    "pelna": "Klub Sportowy Sokół Kleczew",
+    "rok": 1928
+  },
+  "Radomiak Radom": {
+    "adres": "ul. Andrzej Strug",
+    "pelna": "Radomski Klub Sportowy Radomiak Radom S.A.",
+    "rok": 1910,
+    "stadion": "Stadion Braci Czachorów",
+    "pojemnosc": 13982
+  },
+  "Raków Częstochowa": {
+    "stadion": "zondacrypto Arena",
+    "adres": "ul. Limanowskiego 83 42-208 Częstochowa",
+    "pelna": "RKS Raków Częstochowa Spółka Akcyjna",
+    "rok": 1921,
+    "pojemnosc": 5500
+  },
+  "Puszcza Niepołomice": {
+    "adres": "ul. Janusza Kusocińskiego 2, 32-005 Niepołomice",
+    "pelna": "Miejski Klub Sportowy Puszcza Niepołomice",
+    "rok": 1923
+  },
+  "Skawa Wadowice": {
+    "adres": "ul. Błonie 2, 34-100 Wadowice",
+    "pelna": "Miejski Klub Sportowy Skawa Wadowice",
+    "rok": 1907
+  },
+  "Prądniczanka Kraków": {
+    "adres": "św. Andrzeja Boboli 5 31-408 Kraków",
+    "pelna": "K.S. Prądniczanka Kraków",
+    "rok": 1921
+  },
+  "Unia Tarnów": {
+    "adres": "ul. Traugutta 5a 33-101 Tarnów",
+    "pelna": "Klub Sportowy ZKS Unia Tarnów",
+    "rok": 1928
+  },
+  "Tarnovia Tarnów": {
+    "adres": "ul. Bandrowskiego 9 33-100 Tarnów",
+    "pelna": "Miejski Klub Sportowy Tarnovia Tarnów",
+    "rok": 1909
+  },
+  "Star Starachowice": {
+    "adres": "ul. Szkolna 14 27-200 Starachowice",
+    "pelna": "Starachowicki Klub Sportowy Star Starachowice",
+    "rok": 1926
+  },
+  "Unia Skierniewice": {
+    "adres": "ul. Pomologiczna 8a 96-100 Skierniewice",
+    "pelna": "Miejski Klub Sportowy Unia Skierniewice",
+    "rok": 1945
+  },
+  "Zgoda Byczyna": {
+    "rok": 1229
+  },
+  "Zawisza Bydgoszcz": {
+    "adres": "ul. Gdańska 163",
+    "pelna": "Cywilno-Wojskowy Związek Sportowy Zawisza Bydgoszcz",
+    "rok": 1946
+  },
+  "Wisłoka Dębica": {
+    "adres": "ul. Parkowa 1, 39-200 Dębica",
+    "pelna": "Klub Sportowy Wisłoka Dębica",
+    "rok": 1908
+  },
+  "Wisła Kraków": {
+    "adres": "ul. Władysława Reymonta 20 30-059 Kraków",
+    "pelna": "Towarzystwo Sportowe Wisła Kraków Spółka Akcyjna",
+    "rok": 1906,
+    "stadion": "Stadion im. Henryka Reymana",
+    "pojemnosc": 33130
+  },
+  "Zawisza Sulechów": {
+    "adres": "ul. Żeromskiego 38 66-100 Sulechów",
+    "pelna": "Miejski Ludowy Klub Sportowy Zawisza Sulechów",
+    "rok": 1971
+  },
+  "Wisła II Kraków": {
+    "adres": "ul. Władysława Reymonta 20, 30-059 Kraków",
+    "pelna": "Towarzystwo Sportowe Wisła Kraków Spółka Akcyjna"
+  },
+  "Wieczysta Kraków": {
+    "adres": "ul. Kazimierza Chałupnika 16 31-462 Kraków",
+    "pelna": "Wieczysta Kraków Spółka Akcyjna",
+    "rok": 1942,
+    "stadion": "Stadion Wieczystej"
+  },
+  "Świt Szczecin": {
+    "adres": "ul. Stołczyńska 100, 71-831 Szczecin",
+    "pelna": "Klub Sportowy Świt Szczecin",
+    "rok": 1952
+  },
+  "Świt Krzeszowice": {
+    "pelna": "GKS Świt Krzeszowice",
+    "rok": 1923
+  },
+  "Śląsk II Wrocław": {
+    "adres": "Aleja Śląska 1, 54-118 Wrocław",
+    "pelna": "Śląsk II Wrocław"
+  },
+  "Legia Warszawa": {
+    "adres": "ul. Łazienkowska 3, 00-449 Warszawa",
+    "pelna": "Legia Warszawa Spółka Akcyjna",
+    "rok": 1916,
+    "stadion": "Stadion Wojska Polskiego im. Marszałka Józefa Piłsudskiego",
+    "pojemnosc": 31103
+  },
+  "Śląsk Wrocław": {
+    "adres": "al. Śląska 1, 54-118 Wrocław",
+    "pelna": "WKS Śląsk Wrocław Spółka Akcyjna",
+    "rok": 1947,
+    "stadion": "Tarczyński Arena Wrocław",
+    "pojemnosc": 42771
+  },
+  "Cracovia": {
+    "adres": "ul. Kałuży 1, 30-111 Kraków",
+    "pelna": "MKS Cracovia Sportowa Spółka Akcyjna",
+    "rok": 1906,
+    "stadion": "Stadion im. Józefa Piłsudskiego",
+    "pojemnosc": 15016
+  },
+  "Motor Lublin": {
+    "adres": "al. Zygmuntowskie 5, 20-101 Lublin",
+    "pelna": "Motor Lublin Spółka Akcyjna",
+    "rok": 1950,
+    "stadion": "Arena Lublin",
+    "pojemnosc": 15247
+  },
+  "Widzew Łódź": {
+    "adres": "al. Piłsudskiego 138, 92-230 Łódź",
+    "pelna": "Widzew Łódź Spółka Akcyjna",
+    "rok": 1910,
+    "stadion": "Stadion Widzewa im. Ludwika Sobolewskiego",
+    "pojemnosc": 18018
+  },
+  "Zagłębie Lubin": {
+    "adres": "ul. M. Skłodowskiej-Curie 98, 59-301 Lubin",
+    "pelna": "Zagłębie Lubin Spółka Akcyjna",
+    "rok": 1945,
+    "stadion": "KGHM Zagłębie Arena",
+    "pojemnosc": 16086
+  },
+  "GKS Katowice": {
+    "adres": "ul. Bukowa 1, 40-108 Katowice",
+    "pelna": "GKS Katowice Spółka Akcyjna",
+    "rok": 1964,
+    "stadion": "Arena Katowice",
+    "pojemnosc": 15048
+  },
+  "Wisła Płock": {
+    "adres": "ul. Łukasiewicza 34, 09-400 Płock",
+    "pelna": "Wisła Płock Spółka Akcyjna",
+    "rok": 1947,
+    "stadion": "ORLEN Stadion (Stadion im. Kazimierza Górskiego)",
+    "pojemnosc": 15004
+  },
+  "Lechia Gdańsk": {
+    "adres": "al. Pokoju 20, 80-809 Gdańsk",
+    "pelna": "Lechia Gdańsk Spółka Akcyjna",
+    "rok": 1945,
+    "stadion": "Polsat Plus Arena Gdańsk",
+    "pojemnosc": 41620
+  },
+  "Arka Gdynia": {
+    "adres": "ul. Olimpijska 5, 81-538 Gdynia",
+    "pelna": "Arka Gdynia Spółka Akcyjna",
+    "rok": 1929,
+    "stadion": "Stadion Miejski w Gdyni",
+    "pojemnosc": 15139
+  }
+}
