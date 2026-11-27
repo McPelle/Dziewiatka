@@ -1,7 +1,7 @@
 // Dobór oryginalnego logo rozgrywek po nazwie ligi/pucharu (bez zależności od React Native — testowalne).
 import { wojLigi } from "../engine/regiony";
 
-export type KluczLogo = "ekstraklasa" | "l1" | "l2" | "l3" | "superpuchar" | "pucharpolski" | "lm" | "le" | "lk" | "zpnPom" | "zpnKp" | "zpnZach" | "zpnMal" | "l4Kp" | "l4Zach" | "zpnWm" | "zpnPod" | "l4Wm" | "ppWm";
+export type KluczLogo = "ekstraklasa" | "l1" | "l2" | "l3" | "superpuchar" | "pucharpolski" | "lm" | "le" | "lk" | "zpnPom" | "zpnKp" | "zpnZach" | "zpnMal" | "l4Kp" | "l4Zach" | "zpnWm" | "zpnPod" | "l4Wm" | "ppWm" | "l4Mal";
 export function kluczLogoLigi(nazwa: string, poziom?: number): KluczLogo | null {
   if (/Liga Mistrz|Champions|\bLM\b|UCL/i.test(nazwa)) return "lm";
   if (/Liga Europy|Europa League|\bLE\b|UEL/i.test(nazwa)) return "le";
@@ -23,6 +23,6 @@ export function kluczLogoLigi(nazwa: string, poziom?: number): KluczLogo | null 
   if (w === "warmińsko-mazurskie") return /Puchar/i.test(nazwa) ? "ppWm" : iv ? "l4Wm" : "zpnWm";
   if (w === "podlaskie") return "zpnPod"; // IV liga podlaska i puchar Podlaskiego ZPN nie mają własnego logo — herb związku
   if (w === "pomorskie") return "zpnPom";
-  if (w === "małopolskie") return "zpnMal";
+  if (w === "małopolskie") return iv ? "l4Mal" : "zpnMal"; // TEXOM Małopolska 4. Liga — własne logo
   return null;
 }
