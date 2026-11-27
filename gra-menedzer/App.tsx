@@ -41,7 +41,19 @@ export default function App() {
 
   const [czekaNaZapis, setCzekaNaZapis] = useState(false);
   // zapis wczytuje się w tle — menu jest od razu gotowe do klikania
-  useEffect(() => { const t = setTimeout(() => wczytaj().then((s) => { setStan(s); setLaduje(false); }), 30); return () => clearTimeout(t); }, []);
+  useEffect(() => {
+    // wczytanie zapisu w tle; gdy pamięć telefonu nie odpowiada — ponowna próba, a menu i tak działa
+    let koniec = false;
+    const zTimeoutem = () => Promise.race([wczytaj(), new Promise<"czas">((r) => setTimeout(() => r("czas"), 7000))]);
+    const t = setTimeout(async () => {
+      let w = await zTimeoutem();
+      if (w === "czas") w = await zTimeoutem();
+      if (koniec) return;
+      if (w === "czas") { setLaduje(false); if (Platform.OS === "web") window.alert("Nie udało się wczytać zapisu z pamięci telefonu. Zamknij grę całkiem i otwórz ponownie (zapis nie zniknął)."); return; }
+      setStan(w); setLaduje(false);
+    }, 30);
+    return () => { koniec = true; clearTimeout(t); };
+  }, []);
 
   const odswiez = useCallback(() => {
     setWersja((w) => w + 1);

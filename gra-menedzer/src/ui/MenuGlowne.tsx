@@ -21,7 +21,7 @@ export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj }
     <View style={{ flex: 1, backgroundColor: K.tlo }}>
       {/* SCENA TYTUŁOWA */}
       <View style={{ height: "56%", borderBottomWidth: 2, borderBottomColor: K.akcent, overflow: "hidden" }}>
-        <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>{Platform.OS === "web" && grafika3D() ? <Stadion3DWidok s={stan} klub={stan ? klub! : KLUB_DEMO} tlo /> : <TloStadion />}</View>
+        <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}><TloStadion />{/* tło menu zawsze 2D: 3D w tle menu blokowało dotyk w aplikacji z ikony na iPhonie */}</View>
         <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(4,12,8,0.35)" }} />
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingTop: Platform.OS === "android" ? 20 : 0 }}>
           <HerbGry rozmiar={112} />
