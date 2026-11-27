@@ -1,3 +1,4 @@
+import { poMeczuWydzial, tydzienWydzialu } from "./wydzialGier";
 import { sprawdzWyzwanieKolejka, sprawdzWyzwanieSezon } from "./wyzwania";
 import { dotacjaGminy, poMeczu, wyjazdBusem } from "./zywySwiat";
 import { czasNaKadre, przerwaNaKadre } from "./reprezentacje";
@@ -972,6 +973,7 @@ export function zagrajKolejke(s: StanGry) {
       return w;
     });
     liga.wyniki[r] = wyniki;
+    { const mw = wyniki.find((x) => x.dom === s.mojKlub || x.gosc === s.mojKlub); if (mw) poMeczuWydzial(s, mw, s.ligi.indexOf(liga), r); } // ocena sędziego, ew. protest
     // Passa drużyn: wygrana przedłuża serię dodatnią, porażka ujemną, remis zeruje.
     for (const w of wyniki) {
       const kd = s.kluby[w.dom], kg = s.kluby[w.gosc];
@@ -1016,6 +1018,7 @@ export function zagrajKolejke(s: StanGry) {
   for (const w of tydzienJezykow(s)) wiadomosc(s, w); // nauka polskiego cudzoziemców, kurs, tłumacz
   for (const w of sprawdzOsiagniecia(s)) wiadomosc(s, w); // osiągnięcia trenera
   { const t = sprawdzWyzwanieKolejka(s); if (t) wiadomosc(s, t); } // tryb Wyzwania
+  tydzienWydzialu(s); // Wydział Gier, Kolegium Sędziów, Izba PZPN (zaległości płacowe)
   { const t = tydzienZgod(s, s.kluby[s.mojKlub]); if (t) wiadomosc(s, t); }
   { const t = tydzienLicencji(s); if (t) wiadomosc(s, t); } // kurs UEFA, egzamin, wymogi licencyjne ligi // życie zgód: jubileusze, zerwania, nowe układy
   { // wędrująca oprawa z orłami — po stadionach scen kibicowskich (przez zgody)

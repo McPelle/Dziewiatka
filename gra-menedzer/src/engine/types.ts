@@ -401,6 +401,7 @@ export interface StanGry {
   trudnosc?: string; // poziom trudności: latwy | normalny | trudny | legendarny
   osiagniecia?: Record<string, number>; // id osiągnięcia → sezon odblokowania
   osiagnieciaFlagi?: { trening?: boolean; mowa?: boolean; [k: string]: boolean | undefined };
+  wydzial?: import("./wydzialGier").StanWydzialu; // protesty, oceny sędziów, zaległości płacowe / Izba PZPN
   wyzwanie?: import("./wyzwania").StanWyzwania; // tryb Wyzwania: aktywny scenariusz
   startPoziom?: number; // szczebel klubu na starcie kariery
   noweFlagi?: Record<string, { tekst: string; typ: string; sezon: number }[]>; // flagi dorabiane przez kibiców z czasem
