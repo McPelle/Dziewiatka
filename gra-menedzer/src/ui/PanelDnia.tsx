@@ -4,10 +4,13 @@ import { dalejDzien, doMeczu, dzisiaj, fmtData, planTygodnia } from "../engine/d
 import type { StanGry } from "../engine/types";
 import { CZCIONKA, K, st } from "./styl";
 import { PanelOkresu } from "./PanelOkresu";
+import { MeczNaZywo } from "./MeczNaZywo";
+import { paraMojegoMeczu } from "../engine/meczNaZywo";
 
 /** Panel kalendarza na pulpicie: dzisiejszy dzień, plan tygodnia, raport ostatniego dnia, przyciski Dalej / Do meczu. */
 export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => void; pokazMecz: () => void }) {
   const [rozwin, setRozwin] = useState(true);
+  const [naZywo, setNaZywo] = useState<[string, string] | null>(null);
   if (s.okres) return <PanelOkresu s={s} odswiez={odswiez} />;
   const plan = planTygodnia(s);
   const d = dzisiaj(s);
@@ -44,12 +47,18 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
         <Pressable style={[st.przycisk, { flex: 1, marginHorizontal: 0, marginTop: 0 }]} onPress={dalej}>
           <Text style={st.przyciskTekst}>{d.typ === "mecz" ? "⚽ Rozegraj mecz ›" : `Dalej › ${plan[d.idx + 1]?.nazwa ?? ""}`}</Text>
         </Pressable>
+        {d.typ === "mecz" && paraMojegoMeczu(s) && (
+          <Pressable style={[st.przyciskMaly, { justifyContent: "center", borderColor: K.akcent }]} onPress={() => setNaZywo(paraMojegoMeczu(s))}>
+            <Text style={[st.przyciskMalyTekst, { color: K.akcent }]}>📺 Na żywo</Text>
+          </Pressable>
+        )}
         {d.typ !== "mecz" && (
           <Pressable style={[st.przyciskMaly, { justifyContent: "center", borderColor: K.niebieski }]} onPress={() => { doMeczu(s); odswiez(); }}>
             <Text style={[st.przyciskMalyTekst, { color: K.niebieski }]}>⏩ Do meczu</Text>
           </Pressable>
         )}
       </View>
+      {naZywo && <MeczNaZywo s={s} para={naZywo} onAnuluj={() => setNaZywo(null)} onKoniec={(m) => { s.meczLive = m; setNaZywo(null); const mecz = dalejDzien(s); odswiez(); if (mecz) pokazMecz(); }} />}
     </View>
   );
 }
