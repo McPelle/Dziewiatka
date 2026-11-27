@@ -23,7 +23,7 @@ npm install                      # tylko za pierwszym razem na nowej maszynie
 npx tsc --noEmit                 # typecheck (musi być czysty)
 npx expo export --platform web   # build web → folder dist/
 # (opcjonalna kompresja herbów, zmniejsza plik ~2x):
-find dist/assets -name '*.png' -print0 | xargs -0 -P4 -I{} convert "{}" -resize '96x96>' -colors 64 -strip "{}"
+(herby są już zoptymalizowane w assets/herby — NIE kompresować ich przy buildzie; popraw-herby.py robi to raz)
 node scripts/build-html.mjs dist index.html   # składa index.html (gra + herby + ikona)
 ```
 Testy balansu (opcjonalnie): `npx tsx scripts/test-wyniki.ts` (cel ~4.0 gole/mecz).

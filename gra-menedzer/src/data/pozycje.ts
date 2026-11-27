@@ -60,3 +60,58 @@ export function etykietaPoz(poz: Pozycja, pozS?: PozycjaSzczegolowa): string {
   if (pozS && ETYKIETA_POZ[pozS]) return ETYKIETA_POZ[pozS];
   return { BR: "Bramkarz", OBR: "Obrońca", POM: "Pomocnik", NAP: "Napastnik" }[poz];
 }
+
+
+// ——— Dopasowanie do KONKRETNEJ pozycji (slotu w formacji) ———
+// Zawodnik poza swoją pozycją gra słabiej: ŚP na LP traci ~18%, ŚP na LO ~35%, napastnik w obronie ~50%.
+// Wartości = jaki % swojej siły daje zawodnik o pozycji X (wiersz) ustawiony na pozycji Y (kolumna).
+const BLISKIE: Partial<Record<PozycjaSzczegolowa, Partial<Record<PozycjaSzczegolowa, number>>>> = {
+  SO:  { LO: 0.84, PO: 0.84, DP: 0.84, LWA: 0.74, PWA: 0.74, SP: 0.7 },
+  LO:  { LWA: 0.95, SO: 0.84, PO: 0.84, LP: 0.8, PWA: 0.8, DP: 0.72, LS: 0.7, SP: 0.66 },
+  PO:  { PWA: 0.95, SO: 0.84, LO: 0.84, PP: 0.8, LWA: 0.8, DP: 0.72, PS: 0.7, SP: 0.66 },
+  LWA: { LO: 0.95, LP: 0.9, PWA: 0.86, LS: 0.8, PO: 0.8, SO: 0.72, SP: 0.68 },
+  PWA: { PO: 0.95, PP: 0.9, LWA: 0.86, PS: 0.8, LO: 0.8, SO: 0.72, SP: 0.68 },
+  DP:  { SP: 0.92, SO: 0.84, OP: 0.74, LP: 0.72, PP: 0.72, LO: 0.72, PO: 0.72 },
+  SP:  { DP: 0.92, OP: 0.9, LP: 0.82, PP: 0.82, DN: 0.76, LS: 0.72, PS: 0.72, SO: 0.66 },
+  OP:  { SP: 0.9, DN: 0.9, LS: 0.84, PS: 0.84, LP: 0.82, PP: 0.82, NAP: 0.8, DP: 0.74 },
+  LP:  { LS: 0.92, LWA: 0.88, PP: 0.85, SP: 0.82, OP: 0.82, PS: 0.8, LO: 0.78 },
+  PP:  { PS: 0.92, PWA: 0.88, LP: 0.85, SP: 0.82, OP: 0.82, LS: 0.8, PO: 0.78 },
+  LS:  { LP: 0.92, PS: 0.88, OP: 0.82, NAP: 0.82, DN: 0.82, LWA: 0.76, PP: 0.78 },
+  PS:  { PP: 0.92, LS: 0.88, OP: 0.82, NAP: 0.82, DN: 0.82, PWA: 0.76, LP: 0.78 },
+  NAP: { DN: 0.9, LS: 0.82, PS: 0.82, OP: 0.76 },
+  DN:  { NAP: 0.9, OP: 0.9, LS: 0.84, PS: 0.84, SP: 0.76 },
+};
+const ODL_LINII: Record<Pozycja, Record<Pozycja, number>> = {
+  BR: { BR: 1, OBR: 0.35, POM: 0.3, NAP: 0.3 },
+  OBR: { BR: 0.25, OBR: 0.78, POM: 0.62, NAP: 0.48 },
+  POM: { BR: 0.25, OBR: 0.62, POM: 0.78, NAP: 0.66 },
+  NAP: { BR: 0.25, OBR: 0.45, POM: 0.62, NAP: 0.8 },
+};
+const LEWE = new Set<PozycjaSzczegolowa>(["LO", "LWA", "LP", "LS"]);
+const PRAWE = new Set<PozycjaSzczegolowa>(["PO", "PWA", "PP", "PS"]);
+
+/** Dopasowanie pozycji naturalnej `z` do slotu `na` (0..1). */
+export function dopasPozycji(z: PozycjaSzczegolowa, na: PozycjaSzczegolowa): number {
+  if (z === na) return 1;
+  return BLISKIE[z]?.[na] ?? ODL_LINII[KAT_POZ[z]][KAT_POZ[na]];
+}
+/** Dopasowanie ZAWODNIKA do slotu: najlepsza z jego pozycji (podstawowa + wyuczone), z korektą za nogę na bokach. */
+export function dopasowanieDoSlotu(z: { poz: Pozycja; pozS?: PozycjaSzczegolowa; pozycjeDodatkowe?: PozycjaSzczegolowa[]; noga?: "prawa" | "lewa" | "obie" }, slot: PozycjaSzczegolowa): number {
+  const pozycje = [z.pozS ?? POZ_WAGI[z.poz][0][0], ...(z.pozycjeDodatkowe ?? [])];
+  let best = 0;
+  for (const p of pozycje) best = Math.max(best, dopasPozycji(p, slot));
+  if (best < 1 && z.noga && z.noga !== "obie") {
+    // poza swoją pozycją na boku: „słaba" noga do boku linii dokłada minus (lewa strona — lewonożni naturalni)
+    if (LEWE.has(slot) && z.noga === "prawa") best *= 0.95;
+    if (PRAWE.has(slot) && z.noga === "lewa") best *= 0.95;
+  }
+  return best;
+}
+/** Opis dopasowania do UI. */
+export function opisDopasowania(d: number): { tekst: string; kolor: string } {
+  if (d >= 0.999) return { tekst: "naturalna pozycja", kolor: "#3fd47f" };
+  if (d >= 0.88) return { tekst: "dobrze zna tę pozycję", kolor: "#a6e05a" };
+  if (d >= 0.76) return { tekst: "gra poza pozycją", kolor: "#ffce47" };
+  if (d >= 0.6) return { tekst: "słabo zna tę pozycję", kolor: "#ff9a47" };
+  return { tekst: "zupełnie obca pozycja", kolor: "#ff6470" };
+}

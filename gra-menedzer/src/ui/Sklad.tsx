@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
 import { autoSklad, FORMACJE, POZYCJE, przydzielSloty, silaSkladu } from "../engine/mecz";
-import { SKROT_POZ, ETYKIETA_POZ } from "../data/pozycje";
+import { SKROT_POZ, ETYKIETA_POZ, opisDopasowania } from "../data/pozycje";
 import { dataKontraktu, jestMlodziezowcem, NAZWA_KONTRAKTU, wymogMlodziezowca } from "../engine/swiat";
 import { domyslnyWykonawca, poziomAkademii, treningiMoje, ustawWykonawca, wicekapitanowie, wykonawca, zwolnijZawodnika } from "../engine/sezon";
 import type { Nastawienie, StanGry, Zawodnik } from "../engine/types";
@@ -27,7 +27,7 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
   const kadra = s.kluby[s.mojKlub].zawodnicy
     .map((id) => s.zawodnicy[id])
     .sort((a, b) => POZYCJE.indexOf(a.poz) - POZYCJE.indexOf(b.poz) || b.umiej - a.umiej);
-  const sila = silaSkladu(s, t.sklad, t.formacja);
+  const sila = silaSkladu(s, t.sklad, t.formacja, !!t.reczneSloty);
   const maMlodziezowca = t.sklad.some((id) => s.zawodnicy[id] && jestMlodziezowcem(s.zawodnicy[id]));
   const f = FORMACJE[t.formacja];
   const wSkladzie = (poz: string) => t.sklad.filter((id) => s.zawodnicy[id]?.poz === poz).length;
@@ -35,6 +35,7 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
   const przelacz = (z: Zawodnik) => {
     if (z.kontuzja > 0 || s.niedostepni[z.id]) return;
     t.auto = false;
+    t.reczneSloty = false;
     if (t.sklad.includes(z.id)) t.sklad = t.sklad.filter((x) => x !== z.id);
     else if (t.sklad.length < 11) t.sklad = [...t.sklad, z.id];
     odswiez();
@@ -56,7 +57,7 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
           {Object.keys(FORMACJE).map((nazwa) => (
             <Pressable
               key={nazwa}
-              onPress={() => { t.formacja = nazwa; if (t.auto) t.sklad = autoSklad(s, s.mojKlub, nazwa); odswiez(); }}
+              onPress={() => { t.formacja = nazwa; t.reczneSloty = false; if (t.auto) { t.sklad = autoSklad(s, s.mojKlub, nazwa); t.reczneSloty = true; } odswiez(); }}
               style={[st.chip, nazwa === t.formacja && st.chipAktywny]}
             >
               <Text style={{ color: nazwa === t.formacja ? "#1a1a1a" : K.tekst, fontWeight: "700" }}>{nazwa}</Text>
@@ -64,23 +65,24 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
           ))}
         </View>
         {t.sklad.length === 11 && (() => {
-          const role = przydzielSloty(s, t.sklad, t.formacja);
+          const role = przydzielSloty(s, t.sklad, t.formacja, !!t.reczneSloty);
           return (
             <View style={{ marginTop: 6 }}>
               <Text style={st.naglowek}>Ustawienie — role ({t.formacja})</Text>
               <View style={[st.wiersz, { flexWrap: "wrap", gap: 4 }]}>
                 {role.map((r, i) => {
                   const z = r.id ? s.zawodnicy[r.id] : null;
-                  const poza = r.dopas < 0.9;
+                  const poza = r.dopas < 0.999;
+                  const o = opisDopasowania(r.dopas);
                   return (
-                    <View key={i} style={{ borderWidth: 1, borderColor: poza ? K.czerwony : K.linia, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 3, marginBottom: 2 }}>
-                      <Text style={{ fontSize: 10, color: poza ? K.czerwony : K.szary, fontWeight: "700" }}>{SKROT_POZ[r.slot]}</Text>
+                    <View key={i} style={{ borderWidth: 1, borderColor: poza ? o.kolor : K.linia, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 3, marginBottom: 2 }}>
+                      <Text style={{ fontSize: 10, color: poza ? o.kolor : K.szary, fontWeight: "700" }}>{SKROT_POZ[r.slot]}{z ? ` · ${Math.floor(z.umiej * r.dopas)}` : ""}{poza && z ? ` (${Math.round((r.dopas - 1) * 100)}%)` : ""}</Text>
                       <Text style={{ fontSize: 11, color: K.tekst }} numberOfLines={1}>{z ? z.nazwisko : "—"}{poza ? " ⚠" : ""}</Text>
                     </View>
                   );
                 })}
               </View>
-              {role.some((r) => r.dopas < 0.9) && <Text style={[st.maly, { color: K.czerwony, marginTop: 2 }]}>⚠ = zawodnik gra poza swoją pozycją (słabszy wkład).</Text>}
+              {role.some((r) => r.dopas < 0.999) && <Text style={[st.maly, { color: K.akcent, marginTop: 2 }]}>⚠ = gra poza swoją pozycją — liczba po pozycji to jego OVR na tej pozycji (np. ŚP na LP ok. −18%, ŚP na LO ok. −34%). Naucz go pozycji w Centrum treningu, by grał pełną siłą.</Text>}
             </View>
           );
         })()}
@@ -176,7 +178,7 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
           </Text>
           <Pressable
             style={[st.przyciskMaly, t.auto && { borderColor: K.akcent }]}
-            onPress={() => { t.auto = !t.auto; if (t.auto) t.sklad = autoSklad(s, s.mojKlub, t.formacja); odswiez(); }}
+            onPress={() => { t.auto = !t.auto; t.reczneSloty = false; if (t.auto) { t.sklad = autoSklad(s, s.mojKlub, t.formacja); t.reczneSloty = true; } odswiez(); }}
           >
             <Text style={[st.przyciskMalyTekst, t.auto && { color: K.akcent }]}>{t.auto ? "✓ Auto skład" : "Auto skład"}</Text>
           </Pressable>

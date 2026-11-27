@@ -230,6 +230,7 @@ export interface Taktyka {
   formacja: string; // np. "4-4-2"
   nastawienie: Nastawienie;
   sklad: string[]; // 11 id
+  reczneSloty?: boolean; // true = kolejność `sklad` = sloty formacji ustawione ręcznie w edytorze boiska (bez przetasowań)
   auto: boolean; // true = asystent co kolejkę wybiera najlepszą jedenastkę (wg formy i kondycji)
   tempo?: "wolne" | "normalne" | "szybkie"; // tempo gry: szybkie = więcej bramek i zmęczenia
   pressing?: "niski" | "sredni" | "wysoki"; // pressing: wysoki = więcej odbiorów wysoko, ale ryzyko z tyłu i zmęczenie

@@ -2,7 +2,7 @@ import { los, losInt, poisson, szansa, wybierz, wybierzWazone } from "./losuj";
 import { jestMlodziezowcem, wymogMlodziezowca } from "./swiat";
 import { narodowoscKraju } from "../data/narodowosci";
 import { IMIONA, NAZWISKA } from "../data/nazwy";
-import { dopasowanieDoKategorii, KAT_POZ } from "../data/pozycje";
+import { dopasowanieDoKategorii, dopasowanieDoSlotu, KAT_POZ } from "../data/pozycje";
 import { obsadaMeczu } from "../data/sedziowie";
 import { bonusRol } from "../data/role";
 
@@ -68,25 +68,30 @@ export const FORMACJE_SLOTY: Record<string, PozycjaSzczegolowa[]> = {
   "3-4-3": ["BR", "SO", "SO", "SO", "LP", "SP", "SP", "PP", "LS", "NAP", "PS"],
 };
 
-/** Przydziela zawodników pierwszej jedenastki do slotów formacji (zachłannie wg dopasowania pozycji). */
-export function przydzielSloty(s: StanGry, sklad: string[], formacja: string): { slot: PozycjaSzczegolowa; id: string | null; dopas: number }[] {
+/** Przydziela zawodników jedenastki do slotów formacji.
+ *  `reczne` = kolejność `sklad` odpowiada dokładnie slotom (ustawienie z edytora boiska) — bez przetasowań.
+ *  W innym razie: najlepsze dopasowania najpierw (zawodnik ↔ slot), remisy rozstrzyga siła. */
+export function przydzielSloty(s: StanGry, sklad: string[], formacja: string, reczne = false): { slot: PozycjaSzczegolowa; id: string | null; dopas: number }[] {
   const sloty = FORMACJE_SLOTY[formacja] ?? FORMACJE_SLOTY["4-4-2"];
+  if (reczne && sklad.length === sloty.length) {
+    return sloty.map((slot, i) => { const z = s.zawodnicy[sklad[i]]; return { slot, id: z ? z.id : null, dopas: z ? dopasowanieDoSlotu(z, slot) : 0 }; });
+  }
   const dost = sklad.map((id) => s.zawodnicy[id]).filter(Boolean);
-  const uzyte = new Set<string>();
-  const oceny = sloty.map((slot) => {
-    let best: { id: string; dopas: number } | null = null;
-    for (const z of dost) {
-      if (uzyte.has(z.id)) continue;
-      const pcs = [z.pozS, ...(z.pozycjeDodatkowe ?? [])].filter(Boolean) as PozycjaSzczegolowa[];
-      let d = dopasZaw(z, KAT_POZ[slot]);
-      if (pcs.includes(slot)) d = 1.05;                                         // dokładnie ta pozycja
-      else if (pcs.some((p) => KAT_POZ[p] === KAT_POZ[slot])) d = Math.max(d, 0.95); // ta sama linia
-      if (!best || d > best.dopas) best = { id: z.id, dopas: d };
-    }
-    if (best) uzyte.add(best.id);
-    return { slot, id: best?.id ?? null, dopas: best?.dopas ?? 0 };
-  });
-  return oceny;
+  const pary: { i: number; z: Zawodnik; d: number; e: number }[] = [];
+  sloty.forEach((slot, i) => { for (const z of dost) pary.push({ i, z, d: dopasowanieDoSlotu(z, slot), e: efektywna(z) }); });
+  pary.sort((a, b) => b.d - a.d || b.e - a.e);
+  const wynik: { slot: PozycjaSzczegolowa; id: string | null; dopas: number }[] = sloty.map((slot) => ({ slot, id: null, dopas: 0 }));
+  const uzyci = new Set<string>();
+  for (const p of pary) {
+    if (wynik[p.i].id || uzyci.has(p.z.id)) continue;
+    wynik[p.i] = { slot: sloty[p.i], id: p.z.id, dopas: p.d };
+    uzyci.add(p.z.id);
+  }
+  return wynik;
+}
+/** Efektywny OVR zawodnika na danej pozycji (do UI): OVR × dopasowanie. */
+export function ovrNaPozycji(z: Zawodnik, slot: PozycjaSzczegolowa): number {
+  return z.umiej * dopasowanieDoSlotu(z, slot);
 }
 
 export const POZYCJE: Pozycja[] = ["BR", "OBR", "POM", "NAP"];
@@ -101,69 +106,103 @@ export function efektywna(z: Zawodnik): number {
   return (z.umiej * (0.8 + 0.2 * (z.kondycja / 100)) + z.forma * 0.6) * morale;
 }
 
-/** Najlepsza jedenastka dla formacji (z dostępnych). Brak gracza na pozycji = ktoś z innej (słabiej).
+/** Ocena przydatności zawodnika na mecz (asystent): OVR, forma, morale, a przede wszystkim KONDYCJA —
+ *  zmęczony (< 75%) traci, wyczerpany (< 60%) prawie nie wchodzi w grę (ryzyko urazu, spadek w 2. połowie). */
+export function ocenaNaMecz(z: Zawodnik): number {
+  let e = efektywna(z);
+  if (z.kondycja < 75) e *= 1 - (75 - z.kondycja) * 0.012;
+  if (z.kondycja < 60) e *= 0.75;
+  return e;
+}
+
+/** Najlepsza jedenastka dla formacji (asystent). Dobiera zawodników do KONKRETNYCH slotów formacji
+ *  (dopasowanie pozycji × forma × kondycja × morale), potem pilnuje przepisów: młodzieżowiec (PZPN) i limit spoza UE.
+ *  Zwraca skład w kolejności slotów formacji.
  *  `dodatkowi` = zawodnicy spoza kadry klubu brani pod uwagę (np. powołani do rezerw z pierwszego zespołu). */
 export function autoSklad(s: StanGry, klubId: string, formacja: string, dodatkowi?: string[]): string[] {
-  const f = FORMACJE[formacja] ?? FORMACJE["4-4-2"];
+  const sloty = FORMACJE_SLOTY[formacja] ?? FORMACJE_SLOTY["4-4-2"];
   const pula = dodatkowi?.length ? [...new Set([...s.kluby[klubId].zawodnicy, ...dodatkowi])] : s.kluby[klubId].zawodnicy;
   const kadra = pula.map((id) => s.zawodnicy[id]).filter((z) => z && dostepny(s, z));
-  const wybrani = new Set<string>();
-  for (const poz of POZYCJE) {
-    const kandydaci = kadra.filter((z) => naturalnyW(z, poz) && !wybrani.has(z.id)).sort((a, b) => efektywna(b) - efektywna(a));
-    kandydaci.slice(0, f[poz]).forEach((z) => wybrani.add(z.id));
-  }
-  // Dziury: dopełnij najlepszymi z pozostałych.
-  const reszta = kadra.filter((z) => !wybrani.has(z.id)).sort((a, b) => efektywna(b) - efektywna(a));
-  while (wybrani.size < 11 && reszta.length) wybrani.add(reszta.shift()!.id);
-  // Przepis PZPN: wymagana LICZBA młodzieżowców (U-21) na boisku wg szczebla (I liga 1, II/III liga 2, IV+ 1).
+  const wart = (z: Zawodnik, slot: PozycjaSzczegolowa) => ocenaNaMecz(z) * dopasowanieDoSlotu(z, slot);
+  // Przydział: najpierw najcenniejsze pary (zawodnik, slot); bramkarza na bramkę i nikogo z pola na bramkę.
+  const pary: { i: number; z: Zawodnik; v: number }[] = [];
+  sloty.forEach((slot, i) => { for (const z of kadra) pary.push({ i, z, v: wart(z, slot) }); });
+  pary.sort((a, b) => b.v - a.v);
+  const sklad: (string | null)[] = sloty.map(() => null);
+  const uzyci = new Set<string>();
+  for (const p of pary) { if (sklad[p.i] || uzyci.has(p.z.id)) continue; sklad[p.i] = p.z.id; uzyci.add(p.z.id); }
+  // Przepis PZPN: wymagana LICZBA młodzieżowców (U-21) na boisku wg szczebla — wymiana z najmniejszą stratą.
   const wymog = wymogMlodziezowca(s.kluby[klubId].poziom);
-  let maMlodych = [...wybrani].filter((id) => jestMlodziezowcem(s.zawodnicy[id])).length;
-  if (maMlodych < wymog) {
-    const rezerwaMlodzi = kadra.filter((z) => jestMlodziezowcem(z) && !wybrani.has(z.id)).sort((a, b) => efektywna(b) - efektywna(a));
-    while (maMlodych < wymog && rezerwaMlodzi.length) {
-      const mlody = rezerwaMlodzi.shift()!;
-      // schodzi najsłabszy z pola, który sam nie jest młodzieżowcem (bramkarza nie ruszamy)
-      const najsl = [...wybrani].map((id) => s.zawodnicy[id]).filter((z) => z.poz !== "BR" && !jestMlodziezowcem(z)).sort((a, b) => efektywna(a) - efektywna(b))[0];
-      if (!najsl) break;
-      wybrani.delete(najsl.id); wybrani.add(mlody.id); maMlodych++;
+  const ile = () => sklad.filter((id) => id && jestMlodziezowcem(s.zawodnicy[id])).length;
+  while (ile() < wymog) {
+    let best: { i: number; z: Zawodnik; strata: number } | null = null;
+    for (const z of kadra) {
+      if (uzyci.has(z.id) || !jestMlodziezowcem(z)) continue;
+      sklad.forEach((id, i) => {
+        if (!id || sloty[i] === "BR") return;
+        const obecny = s.zawodnicy[id];
+        if (jestMlodziezowcem(obecny)) return;
+        const strata = wart(obecny, sloty[i]) - wart(z, sloty[i]);
+        if (!best || strata < best.strata) best = { i, z, strata };
+      });
     }
+    if (!best) break;
+    const b = best as { i: number; z: Zawodnik };
+    uzyci.delete(sklad[b.i]!); sklad[b.i] = b.z.id; uzyci.add(b.z.id);
   }
   // Przepis PZPN o cudzoziemcach: nie więcej niż limit zawodników spoza UE na boisku.
   const limit = limitSpozaUE(s.kluby[klubId].poziom);
-  let spozaUE = [...wybrani].map((id) => s.zawodnicy[id]).filter((z) => !czyUE(z)).sort((a, b) => efektywna(a) - efektywna(b));
-  if (spozaUE.length > limit) {
-    const rezerwaUE = kadra.filter((z) => !wybrani.has(z.id) && czyUE(z)).sort((a, b) => efektywna(b) - efektywna(a));
-    while (spozaUE.length > limit && rezerwaUE.length) {
-      const out = spozaUE.shift()!; const inp = rezerwaUE.shift()!;
-      wybrani.delete(out.id); wybrani.add(inp.id);
+  const spoza = () => sklad.filter((id) => id && !czyUE(s.zawodnicy[id])).length;
+  while (spoza() > limit) {
+    let best: { i: number; z: Zawodnik; strata: number } | null = null;
+    for (const z of kadra) {
+      if (uzyci.has(z.id) || !czyUE(z)) continue;
+      sklad.forEach((id, i) => {
+        if (!id || czyUE(s.zawodnicy[id])) return;
+        const strata = wart(s.zawodnicy[id], sloty[i]) - wart(z, sloty[i]);
+        if (!best || strata < best.strata) best = { i, z, strata };
+      });
     }
+    if (!best) break;
+    const b = best as { i: number; z: Zawodnik };
+    uzyci.delete(sklad[b.i]!); sklad[b.i] = b.z.id; uzyci.add(b.z.id);
   }
-  return [...wybrani];
+  return sklad.filter(Boolean) as string[];
 }
 
-/** Siła ataku i obrony jedenastki; zawodnik grający nie na swojej pozycji traci 25%. */
-export function silaSkladu(s: StanGry, sklad: string[], formacja: string) {
+/** Raport asystenta: kto wypadł / wszedł względem poprzedniego składu i dlaczego. */
+export function raportAsystenta(s: StanGry, przed: string[], po: string[], formacja: string): string[] {
+  const out: string[] = [];
+  const pS = new Set(przed), nS = new Set(po);
+  for (const id of przed) {
+    if (nS.has(id)) continue;
+    const z = s.zawodnicy[id]; if (!z) continue;
+    const pow = !dostepny(s, z) ? (z.kontuzja ? "kontuzja" : z.zawieszenie ? "pauza za kartki" : "niedostępny")
+      : z.kondycja < 70 ? `odpoczynek (kondycja ${Math.round(z.kondycja)}%)` : z.forma <= -2 ? `słaba forma (${z.forma.toFixed(1)})` : "decyzja taktyczna";
+    out.push(`⬇ ${z.imie} ${z.nazwisko} — ${pow}`);
+  }
+  const przydz = przydzielSloty(s, po, formacja, true);
+  for (const r of przydz) {
+    if (!r.id || pS.has(r.id)) continue;
+    const z = s.zawodnicy[r.id];
+    const pow = z.forma >= 2 ? `w formie (+${z.forma.toFixed(1)})` : jestMlodziezowcem(z) ? "młodzieżowiec (przepis PZPN)" : z.kondycja >= 95 ? "świeży" : "najlepszy wybór na pozycję";
+    out.push(`⬆ ${z.imie} ${z.nazwisko} (${SKROT_SLOT(r.slot)}) — ${pow}`);
+  }
+  return out;
+}
+const SKROT_SLOT = (p: PozycjaSzczegolowa) => ({ SO: "ŚO", SP: "ŚP" } as Record<string, string>)[p] ?? p;
+
+/** Siła ataku i obrony jedenastki. Każdy gra na konkretnym slocie formacji — poza swoją pozycją traci
+ *  wg macierzy dopasowania (np. ŚP na LP −18%, ŚP na LO −34%, bramkarz w polu −65%). */
+export function silaSkladu(s: StanGry, sklad: string[], formacja: string, reczne = false) {
   const f = FORMACJE[formacja] ?? FORMACJE["4-4-2"];
-  const zs = sklad.map((id) => s.zawodnicy[id]).filter(Boolean);
-  // przypisz zawodników do slotów formacji
+  const przydz = przydzielSloty(s, sklad, formacja, reczne);
   const sloty: Record<Pozycja, number[]> = { BR: [], OBR: [], POM: [], NAP: [] };
-  const wolni = [...zs].sort((a, b) => efektywna(b) - efektywna(a));
-  // 1) Naturalni na pozycji (podstawowa lub wyuczona) grają pełną siłą.
-  for (const poz of POZYCJE) {
-    for (let i = 0; i < f[poz]; i++) {
-      const idx = wolni.findIndex((z) => naturalnyW(z, poz));
-      if (idx >= 0) sloty[poz].push(efektywna(wolni.splice(idx, 1)[0]));
-    }
+  for (const r of przydz) {
+    const z = r.id ? s.zawodnicy[r.id] : undefined;
+    sloty[KAT_POZ[r.slot]].push(z ? efektywna(z) * r.dopas : 5);
   }
-  // 2) Dziury łatamy graczami z innej linii — kara zależy od szczegółowej pozycji (odległości).
-  for (const poz of POZYCJE) {
-    while (sloty[poz].length < f[poz]) {
-      const z = wolni.shift();
-      // bramkarz w polu i zawodnik z pola na bramce — mocna kara; poza tym wg dopasowania pozS
-      if (z) sloty[poz].push(efektywna(z) * (poz === "BR" || z.poz === "BR" ? 0.45 : dopasZaw(z, poz)));
-      else sloty[poz].push(5);
-    }
-  }
+  for (const poz of POZYCJE) while (sloty[poz].length < f[poz]) sloty[poz].push(5);
   const sr = (t: number[]) => t.reduce((a, b) => a + b, 0) / t.length;
   const br = sr(sloty.BR), obr = sr(sloty.OBR), pom = sr(sloty.POM), nap = sr(sloty.NAP);
   // liczba graczy w liniach też ma znaczenie
@@ -181,7 +220,7 @@ const NAST: Record<Nastawienie, { swoje: number; rywala: number }> = {
 
 function xg(atak: number, obronaRywala: number) {
   // Łagodniejszy wpływ różnicy sił (/11) = więcej wyrównanych meczów i remisów, mniej pogromów.
-  return 1.22 * Math.exp((atak - obronaRywala) / 11);
+  return 1.48 * Math.exp((atak - obronaRywala) / 11); // 1.48: kalibracja po wprowadzeniu kar za grę poza pozycją (cel ~4 gole/mecz)
 }
 
 interface Druzyna {
@@ -378,8 +417,9 @@ export function zagrajMecz(s: StanGry, dom: Druzyna, gosc: Druzyna, zZdarzeniami
   };
   // Siła: mieszanka 70% wyjściowej XI + 30% składu po zmianach (świeże nogi i lepsza ławka realnie ważą).
   const sila = (sklad: string[], linia: string[], formacja: string, klubId: string) => {
-    const xi = silaSkladu(s, sklad, formacja);
-    const fin = silaSkladu(s, linia, formacja);
+    const reczne = klubId === s.mojKlub && !!s.taktyka.reczneSloty;
+    const xi = silaSkladu(s, sklad, formacja, reczne);
+    const fin = silaSkladu(s, linia, formacja, reczne);
     const bc = bonusCech(s, linia);
     const rb = klubId === s.mojKlub ? bonusRol(s, linia) : { atak: 0, obrona: 0 }; // role taktyczne (tylko klub gracza)
     const lid = liderNaBoisku(s, linia) ? 1.015 : 1; // kapitan/lider — spójność drużyny

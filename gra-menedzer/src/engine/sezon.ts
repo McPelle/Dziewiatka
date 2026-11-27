@@ -1,6 +1,6 @@
 import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj";
 import { AFILIACJE, PRZYJAZNIE } from "../data/derby";
-import { autoSklad, dostepny, FORMACJE, ileSpozaUE, limitSpozaUE, zagrajMecz } from "./mecz";
+import { autoSklad, raportAsystenta, dostepny, FORMACJE, ileSpozaUE, limitSpozaUE, zagrajMecz } from "./mecz";
 import { pogodaMeczu, gorskie } from "./pogoda";
 import { rozwinAtrybuty } from "./atrybuty";
 import { bonusRegeneracji, kosztSztabuNaKolejke, modRozwoj, modRozwojBR, sztabNowySezon } from "./sztab";
@@ -241,12 +241,17 @@ export function przygotujKolejke(s: StanGry) {
   }
   const zle = s.taktyka.sklad.filter((id) => !s.kluby[s.mojKlub].zawodnicy.includes(id) || !dostepny(s, s.zawodnicy[id]));
   if (s.taktyka.auto) {
+    const przed = [...s.taktyka.sklad];
     s.taktyka.sklad = autoSklad(s, s.mojKlub, s.taktyka.formacja);
+    s.taktyka.reczneSloty = true; // asystent ustawia zawodników dokładnie na slotach formacji
+    const rap = raportAsystenta(s, przed, s.taktyka.sklad, s.taktyka.formacja);
+    if (rap.length && przed.length === 11) wiadomosc(s, `🧑‍🏫 Asystent ustalił skład na mecz:\n${rap.join("\n")}`);
   } else if (s.taktyka.sklad.length !== 11 || zle.length) {
     // zostaw dobrych, dopełnij automatem
     const zostaja = s.taktyka.sklad.filter((id) => !zle.includes(id));
     const auto = autoSklad(s, s.mojKlub, s.taktyka.formacja).filter((id) => !zostaja.includes(id));
     s.taktyka.sklad = [...zostaja, ...auto].slice(0, 11);
+    s.taktyka.reczneSloty = false;
   }
   // Zaległe mecze: odrabianie przełożonego spotkania w środku tygodnia zostawia kadrę zmęczoną na najbliższą kolejkę.
   if ((s.zaleglosc ?? 0) > 0) {

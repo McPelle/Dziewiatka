@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { FORMACJE, FORMACJE_SLOTY, przydzielSloty, silaSkladu } from "../engine/mecz";
 import { jestMlodziezowcem, wymogMlodziezowca } from "../engine/swiat";
-import { KAT_POZ, SKROT_POZ } from "../data/pozycje";
+import { KAT_POZ, SKROT_POZ, dopasowanieDoSlotu, opisDopasowania } from "../data/pozycje";
 import type { Pozycja, PozycjaSzczegolowa, StanGry, Zawodnik } from "../engine/types";
 import { CZCIONKA, cien, K, st } from "./styl";
 
@@ -26,7 +26,7 @@ export function BoiskoEdytor({ s, widoczny, onClose, odswiez }: { s: StanGry; wi
   const t = s.taktyka;
   const [formacja, setFormacja] = useState(t.formacja);
   // ustaw[i] = id zawodnika w slocie i (wg FORMACJE_SLOTY), null = pusty.
-  const [ustaw, setUstaw] = useState<(string | null)[]>(() => przydzielSloty(s, t.sklad, t.formacja).map((r) => r.id));
+  const [ustaw, setUstaw] = useState<(string | null)[]>(() => przydzielSloty(s, t.sklad, t.formacja, !!t.reczneSloty).map((r) => r.id));
   // wybrany zawodnik (dotknij → postaw). from = numer slotu na boisku albo null (z ławki).
   const [wybrany, setWybrany] = useState<{ id: string; from: number | null } | null>(null);
   const coords = useMemo(() => wspolrzedneSlotow(formacja), [formacja]);
@@ -37,7 +37,8 @@ export function BoiskoEdytor({ s, widoczny, onClose, odswiez }: { s: StanGry; wi
   const lawka = kadra.filter((z) => !wUstaw.has(z.id)).sort((a, b) => (["BR", "OBR", "POM", "NAP"].indexOf(a.poz) - ["BR", "OBR", "POM", "NAP"].indexOf(b.poz)) || b.umiej - a.umiej);
 
   const naBoisku = ustaw.filter(Boolean) as string[];
-  const silaRaw = silaSkladu(s, naBoisku, formacja);
+  const komplet = naBoisku.length === ustaw.length;
+  const silaRaw = silaSkladu(s, komplet ? (ustaw as string[]) : naBoisku, formacja, komplet);
   const sila = Math.round((silaRaw.atak + silaRaw.obrona) / 2);
   const wymog = wymogMlodziezowca(klub.poziom);
   const mlodzi = naBoisku.filter((id) => jestMlodziezowcem(s.zawodnicy[id])).length;
@@ -45,7 +46,9 @@ export function BoiskoEdytor({ s, widoczny, onClose, odswiez }: { s: StanGry; wi
   const zapisz = (next: (string | null)[]) => {
     setUstaw(next);
     t.formacja = formacja;
-    t.sklad = next.filter(Boolean) as string[];
+    const pelny = next.every(Boolean);
+    t.sklad = pelny ? (next as string[]) : (next.filter(Boolean) as string[]); // pełny skład: kolejność = sloty (ręczne ustawienie)
+    t.reczneSloty = pelny;
     t.auto = false;
     odswiez();
   };
@@ -118,7 +121,7 @@ export function BoiskoEdytor({ s, widoczny, onClose, odswiez }: { s: StanGry; wi
           {Object.keys(FORMACJE).map((nazwa) => {
             const akt = nazwa === formacja;
             return (
-              <Pressable key={nazwa} onPress={() => { setFormacja(nazwa); const re = przydzielSloty(s, t.sklad, nazwa).map((r) => r.id); setUstaw(re); setWybrany(null); t.formacja = nazwa; t.sklad = re.filter(Boolean) as string[]; odswiez(); }}
+              <Pressable key={nazwa} onPress={() => { setFormacja(nazwa); const re = przydzielSloty(s, t.sklad, nazwa).map((r) => r.id); setUstaw(re); setWybrany(null); t.formacja = nazwa; t.sklad = re.filter(Boolean) as string[]; t.reczneSloty = false; odswiez(); }}
                 style={{ backgroundColor: akt ? K.akcent : K.karta2, borderRadius: 16, paddingHorizontal: 13, paddingVertical: 7, marginRight: 8, borderWidth: 1, borderColor: akt ? K.akcent : K.linia }}>
                 <Text style={{ color: akt ? "#15300c" : K.tekst, fontWeight: "800", fontSize: 13, fontFamily: CZCIONKA }}>{nazwa}</Text>
               </Pressable>
@@ -145,8 +148,20 @@ export function BoiskoEdytor({ s, widoczny, onClose, odswiez }: { s: StanGry; wi
               return (
                 <Pressable key={i} onPress={() => klikSlot(i)} style={{ position: "absolute", left: `${c.x}%`, top: `${c.y}%`, width: 64, marginLeft: -32, marginTop: -30, alignItems: "center" }}>
                   {z ? (
-                    <View style={wybranyTu ? { borderRadius: 16, borderWidth: 3, borderColor: "#fff", padding: 1 } : undefined}>
-                      <Token z={z} mlody={jestMlodziezowcem(z)} />
+                    <View style={{ alignItems: "center" }}>
+                      <View style={wybranyTu ? { borderRadius: 16, borderWidth: 3, borderColor: "#fff", padding: 1 } : undefined}>
+                        <Token z={z} mlody={jestMlodziezowcem(z)} />
+                      </View>
+                      {(() => {
+                        const d = dopasowanieDoSlotu(z, c.slot);
+                        if (d >= 0.999) return null;
+                        const o = opisDopasowania(d);
+                        return (
+                          <View style={{ marginTop: 1, backgroundColor: "rgba(0,0,0,0.65)", borderRadius: 6, paddingHorizontal: 4, paddingVertical: 1 }}>
+                            <Text style={{ color: o.kolor, fontSize: 9, fontWeight: "900", fontFamily: CZCIONKA }}>{SKROT_POZ[c.slot]} {Math.floor(z.umiej * d)} ({Math.round((d - 1) * 100)}%)</Text>
+                          </View>
+                        );
+                      })()}
                     </View>
                   ) : (
                     <View style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 2, borderStyle: "dashed", borderColor: docelowy ? "#fff" : "rgba(255,255,255,0.5)", alignItems: "center", justifyContent: "center", backgroundColor: docelowy ? "rgba(54,217,137,0.35)" : "rgba(0,0,0,0.15)" }}>
