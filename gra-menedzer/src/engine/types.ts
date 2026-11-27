@@ -382,6 +382,7 @@ export interface StanGry {
   planDni?: Record<string, import("./planDnia").Aktywnosc>; // zaplanowane zajęcia drużyny na dni kalendarza (rrrr-mm-dd)
   archiwumMeczow?: import("./zywySwiat").MeczArchiwum[]; // wszystkie mecze Twojego klubu w karierze
   fetaSezon?: number; // sezon, którego fetę już pokazano
+  magazynSezon?: number; // sezon, którego magazyn-podsumowanie już obejrzano
   prasa?: import("./zywySwiat").Artykul[]; // lokalna prasa: artykuły po meczach
   social?: import("./zywySwiat").Wpis[]; // wpisy kibiców w sieci
   kadraOkna?: string[]; // przerwy FIFA już rozegrane („sezon-miesiąc")

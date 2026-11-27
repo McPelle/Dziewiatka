@@ -1,6 +1,7 @@
 // Przybliżone współrzędne miast (pomorskie i małopolskie) do liczenia odległości wyjazdów.
 // Wartości orientacyjne (stopnie) — wystarczające do kosztu/zmęczenia dalekich wyjazdów.
 import { gorskie } from "../engine/pogoda";
+import { MIASTA_DODATKOWE } from "./miastaDodatkowe";
 
 export const MIASTA: Record<string, [number, number]> = {
   // Pomorskie
@@ -398,6 +399,8 @@ export const MIASTA: Record<string, [number, number]> = {
   "Zielonki": [50.12, 19.9],   "Łącko": [49.56, 20.44],   "Środa Wielkopolska": [52.23, 17.28],   "Świdnik": [51.22, 22.7],
   "Świątniki Górne": [49.92, 19.95],   "Żegocina": [49.8, 20.42],
 };
+
+for (const [m, w] of Object.entries(MIASTA_DODATKOWE)) if (!MIASTA[m]) MIASTA[m] = w;
 
 const SRODEK: [number, number] = [50.3, 19.5]; // domyślny środek (gdy brak miasta)
 

@@ -16,7 +16,7 @@ import { Mecz3D, type Kamera, type Ustawienia3D } from "./three/Mecz3D";
 import { Szatnia3D } from "./three/Szatnia3D";
 import { PrzedMeczem } from "./PrzedMeczem";
 import { planZabezpieczenia, ryzykoIncydentow } from "../engine/bezpieczenstwo";
-import { akcjeKibicow, dojazdKibicow, sektorGosci, wsparcieKibicow } from "../engine/kibice";
+import { akcjeKibicow, dojazdKibicow, liczbaDelegacji, pozdrowieniaZgod, sektorGosci, wsparcieKibicow } from "../engine/kibice";
 import { barwyKlubu } from "../data/barwy";
 import { kulturaTrybun } from "../engine/flagi";
 import { doGlosu } from "../engine/przyspiewki";
@@ -103,16 +103,18 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
       nm.akcjeIdx = nm.akcjeKibicow.filter((x) => x.min === 0).length;
       // zgody, układy i obóz przyjeżdżają wesprzeć (na derby tłumnie, na zwykłe mecze — zgody z okolicy)
       if (u.widzowie > 0) {
-        const wd = wsparcieKibicow(s, kd0, kd0.miasto, !!u.derby), wg = gosci > 0 ? wsparcieKibicow(s, kg0, kd0.miasto, !!u.derby) : [];
+        const wd = wsparcieKibicow(s, kd0, kd0.miasto, !!u.derby, kg0), wg = gosci > 0 ? wsparcieKibicow(s, kg0, kd0.miasto, !!u.derby, kd0) : [];
+        const rodz = zg ? "przyjazn" as const : u.derby ? "derby" as const : "zwykly" as const;
         nm.wsparcie = { dom: wd.map((k) => ({ nazwa: k.nazwa, kolory: barwyKlubu(k.nazwa) })), gosc: wg.map((k) => ({ nazwa: k.nazwa, kolory: barwyKlubu(k.nazwa) })) };
-        if (wd.length) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🤝 Na trybunie gospodarzy także kibice ${wd.slice(0, 6).map((k) => k.nazwa).join(", ")}${wd.length > 6 ? ` i inni (${wd.length})` : ""} — zgody i sympatycy przyjechali wesprzeć ${kd0.nazwa}.` });
-        if (wg.length) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🤝 W klatce gości obok ${kg0.nazwa} stoją też kibice ${wg.slice(0, 6).map((k) => k.nazwa).join(", ")} — wsparcie zgód${u.derby ? " na derby" : " z okolicy"}.` });
+        if (wd.length) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🤝 Na trybunie gospodarzy także kibice ${wd.slice(0, 6).map((k) => `${k.nazwa} (ok. ${liczbaDelegacji(rodz, kulturaTrybun(s, k).pirotechnika)})`).join(", ")}${wd.length > 6 ? ` i inni (${wd.length})` : ""} — zgody i sympatycy stoją w młynie razem z gospodarzami.` });
+        if (wg.length) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🤝 W klatce gości obok ${kg0.nazwa} stoją też kibice ${wg.slice(0, 6).map((k) => `${k.nazwa} (ok. ${liczbaDelegacji(rodz, kulturaTrybun(s, k).pirotechnika)})`).join(", ")} — zgoda staje razem z gośćmi w ich sektorze.` });
         if (wg.length) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🧣 W klatce szaliki zgodowe pół na pół (${kg0.nazwa.split(" ")[0]} – ${wg[0].nazwa.split(" ")[0]}), bluzy z herbami obu klubów, wspólna flaga „ZGODA” na płocie.` });
         if (wd.length) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🧣 Na trybunie gospodarzy obok barw ${kd0.nazwa} widać też szaliki i koszulki ${wd.slice(0, 3).map((k) => k.nazwa).join(", ")} — przed meczem wymiana szali na znak przyjaźni.` });
         if (u.derby && wd.length + wg.length > 3) nm.bezp.ryzyko = Math.min(0.95, nm.bezp.ryzyko * 1.2);
         if (wg.length) nm.momentum -= 0.05 * Math.min(4, wg.length); if (wd.length) nm.momentum += 0.05 * Math.min(4, wd.length);
       }
       { const t = dojazdKibicow(s, kg0, kd0, gosci, !!u.derby); if (t) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: t }); }
+      { const pz = pozdrowieniaZgod(s, kd0, s.kolejka); if (pz && u.widzowie > 0) (nm.akcjeKibicow ??= []).push({ min: 20 + Math.floor(Math.random() * 50), sektor: "gospodarzy", tekst: pz }); }
       if (gosci > 0) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🧱 Sektor gości („klatka”, ogrodzenie 2,2 m): ${gosci.toLocaleString("pl")} kibiców ${kg0.nazwa} na ${sg.miejsca.toLocaleString("pl")} miejsc (${Math.round(sg.procent * 100)}% stadionu; PZPN wymaga min. 5%).` });
       if (plan) nm.komentarz.unshift({ min: "0'", typ: "info", tekst: plan.masowa ? `🛡 Zabezpieczenie: ${plan.ochroniarze} stewardów, ${plan.koordynatorzy} koordynatorów${plan.zgodne ? "" : " (PONIŻEJ minimum z ustawy!)"} · policja z urzędu: ${plan.policja} funkcjonariuszy${plan.podwyzszoneRyzyko ? " — mecz podwyższonego ryzyka" : ""} · karetka na stadionie.` : `🛡 Porządek zapewnia ${plan.ochroniarze} porządkowych klubu (to nie jest impreza masowa).` });
     }

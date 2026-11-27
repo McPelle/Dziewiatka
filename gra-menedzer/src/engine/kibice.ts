@@ -79,7 +79,7 @@ import { AFILIACJE_DODATKOWE, ZGODNE_OBOZY } from "../data/obozy";
 import { AFILIACJE } from "../data/derby";
 import { odlegloscDrogowa } from "../data/miasta";
 /** Kto przyjedzie wesprzeć daną drużynę: zgody/układy (bliskie lub na derby z daleka) i lokalne kluby z obozu (na derby). */
-export function wsparcieKibicow(s: StanGry, klub: Klub, miastoMeczu: string, derby: boolean): Klub[] {
+export function wsparcieKibicow(s: StanGry, klub: Klub, miastoMeczu: string, derby: boolean, rywal?: Klub): Klub[] {
   const poNazwie = new Map(Object.values(s.kluby).map((k) => [k.nazwa, k]));
   const out = new Map<string, Klub>();
   const dodaj = (n: string | undefined) => { const k = n ? poNazwie.get(n) : undefined; if (k && k.id !== klub.id && !k.rezerwaDla) out.set(k.nazwa, k); };
@@ -87,7 +87,9 @@ export function wsparcieKibicow(s: StanGry, klub: Klub, miastoMeczu: string, der
   for (const r of RELACJE_KIBICOW) if (r.typ !== "kosa" && (r.a === klub.nazwa || r.b === klub.nazwa)) {
     const inny = poNazwie.get(r.a === klub.nazwa ? r.b : r.a); if (!inny) continue;
     const d = odlegloscDrogowa(inny.miasto, miastoMeczu);
-    if (d <= (derby ? 450 : r.typ === "zgoda" ? 320 : 160) || (r.typ === "zgoda" && derby)) dodaj(inny.nazwa); // zgody jeżdżą daleko
+    // „rywal przyjaciela jest rywalem" — zgoda przyjeżdża z daleka, gdy partner gra z jej wrogiem
+    const wrogPartnera = !!rywal && RELACJE_KIBICOW.some((x) => x.typ === "kosa" && ((x.a === inny.nazwa && x.b === rywal.nazwa) || (x.b === inny.nazwa && x.a === rywal.nazwa)));
+    if (d <= (derby || wrogPartnera ? 500 : r.typ === "zgoda" ? 320 : 160) || (r.typ === "zgoda" && (derby || wrogPartnera))) dodaj(inny.nazwa); // zgody jeżdżą daleko
   }
   // zgodne obozy (np. Arka–Lech–Cracovia)
   for (const [a, b] of ZGODNE_OBOZY) if (a === klub.nazwa || b === klub.nazwa) { const inny = poNazwie.get(a === klub.nazwa ? b : a); if (inny && (derby || odlegloscDrogowa(inny.miasto, miastoMeczu) <= 160)) dodaj(inny.nazwa); }
@@ -117,7 +119,7 @@ export function tydzienZgod(s: StanGry, mojKlub: Klub): string | null {
   if (moje.length && r < 0.04) { const z = moje[Math.floor(Math.random() * moje.length)]; const inny = z.a === mojKlub.nazwa ? z.b : z.a;
     return `🎉 ${["Jubileusz zgody", "Wspólny turniej halowy", "Wspólna zbiórka charytatywna", "Wspólny wyjazd na mecz reprezentacji"][Math.floor(Math.random() * 4)]}: kibice ${mojKlub.nazwa} i ${inny}${Math.random() < 0.5 ? " — wymiana szalików i wspólna flaga „Zgoda na zawsze”" : ""}.`; }
   if (moje.length && r < 0.045) { const z = moje[Math.floor(Math.random() * moje.length)]; const inny = z.a === mojKlub.nazwa ? z.b : z.a;
-    if (!dyn.some((x) => x.b === inny)) { dyn.push({ a: mojKlub.nazwa, b: inny, typ: "kosa", od: s.sezon }); return `💔 Zgoda zerwana! Po incydencie na wyjeździe kibice ${mojKlub.nazwa} i ${inny} ogłaszają koniec przyjaźni — od teraz to kosa.`; } }
+    if (!dyn.some((x) => x.b === inny)) { dyn.push({ a: mojKlub.nazwa, b: inny, typ: "kosa", od: s.sezon }); return `💔 Zgoda zerwana! Kibice ${mojKlub.nazwa} wydają oświadczenie: ${inny} ${["zbliżył się z naszym wrogiem", "nie stanął po naszej stronie na wyjeździe", "zawarł układ z ekipą, z którą mamy kosę"][Math.floor(Math.random() * 3)]} — koniec przyjaźni, od teraz to kosa.`; } }
   if (r > 0.993) { // nowa zgoda: klub, który ma wspólnego wroga
     const wrogowie = new Set(RELACJE_KIBICOW.filter((x) => x.typ === "kosa" && (x.a === mojKlub.nazwa || x.b === mojKlub.nazwa)).map((x) => (x.a === mojKlub.nazwa ? x.b : x.a)));
     const kand = RELACJE_KIBICOW.filter((x) => x.typ === "kosa" && (wrogowie.has(x.a) || wrogowie.has(x.b))).map((x) => (wrogowie.has(x.a) ? x.b : x.a)).filter((n) => n !== mojKlub.nazwa && !moje.some((m) => m.a === n || m.b === n));
@@ -125,4 +127,18 @@ export function tydzienZgod(s: StanGry, mojKlub: Klub): string | null {
     if (n && !dyn.some((x) => x.b === n)) { dyn.push({ a: mojKlub.nazwa, b: n, typ: "uklad", od: s.sezon }); return `🤝 Nowy układ kibicowski: ${mojKlub.nazwa} i ${n} — „wróg mojego wroga”. Pierwsze wspólne flagi na trybunach.`; }
   }
   return null;
+}
+
+/** Liczebność delegacji zgody (wg źródeł: derby/mecz z wrogiem 50–300, mecz przyjaźni 800–1300, zwykły mecz 20–80). */
+export function liczbaDelegacji(rodzaj: "derby" | "przyjazn" | "zwykly", silaKlubu: number): number {
+  const [a, b] = rodzaj === "przyjazn" ? [800, 1300] : rodzaj === "derby" ? [50, 300] : [20, 80];
+  return Math.round((a + Math.random() * (b - a)) * Math.max(0.15, Math.min(1, silaKlubu)));
+}
+/** Pozdrowienia dla zgód grających w tym samym czasie (młyn pozdrawia przyjaciół). */
+export function pozdrowieniaZgod(s: StanGry, klub: Klub, kolejka: number): string | null {
+  const zg = RELACJE_KIBICOW.filter((r) => r.typ === "zgoda" && (r.a === klub.nazwa || r.b === klub.nazwa)).map((r) => (r.a === klub.nazwa ? r.b : r.a));
+  const graja = Object.values(s.kluby).filter((k) => zg.includes(k.nazwa) && s.ligi[k.poziom - 1]?.terminarz[kolejka]?.some(([a, b]) => a === k.id || b === k.id));
+  if (!graja.length) return null;
+  const x = graja[Math.floor(Math.random() * graja.length)];
+  return `📣 Młyn pozdrawia przyjaciół: „Pozdrawiamy ${x.nazwa}!” — zgoda gra dziś swój mecz, kibice sprawdzają wynik w telefonach.`;
 }

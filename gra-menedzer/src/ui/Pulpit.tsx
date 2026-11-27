@@ -3,6 +3,7 @@ import { Feta3D } from "./three/Trofea3D";
 import { grafika3D } from "./three/Stadion3DWidok";
 import { bilansZRywalem } from "../engine/zywySwiat";
 import { Samouczek } from "./Samouczek";
+import { PodsumowanieSezonu } from "./PodsumowanieSezonu";
 import { nowiWKlubie, Prezentacja } from "./Prezentacja";
 import { prognozaMeczu } from "../engine/pogoda";
 import { useState } from "react";
@@ -31,6 +32,7 @@ const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Aler
 
 export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => void; pokazMecz: () => void }) {
   const [feta, setFeta] = useState<string | null>(null);
+  const [magazyn, setMagazyn] = useState(false);
   const [widokKlub, setWidokKlub] = useState<string | null>(null);
   const [kariera, setKariera] = useState(false);
   const [scout, setScout] = useState<string | null>(null);
@@ -304,6 +306,8 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
         );
       })()}
 
+      {s.koniecSezonu && (magazyn || s.magazynSezon !== s.sezon) && <PodsumowanieSezonu s={s} onZamknij={() => { s.magazynSezon = s.sezon; setMagazyn(false); odswiez(); }} />}
+      {s.koniecSezonu && <Pressable style={[st.przyciskMaly, { marginHorizontal: 12, marginTop: 10 }]} onPress={() => setMagazyn(true)}><Text style={st.przyciskMalyTekst}>📺 Magazyn — podsumowanie sezonu</Text></Pressable>}
       {s.koniecSezonu ? (
         <Pressable style={st.przycisk} onPress={() => { nowySezon(s); const h = s.historia?.[s.historia.length - 1]; if (h && (h.wynik === "awans" || h.wynik === "mistrz" || h.puchar) && s.fetaSezon !== h.sezon) { s.fetaSezon = h.sezon; setFeta(h.wynik === "mistrz" ? "MISTRZOSTWO" : h.wynik === "awans" ? "AWANS" : h.puchar === "glowny" ? "PUCHAR POLSKI" : "PUCHAR ZPN"); } odswiez(); }}>
           <Text style={st.przyciskTekst}>Zakończ sezon — awanse i spadki ›</Text>

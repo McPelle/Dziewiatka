@@ -885,7 +885,7 @@ export function zagrajKolejke(s: StanGry) {
         }
         if (!incLive && gosci > 0 && (derbyNazwa || w.gosc === s.mojKlub)) { const t = dojazdKibicow(s, kg, kd, gosci, !!derbyNazwa); if (t) wiadomosc(s, t); }
         if (!incLive && widzowie > 0) { // zgody i obóz na trybunach
-          const wd = wsparcieKibicow(s, kd, kd.miasto, !!derbyNazwa), wg = gosci > 0 ? wsparcieKibicow(s, kg, kd.miasto, !!derbyNazwa) : [];
+          const wd = wsparcieKibicow(s, kd, kd.miasto, !!derbyNazwa, kg), wg = gosci > 0 ? wsparcieKibicow(s, kg, kd.miasto, !!derbyNazwa, kd) : [];
           if (wd.length || wg.length) wiadomosc(s, `🤝 Wsparcie na trybunach: ${wd.length ? `z ${kd.nazwa} — ${wd.slice(0, 5).map((k) => k.nazwa).join(", ")}` : ""}${wd.length && wg.length ? "; " : ""}${wg.length ? `w klatce z ${kg.nazwa} — ${wg.slice(0, 5).map((k) => k.nazwa).join(", ")}` : ""}.`);
         }
         // kibice z charakterem (gdy mecz nie był oglądany na żywo — wtedy akcje były w relacji)
