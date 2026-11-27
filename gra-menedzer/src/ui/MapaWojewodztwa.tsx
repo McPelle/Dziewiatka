@@ -17,7 +17,7 @@ import { CZCIONKA, K, st } from "./styl";
 
 const KOLOR_POZ = ["#ffd23f", "#ff9f43", "#ff6b6b", "#c56cf0", "#5aa9ff", "#3fd47f", "#7bed9f", "#b8c4d0", "#8a94a0"];
 const NAZWY_POZ = ["Ekstraklasa", "I liga", "II liga", "III liga", "IV liga", "V liga", "Okręgówka", "A klasa", "B klasa"];
-const WOJE = [["pomorskie", "Pomorskie"], ["kujawsko-pomorskie", "Kujawsko-pomorskie"], ["zachodniopomorskie", "Zachodniopomorskie"], ["małopolskie", "Małopolskie"]] as const;
+const WOJE = [["pomorskie", "Pomorskie"], ["kujawsko-pomorskie", "Kujawsko-pomorskie"], ["zachodniopomorskie", "Zachodniopomorskie"], ["małopolskie", "Małopolskie"], ["warmińsko-mazurskie", "Warmińsko-mazurskie"], ["podlaskie", "Podlaskie"]] as const;
 const MORZE: Record<string, [number, number]> = { pomorskie: [54.86, 17.55], zachodniopomorskie: [54.42, 15.0] };
 // obszar morza (prostokąt na północ od wybrzeża; ląd rysowany na wierzchu): [lat od, lon od]
 const MORZE_OBSZAR: Record<string, [number, number]> = { pomorskie: [54.36, 0], zachodniopomorskie: [53.95, 14.22] };
@@ -25,7 +25,7 @@ const SKROT: Record<string, string> = { "kujawsko-pomorskie": "kuj.-pom.", "zach
 
 /** Województwo klubu na mapie: dla lig regionalnych — województwo ligi (pewniejsze niż nazwa miejscowości). */
 const wojMapy = (s: StanGry, k: Klub) => { const l = s.ligi[k.poziom - 1]; return (k.poziom >= 5 && l ? wojLigi(l.nazwa)?.[0] : undefined) ?? wojKlubu(k); };
-const PREFIKS: Record<string, string> = { pomorskie: "Pomorskie", "kujawsko-pomorskie": "Kujawsko-Pomorskie", zachodniopomorskie: "Zachodniopomorskie", "małopolskie": "Małopolska" };
+const PREFIKS: Record<string, string> = { pomorskie: "Pomorskie", "kujawsko-pomorskie": "Kujawsko-Pomorskie", zachodniopomorskie: "Zachodniopomorskie", "małopolskie": "Małopolska", "warmińsko-mazurskie": "Warmińsko-Mazurskie", podlaskie: "Podlaskie" };
 const _cache = new Map<string, { k: Klub; liga: string }[]>();
 /** Wszystkie kluby województwa z danych (każdy podokręg, Ekstraklasa → B-klasa; bez rezerw). */
 function klubyWojewodztwa(woj: string) {

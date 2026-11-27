@@ -35,7 +35,7 @@ const GRUPY_III: { re: RegExp; woj: Woj[] }[] = [
   { re: /gr(upa)?\.?\s*III\b/i, woj: ["dolnośląskie", "lubuskie", "opolskie", "śląskie"] },
   { re: /gr(upa)?\.?\s*IV\b/i, woj: ["małopolskie", "świętokrzyskie", "podkarpackie", "lubelskie"] },
 ];
-const PREFIKS_WOJ: [string, Woj][] = [["Zachodniopomorskie", "zachodniopomorskie"], ["Kujawsko-Pomorskie", "kujawsko-pomorskie"], ["Pomorskie", "pomorskie"], ["Małopolska", "małopolskie"]];
+const PREFIKS_WOJ: [string, Woj][] = [["Zachodniopomorskie", "zachodniopomorskie"], ["Kujawsko-Pomorskie", "kujawsko-pomorskie"], ["Pomorskie", "pomorskie"], ["Warmińsko-Mazurskie", "warmińsko-mazurskie"], ["Podlaskie", "podlaskie"], ["Małopolska", "małopolskie"]];
 const wojSciezki = (nazwa: string): Woj | undefined => PREFIKS_WOJ.find(([p]) => nazwa.startsWith(p))?.[1];
 
 // ——— Drzewo lig z danych (wszystkie ścieżki 4 województw) ———
