@@ -566,6 +566,10 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         // zawodnicy, którzy zeszli z boiska, schodzą do ławki
         for (const [id, p] of postacie) if (!m.dom.naBoisku.includes(id) && !m.gosc.naBoisku.includes(id) && !lawkowi.includes(p)) { p.g.position.lerp(tmp.set(strona.get(id) === "dom" ? -9 : 9, 0, SZ / 2 + 3), dt * 0.6); animuj(p, 2, dt); if (p.g.position.z > SZ / 2 + 2.5) p.g.visible = false; }
         // incydenty na trybunach: race (dym), interwencja stewardów / policji, wtargnięcie kibica
+        if (m.zadyma && !m.zadyma.koniec) { const z = m.zadyma, zS = z.sektor === "gosci" ? -SZ / 2 - 8 : SZ / 2 + 8, xS = z.sektor === "gosci" ? DL / 2 - 10 : 0;
+          if (["przepychanki", "starcie", "stewardzi", "policja", "opor", "wycofanie"].includes(z.faza)) { interwencja = new THREE.Vector3(xS, 0, Math.sign(zS) * (SZ / 2 + 5)); interwencjaT = Math.max(interwencjaT, 1.5); emocje = Math.max(emocje, 0.9); }
+          if (z.armatka && (z.faza === "opor" || z.faza === "policja") && armatkaT <= 0) armatkaT = 6;
+          if (z.faza === "opor" && race && dym && raceT <= 0) raceT = 5; }
         if ((m.incydenty ?? []).length > ostInc) {
           const inc = m.incydenty![m.incydenty!.length - 1]; ostInc = m.incydenty!.length;
           const zSek = inc.sektor === "gosci" ? -SZ / 2 - 8 : SZ / 2 + 8, xSek = inc.sektor === "gosci" ? DL / 2 - 10 : 0;

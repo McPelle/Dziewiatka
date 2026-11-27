@@ -36,7 +36,44 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Gniezno",
    "FANKLUB Grodzisk Wielkopolski",
    "FANKLUB Jarocin",
-   "FANKLUB Kaźmierz"
+   "FANKLUB Kaźmierz",
+   "FANKLUB Koło",
+   "FANKLUB Komorniki",
+   "FANKLUB Konin",
+   "FANKLUB Kościelec",
+   "FANKLUB Krotoszyn",
+   "FANKLUB Kostrzyn",
+   "FANKLUB Kępno",
+   "FANKLUB Kościan",
+   "FANKLUB Leszno",
+   "FANKLUB Ostrów Wielkopolski",
+   "FANKLUB Ostrzeszów",
+   "FANKLUB Opalenica",
+   "FANKLUB Oborniki",
+   "FANKLUB Owińska",
+   "FANKLUB Piła",
+   "FANKLUB Pniewy",
+   "FANKLUB Rawicz",
+   "FANKLUB Szamotuły",
+   "FANKLUB Swarzędz",
+   "FANKLUB Środa Wielkopolska",
+   "FANKLUB Śrem",
+   "FANKLUB Września",
+   "FANKLUB Wolsztyn",
+   "FANKLUB Wągrowiec",
+   "FANKLUB Wronki",
+   "FANKLUB Złotów"
+  ],
+  "kosy": [
+   "Legia Warszawa",
+   "Ruch Chorzów",
+   "Widzew Łódź",
+   "Elana Toruń",
+   "Śląsk Wrocław",
+   "Lechia Gdańsk",
+   "Pogoń Szczecin",
+   "KKS Kalisz",
+   "Zagłębie Sosnowiec"
   ]
  },
  "Górnik Zabrze": {
@@ -62,12 +99,29 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Syrynia",
    "FANKLUB Mysłowice",
    "FANKLUB Pyskowice",
-   "FANKLUB Lubliniec"
+   "FANKLUB Lubliniec",
+   "FANKLUB Rydułtowy",
+   "FANKLUB Mikołów",
+   "FANKLUB Żory",
+   "FANKLUB Świętochłowice",
+   "FANKLUB Śląsk Cieszyński",
+   "FANKLUB Miasteczko Śląskie"
+  ],
+  "kosy": [
+   "Ruch Chorzów",
+   "Wisła Kraków",
+   "Elana Toruń",
+   "Widzew Łódź",
+   "Piast Gliwice",
+   "Polonia Bytom",
+   "Zagłębie Sosnowiec",
+   "Legia Warszawa"
   ]
  },
  "Jagiellonia Białystok": {
   "ultras": [
-   "UJB – Ultras Jagiellonia Białystok"
+   "UJB – Ultras Jagiellonia Białystok",
+   "UJB - Ultras Jagiellonia Białystok"
   ],
   "zgody": [
    "Mazur Ełk"
@@ -86,7 +140,19 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Nowe Miasto",
    "FANKLUB Sejny",
    "FANKLUB Sidra",
-   "FANKLUB Sokółka"
+   "FANKLUB Sokółka",
+   "FANKLUB Boćki",
+   "FANKLUB Grajewo",
+   "FANKLUB Zambrów"
+  ],
+  "kosy": [
+   "ŁKS Łomża",
+   "Wigry Suwałki",
+   "Lechia Gdańsk",
+   "Cracovia",
+   "Legia Warszawa",
+   "Wisła Kraków",
+   "Arka Gdynia"
   ]
  },
  "Raków Częstochowa": {
@@ -97,7 +163,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Chemik Kędzierzyn-Koźle",
-   "Videoton Szekesfehervar"
+   "Videoton Szekesfehervar",
+   "Stomil Olsztyn (układ)",
+   "Lechia Gdańsk (układ)"
   ],
   "flagi": [
    "Wieczny Raków"
@@ -107,6 +175,14 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Huta Stara B",
    "FANKLUB Radomsko",
    "FANKLUB Rędziny"
+  ],
+  "kosy": [
+   "Widzew Łódź",
+   "Ruch Chorzów",
+   "Wisła Kraków",
+   "Elana Toruń",
+   "Górnik Zabrze",
+   "Piast Gliwice"
   ]
  },
  "GKS Katowice": {
@@ -117,7 +193,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Persona Non Grata"
   ],
   "zgody": [
-   "Banik Ostrava"
+   "Banik Ostrava",
+   "JKS Jarosław (układ)",
+   "ROW Rybnik (układ)"
   ],
   "fanklub": [
    "FANKLUB Bieruń (Stary)",
@@ -131,12 +209,33 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Lędziny",
    "FANKLUB Mysłowice",
    "FANKLUB Libiąż",
-   "FANKLUB Ruda Śląska"
+   "FANKLUB Ruda Śląska",
+   "FANKLUB Siemianowice Śląskie",
+   "FANKLUB Skoczów",
+   "FANKLUB Sławków",
+   "FANKLUB Trzebinia",
+   "FANKLUB Zawiercie",
+   "FANKLUB Załęże",
+   "FANKLUB Żory",
+   "FANKLUB Wolbrom"
+  ],
+  "trybuna": [
+   "Blaszok (stadion przy Bukowej)"
+  ],
+  "kosy": [
+   "Ruch Chorzów",
+   "Zagłębie Sosnowiec",
+   "GKS Tychy",
+   "Legia Warszawa",
+   "GKS Jastrzębie",
+   "Widzew Łódź",
+   "Piast Gliwice"
   ]
  },
  "Legia Warszawa": {
   "trybuna": [
-   "Żyleta"
+   "Żyleta",
+   "Żyleta (trybuna północna)"
   ],
   "ultras": [
    "Nieznani Sprawcy",
@@ -163,7 +262,48 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Puławy",
    "FANKLUB Kostrzyn nad Odrą",
    "FANKLUB Biała Rawska",
-   "FANKLUB Rawa Mazowiecka"
+   "FANKLUB Rawa Mazowiecka",
+   "FANKLUB Skierniewice",
+   "FANKLUB Tomaszów Mazowiecki",
+   "FANKLUB Białobrzegi",
+   "FANKLUB Ciechanów",
+   "FANKLUB Garwolin",
+   "FANKLUB Grójec",
+   "FANKLUB Grodzisk Mazowiecki",
+   "FANKLUB Góra Kalwaria",
+   "FANKLUB Józefów",
+   "FANKLUB Karczew",
+   "FANKLUB Legionowo",
+   "FANKLUB Łomianki",
+   "FANKLUB Łochów",
+   "FANKLUB Marki",
+   "FANKLUB Mińsk Mazowiecki",
+   "FANKLUB Mszczonów",
+   "FANKLUB Mława",
+   "FANKLUB Nowy Dwór Mazowiecki",
+   "FANKLUB Nadarzyn",
+   "FANKLUB Otwock",
+   "FANKLUB Ostrołęka",
+   "FANKLUB Pruszków",
+   "FANKLUB Piaseczno",
+   "FANKLUB Pułtusk",
+   "FANKLUB Płońsk",
+   "FANKLUB Pilawa",
+   "FANKLUB Radzymin",
+   "FANKLUB Raszyn",
+   "FANKLUB Sulejówek",
+   "FANKLUB Sochaczew",
+   "FANKLUB Siedlce",
+   "FANKLUB Wołomin",
+   "FANKLUB Wyszków",
+   "FANKLUB Ząbki",
+   "FANKLUB Żyrardów",
+   "FANKLUB Żelechów",
+   "FANKLUB Wolbrom",
+   "FANKLUB Kwidzyn",
+   "FANKLUB Opatów",
+   "FANKLUB Starachowice",
+   "FANKLUB Cieszyn"
   ],
   "zgody": [
    "Zagłębie Sosnowiec",
@@ -173,19 +313,37 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "flagi": [
    "Sekcja Sympatyków"
+  ],
+  "kosy": [
+   "Polonia Warszawa",
+   "Cracovia",
+   "Śląsk Wrocław",
+   "Lech Poznań",
+   "Arka Gdynia",
+   "ŁKS Łódź",
+   "Widzew Łódź",
+   "Jagiellonia Białystok",
+   "Lechia Gdańsk",
+   "Wisła Kraków",
+   "Ruch Chorzów",
+   "Górnik Zabrze",
+   "GKS Katowice"
   ]
  },
  "Zagłębie Lubin": {
   "ultras": [
-   "OCB'03 – Orange City Boys'03"
+   "OCB'03 – Orange City Boys'03",
+   "OCB'03 - Orange City Boys'03"
   ],
   "chuligani": [
-   "HZL – Hooligans Zagłębie Lubin"
+   "HZL – Hooligans Zagłębie Lubin",
+   "HZL - Hooligans Zagłębie Lubin"
   ],
   "zgody": [
    "Arka Gdynia",
    "Odra Opole",
-   "Zawisza Bydgoszcz"
+   "Zawisza Bydgoszcz",
+   "Polonia Bytom (układ)"
   ],
   "flagi": [
    "Zagłębie Fanatyków"
@@ -201,7 +359,22 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Złotoryja",
    "FANKLUB Szprotawa",
    "FANKLUB Sława",
-   "FANKLUB Wschowa"
+   "FANKLUB Wschowa",
+   "FANKLUB Lubań",
+   "FANKLUB Lwówek Śląski",
+   "FANKLUB Strzegom",
+   "FANKLUB Świdnica",
+   "FANKLUB Góra"
+  ],
+  "kosy": [
+   "Śląsk Wrocław",
+   "Miedź Legnica",
+   "Wisła Kraków",
+   "Lechia Gdańsk",
+   "Legia Warszawa",
+   "ŁKS Łódź",
+   "Widzew Łódź",
+   "Ruch Chorzów"
   ]
  },
  "Wisła Płock": {
@@ -213,13 +386,22 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Dogs Band"
   ],
   "zgody": [
-   "Stomil Olsztyn"
+   "Stomil Olsztyn",
+   "Hutnik Kraków (układ)"
   ],
   "fanklub": [
    "FANKLUB Drobin",
    "FANKLUB Dobrzyń",
    "FANKLUB Gostynin",
    "FANKLUB Sierpc"
+  ],
+  "kosy": [
+   "Legia Warszawa",
+   "Polonia Warszawa",
+   "Olimpia Elbląg",
+   "Wisła Kraków",
+   "Arka Gdynia",
+   "Zawisza Bydgoszcz"
   ]
  },
  "Pogoń Szczecin": {
@@ -232,7 +414,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Feyenoord Rotterdam",
-   "BFC Dynamo"
+   "BFC Dynamo",
+   "NK Osijek (układ)"
   ],
   "flagi": [
    "Pogoń Walcząca"
@@ -249,6 +432,16 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Szczecinek",
    "FANKLUB Trzebiatów",
    "FANKLUB Wysoka Kamieńska"
+  ],
+  "trybuna": [
+   "Młyn / Piekiełko (sektory 10–12)"
+  ],
+  "kosy": [
+   "Lech Poznań",
+   "Cracovia",
+   "Arka Gdynia",
+   "Zagłębie Sosnowiec",
+   "Lechia Gdańsk"
   ]
  },
  "Radomiak Radom": {
@@ -270,6 +463,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Szydłowiec",
    "FANKLUB Skaryszew",
    "FANKLUB Wierzchowiny"
+  ],
+  "kosy": [
+   "Broń Radom",
+   "Korona Kielce",
+   "KSZO Ostrowiec Świętokrzyski",
+   "Motor Lublin",
+   "GKS Tychy",
+   "Polonia Warszawa",
+   "Resovia Rzeszów"
   ]
  },
  "Korona Kielce": {
@@ -281,7 +483,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Ultras Korona '04"
   ],
   "chuligani": [
-   "YBH'01 – Young Boys Hooligans"
+   "YBH'01 – Young Boys Hooligans",
+   "YBH'01 - Young Boys Hooligans"
   ],
   "flagi": [
    "Złocisto-Krwiści"
@@ -296,6 +499,16 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Busko-Zdrój",
    "FANKLUB Miedziana Góra",
    "FANKLUB Chmielnik"
+  ],
+  "zgody": [
+   "Naprzód Jędrzejów (układ)"
+  ],
+  "kosy": [
+   "KSZO Ostrowiec Świętokrzyski",
+   "Widzew Łódź",
+   "Wisła Kraków",
+   "Radomiak Radom",
+   "Legia Warszawa"
   ]
  },
  "Motor Lublin": {
@@ -323,7 +536,20 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Niedrzwica",
    "FANKLUB Niemce",
    "FANKLUB Piaski",
-   "FANKLUB Płonki"
+   "FANKLUB Płonki",
+   "FANKLUB Poniatowa",
+   "FANKLUB Radawiec",
+   "FANKLUB Rejowiec Fabryczny",
+   "FANKLUB Ryki",
+   "FANKLUB Trawniki"
+  ],
+  "kosy": [
+   "Wisła Kraków",
+   "Widzew Łódź",
+   "Ruch Chorzów",
+   "Stal Stalowa Wola",
+   "Avia Świdnik",
+   "Arka Gdynia"
   ]
  },
  "Cracovia": {
@@ -353,7 +579,40 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Libiąż",
    "FANKLUB Limanowa",
    "FANKLUB Miechów",
-   "FANKLUB Muszyna"
+   "FANKLUB Muszyna",
+   "FANKLUB Niepołomice",
+   "FANKLUB Nowy Targ",
+   "FANKLUB Olkusz",
+   "FANKLUB Proszowice",
+   "FANKLUB Poronin",
+   "FANKLUB Rabka-Zdrój",
+   "FANKLUB Skawina",
+   "FANKLUB Trzebinia",
+   "FANKLUB Wieliczka",
+   "FANKLUB Wolbrom",
+   "FANKLUB Zawada",
+   "FANKLUB Zakopane",
+   "FANKLUB Kazimierza Wielka",
+   "FANKLUB Przemyśl",
+   "FANKLUB Jarosław",
+   "FANKLUB Sucha Beskidzka",
+   "FANKLUB Krzeszowice",
+   "FANKLUB Niedźwiedź",
+   "FANKLUB Oświęcim",
+   "FANKLUB Biała Podlaska",
+   "FANKLUB Radom",
+   "FANKLUB Rzeszów"
+  ],
+  "kosy": [
+   "Wisła Kraków",
+   "Śląsk Wrocław",
+   "Lechia Gdańsk",
+   "Legia Warszawa",
+   "Pogoń Szczecin",
+   "Motor Lublin",
+   "Zagłębie Sosnowiec",
+   "Widzew Łódź",
+   "Ruch Chorzów"
   ]
  },
  "Widzew Łódź": {
@@ -364,11 +623,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Wiara spod Zegara"
   ],
   "chuligani": [
-   "DHW'95 – Destroyers Hooligans Widzew"
+   "DHW'95 – Destroyers Hooligans Widzew",
+   "DHW'95 - Destroyers Hooligans Widzew"
   ],
   "zgody": [
    "Ruch Chorzów",
-   "Elana Toruń"
+   "Elana Toruń",
+   "Wisła Kraków (układ)",
+   "KKS Kalisz (układ)",
+   "CSKA Moskwa (układ)"
   ],
   "fanklub": [
    "FANKLUB Grudziądz",
@@ -382,7 +645,47 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Kutno",
    "FANKLUB Konstantynów Łódzki",
    "FANKLUB Koluszki",
-   "FANKLUB Lutomiersk"
+   "FANKLUB Lutomiersk",
+   "FANKLUB Łęczyca",
+   "FANKLUB Łowicz",
+   "FANKLUB Niewiadów",
+   "FANKLUB Opoczno",
+   "FANKLUB Ozorków",
+   "FANKLUB Pabianice",
+   "FANKLUB Piotrków Trybunalski",
+   "FANKLUB Przedbórz",
+   "FANKLUB Rawa Mazowiecka",
+   "FANKLUB Radomsko",
+   "FANKLUB Rogów",
+   "FANKLUB Sieradz",
+   "FANKLUB Skierniewice",
+   "FANKLUB Stryków",
+   "FANKLUB Tomaszów Mazowiecki",
+   "FANKLUB Uniejów",
+   "FANKLUB Wieluń",
+   "FANKLUB Wolbórz",
+   "FANKLUB Zduńska Wola",
+   "FANKLUB Zgierz",
+   "FANKLUB Ciechanów",
+   "FANKLUB Gostynin",
+   "FANKLUB Końskie",
+   "FANKLUB Skarżysko-Kamienna",
+   "FANKLUB Starachowice",
+   "FANKLUB Koźminek",
+   "FANKLUB Opatówek",
+   "FANKLUB Turek"
+  ],
+  "kosy": [
+   "ŁKS Łódź",
+   "Legia Warszawa",
+   "Śląsk Wrocław",
+   "Lechia Gdańsk",
+   "Lech Poznań",
+   "Cracovia",
+   "Motor Lublin",
+   "Zawisza Bydgoszcz",
+   "Górnik Zabrze",
+   "GKS Katowice"
   ]
  },
  "Piast Gliwice": {
@@ -395,11 +698,23 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "GKS Jastrzębie",
-   "BATE Borysów"
+   "BATE Borysów",
+   "RKS Radomsko (układ)"
   ],
   "fanklub": [
    "FANKLUB Kleszczów",
-   "FANKLUB Rudziniec"
+   "FANKLUB Rudziniec",
+   "FANKLUB Czekanów",
+   "FANKLUB Krupski Młyn",
+   "FANKLUB Prudnik",
+   "FANKLUB Taciszów"
+  ],
+  "kosy": [
+   "Górnik Zabrze",
+   "GKS Katowice",
+   "Zagłębie Sosnowiec",
+   "Polonia Bytom",
+   "ROW Rybnik"
   ]
  },
  "Wisła Kraków": {
@@ -413,7 +728,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Ruch Chorzów",
-   "Lazio Rzym"
+   "Lazio Rzym",
+   "Widzew Łódź (układ)",
+   "Unia Tarnów (układ)",
+   "Slovan Bratysława (układ)"
   ],
   "fanklub": [
    "FANKLUB Alwernia",
@@ -427,7 +745,50 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Balice",
    "FANKLUB Chrzanów",
    "FANKLUB Czernichów",
-   "FANKLUB Dąbrowa Tarnowska"
+   "FANKLUB Dąbrowa Tarnowska",
+   "FANKLUB Gorlice",
+   "FANKLUB Golkowice",
+   "FANKLUB Jordanów",
+   "FANKLUB Kalwaria Zebrzydowska",
+   "FANKLUB Krzeszowice",
+   "FANKLUB Limanowa",
+   "FANKLUB Libiąż",
+   "FANKLUB Miechów",
+   "FANKLUB Michałowice",
+   "FANKLUB Niepołomice",
+   "FANKLUB Nowy Targ",
+   "FANKLUB Olkusz",
+   "FANKLUB Proszowice",
+   "FANKLUB Pcim",
+   "FANKLUB Rabka-Zdrój",
+   "FANKLUB Sucha Beskidzka",
+   "FANKLUB Skawina",
+   "FANKLUB Szczawnica",
+   "FANKLUB Świątniki Górne",
+   "FANKLUB Trzebinia",
+   "FANKLUB Ujanowice",
+   "FANKLUB Wadowice",
+   "FANKLUB Wieliczka",
+   "FANKLUB Wolbrom",
+   "FANKLUB Zielonki",
+   "FANKLUB Zakopane",
+   "FANKLUB Busko-Zdrój",
+   "FANKLUB Kazimierza Wielka",
+   "FANKLUB Połaniec",
+   "FANKLUB Jaworzno",
+   "FANKLUB Zawiercie",
+   "FANKLUB Kresy Wschodnie"
+  ],
+  "kosy": [
+   "Cracovia",
+   "Motor Lublin",
+   "Śląsk Wrocław",
+   "Lechia Gdańsk",
+   "Hutnik Kraków",
+   "BKS Stal Bielsko-Biała",
+   "Zagłębie Sosnowiec",
+   "Legia Warszawa",
+   "Lech Poznań"
   ]
  },
  "Śląsk Wrocław": {
@@ -461,7 +822,60 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Kąty Wrocławskie",
    "FANKLUB Lubiąż",
    "FANKLUB Milicz",
-   "FANKLUB Nowa Ruda"
+   "FANKLUB Nowa Ruda",
+   "FANKLUB Oleśnica",
+   "FANKLUB Oława",
+   "FANKLUB Oborniki Śląskie",
+   "FANKLUB Sobótka",
+   "FANKLUB Strzelin",
+   "FANKLUB Stronie Śląskie",
+   "FANKLUB Syców",
+   "FANKLUB Skokowa",
+   "FANKLUB Strzegom",
+   "FANKLUB Środa Śląska",
+   "FANKLUB Trzebnica",
+   "FANKLUB Wołów",
+   "FANKLUB Ząbkowice Śląskie",
+   "FANKLUB Zgorzelec",
+   "FANKLUB Żmigród",
+   "FANKLUB Brzeg",
+   "FANKLUB Namysłów",
+   "FANKLUB Nysa",
+   "FANKLUB Jelcz-Laskowice",
+   "FANKLUB Bielany Wrocławskie",
+   "FANKLUB Kobierzyce",
+   "FANKLUB Jordanów Śląski",
+   "FANKLUB Łagiewniki",
+   "FANKLUB Kamieniec Ząbkowicki",
+   "FANKLUB Bardo",
+   "FANKLUB Złoty Stok",
+   "FANKLUB Lądek-Zdrój",
+   "FANKLUB Kluczbork",
+   "FANKLUB Prusice",
+   "FANKLUB Siechnice",
+   "FANKLUB Żerniki Wrocławskie",
+   "FANKLUB Paczków",
+   "FANKLUB Biestrzyków",
+   "FANKLUB Kamieniec Wrocławski",
+   "FANKLUB Szczodre",
+   "FANKLUB Ziębice",
+   "FANKLUB Bolków",
+   "FANKLUB Kowary",
+   "FANKLUB Bogatynia",
+   "FANKLUB Świdnica",
+   "FANKLUB Żarów",
+   "Ślężanie (Sobótka, Rogów Sobócki)"
+  ],
+  "trybuna": [
+   "Młyn (trybuna B - północna, za bramką)"
+  ],
+  "kosy": [
+   "Zagłębie Lubin",
+   "Widzew Łódź",
+   "Ruch Chorzów",
+   "Wisła Kraków",
+   "Lech Poznań",
+   "Arka Gdynia"
   ]
  },
  "Chrobry Głogów": {
@@ -483,7 +897,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Nowe Miasteczko",
    "FANKLUB Ostaszów",
    "FANKLUB Radwanice",
-   "FANKLUB Szlichtyngowa"
+   "FANKLUB Szlichtyngowa",
+   "FANKLUB Żagań"
+  ],
+  "kosy": [
+   "Zagłębie Lubin",
+   "Miedź Legnica",
+   "Śląsk Wrocław",
+   "Górnik Wałbrzych",
+   "Falubaz Zielona Góra"
   ]
  },
  "ŁKS Łódź": {
@@ -507,6 +929,18 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Pabianice",
    "FANKLUB Poddębice",
    "FANKLUB Uniejów"
+  ],
+  "trybuna": [
+   "Galera (trybuna wschodnia)"
+  ],
+  "kosy": [
+   "Widzew Łódź",
+   "Ruch Chorzów",
+   "Wisła Kraków",
+   "Elana Toruń",
+   "Stal Rzeszów",
+   "Legia Warszawa",
+   "Arka Gdynia"
   ]
  },
  "Polonia Warszawa": {
@@ -520,13 +954,14 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Crazy Group'01"
   ],
   "fanklub": [
-   "Black Rebels",
+   "FANKLUB Black Rebels",
    "FANKLUB Iłowo",
    "FANKLUB Żuromin"
   ],
   "zgody": [
    "Sandecja Nowy Sącz",
-   "Ligallo Fondo Norte (Real Saragossa)"
+   "Ligallo Fondo Norte (Real Saragossa)",
+   "Ligallo Fondo Norte - Real Saragossa (układ)"
   ],
   "flagi": [
    "Duma Stolicy",
@@ -539,6 +974,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Konwiktorska 6",
    "Polonia Restituta",
    "K6 on tour"
+  ],
+  "kosy": [
+   "Legia Warszawa"
   ]
  },
  "Ruch Chorzów": {
@@ -569,7 +1007,31 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Mikołów",
    "FANKLUB Myszków",
    "FANKLUB Mysłowice",
-   "FANKLUB Orzesze"
+   "FANKLUB Orzesze",
+   "FANKLUB Piekary Śląskie",
+   "FANKLUB Pilica",
+   "FANKLUB Radlin",
+   "FANKLUB Ruda Śląska",
+   "FANKLUB Siemianowice Śląskie",
+   "FANKLUB Strzyżowice",
+   "FANKLUB Świętochłowice",
+   "FANKLUB Tarnowskie Góry",
+   "FANKLUB Zawiercie",
+   "FANKLUB Żory",
+   "FANKLUB Staszów"
+  ],
+  "kosy": [
+   "Górnik Zabrze",
+   "GKS Katowice",
+   "Raków Częstochowa",
+   "Legia Warszawa",
+   "Motor Lublin",
+   "GKS Tychy",
+   "Zagłębie Sosnowiec",
+   "Lech Poznań",
+   "Śląsk Wrocław",
+   "Lechia Gdańsk",
+   "ROW Rybnik"
   ]
  },
  "Miedź Legnica": {
@@ -594,6 +1056,17 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Legnickie Pole",
    "FANKLUB Miłkowice",
    "FANKLUB Prochowice"
+  ],
+  "kosy": [
+   "Zagłębie Lubin",
+   "Górnik Wałbrzych",
+   "Chrobry Głogów",
+   "Odra Opole",
+   "Widzew Łódź",
+   "Wisła Kraków",
+   "Unia Tarnów",
+   "Ruch Chorzów",
+   "Elana Toruń"
   ]
  },
  "Puszcza Niepołomice": {
@@ -610,13 +1083,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "chuligani": [
    "Desperados",
-   "MCHPB – Młodzi Chuligani Polonii Bytom"
+   "MCHPB – Młodzi Chuligani Polonii Bytom",
+   "MCHPB - Młodzi Chuligani Polonii Bytom"
   ],
   "zgody": [
    "Arka Gdynia",
    "Odra Opole",
    "Góral Żywiec",
-   "Gryf Wejherowo"
+   "Gryf Wejherowo",
+   "Zagłębie Lubin (układ)"
   ],
   "fanklub": [
    "FANKLUB Cieszyn",
@@ -625,6 +1100,12 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Wojkowice",
    "FANKLUB Gogolin",
    "FANKLUB Prudnik"
+  ],
+  "kosy": [
+   "Górnik Zabrze",
+   "GKS Katowice",
+   "Zagłębie Sosnowiec",
+   "BKS Stal Bielsko-Biała"
   ]
  },
  "Pogoń Grodzisk Mazowiecki": {
@@ -634,6 +1115,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Znicz Pruszków"
+  ],
+  "kosy": [
+   "Widzew Łódź",
+   "Broń Radom",
+   "Polonia Warszawa"
   ]
  },
  "Odra Opole": {
@@ -641,7 +1127,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "UGO - Underground Odra"
   ],
   "chuligani": [
-   "VoS'98 – Vikings of South"
+   "VoS'98 – Vikings of South",
+   "VoS'98 - Vikings of South"
   ],
   "zgody": [
    "Polonia Bytom",
@@ -659,7 +1146,36 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Skorogoszcz",
    "FANKLUB Strzelce Opolskie",
    "FANKLUB Ozimek",
-   "FANKLUB Niemodlin"
+   "FANKLUB Niemodlin",
+   "FANKLUB Brzeg",
+   "FANKLUB Dobrzeń Wielki",
+   "FANKLUB Głuchołazy",
+   "FANKLUB Grodków",
+   "FANKLUB Kędzierzyn-Koźle",
+   "FANKLUB Kolonowskie",
+   "FANKLUB Krapkowice",
+   "FANKLUB Łubniany",
+   "FANKLUB Olesno",
+   "FANKLUB Oława",
+   "FANKLUB Prudnik",
+   "FANKLUB Strzelin",
+   "FANKLUB Turawa",
+   "FANKLUB Tułowice",
+   "FANKLUB Tarnów Opolski",
+   "FANKLUB Zawadzkie",
+   "FANKLUB Zdzieszowice",
+   "FANKLUB Ziębice"
+  ],
+  "trybuna": [
+   "Młyn"
+  ],
+  "kosy": [
+   "Śląsk Wrocław",
+   "Górnik Zabrze",
+   "Raków Częstochowa",
+   "Chemik Kędzierzyn-Koźle",
+   "GKS Katowice",
+   "Zagłębie Sosnowiec"
   ]
  },
  "Stal Rzeszów": {
@@ -671,7 +1187,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Thieves Gang Hooligans'02"
   ],
   "zgody": [
-   "Karpaty Krosno"
+   "Karpaty Krosno",
+   "Stal Stalowa Wola (układ)",
+   "Łada Biłgoraj (układ)",
+   "FC VSS Košice (układ)",
+   "Polonia Przemyśl (układ)"
   ],
   "fanklub": [
    "FANKLUB Dynów",
@@ -682,11 +1202,23 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Sokołów Małopolski",
    "FANKLUB Trzebownisko",
    "FANKLUB Nowa Wieś"
+  ],
+  "kosy": [
+   "Resovia Rzeszów",
+   "Motor Lublin",
+   "Stal Mielec",
+   "Wisłoka Dębica",
+   "ŁKS Łódź",
+   "JKS Jarosław",
+   "Siarka Tarnobrzeg",
+   "Czuwaj Przemyśl",
+   "Stal Sanok"
   ]
  },
  "Stal Mielec": {
   "ultras": [
-   "USM'08 – Ultras Stal Mielec"
+   "USM'08 – Ultras Stal Mielec",
+   "USM'08 - Ultras Stal Mielec"
   ],
   "zgody": [
    "Sandecja Nowy Sącz",
@@ -696,6 +1228,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Chmielnik",
    "FANKLUB Przecław",
    "FANKLUB Wadowice Górne"
+  ],
+  "kosy": [
+   "Siarka Tarnobrzeg",
+   "Stal Stalowa Wola",
+   "Wisłoka Dębica",
+   "Stal Rzeszów",
+   "Karpaty Krosno"
   ]
  },
  "Pogoń Siedlce": {
@@ -708,12 +1247,20 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "zgody": [
    "Wisła Puławy",
    "Dolcan Ząbki",
-   "Mazovia Mińsk Mazowiecki"
+   "Mazovia Mińsk Mazowiecki",
+   "AZS Podlasie Biała Podlaska (układ)"
+  ],
+  "kosy": [
+   "Motor Lublin",
+   "Polonia Warszawa",
+   "Górnik Łęczna",
+   "Chełmianka Chełm"
   ]
  },
  "Lechia Gdańsk": {
   "ultras": [
-   "ULG - Ultras Lechia Gdańsk"
+   "ULG - Ultras Lechia Gdańsk",
+   "Ultras Lechia Gdańsk"
   ],
   "chuligani": [
    "CHWM - Chuligani Wolnego Miasta",
@@ -721,7 +1268,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Śląsk Wrocław",
-   "Gryf Słupsk"
+   "Gryf Słupsk",
+   "Stomil Olsztyn (układ)",
+   "Raków Częstochowa (układ)"
   ],
   "flagi": [
    "Lwy Północy"
@@ -738,7 +1287,30 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Malbork",
    "FANKLUB Miłobądz",
    "FANKLUB Mława",
-   "FANKLUB Nowe nad Wisłą"
+   "FANKLUB Nowe nad Wisłą",
+   "FANKLUB Nowy Dwór Gdański",
+   "FANKLUB Nowy Targ",
+   "FANKLUB Pelplin",
+   "FANKLUB Pisz",
+   "FANKLUB Pruszcz Gdański",
+   "FANKLUB Pszczółki",
+   "FANKLUB Sierakowice",
+   "FANKLUB Skarszewy",
+   "FANKLUB Smętowo",
+   "FANKLUB Sopot",
+   "FANKLUB Starogard Gdański",
+   "FANKLUB Sztum",
+   "FANKLUB Tczew",
+   "FANKLUB Zblewo"
+  ],
+  "kosy": [
+   "Arka Gdynia",
+   "Cracovia",
+   "Lech Poznań",
+   "Elana Toruń",
+   "Widzew Łódź",
+   "Ruch Chorzów",
+   "Pogoń Szczecin"
   ]
  },
  "Arka Gdynia": {
@@ -772,7 +1344,49 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Gościcino",
    "FANKLUB Hel",
    "FANKLUB Jastarnia",
-   "FANKLUB Jastrzębia Góra"
+   "FANKLUB Jastrzębia Góra",
+   "FANKLUB Jurata",
+   "FANKLUB Kartuzy",
+   "FANKLUB Karwia",
+   "FANKLUB Kępno",
+   "FANKLUB Kościerzyna",
+   "FANKLUB Krokowa",
+   "FANKLUB Kuźnica",
+   "FANKLUB Leśniewo",
+   "FANKLUB Lubelskie",
+   "FANKLUB Mosty",
+   "FANKLUB Oberhausen",
+   "FANKLUB Osowa",
+   "FANKLUB Ostrowo",
+   "FANKLUB Prabuty",
+   "FANKLUB Przodkowo",
+   "FANKLUB Puck",
+   "FANKLUB Reda",
+   "FANKLUB Rewa",
+   "FANKLUB Rozewie",
+   "FANKLUB Ruciane Nida",
+   "FANKLUB Rumia",
+   "FANKLUB Skarszewy",
+   "FANKLUB Sopot",
+   "FANKLUB Stare Pole",
+   "FANKLUB Starogard Gdański",
+   "FANKLUB Suchy Dwór",
+   "FANKLUB Swarzewo",
+   "FANKLUB Szemud",
+   "FANKLUB Tczew",
+   "FANKLUB Tuchom",
+   "FANKLUB Wejherowo",
+   "FANKLUB Władysławowo",
+   "FANKLUB Żelistrzewo",
+   "FANKLUB Żukowo"
+  ],
+  "kosy": [
+   "Lechia Gdańsk",
+   "Śląsk Wrocław",
+   "Wisła Kraków",
+   "Pogoń Szczecin",
+   "Zagłębie Sosnowiec",
+   "Legia Warszawa"
   ]
  },
  "Bruk-Bet Termalica Nieciecza": {
@@ -790,6 +1404,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "zgody": [
    "Lechia Tomaszów Mazowiecki",
    "Pelikan Łowicz"
+  ],
+  "kosy": [
+   "ŁKS Łódź",
+   "Olimpia Grudziądz",
+   "Świt Nowy Dwór Mazowiecki",
+   "Mazowsze Grójec",
+   "Victoria Sulejówek"
   ]
  },
  "Warta Poznań": {
@@ -809,6 +1430,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Skoczów",
    "FANKLUB Kozy",
    "FANKLUB Międzybrodzie Bialskie"
+  ],
+  "chuligani": [
+   "Wiecznie Młodzi"
+  ],
+  "kosy": [
+   "Zagłębie Sosnowiec",
+   "BKS Stal Bielsko-Biała"
   ]
  },
  "Olimpia Grudziądz": {
@@ -825,10 +1453,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "fanklub": [
    "FANKLUB Łasin",
    "FANKLUB Radzyń Chełmiński",
-   "FANKLUB Warlubie",
-   "Łasin",
-   "Radzyń Chełmiński",
-   "Warlubie"
+   "FANKLUB Warlubie"
+  ],
+  "kosy": [
+   "Elana Toruń",
+   "Olimpia Elbląg",
+   "Stomil Olsztyn",
+   "Chojniczanka Chojnice",
+   "Sparta Brodnica",
+   "Legia Chełmża"
   ]
  },
  "Sandecja Nowy Sącz": {
@@ -844,11 +1477,28 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "GKS Tychy",
    "Stal Mielec",
    "Czarni Jasło"
+  ],
+  "kosy": [
+   "Wisła Kraków",
+   "Legia Warszawa",
+   "Glinik Gorlice",
+   "Unia Tarnów",
+   "Okocimski KS Brzesko",
+   "Wisłoka Dębica"
   ]
  },
  "Podhale Nowy Targ": {
   "chuligani": [
    "Młode Podhale"
+  ],
+  "kosy": [
+   "Sandecja Nowy Sącz",
+   "Tarnovia Tarnów",
+   "Beskid Andrychów",
+   "Okocimski KS Brzesko",
+   "Cracovia",
+   "Czuwaj Przemyśl",
+   "Unia Oświęcim"
   ]
  },
  "Chojniczanka Chojnice": {
@@ -858,18 +1508,19 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "zgody": [
    "KP Starogard Gdański",
    "Gryf Słupsk",
-   "Wierzyca Pelplin"
+   "Wierzyca Pelplin",
+   "Wierzyca Pelplin (układ)"
   ],
   "fanklub": [
    "FANKLUB Brusy",
    "FANKLUB Czersk",
-   "FANKLUB Pawłowo",
-   "Brusy",
-   "Czersk",
-   "Pawłowo"
+   "FANKLUB Pawłowo"
   ],
   "chuligani": [
    "FZGT - Fanatycy z Grodu Tura"
+  ],
+  "kosy": [
+   "Arka Gdynia"
   ]
  },
  "Stal Stalowa Wola": {
@@ -885,7 +1536,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Inter Mediolan – Curva Nord Milano",
    "Inter Mediolan",
    "Stal Rzeszów",
-   "Polonia Przemyśl"
+   "Polonia Przemyśl",
+   "Inter Mediolan - Curva Nord Milano",
+   "Stal Rzeszów (układ)",
+   "Polonia Przemyśl (układ)"
   ],
   "fanklub": [
    "FANKLUB Janów Lubelski",
@@ -894,14 +1548,17 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Nisko",
    "FANKLUB Nowa Dęba",
    "FANKLUB Żabno",
-   "FANKLUB Zarzecze",
-   "Janów Lubelski",
-   "Modliborzyce",
-   "Krzeszów",
-   "Nisko",
-   "Nowa Dęba",
-   "Żabno",
-   "Zarzecze"
+   "FANKLUB Zarzecze"
+  ],
+  "kosy": [
+   "Motor Lublin",
+   "Korona Kielce",
+   "KSZO Ostrowiec Świętokrzyski",
+   "Hutnik Kraków",
+   "Stal Mielec",
+   "Górnik Łęczna",
+   "Chełmianka Chełm",
+   "Siarka Tarnobrzeg"
   ]
  },
  "Hutnik Kraków": {
@@ -914,15 +1571,26 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Warriors'01"
   ],
   "fanklub": [
-   "Igołomia & Pobiednik",
-   "Szczyrzyc",
-   "Górale"
+   "FANKLUB Igołomia & Pobiednik",
+   "FANKLUB Szczyrzyc",
+   "FANKLUB Górale"
   ],
   "zgody": [
    "Stomil Olsztyn",
    "Wisła Płock",
    "GKS Bełchatów",
-   "1. FC Magdeburg"
+   "1. FC Magdeburg",
+   "Stomil Olsztyn (układ)",
+   "Wisła Płock (układ)",
+   "GKS Bełchatów (układ)",
+   "FC Magdeburg (układ)"
+  ],
+  "kosy": [
+   "Wisła Kraków",
+   "Unia Tarnów",
+   "Stal Stalowa Wola",
+   "Cracovia",
+   "Polonia Przemyśl"
   ]
  },
  "Resovia": {
@@ -940,19 +1608,22 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Świlcza",
    "FANKLUB Brzozów",
    "FANKLUB Sędziszów Małopolski",
-   "FANKLUB Łańcut",
-   "Boguchwała",
-   "Głogów Małopolski",
-   "Malawa",
-   "Trzeboś",
-   "Świlcza",
-   "Brzozów",
-   "Sędziszów Małopolski",
-   "Łańcut"
+   "FANKLUB Łańcut"
   ],
   "zgody": [
    "Stal Sanok",
-   "Spartacus Nyíregyháza"
+   "Spartacus Nyíregyháza",
+   "Stal Sanok (układ)",
+   "Spartacus Nyíregyháza (układ)"
+  ],
+  "kosy": [
+   "Stal Rzeszów",
+   "Karpaty Krosno",
+   "Stal Stalowa Wola",
+   "Widzew Łódź",
+   "Ruch Chorzów",
+   "Elana Toruń",
+   "Polonia Przemyśl"
   ]
  },
  "Górnik Łęczna": {
@@ -964,9 +1635,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "fanklub": [
    "FANKLUB Lubartów",
-   "FANKLUB Milejów",
-   "Lubartów",
-   "Milejów"
+   "FANKLUB Milejów"
+  ],
+  "kosy": [
+   "Avia Świdnik",
+   "Stal Stalowa Wola"
   ]
  },
  "Znicz Pruszków": {
@@ -977,6 +1650,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Pogoń Grodzisk Mazowiecki",
    "Ursus Warszawa",
    "GLKS Nadarzyn"
+  ],
+  "kosy": [
+   "Polonia Warszawa",
+   "Wisła Płock",
+   "Podbeskidzie Bielsko-Biała"
   ]
  },
  "GKS Tychy": {
@@ -998,11 +1676,17 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Bieruń",
    "FANKLUB Bojszowy",
    "FANKLUB Piasek",
-   "FANKLUB Wola",
-   "Bieruń",
-   "Bojszowy",
-   "Piasek",
-   "Wola"
+   "FANKLUB Wola"
+  ],
+  "kosy": [
+   "GKS Katowice",
+   "Górnik Zabrze",
+   "Ruch Chorzów",
+   "Zagłębie Sosnowiec",
+   "BKS Stal Bielsko-Biała",
+   "Widzew Łódź",
+   "Wisła Kraków",
+   "Legia Warszawa"
   ]
  },
  "Zawisza Bydgoszcz": {
@@ -1032,24 +1716,25 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Potulice",
    "FANKLUB Tuchola",
    "FANKLUB Świecie",
-   "FANKLUB Osiek n/Not",
-   "Barcin",
-   "Chełmno",
-   "Inowrocław",
-   "Janikowo",
-   "Kruszwica",
-   "Mogilno",
-   "Nakło",
-   "Pruszcz Pomorski",
-   "Potulice",
-   "Tuchola",
-   "Świecie",
-   "Osiek n/Not"
+   "FANKLUB Osiek n/Not"
+  ],
+  "kosy": [
+   "Elana Toruń",
+   "Widzew Łódź",
+   "Polonia Bydgoszcz",
+   "Ruch Chorzów",
+   "Wisła Kraków",
+   "GKM Grudziądz",
+   "Legia Warszawa",
+   "Lechia Gdańsk"
   ]
  },
  "Lechia Zielona Góra": {
   "ultras": [
    "Ultras Lechia"
+  ],
+  "kosy": [
+   "Carina Gubin"
   ]
  },
  "Avia Świdnik": {
@@ -1061,6 +1746,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Łada Biłgoraj"
+  ],
+  "kosy": [
+   "Motor Lublin",
+   "Górnik Łęczna",
+   "Chełmianka Chełm",
+   "Orlęta Radzyń Podlaski",
+   "Hetman Zamość"
   ]
  },
  "Elana Toruń": {

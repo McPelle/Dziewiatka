@@ -8,6 +8,7 @@
 // Po meczu wynik (gole, kartki, urazy, zmiany, kondycja) trafia do zwykłej kolejki jako „scenariusz" meczu.
 import { jezykKraju, PO_JEZYKU } from "./jezyki";
 import { losujIncydent } from "./bezpieczenstwo";
+import { krokZadymy, moznaZadyma, startZadymy } from "./zadyma";
 import { okrzykMlyna } from "./flagi";
 import { improwizacja, przyspiewka } from "./przyspiewki";
 import { los, losInt, szansa, wybierz, wybierzWazone } from "./losuj";
@@ -67,6 +68,7 @@ export interface MeczLive {
   akcjeKibicow?: import("./kibice").AkcjaKibicow[]; akcjeIdx?: number;
   oprawa?: import("./oprawy").Oprawa; oprawaGosci?: import("./oprawy").Oprawa;
   oprawyPlan?: import("./oprawy").PokazOprawy[];
+  zadyma?: import("./zadyma").Zadyma; zadymaPrzerwa?: boolean;
   kultura?: { dom: import("./flagi").KulturaTrybun; gosc: import("./flagi").KulturaTrybun };
   transparentTeraz?: { tekst: string; sektor: "gospodarzy" | "gosci"; min: number };
   wizualTeraz?: { typ: "dach" | "dron" | "kukla" | "balony" | "pirotechnika" | "graffiti" | "papier"; sektor: "gospodarzy" | "gosci"; min: number };
@@ -195,6 +197,10 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
     else if (!goscie && m.kultura?.dom.gniazdowy) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: okrzykMlyna(s.kluby[m.dom.klubId], m.kultura.dom, m.gd - m.gg) });
   }
   for (const p of m.oprawyPlan ?? []) if (p.min > 1 && p.min === m.min) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: `🎆 ${p.sektor === "gosci" ? "Klatka gości" : "Trybuna gospodarzy"} — kolejna oprawa: ${p.o.opis}` });
+  // zadyma: eskalacja krok po kroku (stewardzi, policja, reakcje kibiców)
+  if (moznaZadyma(m)) startZadymy(m);
+  { const t = krokZadymy(m); if (t) { m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: t }); if (m.zadyma && (m.zadyma.faza === "starcie" || m.zadyma.faza === "opor")) m.wazne = { typ: "var", tekst: "Zadyma na trybunach!" }; } }
+  if (m.zadymaPrzerwa) { m.min--; m.sekwencja = [{ x: 50, y: 50 }]; return false; } // gra przerwana — zegar stoi, piłkarze w środku boiska
   // zaplanowane akcje kibiców (transparenty, przyśpiewki, flaga, przepychanki przy klatce)
   while (m.akcjeKibicow && (m.akcjeIdx ?? 0) < m.akcjeKibicow.length && m.akcjeKibicow[m.akcjeIdx ?? 0].min <= m.min) {
     const a = m.akcjeKibicow[m.akcjeIdx ?? 0]; m.akcjeIdx = (m.akcjeIdx ?? 0) + 1;

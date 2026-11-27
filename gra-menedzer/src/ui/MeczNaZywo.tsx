@@ -20,6 +20,7 @@ import { akcjeKibicow, sektorGosci } from "../engine/kibice";
 import { kulturaTrybun } from "../engine/flagi";
 import { doGlosu } from "../engine/przyspiewki";
 import { pogodaWDniuMeczu } from "../engine/pogoda";
+import { reakcjaKlubu } from "../engine/zadyma";
 import { planOpraw } from "../engine/oprawy";
 import { zgodaKibicow } from "../engine/kibice";
 import { grafika3D, lekkaGrafika } from "./three/Stadion3DWidok";
@@ -272,6 +273,11 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
           {!bez3D && <View style={[st.wiersz, { flexWrap: "wrap" }]}>{KAMERY.map(([k, t]) => <Btn key={k} t={t} on={() => setKamera(k)} akt={kamera === k} />)}</View>}
           <View style={[st.wiersz, { flexWrap: "wrap" }]}>
             {m.polowa === 1 && !m.koniec && <Btn t="⏭ Do przerwy" on={() => dograj(true)} />}
+            {m.zadyma && !m.zadyma.koniec && (<>
+              <Btn t="📢 Apel spikera" kol={K.czerwony} on={() => { setKom(reakcjaKlubu(m, "spiker")); odswiez(); }} />
+              <Btn t="🧢 Kapitan pod sektor" kol={K.czerwony} on={() => { setKom(reakcjaKlubu(m, "kapitan")); odswiez(); }} />
+              <Btn t="⏸ Poproś o przerwę" kol={K.czerwony} on={() => { setKom(reakcjaKlubu(m, "przerwa")); odswiez(); }} />
+            </>)}
             {!m.koniec && <Btn t="⏭⏭ Dograj do końca" on={() => dograj(false)} />}
           </View>
 
