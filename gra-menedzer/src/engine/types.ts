@@ -138,6 +138,7 @@ export interface WpisKariery {
   do: number | null; // sezon odejścia; null = klub obecny
   mecze: number;
   gole: number;
+  wypozyczenie?: boolean; // wypożyczenie (prawdziwa kariera)
 }
 
 export type Noga = "prawa" | "lewa" | "obie";

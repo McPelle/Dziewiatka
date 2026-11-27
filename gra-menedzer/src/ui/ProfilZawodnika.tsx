@@ -289,7 +289,7 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
 
               <WykresRozwoju z={z} />
 
-              <Text style={[st.naglowek, { marginTop: 16 }]}>Historia kariery</Text>
+              <Text style={[st.naglowek, { marginTop: 16 }]}>Historia kariery{z.realny ? " (prawdziwa — mecze i gole ligowe)" : ""}</Text>
               {(() => {
                 let sumM = 0, sumG = 0;
                 return (
@@ -306,7 +306,7 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
                             <Text style={[st.tekst, { fontSize: 14, fontWeight: obecny ? "700" : "400", color: obecny ? K.tekst : K.szary }]} numberOfLines={1}>
                               {obecny ? "▸ " : "• "}{w.klub}
                             </Text>
-                            <Text style={st.maly}>{lata}</Text>
+                            <Text style={st.maly}>{lata}{w.wypozyczenie ? " · wypożyczenie" : ""}</Text>
                           </View>
                           <Text style={[st.tekst, { fontSize: 13, color: obecny ? K.tekst : K.szary }]}>
                             {m} {m === 1 ? "mecz" : "mecz."}{z.poz !== "BR" ? ` · ${g} gol${g === 1 ? "" : g % 10 >= 2 && g % 10 <= 4 && (g < 10 || g > 20) ? "e" : "i"}` : ""}

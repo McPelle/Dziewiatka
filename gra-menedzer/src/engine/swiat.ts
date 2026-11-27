@@ -10,6 +10,7 @@ import { IMIONA, MIANA, MIEJSCOWOSCI, NAZWISKA, NAZWISKA_KASZUBSKIE, NAZWISKA_GO
 import ROSTERY_JSON from "../../assets/rostery.json";
 import ROSTERY_POZ_JSON from "../../assets/rostery-poz.json";
 import ROSTERY_PELNE_JSON from "../../assets/rostery-pelne.json";
+import KARIERY_REALNE from "../../assets/kariery-realne.json";
 
 const ROSTERY = ROSTERY_JSON as unknown as Record<string, [string, string][]>;
 // Realne składy z pozycjami (herb → [imię, nazwisko, kategoria BR/OBR/POM/NAP]); źródło: Wikipedia.
@@ -276,6 +277,20 @@ function podzielLata(lat: number, ile: number): number[] {
 }
 
 /** Generuje wiarygodną historię kariery z meczami i golami (realne staty amatorów nie istnieją). */
+/** Prawdziwa kariera seniorska realnego zawodnika (assets/kariery-realne.json — źródła: pl/en.wikipedia, strony klubów i lig).
+ *  Klucz: „Imię Nazwisko|DD.MM.RRRR”. Ostatni wpis = obecny klub (do: null). Brak danych → undefined (gra NIE dopisuje
+ *  wtedy wymyślonych klubów — pokazuje tylko obecny). */
+export function karieraRealna(s: StanGry, imie: string, nazwisko: string, dataUr: string | undefined, aktualnyKlub: string): WpisKariery[] | undefined {
+  const k = (KARIERY_REALNE as Record<string, { klub: string; od: number; do: number | null; mecze?: number; gole?: number; wyp?: boolean }[]>)[`${imie} ${nazwisko}|${dataUr ?? ""}`];
+  if (!k?.length) return undefined;
+  const w: WpisKariery[] = k.filter((x) => x.od <= s.sezon).map((x) => ({ klub: x.klub, od: x.od, do: x.do, mecze: x.mecze ?? 0, gole: x.gole ?? 0, ...(x.wyp ? { wypozyczenie: true } : {}) }));
+  if (!w.length) return undefined;
+  const ost = w[w.length - 1];
+  // obecny klub zawsze na końcu (do: null) — sezon bieżący nalicza się w grze na żywo
+  if (ost.klub !== aktualnyKlub || ost.do !== null) w.push({ klub: aktualnyKlub, od: Math.max(ost.do ?? s.sezon, ost.od), do: null, mecze: 0, gole: 0 });
+  return w;
+}
+
 export function generujKariere(s: StanGry, z: Zawodnik, aktualnyKlub: string): WpisKariery[] {
   const sezon = s.sezon;
   const lat = Math.max(0, z.wiek - losInt(16, 18)); // ile sezonów w seniorskiej piłce
@@ -559,7 +574,7 @@ export function nowaGra(trener: string, sciezka: Sciezka = SCIEZKA_DOMYSLNA): St
           z.pensja = pensjaDla(z.umiej, poziom);
           if (z.klauzula) z.klauzula = Math.max(10000, Math.round((wartosc(z) * los(1.5, 2.8)) / 1000) * 1000);
           z.klubId = klub.id;
-          z.kariera = generujKariere(s, z, klub.nazwa);
+          z.kariera = karieraRealna(s, imie, nazw, dataUr, klub.nazwa) ?? [{ klub: klub.nazwa, od: s.sezon, do: null, mecze: 0, gole: 0 }];
           klub.zawodnicy.push(z.id);
         }
         const ileP = (p: Pozycja) => klub.zawodnicy.filter((id) => s.zawodnicy[id].poz === p).length;

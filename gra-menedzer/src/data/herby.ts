@@ -2,6 +2,18 @@
 import type { ImageSourcePropType } from "react-native";
 
 export const HERBY: Record<string, ImageSourcePropType> = {
+  "nowy-kts-weszlo": require("../../assets/herby/nowy-kts-weszlo.png"),
+  "nowy-mlawianka-mlawa": require("../../assets/herby/nowy-mlawianka-mlawa.png"),
+  "nowy-widzew-lodz": require("../../assets/herby/nowy-widzew-lodz.png"),
+  "nowy-ck-troszyn": require("../../assets/herby/nowy-ck-troszyn.png"),
+  "nowy-lechia-tomaszow-mazowiecki": require("../../assets/herby/nowy-lechia-tomaszow-mazowiecki.png"),
+  "nowy-wisla-plock": require("../../assets/herby/nowy-wisla-plock.png"),
+  "nowy-zabkovia-zabki": require("../../assets/herby/nowy-zabkovia-zabki.png"),
+  "nowy-lks-lodz": require("../../assets/herby/nowy-lks-lodz.png"),
+  "nowy-pelikan-lowicz": require("../../assets/herby/nowy-pelikan-lowicz.png"),
+  "nowy-warta-sieradz": require("../../assets/herby/nowy-warta-sieradz.png"),
+  "nowy-mazovia-minsk-mazowiecki": require("../../assets/herby/nowy-mazovia-minsk-mazowiecki.png"),
+  "nowy-swit-nowy-dwor-mazowiecki": require("../../assets/herby/nowy-swit-nowy-dwor-mazowiecki.png"),
   "nowy-jeziorak-zbiczno": require("../../assets/herby/nowy-jeziorak-zbiczno.png"),
   "nowy-ulani-skepsk": require("../../assets/herby/nowy-ulani-skepsk.png"),
   "nowy-brzozki-brzozowo": require("../../assets/herby/nowy-brzozki-brzozowo.png"),

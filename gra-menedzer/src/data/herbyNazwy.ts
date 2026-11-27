@@ -2,6 +2,18 @@
 // Dzięki temu oryginalny herb pokazuje się w KAŻDEJ karierze i na każdej liście (nie tylko tam, gdzie dane klubu mają pole `herb`).
 // Kluby bez pliku herbu (brak w nadesłanych herbach) dostają generowany emblemat w barwach klubu.
 export const HERB_PO_NAZWIE: Record<string, string> = {
+  "KTS Weszło": "nowy-kts-weszlo",
+  "Mławianka Mława": "nowy-mlawianka-mlawa",
+  "Widzew II Łódź": "nowy-widzew-lodz",
+  "KS CK Troszyn": "nowy-ck-troszyn",
+  "Lechia Tomaszów Mazowiecki": "nowy-lechia-tomaszow-mazowiecki",
+  "Wisła II Płock": "nowy-wisla-plock",
+  "Ząbkovia Ząbki": "nowy-zabkovia-zabki",
+  "ŁKS II Łódź": "nowy-lks-lodz",
+  "Pelikan Łowicz": "nowy-pelikan-lowicz",
+  "Warta Sieradz": "nowy-warta-sieradz",
+  "Mazovia Mińsk Mazowiecki": "nowy-mazovia-minsk-mazowiecki",
+  "Świt Nowy Dwór Mazowiecki": "nowy-swit-nowy-dwor-mazowiecki",
   "Jeziorak Zbiczno": "nowy-jeziorak-zbiczno",
   "Ulani Skępsk": "nowy-ulani-skepsk",
   "Brzózki Brzozowo": "nowy-brzozki-brzozowo",
