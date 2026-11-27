@@ -74,7 +74,7 @@ export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj }
 
         {stan && <Text style={{ color: K.szary, fontSize: 11, textAlign: "center", marginTop: 12, opacity: 0.8, fontFamily: CZCIONKA }}>Nowa kariera nadpisze obecny autozapis (zapisy w „Wczytaj grę" zostają).</Text>}
         <Text style={{ color: K.szary, fontSize: 10.5, textAlign: "center", marginTop: 22, opacity: 0.55, fontFamily: CZCIONKA }}>
-          wersja beta · 4 województwa · od klasy B po Ekstraklasę
+          wersja beta · 4 województwa · od klasy B po Ekstraklasę{Platform.OS === "web" && (window as any).__WERSJA ? ` · v.${(window as any).__WERSJA}` : ""}{Platform.OS === "web" && !grafika3D() ? " · 3D wyłączone w Więcej → Grafika" : ""}
         </Text>
       </ScrollView>
     </View>

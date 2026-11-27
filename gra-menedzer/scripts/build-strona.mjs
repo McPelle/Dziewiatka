@@ -111,6 +111,7 @@ const html = `<!doctype html>
     });
   })();
 </script>
+<script>window.__WERSJA = "${hash.slice(0, 6)}";</script>
 <script src="./${appJs}" defer></script>
 </body>
 </html>`;
