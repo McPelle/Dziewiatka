@@ -29,7 +29,7 @@ import { czyWyciszony, gwizdek, startDzwieku, stopDzwieku, wycisz } from "./thre
 import { glosDostepny, glosWlaczony, mow, plecZImienia, ustawGlos, zamilknij } from "./three/glos";
 
 type Zakl = "relacja" | "staty" | "sklady" | "taktyka" | "zmiany";
-const KAMERY: [Kamera, string][] = [["auto", "🎬 Reżyser"], ["tv", "📺 TV"], ["bramka", "🥅 Zza bramki"], ["gora", "🛰 Z góry"], ["blisko", "🔍 Zbliżenie"], ["zawodnik", "👁 Kamera zawodnika"]];
+const KAMERY: [Kamera, string][] = [["auto", "🎬 Reżyser"], ["tv", "📺 TV"], ["bramka", "🥅 Zza bramki"], ["gora", "🛰 Z góry"], ["blisko", "🔍 Zbliżenie"], ["zawodnik", "👁 Kamera zawodnika"], ["obrot", "🔄 Obrotowa (przeciągnij)"]];
 
 /** Warunki meczu: pora (wieczór pod reflektorami), pogoda wg miesiąca, frekwencja wg renomy. */
 function warunki(s: StanGry, domId: string, goscId: string, puchar?: boolean): Ustawienia3D {
@@ -281,7 +281,8 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
           {/* sterowanie */}
           <View style={[st.wiersz, { flexWrap: "wrap", marginTop: 8 }]}>
             <Btn t={predkosc > 0 ? "⏸ Pauza" : "▶ Graj"} on={() => (predkosc > 0 ? setPredkosc(0) : graj(ostatniaPr))} akt={predkosc === 0} />
-            {[1, 2, 4, 8].map((v) => <Btn key={v} t={`${v}×`} on={() => graj(v)} akt={predkosc === v} />)}
+            {[0.25, 1, 2, 4, 8].map((v) => <Btn key={v} t={v < 1 ? "🐢 ¼×" : `${v}×`} on={() => graj(v)} akt={predkosc === v} />)}
+            {!bez3D && !m.koniec && (m.skroty ?? []).some((k) => k.gol) && <Btn t="🔁 Powtórka gola" on={() => { const g = [...(m.skroty ?? [])].reverse().find((k) => k.gol)!; m.sekwencja = g.sek.map((p) => ({ ...p })); setKamera("obrot"); setKom(`🔁 Powtórka (${g.min}) — przeciągnij obraz, by obrócić kamerę. ${g.tekst}`); graj(0.25); setWersja((w) => w + 1); }} />}
             <Btn t={tylkoAkcje ? "⚡ Tylko akcje ✓" : "⚡ Tylko akcje"} on={() => setTylkoAkcje(!tylkoAkcje)} akt={tylkoAkcje} />
             <Btn t={autoPauza ? "⏯ Auto-pauza ✓" : "⏯ Auto-pauza"} on={() => setAutoPauza(!autoPauza)} />
             <Btn t={glosno ? "🔊" : "🔇"} on={() => { wycisz(glosno); setGlosno(!glosno); if (glosno) zamilknij(); }} />

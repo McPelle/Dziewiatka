@@ -22,7 +22,7 @@ import { DL, SZ, swiatla, uproscMaterialy, zbudujStadion } from "./stadion3d";
 import { animuj, stworzPostac, wyglad3D, type Postac } from "./zawodnik3d";
 import { gwizdek, kopniecie, napiecie, reakcjaTrybun } from "./dzwiek";
 
-export type Kamera = "auto" | "tv" | "bramka" | "gora" | "blisko" | "zawodnik";
+export type Kamera = "auto" | "tv" | "bramka" | "gora" | "blisko" | "zawodnik" | "obrot";
 export interface Ustawienia3D { noc: boolean; pogoda: "slonce" | "deszcz" | "snieg" | "mgla"; widzowie: number; lekka: boolean; derby?: boolean; pusto?: boolean; godz?: string }
 
 /** Ustawienie slotu: [głębokość od własnej bramki 0–100, pozycja boczna 0–100]. */
@@ -56,6 +56,11 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = ust.noc ? 1.05 : 1.0;
     renderer.domElement.style.width = "100%"; renderer.domElement.style.height = "100%"; renderer.domElement.style.display = "block";
     el.appendChild(renderer.domElement);
+    // kamera obrotowa (powtórka): przeciągnij palcem/myszą, by obracać widok wokół piłki
+    let katObr = 0.6, wysObr = 7, ciagnie: { x: number; y: number } | null = null;
+    renderer.domElement.addEventListener("pointerdown", (e) => { if (stan.current.kamera === "obrot") ciagnie = { x: e.clientX, y: e.clientY }; });
+    renderer.domElement.addEventListener("pointermove", (e) => { if (!ciagnie) return; katObr -= (e.clientX - ciagnie.x) * 0.012; wysObr = Math.max(1.5, Math.min(30, wysObr + (e.clientY - ciagnie.y) * 0.05)); ciagnie = { x: e.clientX, y: e.clientY }; });
+    window.addEventListener("pointerup", () => { ciagnie = null; });
     const scena = new THREE.Scene();
     const cam = new THREE.PerspectiveCamera(34, W() / H(), 0.5, 900); cam.position.set(0, 30, SZ / 2 + 52); cam.lookAt(0, 0, 0);
     swiatla(scena, ust.noc, ust.pogoda === "mgla", ust.lekka);
@@ -720,6 +725,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       else if (m.koniec && celebracja <= 0 && stan.current.kamera === "auto") { camPoz.set(-4, 9, SZ / 2 + 22); camCel.set(0, 1, SZ / 2 - 6); }
       else if (tryb === "tv" || tryb === "auto") { camPoz.set(bx * 0.78, 30, SZ / 2 + 52); camCel.set(bx * 0.86, 0, bz * 0.35); }
       else if (tryb === "bramka") { const sd = Math.sign(bx || 1); camPoz.set(sd * (DL / 2 + 22), 9, bz * 0.3 + 6); camCel.set(bx * 0.8, 1, bz * 0.6); }
+      else if (tryb === "obrot") { camPoz.set(bx + Math.cos(katObr) * 16, wysObr, bz + Math.sin(katObr) * 16); camCel.set(bx, 0.8, bz); }
       else if (tryb === "zawodnik") { // kamera zawodnika: z perspektywy piłkarza najbliżej piłki, patrzy na piłkę
         let best: Postac | null = null, bd = 1e9; for (const p of postacie.values()) { if (lawkowi.includes(p)) continue; const d = (p.g.position.x - bx) ** 2 + (p.g.position.z - bz) ** 2; if (d < bd) { bd = d; best = p; } }
         if (best) { const dx = bx - best.g.position.x, dz = bz - best.g.position.z, L = Math.hypot(dx, dz) || 1; camPoz.set(best.g.position.x - (dx / L) * 2.2, 1.75, best.g.position.z - (dz / L) * 2.2); camCel.set(bx + (dx / L) * 8, 0.8, bz + (dz / L) * 8); }
