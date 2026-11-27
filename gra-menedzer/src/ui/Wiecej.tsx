@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Osiagniecia } from "./Osiagniecia";
 import { MapaWojewodztwa } from "./MapaWojewodztwa";
+import { SerwisKraj } from "./SerwisKraj";
 import { DniKlubu } from "./DniKlubu";
 import { Sklep } from "./Sklep";
 import { AlbumKart } from "./AlbumKart";
@@ -80,6 +81,7 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
         <Osiagniecia s={s} odswiez={odswiez} />
         <MapaWojewodztwa s={s} />
         <WydzialGier s={s} odswiez={odswiez} />
+        <SerwisKraj s={s} />
         <DniKlubu s={s} odswiez={odswiez} />
         <PrasaKibice s={s} />
         <Reprezentacja s={s} />

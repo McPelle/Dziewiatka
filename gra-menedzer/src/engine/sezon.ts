@@ -1,3 +1,4 @@
+import { serwisKolejki } from "./serwisKraj";
 import { tydzienSklepu } from "./sklep";
 import { tydzienKart } from "./karty";
 import { wydarzeniaSezonowe } from "./wydarzeniaKlubu";
@@ -1039,6 +1040,7 @@ export function zagrajKolejke(s: StanGry) {
   tydzien(s);
   s.kolejka++;
   trenerzyWTrakcie(s); // karuzela trenerska: zwolnienia rywali za słabe wyniki w trakcie sezonu
+  { const h = Math.ceil(ileKolejek(s) / 2); serwisKolejki(s, s.kolejka - 1, s.kolejka - 1 === 1 || s.kolejka - 1 === h); } // wiadomości z kraju
   zakonczMisjeJesliCzas(s); // skaut mógł właśnie wrócić z misji
   if (s.kolejka >= ileKolejek(s)) {
     s.koniecSezonu = true;
