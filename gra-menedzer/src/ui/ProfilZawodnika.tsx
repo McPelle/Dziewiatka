@@ -1,4 +1,5 @@
 import { NegocjacjeModal } from "./Transfery";
+import { przelaczObserwowanego, wykupZWypozyczenia } from "../engine/transfery";
 import { useState } from "react";
 import { Alert, Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
@@ -167,6 +168,17 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
               )}
               <NegocjacjeModal s={s} z={oferta ? z : null} onClose={() => setOferta(false)} odswiez={odswiez} />
 
+              {mojKlubowicz && z.wykup && (
+                <Pressable style={[st.przyciskMaly, { marginTop: 10, alignItems: "center", borderColor: K.akcent }]}
+                  onPress={() => { const b = wykupZWypozyczenia(s, z.id); odswiez(); komunikat(b ?? `Wykupiony: ${z.imie} ${z.nazwisko} zostaje na stałe.`); }}>
+                  <Text style={[st.przyciskMalyTekst, { color: K.akcent }]}>🔁 {z.wykup.obowiazek ? "Wykup teraz (obowiązek po sezonie)" : "Skorzystaj z opcji wykupu"} — {zl(z.wykup.kwota)}</Text>
+                </Pressable>
+              )}
+              {!mojKlubowicz && (
+                <Pressable style={{ marginTop: 8, alignItems: "center" }} onPress={() => { przelaczObserwowanego(s, z.id); odswiez(); }}>
+                  <Text style={[st.maly, { color: K.akcent }]}>{(s.obserwowani ?? []).includes(z.id) ? "⭐ Obserwowany — dotknij, by usunąć" : "☆ Dodaj do obserwowanych"}</Text>
+                </Pressable>
+              )}
               {!mojKlubowicz && z.klauzula && z.klubId && oknoOtwarte(s) && (
                 <Pressable style={[st.przyciskMaly, { marginTop: 10, alignItems: "center", borderColor: K.akcent }]}
                   onPress={() => { const b = wykupKlauzula(s, z.id); odswiez(); if (b) komunikat(b); else { komunikat(`Klauzula aktywowana — ${z.imie} ${z.nazwisko} dołącza do klubu.`); onClose(); } }}>

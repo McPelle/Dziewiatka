@@ -3,6 +3,7 @@ import { AFILIACJE, PRZYJAZNIE } from "../data/derby";
 import { klubyLigiZDanych, rodzenstwo, trafiaDo } from "./regiony";
 import { rozliczObietnice } from "./rozmowy";
 import { rozpocznijOkres } from "./okres";
+import { realizujUmowyWstepne, wykupZWypozyczenia } from "./transfery";
 import { nrZespolu, powolaniaAI, zespolyKlubu } from "./rezerwy";
 import { konferencjaPo, konferencjaPrzed } from "./konferencje";
 import { autoSklad, raportAsystenta, dostepny, FORMACJE, ileSpozaUE, limitSpozaUE, zagrajMecz } from "./mecz";
@@ -329,6 +330,18 @@ export function przygotujKolejke(s: StanGry) {
   if (s.kolejka === Math.ceil(ileKolejek(s) / 2) && s.jesienZapisana !== s.sezon) {
     s.jesienZapisana = s.sezon;
     for (const z of Object.values(s.zawodnicy)) z.meczeJesien = z.mecze;
+  }
+  // Premie kontraktowe za gole i występy (z negocjacji transferowych).
+  if (s.mojKlub && s.kluby[s.mojKlub]) {
+    let suma = 0;
+    for (const id of s.kluby[s.mojKlub].zawodnicy) {
+      const z = s.zawodnicy[id]; if (!z?.bonusy) continue;
+      const lg = z.bonusLicz ?? { g: z.gole, m: z.mecze };
+      const dg = z.gole >= lg.g ? z.gole - lg.g : z.gole, dm = z.mecze >= lg.m ? z.mecze - lg.m : z.mecze;
+      suma += dg * z.bonusy.gol + dm * z.bonusy.mecz;
+      z.bonusLicz = { g: z.gole, m: z.mecze };
+    }
+    if (suma > 0) { s.kluby[s.mojKlub].kasa -= suma; wiadomosc(s, `💵 Premie kontraktowe za gole i występy: ${zl(suma)}.`); }
   }
   // Powołani z innych zespołów klubu wracają do swoich drużyn po meczu.
   if (s.powolaniKlubowi?.length) { s.taktyka.sklad = s.taktyka.sklad.filter((id) => !s.powolaniKlubowi!.includes(id)); s.powolaniKlubowi = []; }
@@ -2086,6 +2099,7 @@ export function nowySezon(s: StanGry) {
   s.miesiacSnapshot = {};    // Zawodnik Miesiąca liczony od nowa
   s.celPodniesiony = false;  // dynamiczny cel znów możliwy
   rozwojSztabuILicencji(s);  // sztab rośnie, trener zdobywa licencje
+  realizujUmowyWstepne(s); // umowy wstępne: wolne transfery latem
   s.sezon++;
   if (!s.zwolniony) rozpocznijOkres(s, "lato"); // okres letni: urlop + przygotowania (sparingi, obóz, testy)
   // Jubileusz klubu: okrągła rocznica założenia (25/50/75/100…) — mecz gali, oprawa kibiców, zastrzyk entuzjazmu.
@@ -2683,7 +2697,7 @@ export function zadaniePlacowe(s: StanGry, z: Zawodnik, poziomDocelowy: number):
 }
 
 /** Premia za podpis (dla wolnych zawodników i przy przedłużeniu) — kilka pensji. */
-function premiaPodpisu(pensja: number): number {
+export function premiaPodpisu(pensja: number): number {
   return Math.round((pensja * losInt(2, 5)) / 10) * 10;
 }
 
@@ -3058,6 +3072,8 @@ function zakonczWypozyczenia(s: StanGry) {
   for (const z of Object.values(s.zawodnicy)) {
     if (z.macierzysty == null || z.wypozyczenieDo == null || s.sezon <= z.wypozyczenieDo) continue;
     const moj = z.macierzysty === s.mojKlub;
+    if (z.wykup?.obowiazek && z.klubId === s.mojKlub) { const b = wykupZWypozyczenia(s, z.id); if (!b) continue; wiadomosc(s, `⚠ Obowiązkowy wykup ${z.imie} ${z.nazwisko} nieudany: ${b}`); }
+    if (z.wykup && z.klubId === s.mojKlub) { wiadomosc(s, `🔁 Nie skorzystałeś z opcji wykupu ${z.imie} ${z.nazwisko} — wraca do klubu macierzystego.`); z.wykup = undefined; }
     wrocZWypozyczenia(s, z);
     if (moj) wiadomosc(s, `${z.imie} ${z.nazwisko} wrócił z wypożyczenia.`);
   }

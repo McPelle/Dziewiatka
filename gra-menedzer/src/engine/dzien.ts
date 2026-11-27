@@ -6,6 +6,7 @@ import { moznaPuchar } from "./puchar";
 import { ileKolejek, kontekstTreningu, rozwojTreningowy, zagrajKolejke } from "./sezon";
 import { ETYKIETA_ATRYB } from "./atrybuty";
 import { dataOkresu, dzienOkresu, nazwaDnia, rozpocznijOkres } from "./okres";
+import { przetworzNegocjacje } from "./transfery";
 import type { StanGry, Zawodnik } from "./types";
 
 export type TypDnia = "regeneracja" | "trening" | "puchar" | "odprawa" | "mecz" | "wolne";
@@ -98,6 +99,8 @@ function raportMedyczny(s: StanGry): string[] {
 /** Przejdź do następnego dnia. Zwraca true, jeśli tego dnia rozegrano mecz Twojej drużyny (UI pokazuje relację). */
 export function dalejDzien(s: StanGry): boolean {
   if (s.koniecSezonu || s.zwolniony) return false;
+  s.licznikDni = (s.licznikDni ?? 0) + 1;
+  przetworzNegocjacje(s); // odpowiedzi klubów/agentów, badania, rejestracje
   // Przerwa zimowa: po rundzie jesiennej, przed pierwszym tygodniem wiosny — okres zimowy (urlop + przygotowania).
   const pol = Math.ceil(ileKolejek(s) / 2);
   if (!s.okres && s.kolejka === pol && (s.dzien ?? 0) === 0 && s.zimaSezon !== s.sezon) { s.zimaSezon = s.sezon; rozpocznijOkres(s, "zima"); }

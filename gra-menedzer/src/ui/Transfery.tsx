@@ -1,3 +1,5 @@
+import { przelaczObserwowanego, wypozyczZWykupem, zlozOferte } from "../engine/transfery";
+import { NegocjacjePanel } from "./NegocjacjePanel";
 import { useState } from "react";
 import { Alert, FlatList, Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
@@ -84,7 +86,12 @@ export function Transfery({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
   const koncza = klub.zawodnicy.map((id) => s.zawodnicy[id]).filter((z) => latDoKonca(s, z) <= 1).sort((a, b) => a.kontraktDo - b.kontraktDo);
   const wypozyczeni = Object.values(s.zawodnicy).filter((z) => z.macierzysty === s.mojKlub && z.klubId !== s.mojKlub);
 
-  const kupuj = (z: Zawodnik) => { const blad = wyp ? wypozyczDoSiebie(s, z.id) : kup(s, z.id); odswiez(); if (blad) komunikat(blad); };
+  // Kupno zawsze przez negocjacje (oferta → odpowiedź klubu → kontrakt → badania → rejestracja); wypożyczenie od ręki.
+  const kupuj = (z: Zawodnik) => { if (!wyp) { setNeg(z); return; } const blad = wypozyczDoSiebie(s, z.id); odswiez(); if (blad) komunikat(blad); };
+  const wypZWykupem = (z: Zawodnik, obow: boolean) => {
+    const kw = Math.round(cenaKupna(s, z.id) * (obow ? 0.9 : 1.1) / 1000) * 1000;
+    const blad = wypozyczZWykupem(s, z.id, kw, obow); odswiez(); if (blad) komunikat(blad);
+  };
 
   // Pozycje szczegółowe w wybranej kategorii.
   const pozSWKat = kat === "wszyscy" ? [] : (Object.keys(SKROT_POZ) as PozycjaSzczegolowa[]).filter((p) => KAT_POZ[p] === kat);
@@ -97,6 +104,7 @@ export function Transfery({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
 
   const Naglowek = (
     <View>
+      <NegocjacjePanel s={s} odswiez={odswiez} />
       {s.oferty.length > 0 && (
         <View style={st.karta}>
           <Text style={st.naglowek}>📨 Oferty za Twoich zawodników</Text>
@@ -270,7 +278,7 @@ export function Transfery({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
         renderItem={({ item: z }) =>
           sprzedaz
             ? <WierszSprzedazy s={s} z={z} odswiez={odswiez} />
-            : <WierszRynku s={s} z={z} wyp={wyp} cena={cenaZa(z)} onKup={() => kupuj(z)} onNeg={() => setNeg(z)} />
+            : <WierszRynku s={s} z={z} wyp={wyp} cena={cenaZa(z)} onKup={() => kupuj(z)} onNeg={() => setNeg(z)} onWykup={(o) => wypZWykupem(z, o)} />
         }
       />
       <NegocjacjeModal s={s} z={neg} onClose={() => setNeg(null)} odswiez={odswiez} />
@@ -278,7 +286,7 @@ export function Transfery({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
   );
 }
 
-function WierszRynku({ s, z, wyp, cena, onKup, onNeg }: { s: StanGry; z: Zawodnik; wyp: boolean; cena: number; onKup: () => void; onNeg: () => void }) {
+function WierszRynku({ s, z, wyp, cena, onKup, onNeg, onWykup }: { s: StanGry; z: Zawodnik; wyp: boolean; cena: number; onKup: () => void; onNeg: () => void; onWykup: (obowiazek: boolean) => void }) {
   const klub = s.kluby[s.mojKlub];
   const parent = z.klubId ? s.kluby[z.klubId] : undefined;
   const pensja = pensjaPoTransferze(s, z.id);
@@ -310,6 +318,16 @@ function WierszRynku({ s, z, wyp, cena, onKup, onNeg }: { s: StanGry; z: Zawodni
         <Pressable style={st.przyciskMaly} onPress={onKup}>
           <Text style={st.przyciskMalyTekst}>{wyp ? "Wypożycz" : cena ? "Kup" : "Podpisz"}</Text>
         </Pressable>
+        {wyp && z.kontraktTyp !== "amator" && (
+          <>
+            <Pressable style={[st.przyciskMaly, { borderColor: K.akcent }]} onPress={() => onWykup(false)}>
+              <Text style={[st.przyciskMalyTekst, { color: K.akcent, fontSize: 11 }]}>+ opcja wykupu</Text>
+            </Pressable>
+            <Pressable style={[st.przyciskMaly, { borderColor: K.szary }]} onPress={() => onWykup(true)}>
+              <Text style={[st.przyciskMalyTekst, { fontSize: 11 }]}>+ obowiązek</Text>
+            </Pressable>
+          </>
+        )}
         {!wyp && (
           <Pressable style={[st.przyciskMaly, { borderColor: K.akcent }]} onPress={onNeg}>
             <Text style={[st.przyciskMalyTekst, { color: K.akcent }]}>Negocjuj</Text>
@@ -401,12 +419,16 @@ function NegocjacjeTresc({ s, z, onClose, odswiez }: { s: StanGry; z: Zawodnik; 
   const [lata, setLata] = useState(z.wiek >= 31 ? 2 : 3);
   const [klauzula, setKlauzula] = useState(0);
   const [wynik, setWynik] = useState<WynikNegocjacji | null>(null);
+  const [wstepna, setWstepna] = useState(false);
+  const moznaWstepna = !wolny && latDoKonca(s, z) === 0;
 
   const zloz = () => {
     const o: OfertaTransferu = { kwota: wolny ? 0 : kwota, ratySezony: raty, odsprzedazProc: odsprzedaz || undefined, pensja, lata, klauzula: klauzula || undefined };
-    const r = negocjujTransfer(s, z.id, o);
-    setWynik(r);
-    if (r.ok) { odswiez(); komunikat(`✍️ Transfer dobity: ${z.imie} ${z.nazwisko}.`); onClose(); }
+    const b = zlozOferte(s, z.id, o, { wstepna });
+    if (b) { setWynik({ ok: false, powod: b }); return; }
+    odswiez();
+    komunikat(wolny || z.kontraktTyp === "amator" || wstepna ? `📞 Rozpoczęto rozmowy z ${z.imie} ${z.nazwisko}. Oczekiwania poznasz jutro (Transfery → Negocjacje).` : `📨 Oferta wysłana do ${s.kluby[z.klubId!].nazwa}. Odpowiedź w ciągu 1–3 dni.`);
+    onClose();
   };
 
   const Stepper = ({ etyk, wart, set, step, min = 0 }: { etyk: string; wart: number; set: (n: number) => void; step: number; min?: number }) => (
@@ -445,6 +467,15 @@ function NegocjacjeTresc({ s, z, onClose, odswiez }: { s: StanGry; z: Zawodnik; 
             </View>
           )}
 
+          {moznaWstepna && (
+            <Pressable onPress={() => setWstepna(!wstepna)} style={[st.karta, { marginHorizontal: 0, marginTop: 10, borderColor: wstepna ? K.akcent : K.linia, borderWidth: 1 }]}>
+              <Text style={[st.tekst, { fontWeight: "800" }]}>{wstepna ? "☑" : "☐"} Umowa wstępna — wolny transfer latem</Text>
+              <Text style={st.maly}>Kontrakt kończy mu się po sezonie: podpisz umowę wstępną teraz, przyjdzie za darmo po sezonie (bez kwoty dla klubu).</Text>
+            </Pressable>
+          )}
+          <Pressable onPress={() => { przelaczObserwowanego(s, z.id); odswiez(); }} style={{ marginTop: 8 }}>
+            <Text style={[st.maly, { color: K.akcent }]}>{(s.obserwowani ?? []).includes(z.id) ? "⭐ Obserwowany (dotknij, by usunąć)" : "☆ Dodaj do obserwowanych"}</Text>
+          </Pressable>
           <View style={{ marginTop: 12 }}>
             <Text style={[st.naglowek, { fontSize: 14 }]}>Warunki dla zawodnika</Text>
             <Stepper etyk={`Pensja (żąda ~${zl(zada)}/kol.)`} wart={pensja} set={setPensja} step={Math.max(100, Math.round(zada * 0.05))} />

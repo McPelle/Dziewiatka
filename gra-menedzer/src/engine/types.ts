@@ -104,6 +104,10 @@ export interface Zawodnik {
   junKariera?: { sezon: number; kat: KatJun; m: number; g: number; a: number; sr: number }[]; // historia sezonów juniorskich
   meczeJesien?: number; // mecze rozegrane do końca rundy jesiennej (limity gry w rezerwach liczone per runda)
   meczeRezerwy?: number; // mecze w niższym zespole klubu w sezonie (zasada >50% po zakończeniu sezonu wyższego zespołu)
+  przyszlyKlub?: { klubId: string; warunki: import("./transfery").WarunkiKontraktu }; // umowa wstępna — przejdzie latem za darmo
+  bonusy?: { gol: number; mecz: number };
+  bonusLicz?: { g: number; m: number }; // stan goli/meczów przy ostatnim rozliczeniu premii // premie kontraktowe (zł) za gola / występ
+  wykup?: { kwota: number; obowiazek: boolean; klubId: string }; // wypożyczenie z opcją / obowiązkiem wykupu
   relacja?: number; // zaufanie zawodnika do trenera 0–100 (rozmowy, dotrzymane/złamane obietnice); brak = 60
   ostatniaRozmowa?: number; // sezon*100+kolejka ostatniej rozmowy (druga rozmowa w tygodniu waży mniej)
   obietnica?: { typ: "minuty" | "kontrakt"; doKolejki: number; mecze: number; kontraktDo: number }; // obietnica trenera do rozliczenia
@@ -411,6 +415,9 @@ export interface StanGry {
   xiHistoria?: XIKolejki[]; // archiwum jedenastek kolejek z sezonu
   konferencja?: Konferencja;
   motywacjaMeczu?: number;
+  negocjacje?: import("./transfery").Negocjacja[]; // transfery w toku (etapy rozłożone w dniach)
+  licznikDni?: number; // licznik dni gry (kalendarz)
+  obserwowani?: string[]; // lista obserwowanych zawodników
   jesienZapisana?: number; // sezon, w którym zapisano stan meczów po rundzie jesiennej
   okres?: import("./okres").Okres; // trwający okres przygotowawczy (lato/zima)
   zimaSezon?: number; // sezon, w którym rozegrano już przerwę zimową
