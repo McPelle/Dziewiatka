@@ -53,7 +53,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, ust.lekka ? 1.25 : 2));
     renderer.setSize(W(), H());
     renderer.shadowMap.enabled = !ust.lekka; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = ust.noc ? 1.05 : 1.0;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = ust.noc ? 1.05 : 1.0; // wieczór: patrz niżej
     renderer.domElement.style.width = "100%"; renderer.domElement.style.height = "100%"; renderer.domElement.style.display = "block";
     el.appendChild(renderer.domElement);
     // kamera obrotowa (powtórka): przeciągnij palcem/myszą, by obracać widok wokół piłki
@@ -63,9 +63,10 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     window.addEventListener("pointerup", () => { ciagnie = null; });
     const scena = new THREE.Scene();
     const cam = new THREE.PerspectiveCamera(34, W() / H(), 0.5, 900); cam.position.set(0, 30, SZ / 2 + 52); cam.lookAt(0, 0, 0);
-    swiatla(scena, ust.noc, ust.pogoda === "mgla", ust.lekka);
+    const godzMeczu = parseInt((ust.godz ?? "").split(":")[0], 10); const wieczor = !ust.noc && godzMeczu >= 17;
+    swiatla(scena, ust.noc, ust.pogoda === "mgla", ust.lekka, wieczor);
     const kd = s.kluby[m.dom.klubId], kg = s.kluby[m.gosc.klubId];
-    const stad = zbudujStadion(s, kd, { noc: ust.noc, snieg: ust.pogoda === "snieg", deszcz: ust.pogoda === "deszcz", widzowie: ust.widzowie, lekka: ust.lekka, budowy: m.dom.klubId === s.mojKlub ? s.budowy : undefined });
+    const stad = zbudujStadion(s, kd, { noc: ust.noc, wieczor, snieg: ust.pogoda === "snieg", deszcz: ust.pogoda === "deszcz", widzowie: ust.widzowie, lekka: ust.lekka, budowy: m.dom.klubId === s.mojKlub ? s.budowy : undefined });
     if (ust.lekka) uproscMaterialy(stad.grupa);
     scena.add(stad.grupa);
     // post-processing: bloom (reflektory, bandy LED), głębia ostrości przy zbliżeniach

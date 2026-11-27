@@ -9,7 +9,7 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import type { Klub, StanGry } from "../../engine/types";
-import { swiatla, zbudujStadion } from "./stadion3d";
+import { teksturaNieba, zbudujStadion } from "./stadion3d";
 
 const lekkaGrafikaV2 = () => typeof window !== "undefined" && window.localStorage?.getItem("dz_lekka") === "1";
 const grafika3DV2 = () => typeof window !== "undefined" && !!window.WebGLRenderingContext && window.localStorage?.getItem("dz_3d") !== "0";
@@ -28,15 +28,15 @@ function Stadion3DV2({ s, klub, tlo, wysokosc, noc }: { s: StanGry | null; klub:
     Object.assign(renderer.domElement.style, { width: "100%", height: "100%", display: "block", touchAction: "none" });
     el.appendChild(renderer.domElement);
     const godz = new Date().getHours();
-    const jestNoc = noc ?? (godz >= 19 || godz < 6);
+    const jestNoc = noc ?? (godz >= 19 || godz < 6); const jestWieczor = noc === undefined && godz >= 17 && godz < 19;
     const scena = new THREE.Scene();
     // lekkie światło (bez reflektorów-spotów i cieni): kilka prostych shaderów zamiast kilkunastu ciężkich
-    scena.background = new THREE.Color(jestNoc ? 0x0b1226 : 0x8fbbe8);
-    scena.fog = new THREE.Fog(scena.background as THREE.Color, 160, 520);
-    scena.add(new THREE.HemisphereLight(jestNoc ? 0x8a9ac8 : 0xdfeeff, jestNoc ? 0x1a2a1a : 0x445533, jestNoc ? 1.1 : 1.3));
-    { const sl = new THREE.DirectionalLight(jestNoc ? 0xfff4dd : 0xfff2d8, jestNoc ? 1.4 : 2.2); sl.position.set(60, 80, 45); scena.add(sl); }
+    scena.background = teksturaNieba(jestNoc ? "noc" : jestWieczor ? "wieczor" : "dzien", false);
+    scena.fog = new THREE.Fog(jestNoc ? 0x1b2a4d : jestWieczor ? 0xe9a273 : 0xc4def3, 160, 560);
+    scena.add(new THREE.HemisphereLight(jestNoc ? 0x8a9ac8 : jestWieczor ? 0xffc79a : 0xdfeeff, jestNoc ? 0x1a2a1a : jestWieczor ? 0x4a3a2a : 0x445533, jestNoc ? 1.1 : jestWieczor ? 1.0 : 1.3));
+    { const sl = new THREE.DirectionalLight(jestNoc ? 0xfff4dd : jestWieczor ? 0xffa35a : 0xfff2d8, jestNoc ? 1.4 : 2.2); if (jestWieczor) sl.position.set(120, 32, 70); else sl.position.set(60, 80, 45); scena.add(sl); }
     const mies = new Date().getMonth() + 1;
-    const stad = zbudujStadion(s, klub, { noc: jestNoc, snieg: mies === 12 || mies <= 2 ? new Date().getDate() % 3 === 0 : false, deszcz: false, widzowie: tlo ? klub.pojemnosc * 0.5 : 0, lekka, budowy: s?.budowy });
+    const stad = zbudujStadion(s, klub, { noc: jestNoc, wieczor: jestWieczor, snieg: mies === 12 || mies <= 2 ? new Date().getDate() % 3 === 0 : false, deszcz: false, widzowie: tlo ? klub.pojemnosc * 0.5 : 0, lekka, budowy: s?.budowy });
     // materiały „lekkie" (Lambert): wygląd prawie ten sam, a iPhone przygotowuje je w ułamku sekundy
     const cache = new Map<THREE.Material, THREE.Material>();
     stad.grupa.traverse((o) => {

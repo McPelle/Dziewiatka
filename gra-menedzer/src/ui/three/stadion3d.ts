@@ -19,38 +19,82 @@ function rng(seed: string) {
 }
 const canvas = (w: number, h: number) => { const c = document.createElement("canvas"); c.width = w; c.height = h; return c; };
 
-/** Tekstura murawy: pasy koszenia, delikatny szum trawy, wytarcia w polach karnych (zużycie w sezonie). */
-function teksturaMurawy(sztuczna: boolean, zuzycie: number, snieg: boolean): THREE.CanvasTexture {
-  const c = canvas(1024, 664), g = c.getContext("2d")!;
-  const a = sztuczna ? "#2f8f45" : "#3a9a3f", b = sztuczna ? "#2a8340" : "#338a37";
-  for (let i = 0; i < 16; i++) { g.fillStyle = i % 2 ? a : b; g.fillRect((i * c.width) / 16, 0, c.width / 16 + 1, c.height); }
-  const img = g.getImageData(0, 0, c.width, c.height);
-  for (let i = 0; i < img.data.length; i += 4) { const n = (Math.random() - 0.5) * 18; img.data[i] += n * 0.6; img.data[i + 1] += n; img.data[i + 2] += n * 0.4; }
+/** Tekstura murawy: pasy koszenia w kratkę, źdźbła trawy, wytarcia w polach karnych i bramkowych (zużycie w sezonie),
+ *  ślady sędziów liniowych, ostre linie. `lekka` = mniejsza rozdzielczość dla telefonów. */
+function teksturaMurawy(sztuczna: boolean, zuzycie: number, snieg: boolean, lekka = false): THREE.CanvasTexture {
+  const S = lekka ? 1 : 2, c = canvas(1024 * S, 664 * S), g = c.getContext("2d")!; const W = c.width, H = c.height;
+  const a = sztuczna ? "#2f8f45" : "#3c9c41", b = sztuczna ? "#2a8340" : "#327f36";
+  const PASY = 18;
+  for (let i = 0; i < PASY; i++) { g.fillStyle = i % 2 ? a : b; g.fillRect((i * W) / PASY, 0, W / PASY + 1, H); }
+  // koszenie w poprzek (subtelna kratka — jak na stadionach zawodowych)
+  if (!sztuczna) for (let j = 0; j < 10; j++) if (j % 2) { g.fillStyle = "rgba(0,0,0,0.045)"; g.fillRect(0, (j * H) / 10, W, H / 10 + 1); }
+  // szum trawy
+  const img = g.getImageData(0, 0, W, H);
+  for (let i = 0; i < img.data.length; i += 4) { const n = (Math.random() - 0.5) * 16; img.data[i] += n * 0.5; img.data[i + 1] += n; img.data[i + 2] += n * 0.35; }
   g.putImageData(img, 0, 0);
-  // wytarcia (łysiny) w polach karnych i na środku — rosną z zużyciem
-  if (!sztuczna && zuzycie > 0.05) {
-    for (const [cx, cy, r] of [[60, 332, 90], [964, 332, 90], [512, 332, 70]] as [number, number, number][]) {
-      const gr = g.createRadialGradient(cx, cy, 5, cx, cy, r);
-      gr.addColorStop(0, `rgba(120,95,55,${Math.min(0.75, zuzycie)})`); gr.addColorStop(1, "rgba(120,95,55,0)");
-      g.fillStyle = gr; g.beginPath(); g.ellipse(cx, cy, r * 0.8, r * 1.2, 0, 0, Math.PI * 2); g.fill();
-    }
+  // źdźbła (krótkie kreski jaśniejsze/ciemniejsze)
+  const zdzbla = lekka ? 9000 : 42000;
+  g.lineWidth = S * 0.9;
+  for (let i = 0; i < zdzbla; i++) {
+    const x = Math.random() * W, y = Math.random() * H, l = (1.5 + Math.random() * 3) * S, kat = -Math.PI / 2 + (Math.random() - 0.5) * 0.9;
+    g.strokeStyle = Math.random() < 0.5 ? "rgba(170,230,120,0.10)" : "rgba(10,50,15,0.12)";
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(kat) * l, y + Math.sin(kat) * l); g.stroke();
   }
-  if (snieg) { g.fillStyle = "rgba(245,248,255,0.55)"; g.fillRect(0, 0, c.width, c.height); }
-  // linie boiska
-  const sx = c.width / DL, sy = c.height / SZ, L = (x: number) => x * sx, T = (y: number) => y * sy;
-  g.strokeStyle = snieg ? "#ff5a1f" : "rgba(255,255,255,0.92)"; g.lineWidth = 3.2;
+  // lekkie przyciemnienie przy liniach bocznych (cień trybun, mniej słońca)
+  const vg = g.createLinearGradient(0, 0, 0, H); vg.addColorStop(0, "rgba(0,0,0,0.10)"); vg.addColorStop(0.12, "rgba(0,0,0,0)"); vg.addColorStop(0.88, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,0.10)");
+  g.fillStyle = vg; g.fillRect(0, 0, W, H);
+  // wytarcia (łysiny): pola karne, bramkowe, środek, ścieżki liniowych — rosną z zużyciem
+  if (!sztuczna && zuzycie > 0.05) {
+    const lys = (cx: number, cy: number, rx: number, ry: number, siła: number) => {
+      const gr = g.createRadialGradient(cx, cy, 2, cx, cy, Math.max(rx, ry));
+      gr.addColorStop(0, `rgba(122,96,58,${Math.min(0.8, siła)})`); gr.addColorStop(0.6, `rgba(110,100,60,${Math.min(0.4, siła * 0.5)})`); gr.addColorStop(1, "rgba(120,95,55,0)");
+      g.fillStyle = gr; g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); g.fill();
+    };
+    lys(30 * S, 332 * S, 46 * S, 70 * S, zuzycie * 1.1); lys(994 * S, 332 * S, 46 * S, 70 * S, zuzycie * 1.1);
+    lys(110 * S, 332 * S, 80 * S, 120 * S, zuzycie * 0.8); lys(914 * S, 332 * S, 80 * S, 120 * S, zuzycie * 0.8);
+    lys(512 * S, 332 * S, 70 * S, 90 * S, zuzycie * 0.7);
+    g.fillStyle = `rgba(120,100,60,${Math.min(0.25, zuzycie * 0.35)})`; g.fillRect(256 * S, 4 * S, 512 * S, 6 * S); g.fillRect(256 * S, H - 10 * S, 512 * S, 6 * S);
+  }
+  if (snieg) { g.fillStyle = "rgba(245,248,255,0.55)"; g.fillRect(0, 0, W, H); }
+  // linie boiska (ostre, z delikatną poświatą)
+  const sx = W / DL, sy = H / SZ, L = (x: number) => x * sx, T = (y: number) => y * sy;
+  g.strokeStyle = snieg ? "#ff5a1f" : "rgba(255,255,255,0.95)"; g.lineWidth = 3.4 * S; g.lineCap = "round";
+  g.shadowColor = snieg ? "rgba(255,90,31,0.4)" : "rgba(255,255,255,0.35)"; g.shadowBlur = 2 * S;
   g.strokeRect(L(0.5), T(0.5), L(DL - 1), T(SZ - 1));
   g.beginPath(); g.moveTo(L(DL / 2), T(0.5)); g.lineTo(L(DL / 2), T(SZ - 0.5)); g.stroke();
   g.beginPath(); g.ellipse(L(DL / 2), T(SZ / 2), L(9.15), T(9.15), 0, 0, Math.PI * 2); g.stroke();
+  g.fillStyle = g.strokeStyle as string;
   for (const sxx of [0, 1]) {
     const x0 = sxx ? DL - 0.5 : 0.5, k = sxx ? -1 : 1;
     g.strokeRect(L(Math.min(x0, x0 + k * 16.5)), T(SZ / 2 - 20.16), L(16.5), T(40.32));
     g.strokeRect(L(Math.min(x0, x0 + k * 5.5)), T(SZ / 2 - 9.16), L(5.5), T(18.32));
-    g.beginPath(); g.arc(L(x0 + k * 11), T(SZ / 2), 3, 0, Math.PI * 2); g.fillStyle = g.strokeStyle as string; g.fill();
+    g.beginPath(); g.arc(L(x0 + k * 11), T(SZ / 2), 3 * S, 0, Math.PI * 2); g.fill();
     g.beginPath(); g.ellipse(L(x0 + k * 11), T(SZ / 2), L(9.15), T(9.15), 0, sxx ? Math.PI - 0.93 : -0.93, sxx ? Math.PI + 0.93 : 0.93); g.stroke();
+    // łuki rożne (r = 1 m)
+    for (const yy of [0.5, SZ - 0.5]) { g.beginPath(); g.ellipse(L(x0), T(yy), L(1), T(1), 0, 0, Math.PI * 2); g.stroke(); }
   }
-  g.beginPath(); g.arc(L(DL / 2), T(SZ / 2), 3, 0, Math.PI * 2); g.fill();
-  const t = new THREE.CanvasTexture(c); t.anisotropy = 8; t.colorSpace = THREE.SRGBColorSpace; return t;
+  g.beginPath(); g.arc(L(DL / 2), T(SZ / 2), 3 * S, 0, Math.PI * 2); g.fill();
+  g.shadowBlur = 0;
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 16; t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+
+/** Wypukłość trawy (bump) — drobny szum, powtarzany; nadaje murawie fakturę w świetle reflektorów i niskiego słońca. */
+function teksturaFaktury(): THREE.CanvasTexture {
+  const c = canvas(256, 256), g = c.getContext("2d")!; const img = g.createImageData(256, 256);
+  for (let i = 0; i < img.data.length; i += 4) { const v = 110 + Math.random() * 90; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+  g.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(60, 40); return t;
+}
+
+/** Trawa wokół boiska: pasy koszenia i szum (powtarzana). */
+function teksturaOtoczeniaBoiska(snieg: boolean): THREE.CanvasTexture {
+  const c = canvas(256, 256), g = c.getContext("2d")!;
+  g.fillStyle = "#357f39"; g.fillRect(0, 0, 256, 256); g.fillStyle = "#2f7533"; g.fillRect(0, 0, 128, 256);
+  const img = g.getImageData(0, 0, 256, 256);
+  for (let i = 0; i < img.data.length; i += 4) { const n = (Math.random() - 0.5) * 18; img.data[i] += n * 0.5; img.data[i + 1] += n; img.data[i + 2] += n * 0.35; }
+  g.putImageData(img, 0, 0);
+  if (snieg) { g.fillStyle = "rgba(245,248,255,0.6)"; g.fillRect(0, 0, 256, 256); }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(10, 6); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
 
 /** Bramka z siatką (słupki 12 cm, 7,32 × 2,44 m). */
@@ -100,7 +144,7 @@ function bandy(sponsorzy: string[], led: boolean, odl = 4): THREE.Group {
   return g;
 }
 
-export interface OpcjeStadionu { noc: boolean; snieg: boolean; deszcz: boolean; widzowie: number; budowy?: Budowa[]; lekka?: boolean }
+export interface OpcjeStadionu { noc: boolean; wieczor?: boolean; snieg: boolean; deszcz: boolean; widzowie: number; budowy?: Budowa[]; lekka?: boolean }
 const OS_Y = new THREE.Vector3(0, 1, 0);
 let _tekstKib: THREE.CanvasTexture | null = null;
 /** Sylwetka kibica (głowa + tułów) — biała z przezroczystością; kolor koszulki/szalika nadaje kolor instancji. */
@@ -149,9 +193,9 @@ export function zbudujStadion(s: StanGry | null, klub: Klub, o: OpcjeStadionu): 
   teren.rotation.x = -Math.PI / 2; teren.position.y = -0.02; teren.receiveShadow = true; grupa.add(teren);
   // murawa
   const zuzycie = s ? Math.min(0.8, (s.kolejka % 17) / 17 * (klub.murawa === "podgrzewana" ? 0.3 : nisko ? 1 : 0.6)) : 0.2;
-  const murawa = new THREE.Mesh(new THREE.PlaneGeometry(DL + 8, SZ + 6), new THREE.MeshStandardMaterial({ color: 0x3a9a3f, roughness: 0.95 }));
+  const murawa = new THREE.Mesh(new THREE.PlaneGeometry(DL + 8, SZ + 6), new THREE.MeshStandardMaterial({ map: teksturaOtoczeniaBoiska(o.snieg), roughness: 0.95 }));
   murawa.rotation.x = -Math.PI / 2; murawa.receiveShadow = true; grupa.add(murawa);
-  const pole = new THREE.Mesh(new THREE.PlaneGeometry(DL, SZ), new THREE.MeshStandardMaterial({ map: teksturaMurawy(klub.murawa === "sztuczna", zuzycie, o.snieg), roughness: o.deszcz ? 0.55 : 0.92 }));
+  const pole = new THREE.Mesh(new THREE.PlaneGeometry(DL, SZ), new THREE.MeshStandardMaterial({ map: teksturaMurawy(klub.murawa === "sztuczna", zuzycie, o.snieg, !!o.lekka), ...(o.lekka ? {} : { bumpMap: teksturaFaktury(), bumpScale: 0.6 }), roughness: o.deszcz ? 0.55 : 0.92 }));
   pole.rotation.x = -Math.PI / 2; pole.position.y = 0.01; pole.receiveShadow = true; grupa.add(pole);
   const siatki: THREE.Mesh[] = [];
   for (const st of [-1, 1] as const) { const b = bramka(st, !nisko || r() < 0.4); grupa.add(b); b.traverse((x) => { if (x.name === "siatka") siatki.push(x as THREE.Mesh); }); }
@@ -274,12 +318,12 @@ export function zbudujStadion(s: StanGry | null, klub: Klub, o: OpcjeStadionu): 
   const oswietlenie = klub.oswietlenie ?? klub.poziom <= 3;
   if (tryb?.swiatlaDach) {
     const m = tryb.swiatlaDach.material as THREE.MeshStandardMaterial;
-    if (oswietlenie && o.noc) { m.emissive.set(0xfff6d8); m.emissiveIntensity = 3; }
+    if (oswietlenie && (o.noc || o.wieczor)) { m.emissive.set(0xfff6d8); m.emissiveIntensity = o.noc ? 3 : 2; }
     reflektory.push(tryb.swiatlaDach);
   } else if (oswietlenie) {
     const maszty = tryb?.maszty.length ? tryb.maszty : [-1, 1].flatMap((x) => [-1, 1].map((z) => ({ x: x * (DL / 2 + 16), z: z * (SZ / 2 + 16), h: 26 })));
     const matMaszt = new THREE.MeshStandardMaterial({ color: 0xb8bcc0, metalness: 0.7, roughness: 0.3 });
-    const matPanel = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: new THREE.Color(o.noc ? 0xfff6d8 : 0x000000), emissiveIntensity: o.noc ? 3 : 0 });
+    const matPanel = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: new THREE.Color(o.noc || o.wieczor ? 0xfff6d8 : 0x000000), emissiveIntensity: o.noc ? 3 : o.wieczor ? 2 : 0 });
     for (const mp of maszty) {
       const h = Math.max(mp.h, klub.poziom <= 2 ? 40 : 26);
       const maszt = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.6, h), matMaszt);
@@ -396,17 +440,39 @@ function robotnik(): THREE.Group {
   g.add(kam, nogi, glowa, kask); return g;
 }
 
-/** Światło sceny: dzień (słońce z cieniem) albo noc pod reflektorami. */
-export function swiatla(scena: THREE.Scene, noc: boolean, mgla: boolean, lekka: boolean) {
-  scena.background = new THREE.Color(noc ? 0x0b1226 : mgla ? 0xb9c2c8 : 0x8fbbe8);
-  scena.fog = new THREE.Fog(scena.background as THREE.Color, mgla ? 40 : 160, mgla ? 170 : 520);
-  const hemi = new THREE.HemisphereLight(noc ? 0x6b7aa8 : 0xdfeeff, noc ? 0x1a2a1a : 0x445533, noc ? 0.55 : 0.9); scena.add(hemi);
-  const slonce = new THREE.DirectionalLight(noc ? 0xfff4dd : 0xfff2d8, noc ? 1.6 : 2.4);
-  slonce.position.set(noc ? 20 : 60, noc ? 90 : 80, noc ? 30 : 45);
+/** Niebo jako gradient (dzień / wieczór / noc z gwiazdami) — tło sceny. */
+export function teksturaNieba(pora: "dzien" | "wieczor" | "noc", mgla: boolean): THREE.CanvasTexture {
+  const c = canvas(16, 512), g = c.getContext("2d")!; const gr = g.createLinearGradient(0, 0, 0, 512);
+  const st: [number, string][] = mgla ? [[0, "#9aa4ab"], [1, "#c9d0d4"]]
+    : pora === "noc" ? [[0, "#01030a"], [0.55, "#0a1530"], [0.85, "#1b2a4d"], [1, "#2a3556"]]
+    : pora === "wieczor" ? [[0, "#22346e"], [0.45, "#7b5aa0"], [0.72, "#f08a5a"], [0.9, "#ffc27a"], [1, "#ffe0a8"]]
+    : [[0, "#3f86d6"], [0.6, "#8fc0ef"], [1, "#d7ecfb"]];
+  for (const [o, k] of st) gr.addColorStop(o, k);
+  g.fillStyle = gr; g.fillRect(0, 0, 16, 512);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+
+/** Światło sceny: dzień (słońce z cieniem), wieczór (niskie złote słońce, długie cienie + reflektory) albo noc pod reflektorami. */
+export function swiatla(scena: THREE.Scene, noc: boolean, mgla: boolean, lekka: boolean, wieczor = false) {
+  const pora = noc ? "noc" : wieczor ? "wieczor" : "dzien";
+  scena.background = teksturaNieba(pora, mgla);
+  const horyzont = new THREE.Color(mgla ? 0xb9c2c8 : noc ? 0x1b2a4d : wieczor ? 0xe9a273 : 0xc4def3);
+  scena.fog = new THREE.Fog(horyzont, mgla ? 40 : 160, mgla ? 170 : 560);
+  const hemi = new THREE.HemisphereLight(noc ? 0x6b7aa8 : wieczor ? 0xffc79a : 0xdfeeff, noc ? 0x1a2a1a : wieczor ? 0x4a3a2a : 0x445533, noc ? 0.55 : wieczor ? 0.7 : 0.9); scena.add(hemi);
+  const slonce = new THREE.DirectionalLight(noc ? 0xfff4dd : wieczor ? 0xffa35a : 0xfff2d8, noc ? 1.6 : wieczor ? 2.6 : 2.4);
+  if (noc) slonce.position.set(20, 90, 30); else if (wieczor) slonce.position.set(120, 32, 70); else slonce.position.set(60, 80, 45);
   slonce.castShadow = true; slonce.shadow.mapSize.set(lekka ? 1024 : 2048, lekka ? 1024 : 2048);
-  const c = slonce.shadow.camera as THREE.OrthographicCamera; c.left = -70; c.right = 70; c.top = 50; c.bottom = -50; c.near = 10; c.far = 220; slonce.shadow.bias = -0.0004;
+  const c = slonce.shadow.camera as THREE.OrthographicCamera; c.left = -75; c.right = 75; c.top = 55; c.bottom = -55; c.near = 10; c.far = 260; slonce.shadow.bias = -0.0004;
   scena.add(slonce);
-  if (noc) for (const x of [-1, 1]) for (const z of [-1, 1]) { const sp = new THREE.SpotLight(0xfff3d6, 900, 220, 0.75, 0.6, 1.3); sp.position.set(x * (DL / 2 + 16), 34, z * (SZ / 2 + 16)); sp.target.position.set(-x * 8, 0, -z * 6); scena.add(sp, sp.target); }
+  if (wieczor) { const kontra = new THREE.DirectionalLight(0x7f8cff, 0.35); kontra.position.set(-60, 40, -50); scena.add(kontra); }
+  if (noc || wieczor) for (const x of [-1, 1]) for (const z of [-1, 1]) { const sp = new THREE.SpotLight(0xfff3d6, noc ? 900 : 380, 220, 0.75, 0.6, 1.3); sp.position.set(x * (DL / 2 + 16), 34, z * (SZ / 2 + 16)); sp.target.position.set(-x * 8, 0, -z * 6); scena.add(sp, sp.target); }
+  if (noc && !lekka && !mgla) {
+    // gwiazdy na niebie
+    const n = 400, poz = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { const th = Math.random() * Math.PI * 2, ph = Math.random() * 0.45 + 0.08, R = 600; poz[i * 3] = Math.cos(th) * Math.cos(ph) * R; poz[i * 3 + 1] = Math.sin(ph) * R; poz[i * 3 + 2] = Math.sin(th) * Math.cos(ph) * R; }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(poz, 3));
+    scena.add(new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffffff, size: 1.6, sizeAttenuation: false, fog: false, transparent: true, opacity: 0.8 })));
+  }
 }
 
 /** Zamiana ciężkich materiałów (PBR) na lekkie (Lambert) — błyskawiczne przygotowanie grafiki na telefonach. */

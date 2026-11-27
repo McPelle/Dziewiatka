@@ -52,13 +52,13 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
     Object.assign(renderer.domElement.style, { width: "100%", height: "100%", display: "block", touchAction: "none" });
     el.appendChild(renderer.domElement);
     const godz = new Date().getHours();
-    const jestNoc = noc ?? (godz >= 19 || godz < 6);
+    const jestNoc = noc ?? (godz >= 19 || godz < 6); const jestWieczor = noc === undefined && godz >= 17 && godz < 19;
     const scena = new THREE.Scene();
-    swiatla(scena, jestNoc, false, lekka);
+    swiatla(scena, jestNoc, false, lekka, jestWieczor);
     const mies = new Date().getMonth() + 1;
     etap.current = "budowa stadionu";
     let stad: ReturnType<typeof zbudujStadion>;
-    try { stad = zbudujStadion(s, klub, { noc: jestNoc, snieg: mies === 12 || mies <= 2 ? new Date().getDate() % 3 === 0 : false, deszcz: false, widzowie: tlo ? klub.pojemnosc * 0.5 : 0, lekka: lekka || !!tlo, budowy: s?.budowy }); } catch (e) { clearTimeout(straznik); renderer.dispose(); renderer.domElement.remove(); setAwaria("budowa sceny: " + String((e as Error)?.message ?? e).slice(0, 60)); return; }
+    try { stad = zbudujStadion(s, klub, { noc: jestNoc, wieczor: jestWieczor, snieg: mies === 12 || mies <= 2 ? new Date().getDate() % 3 === 0 : false, deszcz: false, widzowie: tlo ? klub.pojemnosc * 0.5 : 0, lekka: lekka || !!tlo, budowy: s?.budowy }); } catch (e) { clearTimeout(straznik); renderer.dispose(); renderer.domElement.remove(); setAwaria("budowa sceny: " + String((e as Error)?.message ?? e).slice(0, 60)); return; }
     if (lekka) { uproscMaterialy(stad.grupa); renderer.shadowMap.enabled = false; }
     scena.add(stad.grupa);
     const cam = new THREE.PerspectiveCamera(40, W() / H(), 0.5, 1000);
