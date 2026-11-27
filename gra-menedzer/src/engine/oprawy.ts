@@ -161,8 +161,34 @@ export function planOpraw(s: StanGry, kd: Klub, kg: Klub, o: { derby: string | n
   // zwykłe mecze: mocne sceny (Ekstraklasa, I liga, kluby z tradycją) też pokazują oprawy kilka-kilkanaście razy w sezonie
   const zwykla = !okD && Math.random() < o.silaD * 0.45 ? "mecz ligowy — oprawa grup" : null;
   const minuty = [0, 46, 30 + Math.floor(Math.random() * 10), 70 + Math.floor(Math.random() * 10)];
+  // wędrująca oprawa z orłami — jeśli akurat jest u gospodarza i jeszcze jej nie pokazali
+  const w = s.wedrujacaOprawa;
+  if (w && w.klub === kd.nazwa && !w.pokazana) { w.pokazana = true; out.push({ o: OPRAWA_ORLY(kd), min: 0, sektor: "gospodarzy" }); minuty.shift(); }
   for (let i = 0; i < ileD; i++) out.push({ o: nowaOprawa(s, kd, okD!, kg, o.silaD), min: minuty[i] ?? 60, sektor: "gospodarzy" });
   if (zwykla) out.push({ o: nowaOprawa(s, kd, zwykla, kg, o.silaD), min: Math.random() < 0.6 ? 0 : 46, sektor: "gospodarzy" });
   for (let i = 0; i < ileG; i++) out.push({ o: nowaOprawa(s, kg, okG!, kd, o.silaG), min: [1, 47, 65][i] ?? 75, sektor: "gosci" });
   return out.sort((a, b) => a.min - b.min);
+}
+
+// ——— wędrująca oprawa z orłami (reprezentacja) ———
+// Biało-czerwona sektorówka z orłem, której nie pozwolono rozwiesić na PGE Narodowym — krąży po klubach (zwykle przez zgody);
+// każdy klub pokazuje ją raz na swojej trybunie, potem przekazuje dalej.
+export interface WedrujacaOprawa { klub: string; odKolejki: number; sezon: number; trasa: string[]; pokazana: boolean }
+export const OPRAWA_ORLY = (k: Klub): Oprawa => ({ id: `orly|${k.nazwa}`, klub: k.nazwa, rodzaj: "sektorowka", motyw: "🦅 orzeł biały na czerwonym tle", haslo: "Polska — jedna flaga, wszystkie trybuny", uklad: "pasy_poziom", okazja: "wędrująca oprawa z orłami", kolory: ["#ffffff", "#dc143c"], herb: false, sezon: 0, pirotechnika: false,
+  opis: "wędrująca sektorówka z orłem dla reprezentacji — nie pozwolono jej rozwiesić na PGE Narodowym, więc krąży po stadionach klubów; dziś pokazują ją kibice tego klubu." });
+/** Co tydzień: oprawa przechodzi dalej (najchętniej do zgody), gdy obecny klub już ją pokazał lub minęły 3 kolejki. */
+export function wedrownaOprawaTydzien(s: StanGry, kandydaci: Klub[], zgody: (a: Klub) => Klub[]): string | null {
+  const w = s.wedrujacaOprawa;
+  if (!w) {
+    const start = kandydaci.filter((k) => k.poziom <= 2).sort(() => Math.random() - 0.5)[0]; if (!start) return null;
+    s.wedrujacaOprawa = { klub: start.nazwa, odKolejki: s.kolejka, sezon: s.sezon, trasa: [start.nazwa], pokazana: false };
+    return `🦅 Wędrująca oprawa z orłami (ta, której nie wpuszczono na PGE Narodowy) rusza w trasę — pierwszy przystanek: ${start.nazwa}.`;
+  }
+  if (!w.pokazana && (s.sezon === w.sezon ? s.kolejka - w.odKolejki : 99) < 3) return null;
+  const obecny = kandydaci.find((k) => k.nazwa === w.klub);
+  const zg = obecny ? zgody(obecny).filter((k) => !w.trasa.includes(k.nazwa)) : [];
+  const nast = zg[0] ?? kandydaci.filter((k) => !w.trasa.slice(-10).includes(k.nazwa) && k.poziom <= 5).sort(() => Math.random() - 0.5)[0];
+  if (!nast) return null;
+  s.wedrujacaOprawa = { klub: nast.nazwa, odKolejki: s.kolejka, sezon: s.sezon, trasa: [...w.trasa, nast.nazwa].slice(-40), pokazana: false };
+  return `🦅 Wędrująca oprawa z orłami przechodzi z ${w.klub} do ${nast.nazwa}${zg.length ? " (przekazana przez zgodę)" : ""} — trasa: ${[...w.trasa, nast.nazwa].slice(-5).join(" → ")}.`;
 }

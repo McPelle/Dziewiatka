@@ -392,6 +392,7 @@ export interface StanGry {
   sektorGosciProcent?: number; // wielkość sektora gości na Twoim stadionie (min. 5% wg PZPN; 0 = zamknięty)
   opiniaPolicji?: number;
   samouczekZrobiony?: boolean;
+  wedrujacaOprawa?: import("./oprawy").WedrujacaOprawa; // biało-czerwona oprawa z orłami krążąca po klubach
   trudnosc?: string; // poziom trudności: latwy | normalny | trudny | legendarny
   osiagniecia?: Record<string, number>; // id osiągnięcia → sezon odblokowania
   osiagnieciaFlagi?: { trening?: boolean; mowa?: boolean };

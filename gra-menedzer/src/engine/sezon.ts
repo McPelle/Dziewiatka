@@ -39,7 +39,8 @@ import { tydzienJezykow } from "./jezyki";
 import { bonusTrudnosci, sprawdzOsiagniecia } from "./osiagniecia";
 import { nalozSankcje, losujIncydent, rozliczBezpieczenstwo, rozliczWyjazd, zuzyjSankcje } from "./bezpieczenstwo";
 import { akcjeKibicow, karaZaAkcje, sektorGosci, szkodyZaAkcje, zgodaKibicow } from "./kibice";
-import { planOpraw } from "./oprawy";
+import { planOpraw, wedrownaOprawaTydzien } from "./oprawy";
+import { GRUPY_KIBICOW } from "../data/grupyKibicow";
 import { kulturaTrybun, noweFlagiTydzien } from "./flagi";
 import type { GraczXI, Historia, Klub, Konferencja, Wynik, Liga, Nastawienie, Sponsor, SponsorTyp, StanGry, WlasnoscKlubu, WpisTrenera, Zawodnik } from "./types";
 
@@ -1006,6 +1007,11 @@ export function zagrajKolejke(s: StanGry) {
   if (moznaPuchar(s)) rundaPucharu(s);
   for (const w of tydzienJezykow(s)) wiadomosc(s, w); // nauka polskiego cudzoziemców, kurs, tłumacz
   for (const w of sprawdzOsiagniecia(s)) wiadomosc(s, w); // osiągnięcia trenera
+  { // wędrująca oprawa z orłami — po stadionach scen kibicowskich (przez zgody)
+    const kand = Object.values(s.kluby).filter((k) => !!GRUPY_KIBICOW[k.nazwa] || k.poziom <= 3); // kluby ze sceną kibicowską
+    const t = wedrownaOprawaTydzien(s, kand, (a) => kand.filter((b) => b.id !== a.id && !!zgodaKibicow(s, a, b)));
+    if (t && (s.wedrujacaOprawa?.trasa.slice(-2).includes(s.kluby[s.mojKlub].nazwa) || s.wedrujacaOprawa?.trasa.length === 1 || Math.random() < 0.25)) wiadomosc(s, t);
+  }
   { const ml = s.ligi[s.kluby[s.mojKlub].poziom - 1]; for (const id of ml?.kluby ?? []) { const t = noweFlagiTydzien(s, s.kluby[id]); if (t && id === s.mojKlub) wiadomosc(s, t); } } // flagi dorabiane z czasem
   if (europaNaKolejke(s)) rundaEuropy(s);
   tydzien(s);

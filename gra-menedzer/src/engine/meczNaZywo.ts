@@ -9,6 +9,7 @@
 import { jezykKraju, PO_JEZYKU } from "./jezyki";
 import { losujIncydent } from "./bezpieczenstwo";
 import { okrzykMlyna } from "./flagi";
+import { improwizacja, przyspiewka } from "./przyspiewki";
 import { los, losInt, szansa, wybierz, wybierzWazone } from "./losuj";
 import { autoSklad, dostepny, efektywna, FORMACJE, silaSkladu } from "./mecz";
 import { formacjaAI } from "./sezon";
@@ -175,7 +176,24 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
   // trybuny: race, rzucanie przedmiotów, wtargnięcia, bójki — zależnie od ochrony (mecz u siebie) i kibiców
   m.incydentTeraz = undefined;
   // doping młyna (co jakiś czas, zależnie od wyniku)
-  if (m.kultura?.dom.gniazdowy && m.bezp && m.bezp.widzowie > 0 && Math.random() < 0.05) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: okrzykMlyna(s.kluby[m.dom.klubId], m.kultura.dom, m.gd - m.gg) });
+  // gniazdowy wymyśla na poczekaniu: po golu (o strzelcu), w przerwie, w końcówce, przy derbach
+  if (m.bezp && m.bezp.widzowie > 0 && (m.kultura?.dom.gniazdowy || m.bezp.derby)) {
+    const ostGol = m.gole[m.gole.length - 1];
+    const poGolu = ostGol && ostGol.klubId === m.dom.klubId && ostGol.min === (m.polowa === 1 ? Math.min(45, m.min - 1) : m.min - 1);
+    const gk = m.gosc.naBoisku.map((id) => s.zawodnicy[id]).find((z) => z?.poz === "BR");
+    if (poGolu || (m.polowa === 2 && m.min === 46) || Math.random() < 0.03) {
+      const t = improwizacja(s.kluby[m.dom.klubId], s.kluby[m.gosc.klubId], { wynik: m.gd - m.gg, min: m.min, strzelec: poGolu ? s.zawodnicy[ostGol.strzelec]?.nazwisko : undefined, bramkarzRywala: gk?.nazwisko, sedzia: Math.random() < 0.15 ? "Panie sędzio" : undefined, derby: m.bezp.derby, przerwa: m.polowa === 2 && m.min === 46 });
+      m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: `🎤 Gniazdowy z megafonu, na poczekaniu — młyn podchwytuje: „${t}”` });
+    }
+  }
+  if (m.bezp && m.bezp.widzowie > 0 && Math.random() < 0.07) {
+    // prawdziwe przyśpiewki klubu (gdy są w danych), inaczej ogólny doping młyna; czasem odpowiada klatka gości
+    const goscie = (m.komentarz.some((c) => c.tekst.startsWith("🧱"))) && Math.random() < 0.35;
+    const k = s.kluby[goscie ? m.gosc.klubId : m.dom.klubId], r = s.kluby[goscie ? m.dom.klubId : m.gosc.klubId];
+    const p = przyspiewka(k, r, { derby: m.bezp.derby, zgoda: !!m.komentarz.find((c) => c.tekst.startsWith("🤝")), wynik: goscie ? m.gg - m.gd : m.gd - m.gg });
+    if (p) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: `🎵 ${goscie ? "Klatka gości" : "Młyn"}: „${p}”` });
+    else if (!goscie && m.kultura?.dom.gniazdowy) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: okrzykMlyna(s.kluby[m.dom.klubId], m.kultura.dom, m.gd - m.gg) });
+  }
   for (const p of m.oprawyPlan ?? []) if (p.min > 1 && p.min === m.min) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: `🎆 ${p.sektor === "gosci" ? "Klatka gości" : "Trybuna gospodarzy"} — kolejna oprawa: ${p.o.opis}` });
   // zaplanowane akcje kibiców (transparenty, przyśpiewki, flaga, przepychanki przy klatce)
   while (m.akcjeKibicow && (m.akcjeIdx ?? 0) < m.akcjeKibicow.length && m.akcjeKibicow[m.akcjeIdx ?? 0].min <= m.min) {

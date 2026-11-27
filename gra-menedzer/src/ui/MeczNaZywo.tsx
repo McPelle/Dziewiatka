@@ -18,6 +18,7 @@ import { PrzedMeczem } from "./PrzedMeczem";
 import { planZabezpieczenia, ryzykoIncydentow } from "../engine/bezpieczenstwo";
 import { akcjeKibicow, sektorGosci } from "../engine/kibice";
 import { kulturaTrybun } from "../engine/flagi";
+import { doGlosu } from "../engine/przyspiewki";
 import { planOpraw } from "../engine/oprawy";
 import { zgodaKibicow } from "../engine/kibice";
 import { grafika3D, lekkaGrafika } from "./three/Stadion3DWidok";
@@ -132,6 +133,7 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
     // komentator na głos: gole, karne, czerwone, VAR, przerwa i koniec; przy wolnym tempie także groźne akcje
     const nowe = m.komentarz.slice(0, Math.max(0, m.komentarz.length - przed)).reverse();
     for (const c of nowe) {
+      if ((c.tekst.startsWith("🎵") || c.tekst.startsWith("🎤")) && predkosc <= 2) { mow(doGlosu(c.tekst.replace(/^(🎵|🎤)[^„]*„|”$/gu, "")), "spiker", { kto: "kibice-trybuna", plec: "M", emocje: 0.6 }); continue; }
       const wazny = c.typ === "gol" || c.typ === "karny" || c.typ === "var" || (c.typ === "kartka" && c.tekst.includes("🟥")) || (c.typ === "info" && /Koniec|Przerwa/.test(c.tekst));
       if (wazny || (predkosc <= 2 && (c.typ === "akcja" || c.typ === "kartka") && Math.random() < 0.5)) mow(c.tekst.replace(/\d+:\d+.*$/, ""), "komentator", { emocje: c.typ === "gol" ? 1 : c.typ === "karny" ? 0.6 : 0, przerwij: c.typ === "gol", kto: "komentator", plec: "M" });
     }

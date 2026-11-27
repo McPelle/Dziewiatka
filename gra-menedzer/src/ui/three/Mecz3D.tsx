@@ -244,6 +244,19 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         const fl = flagaMesh(f.tekst, f.kolory[0], f.kolory[1], 3); fl.position.set(DL / 2 - 12.5 + i * 3.3, 1.5, -SZ / 2 - 5.4); scena.add(fl);
       });
     }
+    // gniazdowi (prowadzący doping): na podeście przodem do młyna, plecami do boiska, z megafonem; drugi w klatce gości
+    const gniazdowi: { p: Postac; baza: THREE.Vector3; gosc: boolean }[] = [];
+    const megafon = () => { const g = new THREE.Group(); const lej = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.32, 12, 1, true), new THREE.MeshLambertMaterial({ color: 0xf2f2f2, side: THREE.DoubleSide })); lej.rotation.x = Math.PI / 2; lej.position.z = 0.2; g.add(lej); return g; };
+    if (!ust.pusto && ust.widzowie > 0 && (m.kultura?.dom.gniazdowy || ust.derby)) {
+      const pod = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 1.2), new THREE.MeshLambertMaterial({ color: 0x3a3f47 })); pod.position.set(-DL / 2 - 5.2, 0.4, 0); scena.add(pod);
+      const p = stworzPostac({ koszulka: stroje.dom.pole.baza, dodatek: stroje.dom.pole.dodatek, spodenki: "#1b1b1b", getry: "#1b1b1b", nr: 0, seed: 401 });
+      p.g.position.set(-DL / 2 - 5.2, 0.8, 0); p.g.rotation.y = -Math.PI / 2; const mg = megafon(); mg.position.set(0, -0.5, 0.1); mg.rotation.x = -1.4; p.ramiona[1].add(mg); scena.add(p.g); gniazdowi.push({ p, baza: p.g.position.clone(), gosc: false });
+      if (m.komentarz.some((c) => c.tekst.startsWith("🧱"))) {
+        const q = stworzPostac({ koszulka: stroje.gosc.pole.baza, dodatek: stroje.gosc.pole.dodatek, spodenki: "#1b1b1b", getry: "#1b1b1b", nr: 0, seed: 402 });
+        q.g.position.set(DL / 2 - 7, 1.6, -SZ / 2 - 6.4); q.g.rotation.y = Math.PI; const mg2 = megafon(); mg2.position.set(0, -0.5, 0.1); mg2.rotation.x = -1.4; q.ramiona[1].add(mg2); scena.add(q.g); gniazdowi.push({ p: q, baza: q.g.position.clone(), gosc: true });
+      }
+    }
+    let ostGniazdo = m.komentarz.length;
     // zamaskowani pirotechnicy: czarne peleryny, kominiarki, race w górze (pokazywani przy każdej pirotechnice)
     const pirotechnicy: { p: Postac; raca: THREE.Mesh }[] = [];
     if (race && !ust.pusto) for (let i = 0; i < 8; i++) {
@@ -608,6 +621,11 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         (dym.material as THREE.MeshBasicMaterial).opacity = Math.max(0, Math.min(0.45, raceT > 0 ? 0.45 : (dym.material as THREE.MeshBasicMaterial).opacity - dt * 0.03));
         dym.position.y = 12 + Math.sin(czas * 0.3) * 1.5;
         if (raceT > 0) emocje = Math.max(emocje, 0.5);
+        if (gniazdowi.length) {
+          const nowy = m.komentarz.length > ostGniazdo && m.komentarz.slice(0, m.komentarz.length - ostGniazdo).some((c) => c.tekst.startsWith("🎤") || c.tekst.startsWith("🎵") || c.tekst.startsWith("🥁"));
+          ostGniazdo = m.komentarz.length; if (nowy) emocje = Math.max(emocje, 0.7);
+          for (const gz of gniazdowi) { const zyw = 0.5 + emocje; gz.p.g.position.y = gz.baza.y + Math.abs(Math.sin(czas * 4 * zyw)) * 0.18 * zyw; gz.p.ramiona[1].rotation.x = -1.6 + Math.sin(czas * 3) * 0.2; gz.p.ramiona[0].rotation.x = -2.2 - Math.abs(Math.sin(czas * 6)) * 0.7 * zyw; }
+        }
         if (pirotechnicy.length) {
           const pos = race.geometry.getAttribute("position") as THREE.BufferAttribute;
           pirotechnicy.forEach((x, i) => { x.p.g.visible = raceT > 0; if (raceT > 0) { x.p.g.position.set(pos.getX(i * 7), Math.max(1.2, pos.getY(i * 7) - 1.6), pos.getZ(i * 7)); x.p.g.rotation.y = pos.getZ(i * 7) > 0 ? Math.PI : 0; x.p.ramiona[1].rotation.x = -2.9 + Math.sin(czas * 6 + i) * 0.15; x.p.ramiona[0].rotation.x = -1.2; (x.raca.material as THREE.MeshBasicMaterial).opacity = 0.6 + Math.random() * 0.4; x.raca.scale.setScalar(0.8 + Math.random() * 0.6); } });
