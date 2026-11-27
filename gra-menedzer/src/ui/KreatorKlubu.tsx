@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { silaKlubu } from "../engine/swiat";
 import type { StanGry, WlasnoscKlubu } from "../engine/types";
-import type { OpcjeKlubu } from "../engine/wlasnyKlub";
+import { ligaOtwarta, type OpcjeKlubu } from "../engine/wlasnyKlub";
 import { HerbGenerowany } from "./HerbGen";
 import { Herb } from "./Herb";
 import { CZCIONKA, K, st } from "./styl";
@@ -42,6 +42,7 @@ export function KreatorKlubu({ sw, idx, onUtworz, onWstecz }: { sw: StanGry; idx
   const [budzet, setBudzet] = useState<OpcjeKlubu["budzet"]>("sredni");
   const [zastep, setZastep] = useState(kluby[0]);
   const ok = nazwa.trim().length >= 3 && miasto.trim().length >= 2;
+  const otwarta = ligaOtwarta(liga.nazwa); // klasa A/B: dołączenie jako dodatkowa drużyna
 
   const Chip = ({ akt, t, onPress, pod }: { akt: boolean; t: string; onPress: () => void; pod?: string }) => (
     <Pressable onPress={onPress} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1, borderColor: akt ? K.akcent : K.linia, backgroundColor: akt ? "rgba(255,206,71,0.14)" : K.karta, marginRight: 6, marginTop: 6 }}>
@@ -102,17 +103,25 @@ export function KreatorKlubu({ sw, idx, onUtworz, onWstecz }: { sw: StanGry; idx
           <Chip akt={budzet === "bogaty"} t="Bogaty sponsor" pod="180% typowego" onPress={() => setBudzet("bogaty")} />
         </View>
 
-        <Text style={[st.naglowek, { marginTop: 14 }]}>Którą drużynę zastępujesz w lidze?</Text>
-        <Text style={st.maly}>Twój klub zajmie jej miejsce w terminarzu (np. drużyna wycofała się z rozgrywek).</Text>
-        {kluby.map((id) => (
-          <Pressable key={id} onPress={() => setZastep(id)} style={[st.karta, st.wiersz, { marginTop: 6, paddingVertical: 8, borderColor: zastep === id ? K.akcent : K.linia, borderWidth: 1 }]}>
-            <Herb klub={sw.kluby[id]} rozmiar={26} />
-            <Text style={[st.tekst, { flex: 1, marginLeft: 10 }]} numberOfLines={1}>{sw.kluby[id].nazwa}</Text>
-            {zastep === id ? <Text style={{ color: K.akcent, fontWeight: "900" }}>✓</Text> : null}
-          </Pressable>
-        ))}
+        {otwarta ? (
+          <View style={[st.karta, { marginHorizontal: 0, borderColor: K.akcent }]}>
+            <Text style={st.naglowek}>Zgłoszenie do {liga.nazwa}</Text>
+            <Text style={st.tekst}>➕ Twój klub dołączy jako NOWA, dodatkowa drużyna — nikogo nie zastępuje.</Text>
+            <Text style={[st.maly, { marginTop: 4 }]}>W klasach A i B liczba drużyn nie jest stała (nowe zgłoszenia do ZPN): grupa powiększy się z {kluby.length} do {kluby.length + 1} zespołów, a terminarz zostanie ułożony od nowa.</Text>
+          </View>
+        ) : (<>
+          <Text style={[st.naglowek, { marginTop: 14 }]}>Którą drużynę zastępujesz w lidze?</Text>
+          <Text style={st.maly}>Od Ekstraklasy do klasy okręgowej liczba drużyn jest stała — Twój klub zajmie miejsce wybranej drużyny w terminarzu (np. wycofała się z rozgrywek).</Text>
+          {kluby.map((id) => (
+            <Pressable key={id} onPress={() => setZastep(id)} style={[st.karta, st.wiersz, { marginTop: 6, paddingVertical: 8, borderColor: zastep === id ? K.akcent : K.linia, borderWidth: 1 }]}>
+              <Herb klub={sw.kluby[id]} rozmiar={26} />
+              <Text style={[st.tekst, { flex: 1, marginLeft: 10 }]} numberOfLines={1}>{sw.kluby[id].nazwa}</Text>
+              {zastep === id ? <Text style={{ color: K.akcent, fontWeight: "900" }}>✓</Text> : null}
+            </Pressable>
+          ))}
+        </>)}
 
-        <Pressable disabled={!ok} onPress={() => onUtworz({ nazwa, skrot, miasto, rokZalozenia: Number(rok) || 2026, barwy: [b1, b2], stadion, pojemnosc: poj, wlasciciel: wl, budzet, zastepujeId: zastep })}
+        <Pressable disabled={!ok} onPress={() => onUtworz({ nazwa, skrot, miasto, rokZalozenia: Number(rok) || 2026, barwy: [b1, b2], stadion, pojemnosc: poj, wlasciciel: wl, budzet, zastepujeId: zastep, dolacz: otwarta })}
           style={[st.przycisk, { marginHorizontal: 0, marginTop: 18, opacity: ok ? 1 : 0.4 }]}>
           <Text style={st.przyciskTekst}>⚽ Zakładamy klub!</Text>
         </Pressable>
