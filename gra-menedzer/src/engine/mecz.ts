@@ -658,7 +658,8 @@ export function meczZeScenariusza(s: StanGry, m: import("./meczNaZywo").MeczLive
       z.ocenaMeczu = Math.max(1, Math.min(10, Math.round((o + los(-0.4, 0.4)) * 10) / 10));
     }
   };
-  ocen(m.dom, m.gd, m.gg); ocen(m.gosc, m.gg, m.gd);
+  if (m.oceny && Object.keys(m.oceny).length) { for (const zesp of [m.dom, m.gosc]) for (const id of zesp.zagrali) { const z = s.zawodnicy[id]; if (z && m.oceny[id] !== undefined) z.ocenaMeczu = Math.round(m.oceny[id] * 10) / 10; } }
+  else { ocen(m.dom, m.gd, m.gg); ocen(m.gosc, m.gg, m.gd); }
   const pObsady = Math.min(s.kluby[m.dom.klubId].poziom, s.kluby[m.gosc.klubId].poziom);
   let sedzia: Wynik["sedzia"] = obsadaMeczu(s, pObsady, 1, {});
   { const h = hashTekst(sedzia.glowny); const sur = 0.72 + (h % 1000) / 1000 * 0.56; sedzia = { ...sedzia, styl: sur >= 1.15 ? "surowy" : sur <= 0.85 ? "łagodny" : "normalny" }; }
@@ -666,8 +667,8 @@ export function meczZeScenariusza(s: StanGry, m: import("./meczNaZywo").MeczLive
   const st = m.staty, posD = Math.round(st.posD / Math.max(1, st.posN) * 100);
   const staty: Wynik["staty"] = {
     pos: [posD, 100 - posD], strz: st.strz, celne: st.celne, rozne: st.rozne, faule: st.faule, spalone: st.spalone,
-    xg: [Math.round(st.strz[0] * 0.24 * 10) / 10, Math.round(st.strz[1] * 0.24 * 10) / 10], slupki: [0, 0],
-    obronione: [Math.max(0, st.celne[1] - m.gg), Math.max(0, st.celne[0] - m.gd)],
+    xg: [Math.round((st.xg?.[0] ?? 0) * 10) / 10, Math.round((st.xg?.[1] ?? 0) * 10) / 10], slupki: st.slupki ?? [0, 0],
+    obronione: st.obrony ?? [Math.max(0, st.celne[1] - m.gg), Math.max(0, st.celne[0] - m.gd)],
   };
   return { dom: m.dom.klubId, gosc: m.gosc.klubId, gd: m.gd, gg: m.gg, zdarzenia, kara: karaMoja || undefined, staty, sedzia, doliczony: m.dolicz };
 }
