@@ -36,7 +36,6 @@ export const DERBY: ParaDerbowa[] = [
   // Rzeszów / Podkarpacie
   { a: "Resovia", b: "Stal Rzeszów", nazwa: "Derby Rzeszowa" },
   { a: "Stal Mielec", b: "Stal Stalowa Wola", nazwa: "Derby Podkarpacia" },
-  { a: "Stal Rzeszów", b: "Stal Stalowa Wola", nazwa: "Derby Podkarpacia" },
   { a: "Stal Mielec", b: "Stal Rzeszów", nazwa: "Derby Podkarpacia" },
   // Bielsko-Biała
   { a: "Podbeskidzie Bielsko-Biała", b: "Rekord Bielsko-Biała", nazwa: "Derby Bielska-Białej" },
@@ -57,7 +56,6 @@ export const DERBY: ParaDerbowa[] = [
   { a: "Zagłębie Sosnowiec", b: "Górnik Zabrze", nazwa: "Derby Zagłębia i Śląska" },
   // Dolny Śląsk
   { a: "Miedź Legnica", b: "Zagłębie Lubin", nazwa: "Derby Dolnego Śląska" },
-  { a: "Miedź Legnica", b: "Śląsk Wrocław", nazwa: "Derby Dolnego Śląska" },
   { a: "Chrobry Głogów", b: "Miedź Legnica", nazwa: "Derby Dolnego Śląska" },
   { a: "Chrobry Głogów", b: "Zagłębie Lubin", nazwa: "Derby Dolnego Śląska" },
   // Podkarpacie (uzupełnienie)
@@ -91,13 +89,11 @@ export const DERBY: ParaDerbowa[] = [
   { a: "Chojniczanka II Chojnice", b: "Kolejarz Chojnice", nazwa: "Derby Chojnic" },
   { a: "Kaszubia Kościerzyna", b: "Cartusia Kartuzy", nazwa: "Derby Kaszub" },
   { a: "Gryf Wejherowo", b: "Orlęta Reda", nazwa: "Derby Małego Trójmiasta Kaszubskiego" },
-  { a: "Gryf Wejherowo", b: "Orkan Rumia MKS", nazwa: "Derby Małego Trójmiasta Kaszubskiego" },
   { a: "Orlęta Reda", b: "Orkan Rumia MKS", nazwa: "Derby Małego Trójmiasta Kaszubskiego" },
   { a: "Chojniczanka II Chojnice", b: "Bytovia Bytów", nazwa: "Derby Pomorza" },
   { a: "Zenit Łęczyce", b: "Sokół Bożepole Wielkie", nazwa: "Derby gminy Łęczyce" },
   // III liga gr. II — cross-ligowa rywalizacja regionalna
   { a: "Zawisza Bydgoszcz", b: "Elana Toruń", nazwa: "Derby kujawsko-pomorskie (Bydgoszcz–Toruń)" },
-  { a: "Rodło Kwidzyn", b: "KP Starogard Gdański", nazwa: "Mecz podwyższonego ryzyka (kosa)" },
   { a: "KP Starogard Gdański", b: "Wierzyca Pelplin", nazwa: "Derby Kociewia" },
   { a: "Gryf Tczew KP", b: "Wierzyca Pelplin", nazwa: "Derby Kociewia" },
   { a: "Pomezania Malbork", b: "Olimpia Sztum", nazwa: "Derby Powiśla" },
@@ -131,8 +127,6 @@ export const PRZYJAZNIE: ParaDerbowa[] = [
   { a: "Cracovia", b: "Arka Gdynia", nazwa: "Mecz Przyjaźni (Wielka Trójka)" },
   // Triada: Wisła Kraków – Śląsk Wrocław – Lechia Gdańsk
   { a: "Lechia Gdańsk", b: "Śląsk Wrocław", nazwa: "Mecz Przyjaźni (od 1977)" },
-  { a: "Wisła Kraków", b: "Śląsk Wrocław", nazwa: "Mecz Przyjaźni" },
-  { a: "Wisła Kraków", b: "Lechia Gdańsk", nazwa: "Mecz Przyjaźni" },
   // Motor Lublin – Śląsk Wrocław
   { a: "Motor Lublin", b: "Śląsk Wrocław", nazwa: "Mecz Przyjaźni" },
   // Ruch Chorzów – Widzew Łódź
@@ -149,7 +143,6 @@ export const PRZYJAZNIE: ParaDerbowa[] = [
   { a: "GKS Tychy", b: "Zawisza Bydgoszcz", nazwa: "Mecz Przyjaźni (trójca)" },
   // Pomorskie — zgody kibicowskie
   { a: "Gryf Wejherowo", b: "Kaszubia Kościerzyna", nazwa: "Mecz Przyjaźni (Kaszuby)" },
-  { a: "Gryf Wejherowo", b: "Arka Gdynia", nazwa: "Mecz Przyjaźni" },
   { a: "Elana Toruń", b: "Widzew Łódź", nazwa: "Mecz Przyjaźni" },
   // Zachodniopomorskie / kujawsko-pomorskie — zgody kibicowskie (źródło: en.wikipedia)
   { a: "Gwardia Koszalin", b: "Arka Gdynia", nazwa: "Mecz Przyjaźni (obóz Arki)" },
@@ -168,7 +161,6 @@ export const AFILIACJE: Record<string, string> = {
   "Gryf Wejherowo": "Arka Gdynia",
   "Kaszubia Kościerzyna": "Arka Gdynia",
   "Gryf Tczew KP": "Arka Gdynia",
-  "Pogoń Lębork": "Arka Gdynia",
   // Pomorskie — obóz LECHII GDAŃSK (FC Lechii m.in. Starogard, Malbork; sympatycy: Gryf Słupsk, Bytovia, Chojniczanka)
   "Gryf Słupsk": "Lechia Gdańsk",
   "Bytovia Bytów": "Lechia Gdańsk",
@@ -183,5 +175,4 @@ export const AFILIACJE: Record<string, string> = {
   "Unia Tarnów": "Wisła Kraków",
   // Zachodniopomorskie / kujawsko-pomorskie — patronaty kibicowskie (źródło: en.wikipedia)
   "Gwardia Koszalin": "Arka Gdynia",
-  "Włocłavia Włocławek": "ŁKS Łódź",
 };

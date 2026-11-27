@@ -15,6 +15,8 @@ function wrogiePatrony(x: string, y: string): boolean {
 export function jestDerby(s: StanGry, domId: string, goscId: string): string | null {
   const a = s.kluby[domId]?.nazwa, b = s.kluby[goscId]?.nazwa;
   if (!a || !b) return null;
+  // zgoda / układ wg potwierdzonych relacji ma pierwszeństwo — taki mecz nie jest meczem podwyższonego ryzyka
+  if (RELACJE_KIBICOW.some((r) => r.typ !== "kosa" && ((r.a === a && r.b === b) || (r.a === b && r.b === a)))) return null;
   for (const d of DERBY) if ((d.a === a && d.b === b) || (d.a === b && d.b === a)) return d.nazwa;
   for (const r of RELACJE_KIBICOW) if (r.typ === "kosa" && ((r.a === a && r.b === b) || (r.a === b && r.b === a))) return r.nazwa ?? `Mecz podwyższonego ryzyka (kosa kibicowska ${a} – ${b})`;
   // Patronat kibicowski: wrogie obozy (np. Arka vs Lechia, Wisła vs Cracovia) = mecz podwyższonego ryzyka.
