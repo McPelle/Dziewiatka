@@ -100,8 +100,9 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
   if (awaria) return tlo ? <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 } as any}><TloStadion /><Text style={{ position: "absolute", left: 6, bottom: 4, color: "rgba(255,255,255,0.55)", fontSize: 9 }}>3D: {awaria}</Text></View> : <View style={{ width: "100%", height: wysokosc ?? 260, borderRadius: 10, overflow: "hidden" }}><TloStadion /></View>;
   if (tlo) return (
     <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 } as any}>
-      <TloStadion />
-      <View ref={host} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, opacity: widoczny ? 1 : 0, transitionProperty: "opacity", transitionDuration: "900ms" } as any} />
+      {/* grafika 3D zawsze w pełni widoczna (Safari na iPhonie nie pokazuje 3D pod przezroczystością) — to rysunek 2D na wierzchu znika */}
+      <View ref={host} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 } as any} />
+      {!widoczny && <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 } as any}><TloStadion /></View>}
       {diag && !widoczny && <Text style={{ position: "absolute", left: 6, bottom: 4, color: "rgba(255,255,255,0.6)", fontSize: 9 }}>3D: {etap.current}{start ? "" : " (start=nie)"}</Text>}
     </View>
   );
