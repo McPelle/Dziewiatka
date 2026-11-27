@@ -133,6 +133,16 @@ export interface Obiekty {
   gastronomia: number; // stoiska z jedzeniem
   parking: number;
   sklep: number; // sklep klubowy
+  // Nowe obiekty (opcjonalne — stare zapisy ich nie mają, brak = poziom 0)
+  toalety?: number; // sanitariaty
+  kasy?: number; // kasy biletowe i bramki wejściowe
+  strefaKibica?: number; // fan zone przed stadionem
+  loze?: number; // loże VIP / skyboxy
+  telebim?: number; // telebim i bandy LED
+  zadaszenie?: number; // dach nad trybunami
+  muzeum?: number; // muzeum klubu / sala trofeów
+  hotel?: number; // hotel klubowy / centrum konferencyjne
+  baza?: number; // boiska treningowe (baza treningowa przy stadionie)
 }
 
 export type KontraktTyp = "zawodowy" | "polprofesjonalny" | "amator";
@@ -433,7 +443,11 @@ export interface Pracownik {
 /** Sztab szkoleniowy klubu — po jednym etacie na rolę (pusty = wakat). Każdy klub (Ekstraklasa→B klasa) ma swój. */
 export type Sztab = Partial<Record<RolaSztabu, Pracownik>>;
 
-export type SponsorTyp = "glowny" | "techniczny" | "stadionowy" | "producent";
+export type SponsorTyp =
+  | "glowny" | "techniczny" | "stadionowy" | "producent"               // 4 kluczowe (odnawiane automatycznie co sezon)
+  | "rekaw" | "plecy" | "spodenki"                                     // dodatkowe miejsca na stroju
+  | "bandy" | "telebim" | "trybuna"                                    // reklama na stadionie (bandy LED, telebim, nazwa trybuny)
+  | "napoje" | "medyczny" | "motoryzacyjny" | "finansowy" | "bukmacher" | "medialny" | "akademia"; // partnerzy branżowi
 
 export interface Sponsor {
   nazwa: string;

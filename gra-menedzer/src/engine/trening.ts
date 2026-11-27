@@ -149,6 +149,9 @@ export function mnoznikFokus(s: StanGry, z: Zawodnik): number {
   if (f.mlodziez) mn = z.wiek <= 21 ? 1.7 : 0.6;
   else if (f.pozycje === "all") mn = f.meczowy ? 1.06 : 1.2;
   else mn = f.pozycje.includes(z.poz) ? 1.5 : 0.7;
+  // Baza treningowa przy stadionie: do +15% tempa rozwoju młodych (U-23) przy poziomie 5.
+  const baza = s.kluby[s.mojKlub]?.obiekty.baza ?? 0;
+  if (baza && z.wiek <= 23) mn *= 1 + baza * 0.03;
   return mn * intensywnosc(s).rozwoj;
 }
 

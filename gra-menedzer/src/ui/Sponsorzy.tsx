@@ -45,7 +45,7 @@ export function Sponsorzy({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
                 {oferty.map((o, i) => (
                   <View key={i} style={[st.wiersz, { justifyContent: "space-between", paddingVertical: 4 }]}>
                     <View style={[st.wiersz, { gap: 6, flex: 1 }]}><LogoMarki nazwa={o.nazwa} rozmiar={20} /><Text style={st.maly}>{o.nazwa} — {zl(o.wartosc)}/sezon, {o.sezonDo - s.sezon} sez.</Text></View>
-                    <Pressable style={st.przyciskMaly} onPress={() => { podpiszSponsora(s, o); setOtwarty(null); odswiez(); }}>
+                    <Pressable style={st.przyciskMaly} onPress={() => { const b = podpiszSponsora(s, o); setOtwarty(null); odswiez(); if (b && typeof window !== "undefined") window.alert(b); }}>
                       <Text style={st.przyciskMalyTekst}>Podpisz</Text>
                     </Pressable>
                   </View>

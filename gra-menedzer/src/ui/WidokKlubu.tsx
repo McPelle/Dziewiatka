@@ -125,8 +125,8 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
                   </View>
                   {(Object.keys(OBIEKTY_NAZWY) as (keyof Obiekty)[]).map((typ) => (
                     <View key={typ} style={[st.wiersz, { justifyContent: "space-between", paddingVertical: 6, borderTopWidth: 1, borderTopColor: K.linia }]}>
-                      <Text style={st.tekst}>{OBIEKTY_NAZWY[typ]} <Text style={st.maly}>(poz. {klub.obiekty[typ]}/4)</Text></Text>
-                      {klub.obiekty[typ] >= 4 ? (
+                      <Text style={st.tekst}>{OBIEKTY_NAZWY[typ]} <Text style={st.maly}>(poz. {klub.obiekty[typ] ?? 0}/5)</Text></Text>
+                      {(klub.obiekty[typ] ?? 0) >= 5 ? (
                         <Text style={st.maly}>max</Text>
                       ) : (
                         <Pressable style={st.przyciskMaly} onPress={() => akcja(() => rozbudujObiekt(s, typ))}>

@@ -1,4 +1,4 @@
-import { los, losInt, szansa, wybierz, wybierzWazone, zl } from "./losuj";
+import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj";
 import { AFILIACJE, PRZYJAZNIE } from "../data/derby";
 import { autoSklad, dostepny, FORMACJE, ileSpozaUE, limitSpozaUE, zagrajMecz } from "./mecz";
 import { pogodaMeczu, gorskie } from "./pogoda";
@@ -221,7 +221,7 @@ export function rozpocznijKariere(s: StanGry, klubId: string) {
   s.trening = "ogolny";
   zasiejAkademie(s);          // startowy skład akademii U-19/U-17
   inicjujRozgrywkiJun(s);     // ligi i puchary juniorów w regionie
-  s.sponsorzy = nowiSponsorzy(s);
+  s.sponsorzy = sponsorzyStartowi(s);
   // Kapitan: największe przywództwo (prz) + cecha lider; pomocniczo doświadczenie i jakość.
   s.kapitan = [...s.kluby[klubId].zawodnicy].sort((a, b) => kapitanScore(s.zawodnicy[b]) - kapitanScore(s.zawodnicy[a]))[0] ?? null;
   const k = s.kluby[klubId];
@@ -650,6 +650,7 @@ export function zagrajKolejke(s: StanGry) {
         if (kd.trybunaImienia) widzowie = Math.round(widzowie * 1.02); // trybuna legendy — duma, komplet częściej
         if (kd.poziom >= 3 && kd.oswietlenie) widzowie = Math.round(widzowie * 1.02); // mecze pod światłami — więcej chętnych wieczorem
         if (terminWieczorny) widzowie = Math.round(widzowie * 1.03); // wieczorna transmisja prime time ściąga więcej widzów
+        widzowie = Math.round(widzowie * mnoznikKomfortu(kd.obiekty, mrozSnieg || /deszcz|ulew|burz/i.test(pog.nazwa)));
 
       }
       // Zjazd kibiców z całego obozu zgód → derby/podwyższone ryzyko to praktycznie komplet, zgoda prawie komplet.
@@ -1530,6 +1531,12 @@ export function nowySezon(s: StanGry) {
     }
   }
 
+  // Strefa kibica: miejsce spotkań przed meczem — buduje więź z klubem (+1 zaufania na poziom, max +3/sezon).
+  {
+    const fz = s.kluby[s.mojKlub].obiekty.strefaKibica ?? 0;
+    if (fz > 0) s.zaufanieKibicow = Math.min(100, (s.zaufanieKibicow ?? 60) + Math.min(3, fz));
+  }
+
   // Lokalny patron / zakład pracy: dopóki trzyma z klubem — podnosi zaufanie trybun (firma „nasza, z miasta").
   // W trudnych czasach (słaby sezon albo po prostu kryzys) patron może się wycofać: zrywa umowę i zostawia dziurę.
   {
@@ -1894,9 +1901,50 @@ const PRODUCENCI = [
   "Impuls", "Dynamo", "Tytan", "Grom", "Fenix", "Kometa", "Sprinter", "Maraton", "Gladiator", "Atom", "Lider", "Mistral",
   "Wulkan", "Huragan", "Lawina", "Szpada", "Rekin", "Pumax", "Sfera", "Kobra", "Tarcza", "Oszczep",
 ]; // ponad 40 fikcyjnych marek strojów
-const SPONSOR_UDZIAL: Record<SponsorTyp, number> = { glowny: 1, techniczny: 0.4, stadionowy: 0.3, producent: 0.5 };
-const SPONSOR_ETYKIETA: Record<SponsorTyp, string> = { glowny: "Sponsor główny", techniczny: "Sponsor techniczny", stadionowy: "Sponsor stadionu", producent: "Dostawca strojów" };
+// Udział w bazowej puli sponsorskiej. Kluczowe 4 jak dotąd; dodatkowe sloty są mniejsze (razem ~+30% przy komplecie).
+const SPONSOR_UDZIAL: Record<SponsorTyp, number> = {
+  glowny: 1, techniczny: 0.4, stadionowy: 0.3, producent: 0.5,
+  rekaw: 0.1, plecy: 0.08, spodenki: 0.04, bandy: 0.07, telebim: 0.05, trybuna: 0.05,
+  napoje: 0.03, medyczny: 0.03, motoryzacyjny: 0.03, finansowy: 0.04, bukmacher: 0.06, medialny: 0.02, akademia: 0.03,
+};
+const SPONSOR_ETYKIETA: Record<SponsorTyp, string> = {
+  glowny: "Sponsor główny", techniczny: "Sponsor techniczny", stadionowy: "Sponsor stadionu (naming)", producent: "Dostawca strojów",
+  rekaw: "Sponsor na rękawie", plecy: "Sponsor na plecach koszulki", spodenki: "Sponsor na spodenkach",
+  bandy: "Bandy reklamowe", telebim: "Reklama na telebimie", trybuna: "Nazwa trybuny",
+  napoje: "Oficjalny dostawca napojów", medyczny: "Partner medyczny", motoryzacyjny: "Partner motoryzacyjny",
+  finansowy: "Partner finansowy", bukmacher: "Partner bukmacherski", medialny: "Partner medialny", akademia: "Sponsor akademii",
+};
+/** Grupy slotów (do UI). */
+export const SPONSOR_GRUPY: { nazwa: string; typy: SponsorTyp[] }[] = [
+  { nazwa: "Kluczowi sponsorzy", typy: ["glowny", "techniczny", "stadionowy", "producent"] },
+  { nazwa: "Stroje meczowe", typy: ["rekaw", "plecy", "spodenki"] },
+  { nazwa: "Reklama na stadionie", typy: ["bandy", "telebim", "trybuna"] },
+  { nazwa: "Partnerzy klubu", typy: ["napoje", "medyczny", "motoryzacyjny", "finansowy", "bukmacher", "medialny", "akademia"] },
+];
 const ROLE: SponsorTyp[] = ["glowny", "techniczny", "stadionowy", "producent"];
+const ROLE_DODATKOWE: SponsorTyp[] = SPONSOR_GRUPY.slice(1).flatMap((g) => g.typy);
+
+/** Czy slot jest dostępny dla klubu (null = tak; tekst = czego brakuje). */
+export function blokadaSlotu(k: Klub, typ: SponsorTyp): string | null {
+  const ob = k.obiekty;
+  if (typ === "telebim" && !(ob.telebim ?? 0)) return "wymaga telebimu (obiekty stadionu)";
+  if (typ === "trybuna" && k.pojemnosc < 1000) return "wymaga stadionu min. 1000 miejsc";
+  if (typ === "napoje" && !ob.gastronomia) return "wymaga stoisk z jedzeniem";
+  if (typ === "bukmacher" && k.poziom > 6) return "bukmacherzy sponsorują od klasy okręgowej w górę";
+  if (typ === "medialny" && k.poziom > 6) return "media regionalne — od klasy okręgowej w górę";
+  return null;
+}
+
+// Pule nazw dla partnerów branżowych (fikcyjne marki).
+const PULA_BRANZ: Partial<Record<SponsorTyp, string[]>> = {
+  napoje: ["Górski Potok", "Zdrojowa", "Beskidzka Woda", "Energix", "Malinowy Sad", "Ice-Pol", "Kryształowa", "Sokpol"],
+  medyczny: ["MediCentrum", "Klinika Sport-Med", "FizjoPlus", "OrtoMed", "Centrum Rehabilitacji Ruch", "Przychodnia Zdrowie", "DiagnoLab"],
+  motoryzacyjny: ["AutoStar", "Pol-Car Salon", "MotoPol", "AutoCentrum", "KarPol Dealer", "Opony Max", "AutoGaz Serwis"],
+  finansowy: ["WiślanBank", "FortBank", "ProBank", "BankSpółdz", "Kasa Regio", "UbezpieczBank", "Leasing Plus"],
+  bukmacher: ["GrandBet", "SolidBet", "MaxBet", "BetPol", "TypStar", "GolBet", "Fortuna Typu"],
+  medialny: ["PortalSport", "Radio Fala", "TV Region", "Sport24 Portal", "Gazeta Lokalna", "Radio Plus Region"],
+  akademia: ["EduSport", "Fundacja Młody Sport", "Kids Arena", "Szkoła Językowa Atlas", "ZdrowyStart", "Junior Bank"],
+};
 
 // B5: finanse amatorów. Kluby okręgówki i niżej żyją głównie z dotacji gminy/miasta
 // i drobnych lokalnych firm, nie z komercyjnych sponsorów tytularnych.
@@ -1929,6 +1977,7 @@ function nazwaDla(typ: SponsorTyp, uzyte: Set<string>, poziom = 1, miasto = ""):
   else if (poziom >= 6) pula = LOKALNI;                        // pozostałe sloty amatora: lokalne firmy
   else if (poziom === 5 && typ !== "producent") pula = szansa(0.5) ? LOKALNI : SPONSORZY_NAZWY; // IV liga: mix regionalny/lokalny
   else pula = typ === "producent" ? PRODUCENCI : SPONSORZY_NAZWY;
+  if (PULA_BRANZ[typ] && (poziom < 6 || typ === "bukmacher" || typ === "medialny")) pula = PULA_BRANZ[typ]!;
   let n = wybierz(pula); let i = 0;
   while (uzyte.has(n) && i++ < 40) n = wybierz(pula);
   uzyte.add(n); return n;
@@ -1950,8 +1999,37 @@ export function ofertySponsorow(s: StanGry, typ: SponsorTyp): Sponsor[] {
     sezonDo: s.sezon + [1, 2, 3][i],
   }));
 }
-/** Podpisuje sponsora (zastępuje istniejącego tego typu). */
-export function podpiszSponsora(s: StanGry, oferta: Sponsor) {
+/** Aktualna (obowiązująca) umowa w danym slocie. */
+export function umowaSponsora(s: StanGry, typ: SponsorTyp): Sponsor | undefined {
+  return s.sponsorzy.find((x) => x.typ === typ && x.sezonDo >= s.sezon);
+}
+/** Kara umowna za zerwanie trwającej umowy: 50% wartości wszystkich pozostałych sezonów (wliczając bieżący). 0 = brak umowy. */
+export function karaZaZerwanie(s: StanGry, typ: SponsorTyp): number {
+  const u = umowaSponsora(s, typ);
+  if (!u) return 0;
+  const sezonow = u.sezonDo - s.sezon + 1;
+  return Math.round((u.wartosc * sezonow * 0.5) / 500) * 500;
+}
+/** Zrywa umowę (płaci karę). Zwraca komunikat błędu albo null. */
+export function zerwijSponsora(s: StanGry, typ: SponsorTyp): string | null {
+  const u = umowaSponsora(s, typ);
+  if (!u) return "Ten slot nie ma aktywnej umowy.";
+  const kara = karaZaZerwanie(s, typ);
+  const k = s.kluby[s.mojKlub];
+  if (k.kasa < kara) return `Zerwanie umowy z ${u.nazwa} kosztuje ${zl(kara)} kary umownej — brakuje ${zl(kara - k.kasa)}.`;
+  k.kasa -= kara;
+  s.sponsorzy = s.sponsorzy.filter((x) => x !== u);
+  wiadomosc(s, `✂ Zerwano umowę z ${u.nazwa} (${nazwaSponsora(typ).toLowerCase()}) przed terminem — zapłacono ${zl(kara)} kary umownej.`);
+  return null;
+}
+/** Podpisuje sponsora. Jeśli slot ma trwającą umowę — najpierw ją zrywa (kara umowna). Zwraca błąd albo null. */
+export function podpiszSponsora(s: StanGry, oferta: Sponsor): string | null {
+  const blok = blokadaSlotu(s.kluby[s.mojKlub], oferta.typ);
+  if (blok) return `Slot niedostępny: ${blok}.`;
+  if (umowaSponsora(s, oferta.typ)) {
+    const b = zerwijSponsora(s, oferta.typ);
+    if (b) return b;
+  }
   s.sponsorzy = s.sponsorzy.filter((x) => x.typ !== oferta.typ).concat(oferta);
   wiadomosc(s, `Podpisano umowę: ${nazwaSponsora(oferta.typ).toLowerCase()} ${oferta.nazwa} (${zl(oferta.wartosc)}/sezon, do ${oferta.sezonDo}).`);
   // Konflikt kibice–klub o tożsamość: komercyjny sponsor tytularny / naming rights stadionu w klubie z tradycją
@@ -1964,11 +2042,23 @@ export function podpiszSponsora(s: StanGry, oferta: Sponsor) {
     s.zaufanieKibicow = Math.max(0, (s.zaufanieKibicow ?? 60) - spadek);
     wiadomosc(s, `🪧 Część kibiców protestuje przeciw komercyjnej nazwie „${oferta.nazwa}" — w klubie z tradycją tożsamość ponad pieniądze (zaufanie −${spadek}).`);
   }
+  return null;
 }
 export function producentStrojow(s: StanGry): string | undefined {
   return aktywniSponsorzy(s).find((sp) => sp.typ === "producent")?.nazwa;
 }
 
+/** Startowy zestaw: 4 kluczowych + część dodatkowych slotów (reszta do pozyskania z ofert). */
+export function sponsorzyStartowi(s: StanGry): Sponsor[] {
+  const lista = nowiSponsorzy(s);
+  const k = s.kluby[s.mojKlub];
+  const uzyte = new Set(lista.map((x) => x.nazwa));
+  const ile = k.poziom <= 3 ? 6 : k.poziom <= 6 ? 4 : 2;
+  for (const typ of tasuj(ROLE_DODATKOWE.filter((t) => !blokadaSlotu(k, t))).slice(0, ile)) {
+    lista.push({ nazwa: nazwaDla(typ, uzyte, k.poziom, k.miasto), wartosc: wartoscSponsora(s, typ), typ, sezonDo: s.sezon + losInt(1, 3) });
+  }
+  return lista;
+}
 export function nowiSponsorzy(s: StanGry, bonus = 1): Sponsor[] {
   const uzyte = new Set<string>();
   const k = s.kluby[s.mojKlub];
@@ -1992,31 +2082,78 @@ export const nazwaSponsora = (typ: SponsorTyp) => SPONSOR_ETYKIETA[typ];
 // ——— Stadion: rozbudowa i obiekty ———
 const KOSZT_MIEJSCA = [900, 400, 200, 120, 70, 45, 30, 20, 15, 12, 10, 8]; // zł za 1 miejsce wg poziomu
 const KOSZT_OBIEKTU = [2_000_000, 500_000, 150_000, 50_000, 20_000, 9_000, 4_000, 2_000, 1_200, 800, 600, 400];
-const MAX_OBIEKT = 4;
-export const OBIEKTY_NAZWY: Record<keyof import("./types").Obiekty, string> = {
-  gastronomia: "Stoiska z jedzeniem", parking: "Parking", sklep: "Sklep klubowy",
+const MAX_OBIEKT = 5;
+type TypObiektu = keyof import("./types").Obiekty;
+export const OBIEKTY_NAZWY: Record<TypObiektu, string> = {
+  parking: "Parking", gastronomia: "Stoiska z jedzeniem", sklep: "Sklep klubowy", toalety: "Sanitariaty",
+  kasy: "Kasy i bramki biletowe", strefaKibica: "Strefa kibica (fan zone)", loze: "Loże VIP / skyboxy",
+  telebim: "Telebim i bandy LED", zadaszenie: "Zadaszenie trybun", muzeum: "Muzeum klubu", hotel: "Hotel klubowy",
+  baza: "Boiska treningowe",
 };
-
-export function miejscaRozbudowy(s: StanGry): number {
-  return Math.max(200, Math.round((s.kluby[s.mojKlub].pojemnosc * 0.15) / 50) * 50);
-}
-export function kosztRozbudowy(s: StanGry): number {
-  return miejscaRozbudowy(s) * KOSZT_MIEJSCA[s.kluby[s.mojKlub].poziom - 1];
-}
-export function rozbudujStadion(s: StanGry): string | null {
-  const k = s.kluby[s.mojKlub];
-  const koszt = kosztRozbudowy(s);
-  if (k.kasa < koszt) return `Brakuje ${zl(koszt - k.kasa)}.`;
-  const dod = miejscaRozbudowy(s);
-  k.kasa -= koszt;
-  k.pojemnosc += dod;
-  k.renoma = Math.min(1, k.renoma + 0.01);
-  wiadomosc(s, `Rozbudowano stadion o ${dod} miejsc (teraz ${k.pojemnosc}). Koszt ${zl(koszt)}.`);
+export const OBIEKTY_IKONY: Record<TypObiektu, string> = {
+  parking: "🅿️", gastronomia: "🌭", sklep: "🛍", toalety: "🚻", kasy: "🎫", strefaKibica: "🎪", loze: "🥂",
+  telebim: "📺", zadaszenie: "⛱", muzeum: "🏆", hotel: "🏨", baza: "🥅",
+};
+/** Co daje obiekt (opis do UI). */
+export const OBIEKTY_OPIS: Record<TypObiektu, string> = {
+  parking: "przychód z parkowania i +frekwencja (łatwiejszy dojazd)",
+  gastronomia: "przychód z jedzenia na każdym meczu; odblokowuje partnera napojowego",
+  sklep: "sprzedaż pamiątek i koszulek na meczach",
+  toalety: "+frekwencja (komfort kibiców)",
+  kasy: "+frekwencja i drobny przychód (sprawne wejście, mniej kolejek)",
+  strefaKibica: "przychód z fan zone i +zaufanie kibiców co sezon",
+  loze: "więcej miejsc VIP — wyższy przychód z hospitality",
+  telebim: "przychód z reklam; odblokowuje sponsora telebimu",
+  zadaszenie: "+frekwencja przy złej pogodzie, +renoma",
+  muzeum: "przychód z biletów do muzeum, +renoma klubu",
+  hotel: "przychód z noclegów kibiców gości i konferencji",
+  baza: "szybszy rozwój młodych zawodników (+trening)",
+};
+/** Mnożnik kosztu wg typu (względem bazowego kosztu obiektu na danym szczeblu). */
+const KOSZT_TYPU: Record<TypObiektu, number> = {
+  parking: 0.8, gastronomia: 1, sklep: 1, toalety: 0.5, kasy: 0.7, strefaKibica: 1.2, loze: 2, telebim: 1.6,
+  zadaszenie: 3, muzeum: 1.5, hotel: 4, baza: 2.5,
+};
+export const poziomObiektu = (k: Klub, typ: TypObiektu): number => k.obiekty[typ] ?? 0;
+/** Wymóg do budowy obiektu (null = można budować). */
+export function wymogObiektu(k: Klub, typ: TypObiektu): string | null {
+  if (typ === "loze" && k.pojemnosc < 500) return "wymaga stadionu min. 500 miejsc";
+  if (typ === "zadaszenie" && k.pojemnosc < 800) return "wymaga stadionu min. 800 miejsc";
+  if (typ === "hotel" && k.pojemnosc < 2000) return "wymaga stadionu min. 2000 miejsc";
+  if (typ === "muzeum" && k.zalozony && (2026 - k.zalozony) < 20) return "klub musi mieć min. 20 lat historii";
   return null;
 }
-export function kosztObiektu(s: StanGry, typ: keyof import("./types").Obiekty): number {
+/** Warianty rozbudowy stadionu: [nazwa, liczba miejsc, mnożnik ceny za miejsce]. */
+export function wariantyRozbudowy(s: StanGry): { nazwa: string; miejsca: number; koszt: number }[] {
   const k = s.kluby[s.mojKlub];
-  return KOSZT_OBIEKTU[k.poziom - 1] * (k.obiekty[typ] + 1);
+  const r50 = (x: number) => Math.max(50, Math.round(x / 50) * 50);
+  const cena = KOSZT_MIEJSCA[k.poziom - 1];
+  return [
+    { nazwa: "Dostawka miejsc", miejsca: r50(Math.max(100, k.pojemnosc * 0.1)), koszt: 0 },
+    { nazwa: "Rozbudowa trybuny", miejsca: r50(Math.max(200, k.pojemnosc * 0.2)), koszt: 0 },
+    { nazwa: "Nowa trybuna", miejsca: r50(Math.max(500, k.pojemnosc * 0.4)), koszt: 0 },
+  ].map((w, i) => ({ ...w, koszt: Math.round((w.miejsca * cena * [1, 0.95, 0.9][i]) / 100) * 100 }));
+}
+
+export function miejscaRozbudowy(s: StanGry): number {
+  return wariantyRozbudowy(s)[1].miejsca;
+}
+export function kosztRozbudowy(s: StanGry): number {
+  return wariantyRozbudowy(s)[1].koszt;
+}
+export function rozbudujStadion(s: StanGry, wariant = 1): string | null {
+  const k = s.kluby[s.mojKlub];
+  const w = wariantyRozbudowy(s)[wariant] ?? wariantyRozbudowy(s)[1];
+  if (k.kasa < w.koszt) return `Brakuje ${zl(w.koszt - k.kasa)}.`;
+  k.kasa -= w.koszt;
+  k.pojemnosc += w.miejsca;
+  k.renoma = Math.min(1, k.renoma + (wariant === 2 ? 0.015 : 0.008));
+  wiadomosc(s, `🏗 ${w.nazwa}: +${w.miejsca.toLocaleString("pl")} miejsc (teraz ${k.pojemnosc.toLocaleString("pl")}). Koszt ${zl(w.koszt)}.`);
+  return null;
+}
+export function kosztObiektu(s: StanGry, typ: TypObiektu): number {
+  const k = s.kluby[s.mojKlub];
+  return Math.round((KOSZT_OBIEKTU[k.poziom - 1] * KOSZT_TYPU[typ] * (poziomObiektu(k, typ) + 1)) / 100) * 100;
 }
 
 // ——— Akademia młodzieży ———
@@ -2055,14 +2192,17 @@ export function naborAkademii(s: StanGry): { minIlu: number; maxIlu: number; pot
 export function wychowankowie(s: StanGry): Zawodnik[] {
   return s.kluby[s.mojKlub].zawodnicy.map((id) => s.zawodnicy[id]).filter((z) => z.wiek <= 21).sort((a, b) => b.potencjal - a.potencjal);
 }
-export function rozbudujObiekt(s: StanGry, typ: keyof import("./types").Obiekty): string | null {
+export const MAX_POZIOM_OBIEKTU = MAX_OBIEKT;
+export function rozbudujObiekt(s: StanGry, typ: TypObiektu): string | null {
   const k = s.kluby[s.mojKlub];
-  if (k.obiekty[typ] >= MAX_OBIEKT) return "Osiągnięto maksymalny poziom.";
+  if (poziomObiektu(k, typ) >= MAX_OBIEKT) return "Osiągnięto maksymalny poziom.";
+  const wym = wymogObiektu(k, typ);
+  if (wym) return `Nie można budować: ${wym}.`;
   const koszt = kosztObiektu(s, typ);
   if (k.kasa < koszt) return `Brakuje ${zl(koszt - k.kasa)}.`;
   k.kasa -= koszt;
-  k.obiekty[typ]++;
-  k.renoma = Math.min(1, k.renoma + 0.005);
+  k.obiekty[typ] = poziomObiektu(k, typ) + 1;
+  k.renoma = Math.min(1, k.renoma + (typ === "muzeum" || typ === "zadaszenie" ? 0.01 : 0.005));
   wiadomosc(s, `${OBIEKTY_NAZWY[typ]}: rozbudowa do poziomu ${k.obiekty[typ]}. Koszt ${zl(koszt)}.`);
   return null;
 }
@@ -2113,14 +2253,21 @@ export function polozPodgrzewanaMurawe(s: StanGry): string | null {
 
 /** Przychód z obiektów na mecz u siebie (zł), wg frekwencji. */
 export function przychodObiektow(ob: import("./types").Obiekty, widzowie: number): number {
-  return Math.round(widzowie * (ob.gastronomia * 1.5 + ob.parking * 1 + ob.sklep * 0.8));
+  const p = (t: TypObiektu) => ob[t] ?? 0;
+  return Math.round(widzowie * (p("gastronomia") * 1.5 + p("parking") * 1 + p("sklep") * 0.8 + p("kasy") * 0.2
+    + p("strefaKibica") * 0.9 + p("telebim") * 0.5 + p("muzeum") * 0.4 + p("hotel") * 0.7));
+}
+/** Mnożnik frekwencji z komfortu obiektów (parking, sanitariaty, kasy; dach przy złej pogodzie). */
+export function mnoznikKomfortu(ob: import("./types").Obiekty, zlaPogoda: boolean): number {
+  const p = (t: TypObiektu) => ob[t] ?? 0;
+  return 1 + p("parking") * 0.008 + p("toalety") * 0.01 + p("kasy") * 0.008 + (zlaPogoda ? p("zadaszenie") * 0.03 : p("zadaszenie") * 0.005);
 }
 
 /** Przychód dnia meczowego: loże/strefa VIP (hospitality) + catering. Zależny od pojemności, rangi i szczebla; na duże mecze pakiety droższe. Niższe ligi (>V) bez strefy VIP. */
 export function przychodDniaMeczowego(k: Klub, widzowie: number, duzyMecz: boolean): { vip: number; catering: number; razem: number } {
-  const loze = k.poziom <= 5 ? Math.round(k.pojemnosc * 0.004) : 0; // ~0.4% miejsc to loże/skyboxy (realna liczba miejsc VIP)
+  const loze = k.poziom <= 5 || (k.obiekty.loze ?? 0) > 0 ? Math.round(k.pojemnosc * (0.004 + (k.obiekty.loze ?? 0) * 0.002)) : 0; // ~0.4% miejsc to loże/skyboxy (realna liczba miejsc VIP)
   const zajete = Math.min(loze, Math.round(loze * (0.5 + k.renoma * 0.5) * (duzyMecz ? 1.25 : 1)));
-  const cenaPakietu = [900, 500, 250, 120, 60][k.poziom - 1] ?? 0;
+  const cenaPakietu = [900, 500, 250, 120, 60][k.poziom - 1] ?? 40;
   const vip = zajete * cenaPakietu;
   const catering = Math.round(widzowie * (0.25 + k.renoma * 0.15) * (duzyMecz ? 1.3 : 1)); // gastronomia dnia meczowego (napoje/jedzenie)
   return { vip, catering, razem: vip + catering };
