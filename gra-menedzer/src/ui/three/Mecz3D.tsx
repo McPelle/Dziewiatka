@@ -208,7 +208,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     }
     // „klatka" gości: sektor ogrodzony płotem 2,2 m (wymóg PZPN) w narożniku, kibice w barwach gości skaczą przy dopingu
     const gosciFani: THREE.InstancedMesh | undefined = (() => {
-      if (ust.pusto || ust.widzowie <= 0 || !(m.komentarz.some((c) => c.tekst.startsWith("🧱")) || ust.derby)) return undefined;
+      if (m.zgodaMecz || ust.pusto || ust.widzowie <= 0 || !(m.komentarz.some((c) => c.tekst.startsWith("🧱")) || ust.derby)) return undefined; // mecz zgody — klatka pusta
       const x0 = DL / 2 - 14, z0 = -SZ / 2 - 5.5, szer = 14, gl = 9;
       const mPlot = new THREE.MeshBasicMaterial({ color: 0x9aa3ad, wireframe: true, transparent: true, opacity: 0.55 });
       for (const [px, pz, w, rot] of [[x0 + szer / 2, z0, szer, 0], [x0, z0 - gl / 2, gl, Math.PI / 2], [x0 + szer, z0 - gl / 2, gl, Math.PI / 2]] as [number, number, number, number][]) {
@@ -292,6 +292,15 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
       if (typ === "pirotechnika" && race && dym) { raceT = 9; }
       scena.add(g); setTimeout(() => scena.remove(g), 30000);
     };
+    // mecz zgody: wspólny blok kibiców obu klubów za bramką (przemieszani w swoich barwach), flagi gości na płocie gospodarzy
+    let wspolny: THREE.InstancedMesh | undefined;
+    if (m.zgodaMecz && !ust.pusto && ust.widzowie > 0) {
+      const n = 220, mat = new THREE.Matrix4(), kol = [stroje.dom.pole.baza, stroje.dom.pole.dodatek, stroje.gosc.pole.baza, stroje.gosc.pole.dodatek].map((c) => new THREE.Color(c));
+      wspolny = new THREE.InstancedMesh(new THREE.BoxGeometry(0.42, 1.0, 0.34), new THREE.MeshLambertMaterial({ color: 0xffffff }), n);
+      for (let i = 0; i < n; i++) { mat.setPosition(-DL / 2 - 8 - Math.floor(i / 44) * 1.3, 1.2 + Math.floor(i / 44) * 0.75, -18 + (i % 44) * 0.82 + Math.random() * 0.3); wspolny.setMatrixAt(i, mat); wspolny.setColorAt(i, kol[(i * 7 + Math.floor(i / 3)) % 4]); }
+      scena.add(wspolny);
+      (m.kultura?.gosc.flagi ?? []).slice(0, 8).forEach((f, i) => { const fl = flagaMesh(f.tekst, f.kolory[0], f.kolory[1], 3.4, f.kolory2); fl.position.set(-DL / 2 - 6.9, 2.35, -15 + i * 4); fl.rotation.y = Math.PI / 2; scena.add(fl); });
+    }
     // transparent kibiców (wieszany na trybunie danego sektora)
     let transparent: THREE.Mesh | undefined, transT = 0, ostTrans = "";
     const pokazTransparent = (tekst: string, sektor: "gospodarzy" | "gosci") => {
@@ -609,6 +618,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
           else if (e.typ === "balon") e.obj.position.y += dt * (0.8 + (e.t % 1) * 0.6);
           else if (e.typ === "ogien") e.obj.scale.set(1 + Math.sin(e.t * 20) * 0.15, 1 + Math.sin(e.t * 13) * 0.2, 1);
           else if (e.typ === "postac") e.obj.position.y = 15 + Math.abs(Math.sin(e.t * 6)) * 0.3; }
+        if (wspolny) wspolny.position.y = Math.abs(Math.sin(czas * 5)) * 0.2 * (0.4 + emocje);
         if (gosciFani) { gosciFani.position.y = Math.abs(Math.sin(czas * 5)) * 0.18 * (0.4 + emocje); const sz = (gosciFani as any).szaliki as THREE.InstancedMesh | undefined; if (sz) { sz.visible = emocje > 0.55 || Math.sin(czas * 0.15) > 0.85; sz.position.y = gosciFani.position.y; } }
         if (strumien && armatka) { armatkaT = Math.max(0, armatkaT - dt); strumien.visible = armatkaT > 0; if (armatkaT > 0) { strumien.scale.set(1, 0.9 + Math.random() * 0.2, 1); (armatka.children[armatka.children.length - 2] as THREE.Object3D).rotation.y = Math.sin(czas * 1.5) * 0.3; } }
         // sędzia techniczny: tablica z doliczonym czasem i numerami przy zmianach

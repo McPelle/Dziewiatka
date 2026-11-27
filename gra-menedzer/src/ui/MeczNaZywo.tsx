@@ -82,7 +82,11 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
       const sg0 = sektorGosci(s, kd0, !!u.derby);
       const planOp = u.widzowie > 0 ? planOpraw(s, kd0, kg0, { derby: dn, zgoda: zg, puchar: !!puchar, gosci: sg0.zamkniety ? 0 : sg0.miejsca, silaD: kulturaTrybun(s, kd0).pirotechnika, silaG: kulturaTrybun(s, kg0).pirotechnika }) : [];
       nm.oprawyPlan = planOp; nm.incydenty = [];
-      if (zg) nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🤝 ${zg} — na trybunach święto zgody: wspólne przyśpiewki, wymiana szalików i flagi obu klubów obok siebie.` });
+      if (zg) {
+        nm.zgodaMecz = true; nm.bezp.ryzyko *= 0.08; // przyjaciele nie robią sobie zadym
+        nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🤝 ${zg} — mecz przyjaźni! Kibice ${kd0.nazwa} i ${kg0.nazwa} siedzą razem, przemieszani w swoich barwach: szaliki obu klubów, flagi obok siebie na jednym płocie, klatka gości otwarta i pusta.` });
+        nm.komentarz.unshift({ min: "0'", typ: "kibice", tekst: `🎵 Wspólny okrzyk przed gwizdkiem: „${kd0.nazwa.split(" ")[0]} i ${kg0.nazwa.split(" ")[0]} — zgoda na wieki!”` });
+      }
       for (const p of planOp) {
         nm.incydenty.push({ typ: "oprawa", min: p.min, sektor: p.sektor, opis: `Oprawa ${p.sektor === "gosci" ? "gości" : "gospodarzy"}: ${p.o.opis}`, opanowany: true });
         if (p.o.obrazliwa) { nm.incydenty.push({ typ: "transparent", min: p.min + 1, sektor: p.sektor, opis: "Obraźliwa oprawa wobec rywala — delegat w protokole.", opanowany: true }); nm.bezp.ryzyko = Math.min(0.95, nm.bezp.ryzyko * 1.3); }

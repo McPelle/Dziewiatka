@@ -5,6 +5,7 @@ import { kosztSztabuNaKolejke, poziomSztabu, przedluzSztab, ROLE_SZTABU, rynekSz
 import { kosztMisji, REGIONY_SKAUT, sciagnijTalent, wiekMinimalny, wyslijSkauta } from "../engine/skauting";
 import { NAZWA_KONTRAKTU, urodzony } from "../engine/swiat";
 import { narodowoscKraju } from "../data/narodowosci";
+import { KURSY, nastepnaLicencja, punktyDorobku, wymaganaLicencja, zapiszNaKurs } from "../engine/licencje";
 import { jezykKraju, JEZYKI_DO_NAUKI, pensjaTlumacza, potrzebneJezyki, rynekTlumaczy, tlumaczDla, tlumaczeKlubu, zatrudnijTlumacza, zwolnijTlumacza, jezykiTrenera, kosztKursu, kosztKursuTrenera, NAZWA_JEZYKA, jezykZawodnika, poziomJezykaTrenera, polski, type Jezyk } from "../engine/jezyki";
 import type { Pracownik, RolaSztabu, StanGry } from "../engine/types";
 import { ProfilZawodnika } from "./ProfilZawodnika";
@@ -35,6 +36,17 @@ export function Sztab({ s, widoczny, onClose, odswiez }: { s: StanGry; widoczny:
               Specjaliści realnie wpływają na zespół. Łączny koszt: <Text style={{ color: K.akcent, fontWeight: "700" }}>{zl(koszt)}/kolejkę</Text>.
             </Text>
 
+            {/* licencja trenerska UEFA */}
+            {(() => { const cel = nastepnaLicencja(s); const wym = wymaganaLicencja(s.kluby[s.mojKlub].poziom); const k = cel ? KURSY[cel] : null; return (
+              <View style={[st.karta, { marginHorizontal: 0, marginBottom: 10 }]}>
+                <Text style={st.naglowek}>🎓 Licencja trenerska UEFA</Text>
+                <Text style={st.maly}>Masz: <Text style={{ color: K.tekst, fontWeight: "800" }}>UEFA {s.trenerLicencja ?? "C"}</Text> · Twoja liga wymaga: UEFA {wym} · dorobek: {punktyDorobku(s)} pkt</Text>
+                {s.kursLicencji ? <Text style={[st.maly, { color: K.akcent, marginTop: 4 }]}>📚 Trwa kurs UEFA {s.kursLicencji.cel} — zostało {s.kursLicencji.pozostalo} tyg., potem egzamin. Do tego czasu prowadzisz zespół warunkowo.</Text>
+                  : k && cel ? (<>
+                    <Text style={[st.maly, { marginTop: 4 }]}>{k.opis} Koszt {zl(k.koszt)}, {k.tygodnie} tygodni, wymagany dorobek {k.pkt} pkt.</Text>
+                    <Pressable onPress={() => { const b = zapiszNaKurs(s); if (b) info(b); odswiez(); }} style={[st.przyciskMaly, { marginTop: 6, alignItems: "center", borderColor: K.akcent }]}><Text style={[st.przyciskMalyTekst, { color: K.akcent }]}>Zapisz się na kurs UEFA {cel}</Text></Pressable>
+                  </>) : <Text style={[st.maly, { marginTop: 4 }]}>Najwyższa licencja — UEFA Pro.</Text>}
+              </View>); })()}
             {/* języki: tłumacz klubowy i kurs polskiego dla obcokrajowców */}
             {(() => {
               const k = s.kluby[s.mojKlub];

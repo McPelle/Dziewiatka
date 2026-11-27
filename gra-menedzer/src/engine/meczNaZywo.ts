@@ -69,6 +69,7 @@ export interface MeczLive {
   oprawa?: import("./oprawy").Oprawa; oprawaGosci?: import("./oprawy").Oprawa;
   oprawyPlan?: import("./oprawy").PokazOprawy[];
   zadyma?: import("./zadyma").Zadyma; zadymaPrzerwa?: boolean;
+  zgodaMecz?: boolean; // mecz zgody/układu — kibice obu klubów razem na jednej trybunie
   wsparcie?: { dom: { nazwa: string; kolory: [string, string] }[]; gosc: { nazwa: string; kolory: [string, string] }[] }; // zgody/układy/obóz na trybunach
   kultura?: { dom: import("./flagi").KulturaTrybun; gosc: import("./flagi").KulturaTrybun };
   transparentTeraz?: { tekst: string; sektor: "gospodarzy" | "gosci"; min: number };
@@ -191,10 +192,10 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
   }
   if (m.bezp && m.bezp.widzowie > 0 && Math.random() < 0.07) {
     // prawdziwe przyśpiewki klubu (gdy są w danych), inaczej ogólny doping młyna; czasem odpowiada klatka gości
-    const goscie = (m.komentarz.some((c) => c.tekst.startsWith("🧱"))) && Math.random() < 0.35;
+    const goscie = (m.zgodaMecz || m.komentarz.some((c) => c.tekst.startsWith("🧱"))) && Math.random() < (m.zgodaMecz ? 0.5 : 0.35); // na meczu zgody — doping na zmianę dla obu drużyn
     const k = s.kluby[goscie ? m.gosc.klubId : m.dom.klubId], r = s.kluby[goscie ? m.dom.klubId : m.gosc.klubId];
     const p = przyspiewka(k, r, { derby: m.bezp.derby, zgoda: !!m.komentarz.find((c) => c.tekst.startsWith("🤝")), wynik: goscie ? m.gg - m.gd : m.gd - m.gg });
-    if (p) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: `🎵 ${goscie ? "Klatka gości" : "Młyn"}: „${p}”` });
+    if (p) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: `🎵 ${m.zgodaMecz ? `Wspólna trybuna (dla ${k.nazwa})` : goscie ? "Klatka gości" : "Młyn"}: „${p}”` });
     else if (!goscie && m.kultura?.dom.gniazdowy) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: okrzykMlyna(s.kluby[m.dom.klubId], m.kultura.dom, m.gd - m.gg) });
   }
   for (const p of m.oprawyPlan ?? []) if (p.min > 1 && p.min === m.min) m.komentarz.unshift({ min: tekstMinuty(m), typ: "kibice", tekst: `🎆 ${p.sektor === "gosci" ? "Klatka gości" : "Trybuna gospodarzy"} — kolejna oprawa: ${p.o.opis}` });

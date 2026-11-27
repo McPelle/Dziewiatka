@@ -36,6 +36,7 @@ import { atutBoiska, frekwencja, jestDerby, jestPrzyjazn } from "./derby";
 import { europaNaKolejke, kwalifikacjaEuropejska, nowaEuropa, rundaEuropy } from "./europa";
 import { moznaPuchar, nowyPuchar, rundaPucharu } from "./puchar";
 import { tydzienJezykow } from "./jezyki";
+import { tydzienLicencji } from "./licencje";
 import { bonusTrudnosci, sprawdzOsiagniecia } from "./osiagniecia";
 import { nalozSankcje, losujIncydent, rozliczBezpieczenstwo, rozliczWyjazd, zuzyjSankcje } from "./bezpieczenstwo";
 import { akcjeKibicow, dojazdKibicow, karaZaAkcje, sektorGosci, szkodyZaAkcje, tydzienZgod, wsparcieKibicow, zgodaKibicow } from "./kibice";
@@ -1013,7 +1014,8 @@ export function zagrajKolejke(s: StanGry) {
   if (moznaPuchar(s)) rundaPucharu(s);
   for (const w of tydzienJezykow(s)) wiadomosc(s, w); // nauka polskiego cudzoziemców, kurs, tłumacz
   for (const w of sprawdzOsiagniecia(s)) wiadomosc(s, w); // osiągnięcia trenera
-  { const t = tydzienZgod(s, s.kluby[s.mojKlub]); if (t) wiadomosc(s, t); } // życie zgód: jubileusze, zerwania, nowe układy
+  { const t = tydzienZgod(s, s.kluby[s.mojKlub]); if (t) wiadomosc(s, t); }
+  { const t = tydzienLicencji(s); if (t) wiadomosc(s, t); } // kurs UEFA, egzamin, wymogi licencyjne ligi // życie zgód: jubileusze, zerwania, nowe układy
   { // wędrująca oprawa z orłami — po stadionach scen kibicowskich (przez zgody)
     const kand = Object.values(s.kluby).filter((k) => k.poziom <= 5 && !k.rezerwaDla); // wszystkie kluby od Ekstraklasy do IV ligi
     const t = wedrownaOprawaTydzien(s, kand, (a) => kand.filter((b) => b.id !== a.id && !!zgodaKibicow(s, a, b)));
@@ -2828,9 +2830,8 @@ export function rozwojSztabuILicencji(s: StanGry) {
   const pkt = sezony + awanse * 2 + tytuly * 3;
   const docelowa: "C" | "B" | "A" | "PRO" = pkt >= 16 ? "PRO" : pkt >= 9 ? "A" : pkt >= 4 ? "B" : "C";
   const ranga = { C: 0, B: 1, A: 2, PRO: 3 };
-  if (ranga[docelowa] > ranga[s.trenerLicencja ?? "C"]) {
-    s.trenerLicencja = docelowa;
-    wiadomosc(s, `🎓 Zdobyłeś licencję trenerską UEFA ${docelowa}! Rosnące kwalifikacje otwierają drzwi do większych klubów.`);
+  if (ranga[docelowa] > ranga[s.trenerLicencja ?? "C"] && !s.kursLicencji) {
+    wiadomosc(s, `🎓 Twój dorobek pozwala zapisać się na kurs trenerski UEFA (Sztab → Licencja UEFA) — licencję zdobywa się na kursie i egzaminie.`);
   }
 }
 
