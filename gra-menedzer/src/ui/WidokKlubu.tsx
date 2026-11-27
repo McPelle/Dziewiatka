@@ -1,3 +1,5 @@
+import { budowyKlubu, oglosPrzetarg, opisUtrudnien, trwaBudowa } from "../engine/budowy";
+import { PrzetargPanel, TrwajaceBudowy } from "./Budowy";
 import { useState } from "react";
 import { Alert, Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import STADIONY_JSON from "../../assets/stadiony.json";
@@ -120,20 +122,24 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
               <View style={{ marginTop: 18 }}>
                 <Text style={st.naglowek}>🏟 Stadion z lotu ptaka</Text>
                 <Text style={[st.maly, { marginBottom: 6 }]}>{klub.pojemnosc.toLocaleString("pl")} miejsc · trybuny i obiekty rosną razem z rozbudową</Text>
-                <WidokStadionu klub={klub} oswietlenie={maOswietlenie(klub)} />
+                <WidokStadionu klub={klub} oswietlenie={maOswietlenie(klub)} budowy={moj ? budowyKlubu(s) : undefined} />
               </View>
 
               {moj && (
                 <View style={{ marginTop: 18 }}>
+                  <TrwajaceBudowy s={s} />
+                  <PrzetargPanel s={s} odswiez={odswiez} />
                   <Text style={st.naglowek}>🏗 Rozbudowa stadionu</Text>
+                  <Text style={[st.maly, { marginBottom: 4 }]}>Każda budowa to przetarg: firmy podają cenę i czas, a w trakcie robót część miejsc jest wyłączona.</Text>
                   {wariantyRozbudowy(s).map((w, i) => (
                     <View key={w.nazwa} style={[st.wiersz, { justifyContent: "space-between", paddingVertical: 6, borderTopWidth: i ? 1 : 0, borderTopColor: K.linia }]}>
                       <View style={{ flex: 1 }}>
                         <Text style={st.tekst}>{w.nazwa}</Text>
-                        <Text style={st.maly}>+{w.miejsca.toLocaleString("pl")} miejsc → {(klub.pojemnosc + w.miejsca).toLocaleString("pl")}</Text>
+                        <Text style={st.maly}>+{w.miejsca.toLocaleString("pl")} miejsc → {(klub.pojemnosc + w.miejsca).toLocaleString("pl")} · ok. {zl(w.koszt)}</Text>
+                        <Text style={[st.maly, { fontSize: 11 }]}>W trakcie: {opisUtrudnien({ rodzaj: "stadion", wariant: i })}</Text>
                       </View>
-                      <Pressable style={st.przyciskMaly} onPress={() => akcja(() => rozbudujStadion(s, i))}>
-                        <Text style={st.przyciskMalyTekst}>{zl(w.koszt)}</Text>
+                      <Pressable style={[st.przyciskMaly, trwaBudowa(s, { rodzaj: "stadion", wariant: i }) ? { opacity: 0.4 } : null]} onPress={() => akcja(() => oglosPrzetarg(s, { rodzaj: "stadion", wariant: i }))}>
+                        <Text style={st.przyciskMalyTekst}>{trwaBudowa(s, { rodzaj: "stadion", wariant: i }) ? "🚧 w budowie" : "📑 Przetarg"}</Text>
                       </Pressable>
                     </View>
                   ))}
@@ -152,8 +158,9 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
                         {poz >= MAX_POZIOM_OBIEKTU ? (
                           <Text style={st.maly}>max</Text>
                         ) : (
-                          <Pressable style={[st.przyciskMaly, wym ? { opacity: 0.4 } : null]} onPress={() => akcja(() => rozbudujObiekt(s, typ))}>
-                            <Text style={st.przyciskMalyTekst}>{poz ? "Rozbuduj" : "Zbuduj"} · {zl(kosztObiektu(s, typ))}</Text>
+                          trwaBudowa(s, { rodzaj: "obiekt", typ }) ? <Text style={[st.maly, { color: "#e0a030" }]}>🚧 w budowie</Text> :
+                          <Pressable style={[st.przyciskMaly, wym ? { opacity: 0.4 } : null]} onPress={() => akcja(() => oglosPrzetarg(s, { rodzaj: "obiekt", typ }))}>
+                            <Text style={st.przyciskMalyTekst}>📑 {poz ? "Rozbuduj" : "Zbuduj"} · ok. {zl(kosztObiektu(s, typ))}</Text>
                           </Pressable>
                         )}
                       </View>

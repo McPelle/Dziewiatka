@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import Svg, { Circle, G, Line, Polygon, Rect, Text as SvgText } from "react-native-svg";
 import type { Klub } from "../engine/types";
+import type { Budowa } from "../engine/budowy";
 import { barwyKlubu } from "../data/barwy";
 
 // Rysunek stadionu z lotu ptaka. Wszystko liczone z danych klubu:
@@ -32,7 +33,7 @@ export function podzialTrybun(poj: number): { strony: Partial<Record<Strona, num
 }
 const glebokosc = (miejsca: number) => Math.max(6, Math.min(50, 4 + Math.sqrt(miejsca) * 0.4));
 
-export function WidokStadionu({ klub, oswietlenie }: { klub: Klub; oswietlenie: boolean }) {
+export function WidokStadionu({ klub, oswietlenie, budowy }: { klub: Klub; oswietlenie: boolean; budowy?: Budowa[] }) {
   const r = rng(klub.nazwa);
   const [kol1, kol2] = barwyKlubu(klub.nazwa);
   const ob = klub.obiekty;
@@ -255,6 +256,66 @@ export function WidokStadionu({ klub, oswietlenie }: { klub: Klub; oswietlenie: 
     const wSrodku = x > bx0 - d.W - 14 && x < bx1 + d.E + 14 && y > by0 - d.N - 14 && y < by1 + d.S + 24;
     if (wSrodku || (y > yDol - 8 && y < yDol + 18)) continue;
     el.push(<Circle key={k()} cx={x} cy={y} r={3 + r() * 2} fill="#1f4a24" opacity={0.9} />);
+  }
+
+  // ——— Place budowy: ogrodzenie, dźwig, koparka, materiały i robotnicy w kaskach ———
+  for (const b of budowy ?? []) {
+    const rb = rng(b.id);
+    let zx: number, zy: number, zw: number, zh: number;
+    if (b.cel.rodzaj === "stadion") {
+      const przed = podzialTrybun(klub.pojemnosc).strony, po = podzialTrybun(klub.pojemnosc + (b.miejsca ?? 200)).strony;
+      let strona: Strona = "S", max = -1;
+      for (const x of ["S", "N", "W", "E"] as Strona[]) { const dd = (po[x] ?? 0) - (przed[x] ?? 0); if (dd > max) { max = dd; strona = x; } }
+      const g = Math.max(d[strona], 10) + 10;
+      if (strona === "S") { zw = bx1 - bx0; zh = g; zx = bx0; zy = by1 + 2; }
+      else if (strona === "N") { zw = bx1 - bx0; zh = g; zx = bx0; zy = by0 - 2 - g; }
+      else if (strona === "W") { zw = g; zh = by1 - by0; zx = bx0 - 2 - g; zy = by0; }
+      else { zw = g; zh = by1 - by0; zx = bx1 + 2; zy = by0; }
+    } else {
+      const pozy: Record<string, [number, number]> = {
+        parking: [65, 40], gastronomia: [175, H - 45], sklep: [418, 150], muzeum: [418, 110], hotel: [418, 200], strefaKibica: [412, H - 62],
+        baza: [205, 26], telebim: [bx0 - d.W - 20, CY], kasy: [CX, by1 + d.S + 14], toalety: [bx0 - d.W - 6, by1 + d.S + 6],
+        loze: [CX, by1 + d.S * 0.6], zadaszenie: [CX, by0 - d.N / 2],
+      };
+      const [cx, cy] = pozy[b.cel.typ] ?? [CX, CY];
+      const big = b.cel.typ === "hotel" || b.cel.typ === "zadaszenie" || b.cel.typ === "baza" ? 1.5 : 1;
+      zw = 44 * big; zh = 26 * big; zx = cx - zw / 2; zy = cy - zh / 2;
+    }
+    // ogrodzenie (pomarańczowa siatka) + plac
+    el.push(<Rect key={k()} x={zx} y={zy} width={zw} height={zh} fill="#8a7a5c" opacity={0.75} />);
+    for (let i = 0; i < 6; i++) el.push(<Line key={k()} x1={zx + (i / 6) * zw} y1={zy} x2={zx + ((i + 1) / 6) * zw} y2={zy + zh} stroke="#6b5c40" strokeWidth={2} opacity={0.5} />);
+    el.push(<Rect key={k()} x={zx} y={zy} width={zw} height={zh} fill="none" stroke="#ff7a1a" strokeWidth={1.2} strokeDasharray="3,2" />);
+    // materiały: palety, stal, deski
+    for (let i = 0; i < 4; i++) {
+      const mx = zx + 3 + rb() * (zw - 12), my = zy + 3 + rb() * (zh - 9);
+      el.push(<Rect key={k()} x={mx} y={my} width={6} height={4} fill={["#b0b4b8", "#a8743a", "#6d7378", "#d8d2c0"][i]} stroke="#333" strokeWidth={0.3} />);
+    }
+    // koparka
+    const kx = zx + zw * (0.2 + rb() * 0.2), ky = zy + zh * 0.6;
+    el.push(<Rect key={k()} x={kx - 4} y={ky - 3} width={8} height={6} rx={1} fill="#f2b705" stroke="#333" strokeWidth={0.4} />);
+    el.push(<Line key={k()} x1={kx + 3} y1={ky} x2={kx + 11} y2={ky - 5} stroke="#d99a00" strokeWidth={1.6} />);
+    el.push(<Rect key={k()} x={kx + 10} y={ky - 7} width={3} height={3} fill="#555" />);
+    // dźwig wieżowy (widok z góry: wysięgnik + przeciwwaga + wózek)
+    const dx = zx + zw * (0.55 + rb() * 0.25), dy = zy + zh * (0.3 + rb() * 0.4);
+    const kat = rb() * Math.PI * 2, dl = Math.max(zw, zh) * 0.75 + 16;
+    const ex = dx + Math.cos(kat) * dl, ey = dy + Math.sin(kat) * dl, px = dx - Math.cos(kat) * dl * 0.3, py = dy - Math.sin(kat) * dl * 0.3;
+    el.push(<Line key={k()} x1={px} y1={py} x2={ex} y2={ey} stroke="#000" strokeWidth={3.4} opacity={0.25} />);
+    el.push(<Line key={k()} x1={px} y1={py} x2={ex} y2={ey} stroke="#ffcc00" strokeWidth={2.2} />);
+    el.push(<Line key={k()} x1={px} y1={py} x2={ex} y2={ey} stroke="#9a7a00" strokeWidth={0.5} strokeDasharray="1.5,1.5" />);
+    el.push(<Rect key={k()} x={px - 3} y={py - 3} width={6} height={6} fill="#5b5f66" />);
+    el.push(<Rect key={k()} x={dx - 2.5} y={dy - 2.5} width={5} height={5} fill="#ff9900" stroke="#333" strokeWidth={0.5} />);
+    const wf = 0.55 + rb() * 0.35;
+    el.push(<Rect key={k()} x={dx + Math.cos(kat) * dl * wf - 1.5} y={dy + Math.sin(kat) * dl * wf - 1.5} width={3} height={3} fill="#333" />);
+    // robotnicy (kamizelka + żółty kask)
+    const ilu = 4 + Math.floor(rb() * 4);
+    for (let i = 0; i < ilu; i++) {
+      const wx = zx + 3 + rb() * (zw - 6), wy = zy + 3 + rb() * (zh - 6);
+      el.push(<Circle key={k()} cx={wx} cy={wy} r={1.8} fill="#ff6a00" stroke="#222" strokeWidth={0.3} />);
+      el.push(<Circle key={k()} cx={wx} cy={wy} r={0.9} fill="#ffe14d" />);
+    }
+    // tablica budowy
+    el.push(<Rect key={k()} x={zx} y={zy - 7} width={Math.min(zw, 52)} height={6} fill="#1a3d8f" />);
+    el.push(<SvgText key={k()} x={zx + 2} y={zy - 2.6} fontSize={4.2} fontWeight="bold" fill="#fff">🚧 BUDOWA {Math.round(Math.min(1, b.dniMinelo / (b.dniRazem + b.opoznienie)) * 100)}%</SvgText>);
   }
 
   return (

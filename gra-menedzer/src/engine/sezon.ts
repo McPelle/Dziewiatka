@@ -1,3 +1,4 @@
+import { utrudnieniaMeczu } from "./budowy";
 import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj";
 import { AFILIACJE, PRZYJAZNIE } from "../data/derby";
 import { klubyLigiZDanych, rodzenstwo, trafiaDo } from "./regiony";
@@ -803,6 +804,12 @@ export function zagrajKolejke(s: StanGry) {
         if (kd.poziom >= 3 && kd.oswietlenie) widzowie = Math.round(widzowie * 1.02); // mecze pod światłami — więcej chętnych wieczorem
         if (terminWieczorny) widzowie = Math.round(widzowie * 1.03); // wieczorna transmisja prime time ściąga więcej widzów
         widzowie = Math.round(widzowie * mnoznikKomfortu(kd.obiekty, mrozSnieg || /deszcz|ulew|burz/i.test(pog.nazwa)));
+        // Budowy na stadionie: zamknięte sektory i mniej chętnych (hałas, brak parkingu, kolejki).
+        const ut = utrudnieniaMeczu(s);
+        if (ut.ograniczenie > 0 || ut.frekKara > 0) {
+          widzowie = Math.min(Math.round(kd.pojemnosc * (1 - ut.ograniczenie)), Math.round(widzowie * (1 - ut.frekKara)));
+          if (moj) wiadomosc(s, `🚧 Prace budowlane na stadionie: ${ut.ograniczenie ? `${Math.round(ut.ograniczenie * 100)}% miejsc wyłączonych, ` : ""}frekwencja niższa o ok. ${Math.round(ut.frekKara * 100)}%.`);
+        }
 
       }
       // Zjazd kibiców z całego obozu zgód → derby/podwyższone ryzyko to praktycznie komplet, zgoda prawie komplet.

@@ -1,6 +1,7 @@
 // Kalendarz dzień po dniu (jak w Football Managerze). Silnik rozgrywek pozostaje „kolejkowy" (1 kolejka = 1 tydzień),
 // a gracz przechodzi przez dni tygodnia: regeneracja → treningi (z raportami) → [środa: puchar] → odprawa → MECZ → odpoczynek.
 // Każdy dzień treningowy nalicza 1/3 tygodniowego treningu (reszta dolicza się przy meczu, gdy przeskoczysz do meczu).
+import { postepBudow } from "./budowy";
 import { dateKolejki, kalendarzSzczebla } from "./kalendarz";
 import { moznaPuchar } from "./puchar";
 import { ileKolejek, kontekstTreningu, rozwojTreningowy, zagrajKolejke } from "./sezon";
@@ -101,6 +102,7 @@ export function dalejDzien(s: StanGry): boolean {
   if (s.koniecSezonu || s.zwolniony) return false;
   s.licznikDni = (s.licznikDni ?? 0) + 1;
   przetworzNegocjacje(s); // odpowiedzi klubów/agentów, badania, rejestracje
+  postepBudow(s); // budowy na stadionie idą dzień po dniu
   // Przerwa zimowa: po rundzie jesiennej, przed pierwszym tygodniem wiosny — okres zimowy (urlop + przygotowania).
   const pol = Math.ceil(ileKolejek(s) / 2);
   if (!s.okres && s.kolejka === pol && (s.dzien ?? 0) === 0 && s.zimaSezon !== s.sezon) { s.zimaSezon = s.sezon; rozpocznijOkres(s, "zima"); }
