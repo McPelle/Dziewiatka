@@ -2,6 +2,15 @@
 import type { ImageSourcePropType } from "react-native";
 
 export const HERBY: Record<string, ImageSourcePropType> = {
+  "nowy-lzs-waldowo": require("../../assets/herby/nowy-lzs-waldowo.png"),
+  "nowy-feniks-lasin": require("../../assets/herby/nowy-feniks-lasin.png"),
+  "nowy-victoria-smolnik": require("../../assets/herby/nowy-victoria-smolnik.png"),
+  "nowy-mloda-wloclawianka": require("../../assets/herby/nowy-mloda-wloclawianka.png"),
+  "nowy-fa-mezar-naklo": require("../../assets/herby/nowy-fa-mezar-naklo.png"),
+  "nowy-jss-torun": require("../../assets/herby/nowy-jss-torun.png"),
+  "nowy-zelki-zelkowo": require("../../assets/herby/nowy-zelki-zelkowo.png"),
+  "nowy-wda-czarna-woda": require("../../assets/herby/nowy-wda-czarna-woda.png"),
+  "nowy-norda-karwia": require("../../assets/herby/nowy-norda-karwia.png"),
   "11": require("../../assets/herby/11.png"),
   "247": require("../../assets/herby/247.png"),
   "254": require("../../assets/herby/254.png"),

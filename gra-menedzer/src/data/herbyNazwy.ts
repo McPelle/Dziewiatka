@@ -2,6 +2,15 @@
 // Dzięki temu oryginalny herb pokazuje się w KAŻDEJ karierze i na każdej liście (nie tylko tam, gdzie dane klubu mają pole `herb`).
 // Kluby bez pliku herbu (brak w nadesłanych herbach) dostają generowany emblemat w barwach klubu.
 export const HERB_PO_NAZWIE: Record<string, string> = {
+  "LZS Wałdowo": "nowy-lzs-waldowo",
+  "Feniks Łasin": "nowy-feniks-lasin",
+  "Victoria Smólnik": "nowy-victoria-smolnik",
+  "Młoda Włocławianka Włocławek": "nowy-mloda-wloclawianka",
+  "FA Mezar Nakło n/ Notecią": "nowy-fa-mezar-naklo",
+  "JSS Toruń": "nowy-jss-torun",
+  "Żelki Żelkowo": "nowy-zelki-zelkowo",
+  "Wda Czarna Woda": "nowy-wda-czarna-woda",
+  "Norda Karwia": "nowy-norda-karwia",
   "AF Brzoza": "kp-af-brzoza",
   "AKS 1947 Busko Zdrój": "5211",
   "AKS Ujanowice": "5797",
