@@ -1096,17 +1096,17 @@ function tydzien(s: StanGry) {
     }
     // 1b) Talent przerasta ligę: kluby z wyższych szczebli zgłaszają się same (również po amatorów — odstępne).
     for (const z of moj.zawodnicy.map((id) => s.zawodnicy[id])) {
-      if (!z || z.macierzysty || (z.wystawiony ?? 0) > 0 || s.oferty.some((o) => o.zawodnikId === z.id)) continue;
+      if (!z || z.macierzysty || z.kontraktTyp === "amator" || (z.wystawiony ?? 0) > 0 || s.oferty.some((o) => o.zawodnikId === z.id)) continue;
       if (moj.poziom <= 1 || z.umiej < zakresUmiej(moj.poziom - 1)[0] + 2) continue; // gra na poziomie wyższej ligi
       if (!szansa(deadline ? 0.25 : 0.1)) continue;
       const kupcy = Object.values(s.kluby).filter((k) => k.id !== moj.id && k.poziom < moj.poziom && k.poziom >= moj.poziom - 3 && k.zawodnicy.length < 28);
       if (!kupcy.length) continue;
       const kupiec = wybierzWazone(kupcy, (k) => wagaBliskosci(s, moj, k) * (1 + k.renoma));
-      const baza = z.kontraktTyp === "amator" ? wartosc(z) * 0.5 : wartosc(z);
+      const baza = wartosc(z);
       const kwota = Math.max(1000, Math.round((baza * los(0.8, 1.25)) / 100) * 100);
       if (kupiec.kasa < kwota) continue;
       s.oferty.push({ zawodnikId: z.id, klubId: kupiec.id, kwota });
-      wiadomosc(s, `🔭 ${kupiec.nazwa} (${s.ligi[kupiec.poziom - 1]?.nazwa ?? "wyższa liga"}) chce ${z.imie} ${z.nazwisko} — oferuje ${zl(kwota)}${z.kontraktTyp === "amator" ? " odstępnego" : ""}. Talent przerasta naszą ligę.`);
+      wiadomosc(s, `🔭 ${kupiec.nazwa} (${s.ligi[kupiec.poziom - 1]?.nazwa ?? "wyższa liga"}) chce ${z.imie} ${z.nazwisko} — oferuje ${zl(kwota)}. Talent przerasta naszą ligę.`);
     }
     // 2) Sporadyczna oferta za niewystawionego (jak dawniej, rzadziej).
     if (szansa(deadline ? 0.4 : 0.18)) {
@@ -2341,7 +2341,7 @@ function premiaPodpisu(pensja: number): number {
 export function cenaKupna(s: StanGry, zawodnikId: string): number {
   const z = s.zawodnicy[zawodnikId];
   if (!z.klubId) return 0; // wolny zawodnik
-  if (z.kontraktTyp === "amator") return z.wiek <= 23 ? Math.round((wartosc(z) * 0.15) / 100) * 100 : 0; // amator: tylko ekwiwalent za wyszkolenie (młodzi)
+  if (z.kontraktTyp === "amator") return 0; // amatorzy zmieniają kluby bez kwot
   const lata = latDoKonca(s, z);
   const wsp = lata <= 0 ? 0 : lata === 1 ? 0.35 : lata === 2 ? 0.7 : lata === 3 ? 1.05 : 1.3;
   return Math.round((wartosc(z) * wsp) / 100) * 100;
@@ -2882,7 +2882,7 @@ export function wyplacOdsprzedaz(s: StanGry, z: Zawodnik, cena: number, sprzedaj
 /** Sugerowana kwota wywoławcza przy wystawianiu własnego zawodnika na sprzedaż (≈ wartość rynkowa). */
 export function sugerowanaCenaSprzedazy(s: StanGry, zawodnikId: string): number {
   const z = s.zawodnicy[zawodnikId];
-  const w = z.kontraktTyp === "amator" ? wartosc(z) * 0.5 : wartosc(z); // amator: odstępne ≈ połowa wartości
+  const w = wartosc(z);
   return w >= 20000 ? Math.round(w / 10000) * 10000 : Math.max(200, Math.round(w / 100) * 100);
 }
 
@@ -2892,7 +2892,7 @@ export function wystawNaSprzedaz(s: StanGry, zawodnikId: string, kwota: number):
   const moj = s.kluby[s.mojKlub];
   if (!z || z.klubId !== moj.id) return "To nie jest zawodnik Twojego klubu.";
   if (z.macierzysty) return "Zawodnik jest u Was na wypożyczeniu — nie możesz go sprzedać.";
-  // Amator: klub może żądać „odstępnego" (zgoda na zmianę barw / ekwiwalent za wyszkolenie) — realia niższych lig.
+  if (z.kontraktTyp === "amator") return "Amatora nie sprzedasz za kwotę (umowa amatorska). Po awansie na szczebel półprofesjonalny (IV liga) dostanie kontrakt półprofesjonalny i wtedy można go sprzedać.";
   if (!(kwota > 0)) return "Podaj kwotę wywoławczą większą od zera.";
   z.wystawiony = Math.round(kwota / 100) * 100;
   wiadomosc(s, `🏷 Wystawiono ${z.imie} ${z.nazwisko} na sprzedaż — cena wywoławcza ${zl(z.wystawiony)}.`);

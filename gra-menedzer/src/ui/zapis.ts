@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
-import { wartoscKontraktuTrenera } from "../engine/sezon";
+import { aktualizujTypyKontraktow, wartoscKontraktuTrenera } from "../engine/sezon";
 import { losujAgenta, maAgenta } from "../engine/swiat";
 import type { StanGry } from "../engine/types";
 
@@ -67,10 +67,7 @@ export async function wczytaj(): Promise<StanGry | null> {
   try {
     const t = await pobierz(KLUCZ);
     if (!t) return null;
-    const s = JSON.parse(t) as StanGry;
-    migrujKariere(s);
-    migrujTrenera(s);
-    return s;
+    return przygotuj(JSON.parse(t) as StanGry);
   } catch {
     return null;
   }
@@ -167,6 +164,7 @@ export async function zapiszSlot(s: StanGry, opcje: { nowy?: boolean; id?: strin
 function przygotuj(s: StanGry): StanGry {
   migrujKariere(s);
   migrujTrenera(s);
+  aktualizujTypyKontraktow(s); // stare zapisy: wyrównaj kontrakty do szczebla klubu (np. amatorzy w IV/III lidze)
   return s;
 }
 

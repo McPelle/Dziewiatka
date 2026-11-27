@@ -344,8 +344,9 @@ function WierszSprzedazy({ s, z, odswiez }: { s: StanGry; z: Zawodnik; odswiez: 
           <Text style={[st.maly, { fontSize: 11 }]}>pot. {Math.floor(z.potencjal)}</Text>
         </View>
       </View>
-      {amator && <Text style={[st.maly, { marginTop: 8, color: K.szary }]}>Amator — kupujący płaci odstępne (zgoda klubu na zmianę barw / ekwiwalent za wyszkolenie). Po awansie na szczebel półprofesjonalny dostanie umowę z kwotą transferową.</Text>}
-      {(
+      {amator ? (
+        <Text style={[st.maly, { marginTop: 8, color: K.szary }]}>Umowa amatorska — nie sprzedasz go za kwotę. Po awansie klubu na szczebel półprofesjonalny (IV liga) kontrakt zmieni się na półprofesjonalny i wtedy będzie można go sprzedać.</Text>
+      ) : (
         <View style={[st.wiersz, { justifyContent: "space-between", alignItems: "center", marginTop: 8 }]}>
           <View style={[st.wiersz, { gap: 8, alignItems: "center" }]}>
             <Pressable style={st.przyciskMaly} onPress={() => setKwota((k) => Math.max(amator ? 100 : 1000, k - krok))}><Text style={st.przyciskMalyTekst}>−</Text></Pressable>

@@ -4,7 +4,7 @@
 //  - możesz promować juniora do pierwszego zespołu; absolwenci (>21 l.) awansują albo odchodzą.
 // Juniorzy mają klubId = Twój klub, ale NIE są w k.zawodnicy (dopóki ich nie promujesz) — stąd osobna lista k.juniorzy.
 import { los, losInt, szansa, wybierz } from "./losuj";
-import { KADRA, nowyZawodnik, pensjaDla, zakresUmiej } from "./swiat";
+import { KADRA, kontraktTyp, nowyZawodnik, pensjaDla, zakresUmiej } from "./swiat";
 import { rozwinAtrybuty } from "./atrybuty";
 import type { Klub, StanGry, Zawodnik } from "./types";
 
@@ -112,7 +112,7 @@ export function promujJuniora(s: StanGry, id: string): string | null {
   const z = s.zawodnicy[id];
   k.juniorzy = (k.juniorzy ?? []).filter((x) => x !== id);
   k.zawodnicy.push(id);
-  z.kontraktTyp = k.poziom <= 3 ? "polprofesjonalny" : "amator";
+  z.kontraktTyp = k.poziom <= 3 ? "polprofesjonalny" : kontraktTyp(k.poziom); // junior w pierwszym zespole — umowa wg szczebla
   z.kontraktDo = s.sezon + 3;
   z.pensja = Math.round(pensjaDla(z.umiej, k.poziom) * 0.6);
   z.numer = numerWolny(s, k, z);
