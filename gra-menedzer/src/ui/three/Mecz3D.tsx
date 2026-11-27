@@ -19,11 +19,11 @@ import { uriObrazka } from "./Konferencja3D";
 import type { PozycjaSzczegolowa, StanGry } from "../../engine/types";
 import type { StrojeMeczu } from "../strojeDane";
 import { DL, SZ, swiatla, uproscMaterialy, zbudujStadion } from "./stadion3d";
-import { animuj, stworzPostac, wyglad3D, type Postac } from "./zawodnik3d";
+import { animuj, obrocDo, stworzPostac, wyglad3D, type Postac } from "./zawodnik3d";
 import { gwizdek, kopniecie, napiecie, reakcjaTrybun } from "./dzwiek";
 
 export type Kamera = "auto" | "tv" | "bramka" | "gora" | "blisko" | "zawodnik" | "obrot";
-export interface Ustawienia3D { noc: boolean; pogoda: "slonce" | "deszcz" | "snieg" | "mgla"; widzowie: number; lekka: boolean; derby?: boolean; pusto?: boolean; godz?: string }
+export interface Ustawienia3D { noc: boolean; pogoda: "slonce" | "deszcz" | "snieg" | "mgla"; widzowie: number; lekka: boolean; derby?: boolean; pusto?: boolean; godz?: string; wieczor?: boolean }
 
 /** Ustawienie slotu: [głębokość od własnej bramki 0–100, pozycja boczna 0–100]. */
 const SLOT_XY: Record<PozycjaSzczegolowa, [number, number]> = {
@@ -63,7 +63,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
     window.addEventListener("pointerup", () => { ciagnie = null; });
     const scena = new THREE.Scene();
     const cam = new THREE.PerspectiveCamera(34, W() / H(), 0.5, 900); cam.position.set(0, 30, SZ / 2 + 52); cam.lookAt(0, 0, 0);
-    const godzMeczu = parseInt((ust.godz ?? "").split(":")[0], 10); const wieczor = !ust.noc && godzMeczu >= 17;
+    const godzMeczu = parseInt((ust.godz ?? "").split(":")[0], 10); const wieczor = ust.wieczor ?? (!ust.noc && godzMeczu >= 17);
     swiatla(scena, ust.noc, ust.pogoda === "mgla", ust.lekka, wieczor);
     const kd = s.kluby[m.dom.klubId], kg = s.kluby[m.gosc.klubId];
     const stad = zbudujStadion(s, kd, { noc: ust.noc, wieczor, snieg: ust.pogoda === "snieg", deszcz: ust.pogoda === "deszcz", widzowie: ust.widzowie, lekka: ust.lekka, budowy: m.dom.klubId === s.mojKlub ? s.budowy : undefined });
@@ -602,7 +602,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
           if (dist > 0.05) { tmp.normalize().multiplyScalar(Math.min(dist, m.koniec || m.karne || murIds.includes(u.id) ? 4 * dt : vmax * Math.max(dt, dtg) * (gra ? 1 : 0.15))); }
           p.g.position.add(tmp);
           const vr = tmp.length() / Math.max(0.001, dt) / Math.max(1, sp);
-          if (tmp.lengthSq() > 1e-5) p.g.rotation.y = Math.atan2(tmp.x, tmp.z); else p.g.rotation.y = Math.atan2(bx - p.g.position.x, bz - p.g.position.z);
+          obrocDo(p.g, tmp.lengthSq() > 1e-5 ? Math.atan2(tmp.x, tmp.z) : Math.atan2(bx - p.g.position.x, bz - p.g.position.z), dt * Math.max(1, sp), 12);
           animuj(p, vr, dt);
           if (murIds.includes(u.id) && murSrodek && dist < 0.6) { p.g.rotation.y = Math.atan2(bx - p.g.position.x, bz - p.g.position.z); p.ramiona[0].rotation.x = -0.5; p.ramiona[1].rotation.x = -0.5; p.ramiona[0].rotation.z = 0.5; p.ramiona[1].rotation.z = -0.5; }
           if (m.koniec && celebracja <= 0 && dist < 0.5) {
@@ -663,7 +663,7 @@ export function Mecz3D({ s, m, wersja, predkosc, kamera, ust, stroje, onKoniecSe
         // sędzia i asystenci
         tmp.set(bx - 7 - sedzia.g.position.x, 0, bz + 6 - sedzia.g.position.z); const ds = tmp.length();
         if (ds > 0.3) sedzia.g.position.add(tmp.normalize().multiplyScalar(Math.min(ds, 8 * Math.max(dt, dtg))));
-        sedzia.g.rotation.y = Math.atan2(bx - sedzia.g.position.x, bz - sedzia.g.position.z); animuj(sedzia, ds > 1 ? 4 : 0, dt);
+        obrocDo(sedzia.g, Math.atan2(bx - sedzia.g.position.x, bz - sedzia.g.position.z), dt, 6); animuj(sedzia, ds > 1 ? 4 : 0, dt);
         // kartka: nowa w meczu → sędzia podnosi ją w górę
         if (m.kartki.length > ostKartek) { const k = m.kartki[m.kartki.length - 1]; (kartka.material as THREE.MeshBasicMaterial).color.set(k.typ === "czerwona" ? 0xe01010 : 0xffd600); kartkaT = 2.2; ostKartek = m.kartki.length; gwizdek(); }
         kartkaT = Math.max(0, kartkaT - dt); kartka.visible = kartkaT > 0;

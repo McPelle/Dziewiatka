@@ -3,7 +3,7 @@
 import * as THREE from "three";
 
 export interface Twarz3D { usta: THREE.Mesh; brwi: [THREE.Mesh, THREE.Mesh]; oczy: [THREE.Mesh, THREE.Mesh]; glowa: THREE.Object3D }
-export interface Postac { twarz?: Twarz3D; g: THREE.Group; uda: [THREE.Object3D, THREE.Object3D]; lydki: [THREE.Object3D, THREE.Object3D]; ramiona: [THREE.Object3D, THREE.Object3D]; tulow: THREE.Object3D; faza: number; poza: "bieg" | "strzal" | "radosc" | "rzut" | "stoi" | "lezy"; pozaT: number }
+export interface Postac { twarz?: Twarz3D; g: THREE.Group; uda: [THREE.Object3D, THREE.Object3D]; lydki: [THREE.Object3D, THREE.Object3D]; ramiona: [THREE.Object3D, THREE.Object3D]; tulow: THREE.Object3D; faza: number; poza: "bieg" | "strzal" | "radosc" | "rzut" | "stoi" | "lezy"; pozaT: number; vS?: number; ostPoza?: string; przejT?: number; snap?: number[] }
 const SKORA = [0xf1c9a5, 0xe8b48c, 0xd29b74, 0xb07a52, 0x7a4e30, 0x4e3220];
 const WLOSY = [0x2b1d12, 0x4a3020, 0x8a6a3a, 0xc9a35a, 0x111111, 0x6b4a2a];
 
@@ -94,18 +94,37 @@ export function stworzPostac(o: { skora?: string; wlosy?: string; lysy?: boolean
   return { twarz, g, uda: [u1, u2], lydki: [k1, k2], ramiona, tulow, faza: (o.seed % 100) / 15, poza: "stoi", pozaT: 0 };
 }
 
-/** Animacja postaci: v = prędkość (m/s), dt = czas klatki. */
-export function animuj(p: Postac, v: number, dt: number) {
+/** Płynny obrót w stronę kąta `cel` (najkrótszą drogą). */
+export function obrocDo(g: THREE.Object3D, cel: number, dt: number, szybkosc = 10) {
+  let d = cel - g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d));
+  g.rotation.y += d * (1 - Math.exp(-dt * szybkosc));
+}
+
+const STAWY = (p: Postac) => [p.uda[0].rotation, p.uda[1].rotation, p.lydki[0].rotation, p.lydki[1].rotation, p.ramiona[0].rotation, p.ramiona[1].rotation, p.tulow.rotation];
+const PRZEJSCIE = 0.18;
+
+/** Animacja postaci: v = prędkość (m/s), dt = czas klatki. Prędkość jest wygładzana, a zmiana pozy (bieg → strzał → radość…)
+ *  przechodzi płynnie (krótkie przenikanie ze starej pozy do nowej), w miejscu — oddech i lekkie przestępowanie. */
+export function animuj(p: Postac, vSur: number, dt: number) {
+  p.vS = (p.vS ?? vSur) + (vSur - (p.vS ?? vSur)) * (1 - Math.exp(-dt * 7)); const v = p.vS;
   p.pozaT = Math.max(0, p.pozaT - dt);
   if (p.pozaT <= 0 && p.poza !== "lezy") p.poza = v > 0.4 ? "bieg" : "stoi";
+  const grupaPozy = p.poza === "stoi" ? "bieg" : p.poza;
+  if (p.ostPoza !== undefined && p.ostPoza !== grupaPozy) { p.snap = STAWY(p).flatMap((r) => [r.x, r.y, r.z]); p.snap.push(p.g.position.y); p.przejT = PRZEJSCIE; }
+  p.ostPoza = grupaPozy;
   const [u1, u2] = p.uda, [k1, k2] = p.lydki, [r1, r2] = p.ramiona;
+  p.tulow.rotation.y = 0;
   if (p.poza === "bieg" || p.poza === "stoi") {
     p.faza += dt * (4 + Math.min(v, 9) * 1.15);
-    const amp = Math.min(1, v / 6) * 0.9;
+    const amp = Math.min(1, v / 6) * 0.9, spok = 1 - Math.min(1, v / 1.2);
     u1.rotation.x = Math.sin(p.faza) * amp; u2.rotation.x = -Math.sin(p.faza) * amp;
-    k1.rotation.x = Math.max(0, -Math.sin(p.faza + 0.6)) * amp * 1.4; k2.rotation.x = Math.max(0, Math.sin(p.faza + 0.6)) * amp * 1.4;
-    r1.rotation.x = -Math.sin(p.faza) * amp * 0.8; r2.rotation.x = Math.sin(p.faza) * amp * 0.8; r1.rotation.z = -0.12; r2.rotation.z = 0.12;
-    p.tulow.rotation.x = Math.min(0.25, v * 0.03); p.g.position.y = Math.abs(Math.sin(p.faza)) * 0.05 * amp; p.tulow.rotation.z = 0;
+    k1.rotation.x = Math.max(0, -Math.sin(p.faza + 0.6)) * amp * 1.4 + 0.06; k2.rotation.x = Math.max(0, Math.sin(p.faza + 0.6)) * amp * 1.4 + 0.06;
+    const oddech = Math.sin(p.faza * 0.38) * spok;
+    r1.rotation.x = -Math.sin(p.faza) * amp * 0.8 + oddech * 0.04; r2.rotation.x = Math.sin(p.faza) * amp * 0.8 + oddech * 0.04;
+    r1.rotation.z = -0.12 - spok * 0.05; r2.rotation.z = 0.12 + spok * 0.05;
+    p.tulow.rotation.x = Math.min(0.25, v * 0.03) + oddech * 0.025; p.tulow.rotation.y = Math.sin(p.faza) * 0.14 * amp;
+    p.tulow.rotation.z = Math.sin(p.faza * 0.19) * 0.03 * spok; // przenoszenie ciężaru w miejscu
+    p.g.position.y = Math.abs(Math.sin(p.faza)) * 0.05 * amp;
   } else if (p.poza === "strzal") {
     const t = 1 - p.pozaT / 0.45; // zamach i uderzenie prawą nogą
     u2.rotation.x = t < 0.5 ? 0.9 * t * 2 : 0.9 - (t - 0.5) * 2 * 2.1; k2.rotation.x = t < 0.5 ? 1.2 : Math.max(0, 1.2 - (t - 0.5) * 4);
@@ -121,6 +140,13 @@ export function animuj(p: Postac, v: number, dt: number) {
     p.g.position.y = Math.sin(t * Math.PI) * 0.5;
   } else if (p.poza === "lezy") {
     p.tulow.rotation.x = -1.45; u1.rotation.x = -0.2; u2.rotation.x = 0.3; p.g.position.y = 0.02;
+  }
+  // przenikanie ze starej pozy (gładka zmiana zamiast skoku)
+  if (p.przejT && p.przejT > 0 && p.snap) {
+    const w0 = 1 - p.przejT / PRZEJSCIE, w = w0 * w0 * (3 - 2 * w0);
+    STAWY(p).forEach((r, i) => { r.x = p.snap![i * 3] + (r.x - p.snap![i * 3]) * w; r.y = p.snap![i * 3 + 1] + (r.y - p.snap![i * 3 + 1]) * w; r.z = p.snap![i * 3 + 2] + (r.z - p.snap![i * 3 + 2]) * w; });
+    p.g.position.y = p.snap[21] + (p.g.position.y - p.snap[21]) * w;
+    p.przejT -= dt;
   }
 }
 

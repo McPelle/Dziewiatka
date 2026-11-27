@@ -46,7 +46,11 @@ function warunki(s: StanGry, domId: string, goscId: string, puchar?: boolean): U
   const wielkiPuchar = !!puchar && s.kluby[goscId].poziom < k.poziom; // gość z wyższej ligi w pucharze — komplet
   const widzowie = pusto ? 0 : wielkiPuchar ? Math.round(k.pojemnosc * 0.97) : Math.round(k.pojemnosc * Math.min(0.95, 0.3 + k.renoma * 0.55));
   const lekka = lekkaGrafika();
-  return { noc, pogoda, widzowie, lekka, derby: !!jestDerby(s, domId, goscId), pusto, godz: gm.godz };
+  // „złota godzina”: ok. 2,5 h przed zachodem słońca w danym miesiącu (Polska, z czasem letnim) — niskie słońce, długie cienie
+  const ZACHOD = [15.9, 16.8, 17.7, 19.6, 20.4, 21.0, 20.9, 20.1, 19.0, 17.9, 16.0, 15.5];
+  const hm = gm.godz.split(":").map(Number), godzF = (hm[0] || 0) + (hm[1] || 0) / 60, zach = ZACHOD[mies - 1];
+  const wieczor = !noc && godzF >= zach - 2.5;
+  return { noc, wieczor, pogoda, widzowie, lekka, derby: !!jestDerby(s, domId, goscId), pusto, godz: gm.godz };
 }
 
 const KLUCZ_LIVE = "dz_mecz_live";
@@ -237,7 +241,7 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
         <View style={[st.wiersz, { justifyContent: "center", gap: 10, paddingVertical: 4, backgroundColor: "#071710" }]}>
           {m.puchar ? <Text style={{ color: K.akcent, fontSize: 11, fontWeight: "800" }}>🏆 {m.puchar.nazwa}</Text> : <LogoLigi nazwa={s.ligi[kd.poziom - 1]?.nazwa ?? ""} poziom={kd.poziom} rozmiar={18} />}
           <Text style={{ color: K.akcent, fontWeight: "900", fontFamily: CZCIONKA }}>{minuta}</Text>
-          <Text style={st.maly}>🕒 {ust.godz} · {ust.noc ? "🌙 pod reflektorami" : "☀️ dzień"} · {{ slonce: "pogodnie", deszcz: "🌧 deszcz", snieg: "❄️ śnieg (pomarańczowa piłka)", mgla: "🌫 mgła" }[ust.pogoda]} · {ust.pusto ? "🚷 puste trybuny (kara ZPN)" : `${ust.widzowie.toLocaleString("pl")} widzów`}{ust.derby ? " · ⚔ DERBY" : ""}</Text>
+          <Text style={st.maly}>🕒 {ust.godz} · {ust.noc ? "🌙 pod reflektorami" : ust.wieczor ? "🌇 zachód słońca" : "☀️ dzień"} · {{ slonce: "pogodnie", deszcz: "🌧 deszcz", snieg: "❄️ śnieg (pomarańczowa piłka)", mgla: "🌫 mgła" }[ust.pogoda]} · {ust.pusto ? "🚷 puste trybuny (kara ZPN)" : `${ust.widzowie.toLocaleString("pl")} widzów`}{ust.derby ? " · ⚔ DERBY" : ""}</Text>
         </View>
         {/* pasek przewagi */}
         <View style={{ flexDirection: "row", height: 4 }}><View style={{ flex: Math.max(0.05, 0.5 + m.momentum * 0.5), backgroundColor: K.akcent }} /><View style={{ flex: Math.max(0.05, 0.5 - m.momentum * 0.5), backgroundColor: K.niebieski }} /></View>
