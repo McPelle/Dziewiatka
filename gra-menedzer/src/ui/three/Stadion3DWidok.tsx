@@ -22,10 +22,13 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
   const [widoczny, setWidoczny] = useState(!tlo);
   const [diag, setDiag] = useState(false);
   const etap = useRef("czeka na start");
+  const info = useRef({ gpu: "?", w: 0, h: 0, klatki: 0, blad: "" });
+  const [, przerysuj] = useState(0);
+  useEffect(() => { if (!tlo) return; const iv = setInterval(() => przerysuj((x) => x + 1), 1500); return () => clearInterval(iv); }, [tlo]);
   useEffect(() => {
     if (!tlo) return;
     const t = setTimeout(() => setStart(true), 700); // bez requestIdleCallback — na iPhonie potrafi nigdy nie zadziałać
-    const diag = setTimeout(() => setDiag(true), 9000);
+    const diag = setTimeout(() => setDiag(true), 6000);
     return () => { clearTimeout(t); clearTimeout(diag); };
   }, [tlo]);
   useEffect(() => {
@@ -36,6 +39,7 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
     let renderer: THREE.WebGLRenderer;
     try { renderer = new THREE.WebGLRenderer({ antialias: !lekka, failIfMajorPerformanceCaveat: false }); } catch (e) { setAwaria("brak WebGL: " + String((e as Error)?.message ?? e).slice(0, 60)); return; }
     let klatki = 0, zEfektami = !lekka;
+    try { const gl = renderer.getContext(); const dbg = gl.getExtension("WEBGL_debug_renderer_info"); info.current.gpu = String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)).slice(0, 28) + (renderer.capabilities.isWebGL2 ? " ·GL2" : " ·GL1"); } catch { /* */ }
     const strata = (e: Event) => { e.preventDefault(); setTimeout(() => setProba((p) => p + 1), 800); }; // iPhone wyłączył grafikę → start od nowa
     renderer.domElement.addEventListener("webglcontextlost", strata);
     const straznik = setTimeout(() => { if (klatki === 0) setAwaria("grafika nie ruszyła w 30 s"); }, 30000);
@@ -78,8 +82,8 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
       cam.position.set(Math.cos(kat + tiltX * 0.25) * r, 18 + wys * r * 0.55 + tiltY * 6, Math.sin(kat + tiltX * 0.25) * r);
       cam.lookAt(0, 2, 0);
       stad.aktualizuj(t, tlo ? 0.15 : 0);
-      try { if (zEfektami) composer.render(dt); else renderer.render(scena, cam); klatki++; if (klatki === 3) etap.current = "OK"; }
-      catch (e) { if (zEfektami) zEfektami = false; else { cancelAnimationFrame(raf); setAwaria("rysowanie: " + String((e as Error)?.message ?? e).slice(0, 60)); } } // bez poświaty, a gdy i to nie działa — 2D
+      try { if (zEfektami) composer.render(dt); else renderer.render(scena, cam); klatki++; info.current.klatki = klatki; info.current.w = renderer.domElement.width; info.current.h = renderer.domElement.height; if (klatki === 3) etap.current = "OK"; }
+      catch (e) { info.current.blad = String((e as Error)?.message ?? e).slice(0, 50); if (zEfektami) zEfektami = false; else { cancelAnimationFrame(raf); setAwaria("rysowanie: " + String((e as Error)?.message ?? e).slice(0, 60)); } } // bez poświaty, a gdy i to nie działa — 2D
     };
     let anulowano = false;
     etap.current = "kompilacja";
@@ -103,7 +107,7 @@ export function Stadion3DWidok({ s, klub, tlo, wysokosc, noc }: { s: StanGry | n
       {/* grafika 3D zawsze w pełni widoczna (Safari na iPhonie nie pokazuje 3D pod przezroczystością) — to rysunek 2D na wierzchu znika */}
       <View ref={host} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 } as any} />
       {!widoczny && <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 } as any}><TloStadion /></View>}
-      {diag && !widoczny && <Text style={{ position: "absolute", left: 6, bottom: 4, color: "rgba(255,255,255,0.6)", fontSize: 9 }}>3D: {etap.current}{start ? "" : " (start=nie)"}</Text>}
+      {diag && <Text style={{ position: "absolute", left: 6, bottom: 4, color: "rgba(255,255,255,0.75)", fontSize: 9, backgroundColor: "rgba(0,0,0,0.45)" }}>3D: {etap.current}{start ? "" : " (start=nie)"} · widać={widoczny ? "tak" : "nie"} · kl={info.current.klatki} · {info.current.w}×{info.current.h} · {info.current.gpu}{info.current.blad ? ` · BŁĄD: ${info.current.blad}` : ""}</Text>}
     </View>
   );
   return <View ref={host} style={{ width: "100%", height: wysokosc ?? 260, borderRadius: 10, overflow: "hidden", backgroundColor: "#0b1226" }} />;
