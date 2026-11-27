@@ -6,6 +6,8 @@ import { rozpocznijKariere } from "../engine/sezon";
 import type { StanGry } from "../engine/types";
 import { Herb } from "./Herb";
 import { HerbGenerowany } from "./HerbGen";
+import { KreatorKlubu } from "./KreatorKlubu";
+import { stworzWlasnyKlub } from "../engine/wlasnyKlub";
 import { CZCIONKA, cien, K, st } from "./styl";
 
 // Barwy oryginalnych herbów lig (wg szczebla) i województw (wg regionu) — własne, nie kopie logo.
@@ -94,7 +96,8 @@ type Widok =
   | { typ: "trzecia" }
   | { typ: "woj"; wi: number }
   | { typ: "wojLevel"; wi: number; label: string; grupy: { nazwa: string; sciezkaId: string; idx: number }[] }
-  | { typ: "kluby"; sciezkaId: string; idx: number; tytul: string; powrot: Widok };
+  | { typ: "kluby"; sciezkaId: string; idx: number; tytul: string; powrot: Widok }
+  | { typ: "kreator"; sciezkaId: string; idx: number; powrot: Widok };
 
 export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
   const [trener, setTrener] = useState("");
@@ -140,6 +143,17 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
     </Pressable>
   );
 
+  // ——— Kreator własnego klubu ———
+  if (widok.typ === "kreator") {
+    const sw = budujSwiat(widok.sciezkaId);
+    return <KreatorKlubu sw={sw} idx={widok.idx} onWstecz={() => setWidok(widok.powrot)} onUtworz={(o) => {
+      sw.trener = trener.trim() || "Trener";
+      const id = stworzWlasnyKlub(sw, o);
+      rozpocznijKariere(sw, id);
+      onStart(sw);
+    }} />;
+  }
+
   // ——— Ekran klubów ———
   if (widok.typ === "kluby") {
     const sw = budujSwiat(widok.sciezkaId);
@@ -148,6 +162,14 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
     return (
       <View style={st.ekran}>
         <Pasek tytul="Wybierz klub" pod={`${widok.tytul} · ${kluby.length} klubów`} onBack={() => setWidok(widok.powrot)} />
+        <Pressable onPress={() => setWidok({ typ: "kreator", sciezkaId: widok.sciezkaId, idx: widok.idx, powrot: widok })}
+          style={({ pressed }) => [st.karta, st.wiersz, { marginTop: 8, paddingVertical: 14, borderColor: K.akcent, borderWidth: 1, opacity: pressed ? 0.85 : 1 }]}>
+          <Text style={{ fontSize: 26, marginRight: 12 }}>🏗</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: K.akcent, fontSize: 15.5, fontWeight: "900", fontFamily: CZCIONKA }}>＋ Stwórz własny klub w tej lidze</Text>
+            <Text style={st.maly}>Nazwa, barwy, herb, stadion, właściciel, budżet — od zera</Text>
+          </View>
+        </Pressable>
         <FlatList
           data={kluby}
           keyExtractor={(id) => id}

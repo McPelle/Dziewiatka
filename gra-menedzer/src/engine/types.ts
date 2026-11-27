@@ -161,6 +161,9 @@ export interface Klub {
   kasa: number;
   zawodnicy: string[];
   prawdziwy: boolean;
+  wlasny?: boolean; // klub stworzony przez gracza
+  barwyWlasne?: [string, string]; // barwy klubu gracza (podstawowa, dodatkowa)
+  pozaPiramida?: boolean; // klub spadł/awansował do ligi swojego regionu poza symulowaną piramidą (gra dalej, ale nie w Twoich ligach)
   pozaLiga?: boolean; // drużyna spoza rozgrywek ligowych (zgłoszona tylko do regionalnego Pucharu Polski)
   opisPozaLiga?: string; // kim jest drużyna spoza lig (orlikowa, firmowa, OSP, oldboje…)
   herb?: string;
@@ -280,7 +283,7 @@ export interface XIKolejki {
 }
 
 export interface Puchar {
-  faza: "regionalny" | "glowny" | "odpadl" | "zdobyty";
+  faza: "regionalny" | "glowny" | "odpadl" | "zdobyty" | "kwalifikacja"; // kwalifikacja = zdobyty PP regionu → 1/32 STS PP w następnym sezonie
   runda: number;
   harmonogram: number[]; // indeksy kolejek, w których gra się rundę
   przeciwnik: string | null;
@@ -366,6 +369,7 @@ export interface StanGry {
   trenerLicencja?: "C" | "B" | "A" | "PRO"; // licencja trenerska UEFA (rośnie z doświadczeniem)
   powodWolny?: "zwolniony" | "wygasl"; // dlaczego trener jest bez klubu
   ofertyTrenera?: { klubId: string; sezon: number; pensja: number; lata?: number; obecny?: boolean }[];
+  kwalifikacjaPP?: number; // sezon, w którym klub gracza (zdobywca PP na szczeblu ZPN) startuje w 1/32 STS Pucharu Polski
   propozycjaTrenera?: { pensja: number; lata: number; rundy: number; status: "otwarta" | "wycofana" | "odrzucona"; ostatniaProsba?: { pensja: number; lata: number } }; // przedłużenie od zarządu (ostatni sezon umowy) // oferty pracy od innych klubów (gdy masz dobre wyniki)
   skauting?: { region: string; kolejkiDo: number }; // aktywna misja skautingowa (region + kolejka zakończenia)
   odkryci?: string[]; // id odkrytych talentów (bezklubowi, obserwowani — watchlista skauta)

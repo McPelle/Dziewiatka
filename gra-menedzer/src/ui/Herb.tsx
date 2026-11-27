@@ -35,5 +35,5 @@ export function Herb({ klub, rozmiar = 28 }: { klub: Klub; rozmiar?: number }) {
   // Brak pliku → oryginalny, proceduralny herb w prawdziwych barwach klubu (patrz HerbGen.tsx).
   const nazwa = nazwaPierwszejDruzyny(klub.nazwa) ?? klub.nazwa; // rezerwy bez pliku — ten sam emblemat co pierwsza drużyna
   const [tlo, akcent] = barwyKlubu(nazwa);
-  return <HerbGenerowany nazwa={nazwa} tlo={tlo} akcent={akcent} rok={rokZalozenia(nazwa)} rozmiar={rozmiar} />;
+  return <HerbGenerowany nazwa={nazwa} tlo={tlo} akcent={akcent} rok={klub.zalozony ?? rokZalozenia(nazwa)} rozmiar={rozmiar} />;
 }

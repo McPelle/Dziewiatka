@@ -1,5 +1,6 @@
 import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj";
 import { AFILIACJE, PRZYJAZNIE } from "../data/derby";
+import { klubyLigiZDanych, rodzenstwo, trafiaDo } from "./regiony";
 import { autoSklad, raportAsystenta, dostepny, FORMACJE, ileSpozaUE, limitSpozaUE, zagrajMecz } from "./mecz";
 import { pogodaMeczu, gorskie } from "./pogoda";
 import { rozwinAtrybuty } from "./atrybuty";
@@ -15,7 +16,7 @@ import { oknoTransferowe, type InfoOkna } from "./kalendarz";
 import { odlegloscDrogowa } from "../data/miasta";
 import { odswiezRynekTestow, rozwojTestow, sprzatnijRynekTestow } from "./testy";
 import {
-  BILET, celSezonu, dlugoscKontraktu, KADRA, kontraktTyp, ligaKlubu, losujAgenta, maAgenta, nadajNumery, NAZWA_KONTRAKTU, nowyZawodnik, pensjaDla,
+  BILET, noweId, celSezonu, dlugoscKontraktu, KADRA, kontraktTyp, ligaKlubu, losujAgenta, maAgenta, nadajNumery, NAZWA_KONTRAKTU, nowyZawodnik, pensjaDla,
   jestMlodziezowcem, naliczSezonDoKariery, przejscieDoKlubu, PREMIA_AWANS, polaczRezerwy, silaKlubu, SPONSOR_SEZON, tabelaLigi, terminarz, uzupelnijWolnych, wartosc, WIDZOWIE, wpisKarieryOtwarty, wymogMlodziezowca, zakresUmiej,
 } from "./swiat";
 
@@ -163,7 +164,7 @@ function ofertyPoWygasnieciu(s: StanGry) {
   }
   const dorobek = (s.trenerKariera ?? []).reduce((a, w) => a + w.tytuly + w.awanse, 0);
   const gora = dorobek >= 2 ? 2 : dorobek >= 1 || s.zarzad >= 60 ? 1 : 0;
-  const kand = Object.values(s.kluby).filter((k) => !k.pozaLiga && !k.rezerwaDla && k.id !== obecny.id
+  const kand = Object.values(s.kluby).filter((k) => !k.pozaLiga && !k.pozaPiramida && !k.rezerwaDla && k.id !== obecny.id
     && k.poziom >= Math.max(1, obecny.poziom - gora) && k.poziom <= Math.min(s.ligi.length, obecny.poziom + 1));
   for (const k of tasuj(kand).slice(0, losInt(2, 5))) {
     lista.push({ klubId: k.id, sezon: s.sezon, pensja: wartoscKontraktuTrenera(k.poziom, k.renoma), lata: losInt(1, 3) });
@@ -1160,7 +1161,7 @@ function tydzien(s: StanGry) {
   // Deadline day: w ostatniej kolejce otwartego okna ofert jest więcej (gorączka transferowa).
   const deadline = oknoOtwarte(s) && !oknoTransferowe(s.sezon, ileKolejek(s), s.kolejka + 1, false, moj.poziom).otwarte;
   if (oknoOtwarte(s) && moj.zawodnicy.length > 14) {
-    const kupcyZa = (z: Zawodnik) => Object.values(s.kluby).filter((k) => !k.pozaLiga && k.id !== moj.id && k.poziom <= moj.poziom + 1 && k.poziom >= moj.poziom - 2 && k.zawodnicy.length < 25);
+    const kupcyZa = (z: Zawodnik) => Object.values(s.kluby).filter((k) => !k.pozaLiga && !k.pozaPiramida && k.id !== moj.id && k.poziom <= moj.poziom + 1 && k.poziom >= moj.poziom - 2 && k.zawodnicy.length < 25);
     // 1) Wystawieni na sprzedaż — oferty tym chętniej, im rozsądniejsza cena wywoławcza.
     const wystawieni = moj.zawodnicy.map((id) => s.zawodnicy[id]).filter((z) => (z.wystawiony ?? 0) > 0 && !z.macierzysty);
     for (const z of wystawieni) {
@@ -1186,7 +1187,7 @@ function tydzien(s: StanGry) {
       if (!z || z.macierzysty || z.kontraktTyp === "amator" || (z.wystawiony ?? 0) > 0 || s.oferty.some((o) => o.zawodnikId === z.id)) continue;
       if (moj.poziom <= 1 || z.umiej < zakresUmiej(moj.poziom - 1)[0] + 2) continue; // gra na poziomie wyższej ligi
       if (!szansa(deadline ? 0.25 : 0.1)) continue;
-      const kupcy = Object.values(s.kluby).filter((k) => !k.pozaLiga && k.id !== moj.id && k.poziom < moj.poziom && k.poziom >= moj.poziom - 3 && k.zawodnicy.length < 28);
+      const kupcy = Object.values(s.kluby).filter((k) => !k.pozaLiga && !k.pozaPiramida && k.id !== moj.id && k.poziom < moj.poziom && k.poziom >= moj.poziom - 3 && k.zawodnicy.length < 28);
       if (!kupcy.length) continue;
       const kupiec = wybierzWazone(kupcy, (k) => wagaBliskosci(s, moj, k) * (1 + k.renoma));
       const baza = wartosc(z);
@@ -1199,7 +1200,7 @@ function tydzien(s: StanGry) {
     if (szansa(deadline ? 0.4 : 0.18)) {
       const z = s.zawodnicy[wybierz(moj.zawodnicy)];
       if (!(z.wystawiony ?? 0) && !z.macierzysty && !s.oferty.some((o) => o.zawodnikId === z.id)) {
-        const kupcy = Object.values(s.kluby).filter((k) => !k.pozaLiga && k.id !== moj.id && k.poziom <= moj.poziom && k.poziom >= moj.poziom - 2);
+        const kupcy = Object.values(s.kluby).filter((k) => !k.pozaLiga && !k.pozaPiramida && k.id !== moj.id && k.poziom <= moj.poziom && k.poziom >= moj.poziom - 2);
         if (kupcy.length) {
           const kupiec = wybierzWazone(kupcy, (k) => wagaBliskosci(s, moj, k) * wieziRynkowe(moj.nazwa, k.nazwa));
           const kwota = Math.round((wartosc(z) * los(0.7, 1.3) * (deadline ? 1.1 : 1)) / 100) * 100;
@@ -1217,7 +1218,7 @@ function tydzien(s: StanGry) {
     if (zKl.length) {
       const zz = s.zawodnicy[wybierz(zKl.map((z) => z.id))];
       const kwota = zz.klauzula!;
-      const kupcy = Object.values(s.kluby).filter((k) => !k.pozaLiga && k.id !== moj.id && k.kasa >= kwota && (k.poziom < moj.poziom || (k.poziom === moj.poziom && k.renoma > moj.renoma + 0.04)));
+      const kupcy = Object.values(s.kluby).filter((k) => !k.pozaLiga && !k.pozaPiramida && k.id !== moj.id && k.kasa >= kwota && (k.poziom < moj.poziom || (k.poziom === moj.poziom && k.renoma > moj.renoma + 0.04)));
       if (kupcy.length) {
         const kupiec = kupcy.sort((a, b) => a.poziom - b.poziom || b.renoma - a.renoma)[0];
         const chce = kupiec.poziom < moj.poziom || kupiec.renoma > moj.renoma + 0.06 || zz.morale < 45;
@@ -1365,6 +1366,59 @@ export function aktualizujTypyKontraktow(s: StanGry) {
   if (ileMoich) wiadomosc(s, `📝 Awans = nowe realia: ${ileMoich} zawodników przeszło na kontrakt: ${NAZWA_KONTRAKTU[kontraktTyp(s.kluby[s.mojKlub].poziom)]} (zgodnie z przepisami PZPN dla szczebla). Pensje wzrosły łącznie o ${zl(wzrostPensji)}/kolejkę — zawodnicy mają teraz kwotę transferową i można ich sprzedawać za pieniądze.`);
 }
 
+/** Czy liga to klasa okręgowa / A / B / C (liczba drużyn zmienia się co sezon; IV liga i wyżej — stała, regulaminowa). */
+function klasaZmienna(nazwa: string): boolean { return /klasa (a|b|c)\b/i.test(nazwa) && !/okręgow/i.test(nazwa); }
+/** Mistrzowie grup-rodzeństwa (spoza symulowanej piramidy) awansujący do ligi poziomu i (np. mistrz IV ligi innego województwa).
+ *  Klub z danych wraca do gry (albo zostaje utworzony) z kadrą na poziomie ligi. */
+function awanseZRodzenstwa(s: StanGry, i: number, n: number): string[] {
+  const nazwaG = s.ligi[i].nazwa, nazwaD = s.ligi[i + 1].nazwa;
+  const out: string[] = [];
+  const wGrze = new Set(s.ligi.flatMap((l) => l.kluby).map((id) => s.kluby[id]?.nazwa));
+  for (const grupa of rodzenstwo(nazwaG, nazwaD)) {
+    const dane = klubyLigiZDanych(grupa).filter((d) => !wGrze.has(d.nazwa) && !/\s(II|III|IV)(\s|$)/.test(d.nazwa));
+    for (const d of tasuj(dane).slice(0, Math.max(1, Math.min(n, 1)))) {
+      const id = wprowadzKlub(s, d, i + 2);
+      out.push(id); wGrze.add(d.nazwa);
+    }
+  }
+  return out;
+}
+/** Wprowadza do piramidy klub z danych (reaktywuje go, jeśli wcześniej z niej wypadł). Kadra generowana na poziomie `poziom`. */
+function wprowadzKlub(s: StanGry, d: { nazwa: string; skrot: string; miasto: string; herb?: string; stadion?: string; adres?: string }, poziom: number): string {
+  const stary = Object.values(s.kluby).find((k) => k.nazwa === d.nazwa && k.pozaPiramida);
+  if (stary) { stary.pozaPiramida = false; stary.poziom = poziom; return stary.id; }
+  const wzor = Object.values(s.kluby).find((k) => k.poziom === poziom && !k.pozaLiga) ?? s.kluby[s.mojKlub];
+  const id = noweId(s, "k");
+  const k: Klub = { ...wzor, id, nazwa: d.nazwa, skrot: d.skrot, miasto: d.miasto, herb: d.herb, poziom, zawodnicy: [], prawdziwy: true,
+    rezerwaId: undefined, rezerwaDla: undefined, pozaLiga: false, pozaPiramida: false, renoma: Math.max(0.1, wzor.renoma * 0.9),
+    stadion: d.stadion ?? `Stadion w ${d.miasto}`, adres: d.adres, obiekty: { gastronomia: 0, parking: 0, sklep: 0 }, juniorzy: [], historia: undefined } as Klub;
+  s.kluby[id] = k;
+  for (const poz of KADRA) { const z = nowyZawodnik(s, poziom, poz); z.klubId = id; k.zawodnicy.push(z.id); }
+  nadajNumery(s, k);
+  return id;
+}
+/** Klub opuszcza symulowaną piramidę (gra dalej w lidze swojego regionu, której gra nie rozgrywa). Zostaje w świecie (zawodnicy, historia). */
+function opuscPiramide(s: StanGry, id: string) {
+  const k = s.kluby[id];
+  if (!k || id === s.mojKlub) return;
+  k.pozaPiramida = true;
+  s.oferty = s.oferty.filter((o) => o.klubId !== id);
+}
+/** Nowe zgłoszenia do najniższej ligi: kluby z grup tej samej klasy w regionie (z danych), których nie ma w grze. */
+function uzupelnijNajnizsza(s: StanGry, ost: number, ile: number): string[] {
+  const nazwa = s.ligi[ost].nazwa;
+  const wGrze = new Set(s.ligi.flatMap((l) => l.kluby).map((id) => s.kluby[id]?.nazwa));
+  const kandydaci = [...klubyLigiZDanych(nazwa), ...(s.ligi[ost - 1] ? rodzenstwo(s.ligi[ost - 1].nazwa, nazwa).flatMap((g) => klubyLigiZDanych(g)) : [])]
+    .filter((d) => !wGrze.has(d.nazwa) && trafiaDo(d, s.ligi[ost - 1]?.nazwa ?? nazwa, nazwa));
+  const out: string[] = [];
+  for (const d of tasuj(kandydaci).slice(0, ile)) out.push(wprowadzKlub(s, d, ost + 1));
+  while (out.length < ile) {
+    const miasto = s.kluby[s.ligi[ost].kluby[out.length % s.ligi[ost].kluby.length]]?.miasto ?? "Gmina";
+    out.push(wprowadzKlub(s, { nazwa: `${wybierz(RDZEN_AMATOR)} ${miasto}`, skrot: "NOW", miasto }, ost + 1));
+  }
+  return out;
+}
+
 export function nowySezon(s: StanGry) {
   // dogranie pozostałych kolejek w dłuższych ligach
   const max = Math.max(...s.ligi.map((l) => l.terminarz.length));
@@ -1402,6 +1456,13 @@ export function nowySezon(s: StanGry) {
     }
   }
   const nowe: string[][] = tabele.map((t) => [...t]);
+  // ——— Awanse i spadki z zachowaniem REGIONÓW (PZPN/ZPN) ———
+  // Spadkowicz trafia tylko do ligi swojego województwa / podokręgu. Kto spada „do innego regionu", opuszcza
+  // symulowaną piramidę (gra dalej w swojej lidze, poza Twoją ścieżką). Liczba spadających z ligi zależy od tego,
+  // ilu klubów z jej regionu spadło z góry (jak „spadek zależny" w regulaminach ZPN), więc rozmiary lig się nie zmieniają.
+  const zGory: string[][] = s.ligi.map(() => []);   // przybyli z wyższej ligi (zgodni regionalnie)
+  const wGore: string[][] = s.ligi.map(() => []);   // awansowali z danej ligi wyżej
+  const wychodza: string[] = [];                    // opuszczają symulowaną piramidę
   for (let i = 0; i < s.ligi.length - 1; i++) {
     const n = s.wymiana[i];
     const gorna = tabele[i];      // wyższa liga (spadki)
@@ -1415,18 +1476,55 @@ export function nowySezon(s: StanGry) {
     const directUp = n - b;
     const strefaAwans = b > 0 ? dolnaE.slice(directUp, directUp + 4 * b) : [];
     const awansBaraz = b > 0 ? baraz(s, strefaAwans, b, "awans") : [];
-    const awansuja = [...dolnaE.slice(0, directUp), ...awansBaraz];
-    // Spadek: (n-rb) bezpośrednio z dołu + rb przegranych baraż o utrzymanie.
-    const directDown = n - rb;
-    const strefaUtrzym = rb > 0 ? gorna.slice(gorna.length - directDown - 2 * rb, gorna.length - directDown) : [];
-    const utrzymani = rb > 0 ? baraz(s, strefaUtrzym, rb, "utrzymanie") : [];
+    let awansuja = [...dolnaE.slice(0, directUp), ...awansBaraz];
+    // Wycofania z rozgrywek (problemy finansowe) — amatorskie szczeble (V liga i niżej). W ligach o stałej liczbie drużyn
+    // (do V ligi i klas okręgowych) lukę wypełnia KOLEJNA drużyna z tabeli niższej ligi tego okręgu (dodatkowy awans);
+    // w klasach A/B/C grupa po prostu się zmniejsza.
+    const wycofani = i + 1 >= 6 ? gorna.filter((id) => id !== s.mojKlub && !s.kluby[id]?.rezerwaDla && !wGore[i].includes(id) && szansa(0.008 + (1 - (s.kluby[id]?.renoma ?? 0.5)) * 0.012)).slice(0, 1) : [];
+    for (const id of wycofani) {
+      const k = s.kluby[id];
+      nowe[i] = nowe[i].filter((x) => x !== id);
+      wychodza.push(id);
+      if (!klasaZmienna(s.ligi[i].nazwa)) {
+        const kolejny = dolnaE.find((x) => !awansuja.includes(x));
+        if (kolejny) {
+          awansuja = [...awansuja, kolejny];
+          wiadomosc(s, `📉 ${k.nazwa} wycofał się z ${s.ligi[i].nazwa} (problemy finansowe). Na jego miejsce awansuje kolejna drużyna z ${s.ligi[i + 1].nazwa}: ${s.kluby[kolejny].nazwa} (${dolna.indexOf(kolejny) + 1}. miejsce).`);
+        }
+      } else wiadomosc(s, `📉 ${k.nazwa} wycofał się z rozgrywek ${s.ligi[i].nazwa} (problemy finansowe) — grupa w nowym sezonie będzie mniejsza.`);
+    }
+    const ileWycofanych = wycofani.length;
+    wGore[i + 1] = awansuja;
+    // Awanse z grup-rodzeństwa (spoza Twojej piramidy, np. mistrz IV ligi innego województwa grupy III ligi).
+    const wirtualni = awanseZRodzenstwa(s, i, n);
+    // Ilu musi spaść, by liga zachowała rozmiar: przybywają awansujący + zgodni regionalnie z góry, ubywają awansujący wyżej.
+    let ileSpada = Math.max(0, Math.min(gorna.length - 2, awansuja.length + wirtualni.length + zGory[i].length - wGore[i].length - (klasaZmienna(s.ligi[i].nazwa) ? 0 : ileWycofanych)));
+    // Klasy okręgowe/A/B/C: liczebność grup realnie waha się co sezon (wycofania, nowe zgłoszenia, spadki zależne) — ±1.
+    if (klasaZmienna(s.ligi[i].nazwa)) {
+      const d = szansa(0.3) ? (szansa(0.5) ? 1 : -1) : 0;
+      const poRoz = gorna.length - (ileSpada + d) + awansuja.length + wirtualni.length + zGory[i].length - wGore[i].length;
+      if (poRoz >= 10 && poRoz <= 18 && ileSpada + d >= 0) ileSpada += d;
+    }
+    const rbE = Math.min(rb, Math.max(0, ileSpada - 0));
+    const directDown = Math.max(0, ileSpada - rbE);
+    const kandydaci = gorna.filter((id) => !wGore[i].includes(id) && !wycofani.includes(id));
+    const strefaUtrzym = rbE > 0 ? kandydaci.slice(kandydaci.length - directDown - 2 * rbE, kandydaci.length - directDown) : [];
+    const utrzymani = rbE > 0 ? baraz(s, strefaUtrzym, rbE, "utrzymanie") : [];
     const spadekBaraz = strefaUtrzym.filter((id) => !utrzymani.includes(id));
-    const spadaja = [...gorna.slice(gorna.length - directDown), ...spadekBaraz];
+    const spadaja = [...kandydaci.slice(kandydaci.length - directDown), ...spadekBaraz];
     if (s.mojKlub && awansBaraz.includes(s.mojKlub)) wiadomosc(s, "🎉 Awans przez baraże!");
     if (s.mojKlub && spadekBaraz.includes(s.mojKlub)) wiadomosc(s, "💔 Spadek po przegranym barażu o utrzymanie.");
-    nowe[i] = nowe[i].filter((id) => !spadaja.includes(id)).concat(awansuja);
-    nowe[i + 1] = nowe[i + 1].filter((id) => !awansuja.includes(id)).concat(spadaja);
-    for (const id of awansuja) {
+    // Podział spadkowiczów: do Twojej ligi niżej tylko ci z tego regionu; reszta — do swoich lig (poza symulacją).
+    const nazwaG = s.ligi[i].nazwa, nazwaD = s.ligi[i + 1].nazwa;
+    const doDolnej: string[] = [];
+    for (const id of spadaja) {
+      if (id === s.mojKlub || trafiaDo(s.kluby[id], nazwaG, nazwaD)) doDolnej.push(id);
+      else wychodza.push(id);
+    }
+    zGory[i + 1] = doDolnej;
+    nowe[i] = nowe[i].filter((id) => !spadaja.includes(id)).concat(awansuja, wirtualni);
+    nowe[i + 1] = nowe[i + 1].filter((id) => !awansuja.includes(id)).concat(doDolnej);
+    for (const id of [...awansuja, ...wirtualni]) {
       const k = s.kluby[id];
       k.poziom = i + 1;
       k.renoma = Math.min(1, k.renoma + 0.1);
@@ -1438,14 +1536,29 @@ export function nowySezon(s: StanGry) {
       // Historyczny prestiż jest podłogą — wielkie marki po spadku nie tracą całej renomy (kibice/marka trwają).
       s.kluby[id].renoma = Math.max(0.1, prestizKlubu(s.kluby[id].nazwa), s.kluby[id].renoma - 0.1);
     }
+    const obcy = spadaja.filter((id) => !doDolnej.includes(id));
+    if (obcy.length && s.kluby[s.mojKlub].poziom >= i + 1 && s.kluby[s.mojKlub].poziom <= i + 2)
+      wiadomosc(s, `🗺 Spadek z ${nazwaG}: ${obcy.map((id) => s.kluby[id].nazwa).join(", ")} — trafiają do lig swoich województw/podokręgów (nie do ${nazwaD}).`);
   }
+  // Najniższa liga: po awansach uzupełniamy ją nowymi zgłoszeniami z regionu (nowe kluby / spadkowicze z klasy C),
+  // a nadmiar (gdy z góry przybyło więcej) — spada do klasy C (poza symulacją).
+  {
+    const ost = s.ligi.length - 1;
+    let docel = tabele[ost].length;
+    if (klasaZmienna(s.ligi[ost].nazwa) && szansa(0.4)) docel = Math.max(8, Math.min(16, docel + (szansa(0.5) ? 1 : -1))); // nowe zgłoszenia / wycofania
+    let lista = nowe[ost].filter((id) => !wGore[ost].includes(id));
+    while (lista.length > docel) { const id = lista[lista.length - 1]; if (id === s.mojKlub) break; lista = lista.slice(0, -1); wychodza.push(id); }
+    if (lista.length < docel) lista = lista.concat(uzupelnijNajnizsza(s, ost, docel - lista.length));
+    nowe[ost] = lista;
+  }
+  for (const id of wychodza) opuscPiramide(s, id);
   aktualizujTypyKontraktow(s); // awans: amatorzy → półprofesjonaliści → zawodowcy (wg szczebla, PZPN)
   const nowyPoziom = s.kluby[s.mojKlub].poziom;
   const stara = s.ligi[mojPoziom - 1].nazwa;
   const wynik = mojPoziom === 1 && mojeMiejsce === 1 ? "mistrz" : nowyPoziom < mojPoziom ? "awans" : nowyPoziom > mojPoziom ? "spadek" : "utrzymanie";
   if (nowyPoziom < mojPoziom) sprawdzLicencje(s); // awans → wymogi licencyjne na wyższy szczebel
   const mojaNazwa = s.kluby[s.mojKlub].nazwa;
-  const pucharWynik = s.puchar?.zdobywcaGlowny === mojaNazwa ? "glowny" : s.puchar?.zdobywcaRegion === mojaNazwa ? "region" : undefined;
+  const pucharWynik = s.puchar?.zdobywcaGlowny === s.mojKlub || s.puchar?.zdobywcaGlowny === mojaNazwa ? "glowny" : s.puchar?.zdobywcaRegion === s.mojKlub || s.puchar?.zdobywcaRegion === mojaNazwa ? "region" : undefined;
   const moiLaury: string[] = [];
   const wpisHist: Historia = { sezon: s.sezon, liga: stara, miejsce: mojeMiejsce, wynik, puchar: pucharWynik, wyroznienia: moiLaury };
   s.historia.push(wpisHist);
@@ -1470,7 +1583,7 @@ export function nowySezon(s: StanGry) {
       const mojaRen = s.kluby[s.mojKlub].renoma;
       // kandydaci: wyższa liga (niższy poziom) albo ta sama liga, ale wyraźnie większy klub
       const kand = Object.values(s.kluby)
-        .filter((k) => k.id !== s.mojKlub && !k.rezerwaDla && !k.pozaLiga && (k.poziom < nowyPoziom || (k.poziom === nowyPoziom && k.renoma > mojaRen + 0.08)))
+        .filter((k) => k.id !== s.mojKlub && !k.rezerwaDla && !k.pozaLiga && !k.pozaPiramida && (k.poziom < nowyPoziom || (k.poziom === nowyPoziom && k.renoma > mojaRen + 0.08)))
         .sort((a, b) => a.poziom - b.poziom || b.renoma - a.renoma);
       const ile = (wynik === "mistrz" || pucharWynik) ? 2 : 1;
       for (const k of kand.slice(0, ile)) {
@@ -1856,7 +1969,7 @@ export function nowySezon(s: StanGry) {
   s.xiHistoria = [];
   s.xiKolejki = undefined;
   s.ostatnieOceny = undefined;
-  wycofanieKlubow(s); // bankructwa amatorów — nowe kluby w ich miejsce
+  // (wycofania klubów rozstrzygane są przy awansach/spadkach — patrz nowySezon: dodatkowy awans z niższej ligi)
   zakonczWypozyczenia(s);
   wygasanieKontraktow(s);
   uzupelnijWolnych(s);
@@ -2743,7 +2856,7 @@ export function wypozyczNaZewnatrz(s: StanGry, zawodnikId: string): string | nul
   if (z.macierzysty) return "Tego zawodnika sam masz na wypożyczeniu — nie możesz go podnająć.";
   if (moj.zawodnicy.length <= 15) return "Za mała kadra, żeby wypożyczać (min 15).";
   // Klub docelowy: najchętniej mniejszy (niższa liga), z miejscem w kadrze.
-  const kandydaci = Object.values(s.kluby).filter((k) => !k.pozaLiga && k.id !== moj.id && k.zawodnicy.length < 24);
+  const kandydaci = Object.values(s.kluby).filter((k) => !k.pozaLiga && !k.pozaPiramida && k.id !== moj.id && k.zawodnicy.length < 24);
   const cel = kandydaci.filter((k) => k.poziom > moj.poziom).sort((a, b) => a.poziom - b.poziom)[0]
     ?? kandydaci.filter((k) => k.poziom >= moj.poziom).sort((a, b) => a.poziom - b.poziom)[0]
     ?? kandydaci[0];

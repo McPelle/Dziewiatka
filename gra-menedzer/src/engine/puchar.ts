@@ -5,6 +5,7 @@ import { frekwencja } from "./derby";
 import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj";
 import { autoSklad, zagrajMecz } from "./mecz";
 import { BILET, nadajNumery, noweId, nowyZawodnik } from "./swiat";
+import { wojKlubu } from "./regiony";
 import { odlegloscDrogowa } from "../data/miasta";
 import type { Puchar, StanGry, Wynik } from "./types";
 
@@ -56,50 +57,61 @@ export function okregKujawski(s: StanGry): string {
 export function wejscieDoPucharu(s: StanGry, klubId: string): number {
   const k = s.kluby[klubId];
   if (k.pozaLiga) return 0;
+  if (k.poziom <= 4) return 4; // III liga — dołącza na końcu fazy okręgowej
   const n = (s.ligi[k.poziom - 1]?.nazwa ?? "").toLowerCase();
   if (/klasa (b|c)/.test(n)) return 0;
   if (/klasa a/.test(n)) return 1;
   if (/okręgow|v liga/.test(n) && !/iv liga/.test(n)) return 2;
   return 3;
 }
-/** Rundy wstępne pucharu regionalnego (przed fazą okręgową) — liczba zależy od tego, jak nisko gra klub gracza. */
-const RUNDY_WSTEPNE = ["Runda wstępna Pucharu Polski (klasy B i C)", "I runda Pucharu Polski — wchodzą kluby klasy A", "II runda Pucharu Polski — wchodzą klasa okręgowa i V liga"];
+/** Faza okręgowa/podokręgowa (regulaminy ZPN 2026/27): klasa B + drużyny spoza lig zaczynają, wyższe klasy dochodzą później,
+ *  III liga wchodzi na koniec etapu. Liczba rund zależy od tego, jak nisko gra klub gracza. */
+const RUNDY_OKREGOWE = ["I runda (klasa B, drużyny spoza lig)", "II runda — wchodzi klasa A", "III runda — wchodzą klasa okręgowa i V liga", "IV runda — wchodzi IV liga", "Finał etapu okręgowego — wchodzi III liga"];
 function wstepneDla(s: StanGry): string[] {
   const w = wejscieDoPucharu(s, s.mojKlub);
-  return RUNDY_WSTEPNE.slice(Math.min(w, 3));
+  const ok = okregPomorski(s) || okregMalopolski(s) || okregKujawski(s);
+  return RUNDY_OKREGOWE.slice(Math.min(w, 4)).map((r) => (ok ? `${r} — okręg ${ok}` : r));
 }
-/** Ile rund wstępnych ma przed sobą klub gracza (do przesunięcia numeracji). */
+/** Ile rund fazy okręgowej ma przed sobą klub gracza. */
 export function ileWstepnych(s: StanGry): number { return wstepneDla(s).length; }
 
 export function nazwyRegion(s: StanGry): string[] {
   return [...wstepneDla(s), ...nazwyRegionGlowne(s)];
 }
-function nazwyRegionGlowne(s: StanGry): string[] {
-  const okP = okregPomorski(s);
-  if (okP) return [
-    `Ćwierćfinał Pucharu Polski — okręg ${okP}`,
-    `Półfinał Pucharu Polski — okręg ${okP}`,
-    `Finał okręgu ${okP} (Puchar Polski)`,
-    `Finał wojewódzki — Puchar Polski Pomorskiego ZPN`,
-  ];
-  const okM = okregMalopolski(s);
-  if (okM) return [
-    `Ćwierćfinał Pucharu Polski — okręg ${okM}`,
-    `Półfinał Pucharu Polski — okręg ${okM}`,
-    `Finał okręgu ${okM} (Puchar Polski)`,
-    `Finał wojewódzki — Puchar Polski Małopolskiego ZPN`,
-  ];
-  const okK = okregKujawski(s);
-  if (okK) return [
-    `Ćwierćfinał Pucharu Polski — podokręg ${okK}`,
-    `Półfinał Pucharu Polski — podokręg ${okK}`,
-    `Finał podokręgu ${okK} (Puchar Polski)`,
-    `Finał wojewódzki — Puchar Polski Kujawsko-Pomorskiego ZPN`,
-  ];
-  const g = pucharRegion(s).gen;
-  return [`1/8 ${g}`, `Ćwierćfinał ${g}`, `Półfinał ${g}`, `Finał ${g}`];
+/** Związek (do regulaminów). */
+function zwiazek(s: StanGry): "MZPN" | "POM" | "ZZPN" | "KP" | "?" {
+  const r = s.sciezka || "";
+  if (r.includes("Zachodniopomor")) return "ZZPN";
+  if (r.includes("Kujawsko")) return "KP";
+  if (r.includes("Pomorsk")) return "POM";
+  if (r.includes("Małopol")) return "MZPN";
+  return "?";
 }
-const POZIOM_ZAWODOWY = 4;
+/** Czy przy remisie gra się dogrywkę (2×15), czy od razu rzuty karne — wg regulaminu danego ZPN. */
+export function dogrywkaWRundzie(s: StanGry, runda: number): boolean {
+  const n = nazwyRegion(s).length, w = ileWstepnych(s);
+  const final = runda === n - 1, etap2 = runda >= w;
+  switch (zwiazek(s)) {
+    case "POM": return true;          // Pomorski ZPN: dogrywka i karne w każdym meczu
+    case "KP": return etap2;          // K-PZPN: od 1/8 dogrywka, wcześniej od razu karne
+    case "MZPN": case "ZZPN": return final; // MZPN, ZZPN: od razu karne, dogrywka tylko w finale
+    default: return final;
+  }
+}
+function nazwyRegionGlowne(s: StanGry): string[] {
+  const z = { MZPN: "Małopolskiego ZPN", POM: "Pomorskiego ZPN", ZZPN: "Zachodniopomorskiego ZPN", KP: "Kujawsko-Pomorskiego ZPN", "?": "ZPN" }[zwiazek(s)];
+  return [`1/8 finału Pucharu Polski ${z}`, `Ćwierćfinał Pucharu Polski ${z}`, `Półfinał Pucharu Polski ${z}`, `Finał Pucharu Polski ${z}`];
+}
+const POZIOM_ZAWODOWY = 3;
+/** Czy klub należy do województwa ZPN gracza (PP na szczeblu ZPN — tylko kluby tego związku; III liga ma kluby z 4 województw). */
+function wRegionie(s: StanGry, id: string): boolean {
+  const k = s.kluby[id];
+  if (!k || k.pozaPiramida) return false;
+  if (k.pozaLiga) return true;
+  const mojW = wojKlubu(s.kluby[s.mojKlub]);
+  const w = wojKlubu(k);
+  return !mojW || !w || w === mojW;
+} // Ekstraklasa, I i II liga — tylko szczebel centralny; III liga i niżej grają PP na szczeblu ZPN (regulaminy 2026/27)
 /** Zespół rezerw (PZPN: rezerwy nie startują w Pucharze Polski) — po polu rezerwaDla albo po nazwie („II", „III"). */
 export function jestRezerwa(s: StanGry, id: string): boolean {
   const k = s.kluby[id];
@@ -111,13 +123,13 @@ export const NAZWY_GLOWNY = ["1/32 STS Pucharu Polski", "1/16 STS Pucharu Polski
 
 /** Pełna drabinka (lista rund) Twojej drogi w pucharze — amator gra regionalny + główny, zawodowiec tylko główny. */
 export function pelnaDrabinka(s: StanGry): string[] {
-  const amator = s.kluby[s.mojKlub] && s.kluby[s.mojKlub].poziom > POZIOM_ZAWODOWY;
-  return amator ? [...nazwyRegion(s), ...NAZWY_GLOWNY] : [...NAZWY_GLOWNY];
+  const amator = s.kluby[s.mojKlub] && s.kluby[s.mojKlub].poziom > POZIOM_ZAWODOWY && s.kwalifikacjaPP !== s.sezon;
+  return amator ? [...nazwyRegion(s)] : [...NAZWY_GLOWNY];
 }
 
 // Nagrody za rundę (zł) — rosną z fazą. Indeks = numer rundy.
 const NAGRODA_REGION_GL = [1_000, 2_000, 4_000, 10_000];
-const nagrodaRegion = (s: StanGry, r: number) => { const w = ileWstepnych(s); return r < w ? [300, 500, 700][r] ?? 500 : NAGRODA_REGION_GL[Math.min(r - w, 3)]; };
+const nagrodaRegion = (s: StanGry, r: number) => { const w = ileWstepnych(s); return r < w ? [300, 500, 700, 1000, 1500][r] ?? 500 : NAGRODA_REGION_GL[Math.min(r - w, 3)]; };
 const NAGRODA_GLOWNY = [20_000, 50_000, 120_000, 300_000, 700_000, 2_000_000];
 
 // Drużyny spoza lig — w realiach ZPN do Pucharu Polski na szczeblu wojewódzkim może zgłosić się zespół, który nie gra
@@ -170,8 +182,9 @@ function druzynyPozaLiga(s: StanGry): string[] {
 
 export function nowyPuchar(s: StanGry): Puchar {
   const poziom = s.kluby[s.mojKlub].poziom;
+  const kwal = s.kwalifikacjaPP === s.sezon; // zdobywca PP ZPN z zeszłego sezonu → od razu 1/32 STS PP
   const pozaLiga = poziom > POZIOM_ZAWODOWY ? druzynyPozaLiga(s) : [];
-  const zawodowy = poziom <= POZIOM_ZAWODOWY;
+  const zawodowy = poziom <= POZIOM_ZAWODOWY || kwal;
   // Rundy pucharowe rozłożone na sezon (co ~2–3 kolejki).
   const kolejek = s.ligi[poziom - 1].terminarz.length;
   const ile = zawodowy ? NAZWY_GLOWNY.length : nazwyRegion(s).length + NAZWY_GLOWNY.length;
@@ -185,7 +198,7 @@ export function nowyPuchar(s: StanGry): Puchar {
     : s.ligi.filter((l) => l.poziom > POZIOM_ZAWODOWY).flatMap((l) => l.kluby);
   // Regionalny: w pierwszej rundzie gracza grają tylko kluby, które już weszły do rozgrywek (niższe klasy najpierw).
   const startW = zawodowy ? 99 : wejscieDoPucharu(s, s.mojKlub);
-  const pole = tasuj([...pozaLiga, ...poleFaza].filter((id) => id !== s.mojKlub && !jestRezerwa(s, id) && (zawodowy || wejscieDoPucharu(s, id) <= Math.min(3, startW)))).slice(0, 31);
+  const pole = tasuj([...pozaLiga, ...poleFaza].filter((id) => id !== s.mojKlub && (zawodowy ? !jestRezerwa(s, id) : wRegionie(s, id)) && (zawodowy || wejscieDoPucharu(s, id) <= Math.min(4, startW)))).slice(0, 31);
   return {
     faza: zawodowy ? "glowny" : "regionalny",
     runda: 0,
@@ -218,12 +231,12 @@ function losujRywala(s: StanGry, faza: "regionalny" | "glowny", runda: number): 
   const moj = s.mojKlub;
   const mojPoziom = s.kluby[moj].poziom;
   // Rywal pochodzi z pola uczestników wciąż w grze (pełne losowanie par), jeśli jest dostępne.
-  let poleAkt = (s.puchar?.pole ?? []).filter((id) => id !== moj && !jestRezerwa(s, id));
+  let poleAkt = (s.puchar?.pole ?? []).filter((id) => id !== moj && (faza === "regionalny" || !jestRezerwa(s, id)));
   if (faza === "regionalny") {
     // Wejście wyższych szczebli: w rundzie (startGracza + runda) dołączają kluby z tym progiem wejścia.
-    const prog = Math.min(3, wejscieDoPucharu(s, moj) + runda);
+    const prog = Math.min(4, wejscieDoPucharu(s, moj) + runda);
     const dochodza = s.ligi.filter((l) => l.poziom > POZIOM_ZAWODOWY).flatMap((l) => l.kluby)
-      .filter((id) => id !== moj && !jestRezerwa(s, id) && wejscieDoPucharu(s, id) === prog && !poleAkt.includes(id));
+      .filter((id) => id !== moj && wRegionie(s, id) && wejscieDoPucharu(s, id) === prog && !poleAkt.includes(id));
     if (dochodza.length && s.puchar) { s.puchar.pole = [...poleAkt, ...tasuj(dochodza).slice(0, 16)]; poleAkt = s.puchar.pole; }
     // Rywal z tej samej lub sąsiedniej rangi częściej (losowanie w podokręgach).
     const dost = poleAkt.filter((id) => wejscieDoPucharu(s, id) <= prog);
@@ -240,7 +253,7 @@ function losujRywala(s: StanGry, faza: "regionalny" | "glowny", runda: number): 
   let pula: string[];
   if (faza === "regionalny") {
     // amatorzy z tej samej drabiny (poziom ≥ 4), nie mój klub, bez zespołów rezerw (PZPN — rezerwy nie grają w pucharze)
-    pula = s.ligi.filter((l) => l.poziom > POZIOM_ZAWODOWY).flatMap((l) => l.kluby).filter((id) => id !== moj && !jestRezerwa(s, id));
+    pula = s.ligi.filter((l) => l.poziom > POZIOM_ZAWODOWY).flatMap((l) => l.kluby).filter((id) => id !== moj && wRegionie(s, id));
   } else {
     // zawodowcy; w późniejszych rundach coraz wyższe ligi (jak w realu — na końcu Ekstraklasa)
     const maxPoziom = Math.max(1, POZIOM_ZAWODOWY - Math.floor(runda / 2));
@@ -298,8 +311,10 @@ export function rundaPucharu(s: StanGry): WynikPucharu {
     const przewaga = Math.max(0.3, Math.min(0.7, 0.5 + (s.kluby[s.mojKlub].renoma - s.kluby[rywalId].renoma) * 0.4));
     const wygramy = szansa(przewaga);
     const dodaj = (my: boolean) => { if (uSiebie) w = { ...w, gd: w.gd + (my ? 1 : 0), gg: w.gg + (my ? 0 : 1) }; else w = { ...w, gg: w.gg + (my ? 1 : 0), gd: w.gd + (my ? 0 : 1) }; };
-    if (szansa(0.35)) { dogrywka = true; dodaj(wygramy); } // gol w dogrywce rozstrzyga
-    else { karne = true; dodaj(wygramy); }               // rzuty karne
+    // Regulaminy: w fazie centralnej dogrywka zawsze; w ZPN — zależnie od związku i rundy (inaczej od razu karne).
+    const mozeDogrywka = p.faza === "glowny" || dogrywkaWRundzie(s, p.runda);
+    if (mozeDogrywka && szansa(0.4)) { dogrywka = true; dodaj(wygramy); } // gol w dogrywce rozstrzyga
+    else { karne = true; dodaj(wygramy); }                               // rzuty karne
   }
   p.ostatniMecz = w;
   // Frekwencja pucharowa: gdy gościsz u siebie (zwłaszcza wyżej notowany rywal), przychodzi więcej kibiców.
@@ -345,6 +360,11 @@ export function rundaPucharu(s: StanGry): WynikPucharu {
   }
 
   if (!awans) {
+    if (p.faza === "regionalny") {
+      const n = nazwyFazy.length;
+      if (p.runda === n - 1) { s.kluby[s.mojKlub].kasa += 25_000; wiadomosc(s, `🥈 Finalista Pucharu Polski na szczeblu ZPN — nagroda PZPN 25 000 zł.`); }
+      else if (p.runda === n - 2 && zwiazek(s) === "POM") { s.kluby[s.mojKlub].kasa += 1_500; wiadomosc(s, "Półfinalista Pucharu Polski Pomorskiego ZPN — nagroda 1 500 zł."); }
+    }
     p.faza = "odpadl";
     wiadomosc(s, `Puchar: odpadliście z ${rywalNazwa} (${wynikTekst}) w rundzie „${nazwa}". Premia ${zl(nagroda)}.`);
     return { rozegrano: true, wynik: w, awans: false, nazwa };
@@ -364,14 +384,11 @@ export function rundaPucharu(s: StanGry): WynikPucharu {
   // wygrana faza
   if (p.faza === "regionalny") {
     p.zdobywcaRegion = s.mojKlub;
-    p.faza = "glowny";
-    p.runda = 0;
-    p.nazwaRundy = NAZWY_GLOWNY[0];
-    // dołóż rundy głównego do harmonogramu, jeśli się skończyły
-    const ost = p.harmonogram[p.harmonogram.length - 1];
-    const krok = 2;
-    while (p.harmonogram.length < nazwyRegion(s).length + NAZWY_GLOWNY.length) p.harmonogram.push(ost + krok * (p.harmonogram.length));
-    wiadomosc(s, `🏆 Zdobyliście wojewódzki Puchar Polski (${pucharRegion(s).nom})! Wchodzicie do centralnego STS Pucharu Polski — I runda (1/32), zagracie z zawodowcami.`);
+    p.faza = "kwalifikacja";
+    s.kwalifikacjaPP = s.sezon + 1;
+    s.kluby[s.mojKlub].kasa += 50_000;
+    s.zarzad = Math.min(100, s.zarzad + 8);
+    wiadomosc(s, `🏆 Zdobyliście ${pucharRegion(s).nom}! Nagroda PZPN 50 000 zł. W przyszłym sezonie gracie w 1/32 STS Pucharu Polski z klubami Ekstraklasy i I ligi.`);
     s.historia.push({ sezon: s.sezon, liga: pucharRegion(s).nom, miejsce: 1, wynik: "mistrz" });
     return { rozegrano: true, wynik: w, awans: true, nazwa: `Zdobywca ${pucharRegion(s).gen}` };
   } else {
@@ -398,5 +415,6 @@ export function etapPucharu(s: StanGry): string {
   if (p.faza === "regionalny") return `${pucharRegion(s).nom} — ${p.nazwaRundy}`;
   if (p.faza === "glowny") return p.nazwaRundy;
   if (p.faza === "zdobyty") return "Zdobywca STS Pucharu Polski 🏆";
+  if (p.faza === "kwalifikacja") return `Zdobywca ${pucharRegion(s).gen} 🏆 — w przyszłym sezonie 1/32 STS PP`;
   return "Odpadliście z pucharu";
 }

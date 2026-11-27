@@ -1137,7 +1137,10 @@ export function kolorKolizja(a: string, b: string): boolean {
 }
 
 /** Barwy klubu: prawdziwe (słownik) → barwy pierwszego zespołu dla rezerw → z nazwy (słowa-kolory) → z hasza. */
+/** Barwy klubów stworzonych przez gracza (rejestrowane przy tworzeniu i wczytaniu zapisu). */
+export const BARWY_WLASNE: Record<string, [string, string]> = {};
 export function barwyKlubu(nazwa: string): [string, string] {
+  if (BARWY_WLASNE[nazwa]) return BARWY_WLASNE[nazwa];
   const wpis = BARWY_KLUBOW[nazwa];
   if (wpis) return wpis;
   // Rezerwy („X II", „X III", „X 2") dziedziczą barwy pierwszego zespołu.
