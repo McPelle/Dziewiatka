@@ -11,7 +11,7 @@ import { dataKontraktu, NAZWA_KONTRAKTU, wartosc } from "../engine/swiat";
 import { KAT_POZ, SKROT_POZ, ETYKIETA_POZ } from "../data/pozycje";
 import type { OfertaTransferu, WynikNegocjacji } from "../engine/sezon";
 import type { Pozycja, PozycjaSzczegolowa, StanGry, Zawodnik } from "../engine/types";
-import { K, KOLOR_POZ, st } from "./styl";
+import { K, KOLOR_POZ, st, web } from "./styl";
 import { dzwiekUI } from "./muzyka";
 
 const komunikat = (t: string) => (Platform.OS === "web" ? window.alert(t) : Alert.alert("Transfer", t));
@@ -299,7 +299,7 @@ function WierszRynku({ s, z, wyp, cena, onKup, onNeg, onWykup, onProfil }: { s: 
   return (
     <View style={[st.karta, st.wiersz, { marginTop: 6, paddingVertical: 10 }]}>
       <View style={{ width: 44 }}>
-        <Text style={{ color: KOLOR_POZ[z.poz], fontWeight: "800" }}>{z.poz}</Text>
+        <Text style={{ color: KOLOR_POZ[z.poz], fontWeight: "900", ...web({ textShadow: `0 0 8px ${KOLOR_POZ[z.poz]}88, 0 1px 0 #000` }) }}>{z.poz}</Text>
         {z.pozS && <Text style={{ color: K.szary, fontSize: 10, fontWeight: "700" }}>{SKROT_POZ[z.pozS]}</Text>}
       </View>
       <View style={{ flex: 1 }}>
@@ -447,8 +447,8 @@ function NegocjacjeTresc({ s, z, onClose, odswiez }: { s: StanGry; z: Zawodnik; 
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-      <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "92%", paddingBottom: 20 }}>
+    <View style={st.zaslona}>
+      <View style={[st.arkusz, { maxHeight: "92%", paddingBottom: 20 }]}>
         <ScrollView contentContainerStyle={{ padding: 18 }}>
           <Text style={st.tytul}>Negocjacje — {z.imie} {z.nazwisko}</Text>
           <Text style={[st.maly, { marginBottom: 8 }]}>

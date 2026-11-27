@@ -6,7 +6,7 @@ import type { EuroRywal, StanGry } from "../engine/types";
 import { Relacja } from "./Terminarz";
 import { Herb } from "./Herb";
 import { EmblematRozgrywek, HerbEuro } from "./HerbEuro";
-import { K, st } from "./styl";
+import { K, st, web } from "./styl";
 
 /** Karta z prawdziwymi danymi europejskiego rywala (bez herbu — oryginalny emblemat). */
 function KartaRywala({ r }: { r: EuroRywal }) {
@@ -73,7 +73,7 @@ function Europa({ s }: { s: StanGry }) {
             <View key={i} style={[st.wiersz, { alignItems: "stretch" }]}>
               <View style={{ width: 20, alignItems: "center" }}>
                 {i > 0 && <View style={{ width: 2, height: 8, backgroundColor: K.linia }} />}
-                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: kolor, borderWidth: 2, borderColor: K.tlo }} />
+                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: kolor, borderWidth: 2, borderColor: K.tlo, ...web({ backgroundImage: `radial-gradient(circle at 35% 30%, #ffffffcc 0%, ${kolor} 45%, #00000088 100%)`, boxShadow: `0 0 8px ${kolor}aa, 0 2px 3px rgba(0,0,0,0.6)` }) }} />
                 {i < rundy.length - 1 && <View style={{ width: 2, flex: 1, backgroundColor: K.linia }} />}
               </View>
               <View style={{ flex: 1, paddingVertical: 3, paddingBottom: 7 }}>
@@ -116,7 +116,7 @@ function Drabinka({ s }: { s: StanGry }) {
             {/* linia pionowa + kropka */}
             <View style={{ width: 22, alignItems: "center" }}>
               {i > 0 && <View style={{ width: 2, height: 10, backgroundColor: K.linia }} />}
-              <View style={{ width: 13, height: 13, borderRadius: 7, backgroundColor: kolorKropki, borderWidth: 2, borderColor: K.tlo }} />
+              <View style={{ width: 13, height: 13, borderRadius: 7, backgroundColor: kolorKropki, borderWidth: 2, borderColor: K.tlo, ...web({ backgroundImage: `radial-gradient(circle at 35% 30%, #ffffffcc 0%, ${kolorKropki} 45%, #00000088 100%)`, boxShadow: `0 0 8px ${kolorKropki}aa, 0 2px 3px rgba(0,0,0,0.6)` }) }} />
               {i < rundy.length - 1 && <View style={{ width: 2, flex: 1, backgroundColor: K.linia }} />}
             </View>
             <View style={{ flex: 1, paddingVertical: 4, paddingBottom: 8 }}>

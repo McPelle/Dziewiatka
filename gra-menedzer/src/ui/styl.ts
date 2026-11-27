@@ -62,6 +62,9 @@ export const st = StyleSheet.create({
   przyciskMalyTekst: { color: K.tekst, fontSize: 14, fontWeight: "800", fontFamily: CZCIONKA, ...web({ textShadow: "0 1px 2px rgba(0,0,0,0.6)" }) },
   chip: { borderRadius: 18, paddingVertical: 7, paddingHorizontal: 14, backgroundColor: K.karta2, marginRight: 8, marginBottom: 8, borderWidth: 1, borderColor: "rgba(255,255,255,0.10)", ...web({ backgroundImage: G.szklo, boxShadow: "0 2px 0 rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12)" }) },
   chipAktywny: { backgroundColor: K.akcent, borderColor: "#c48a0d", ...web({ backgroundImage: G.zloto, boxShadow: "0 2px 0 #9c6a07, 0 0 12px rgba(255,206,71,0.45), inset 0 1px 0 rgba(255,255,255,0.7)" }) },
+  // okna wysuwane od dołu (arkusze 3D): przyciemnione, rozmyte tło + arkusz z gradientem, złotą krawędzią i cieniem
+  zaslona: { flex: 1, backgroundColor: "rgba(0,0,0,0.62)", justifyContent: "flex-end", ...web({ backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)" }) },
+  arkusz: { backgroundColor: K.tlo, borderTopLeftRadius: 24, borderTopRightRadius: 24, borderTopWidth: 2, borderLeftWidth: 1, borderRightWidth: 1, borderColor: "rgba(255,206,71,0.55)", overflow: "hidden", ...web({ backgroundImage: G.tlo, boxShadow: "0 -14px 44px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.18), 0 -2px 18px rgba(255,206,71,0.18)" }) },
   input: { backgroundColor: K.karta2, color: K.tekst, borderRadius: 12, padding: 13, fontSize: 16, borderWidth: 1, borderColor: "rgba(255,255,255,0.10)", fontFamily: CZCIONKA, ...web({ boxShadow: "inset 0 2px 6px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.06)" }) },
 });
 

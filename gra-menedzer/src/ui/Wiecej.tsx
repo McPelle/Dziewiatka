@@ -28,7 +28,7 @@ import { Sponsorzy } from "./Sponsorzy";
 import { Stroje } from "./Stroje";
 import { PucharEkran } from "./PucharEkran";
 import { PrzegladLig } from "./PrzegladLig";
-import { CZCIONKA, cien, K, st } from "./styl";
+import { CZCIONKA, cien, G, K, st, web } from "./styl";
 
 // Hub „Więcej" — pełne menu wszystkich działów klubu. Karty pogrupowane, z ikoną i krótkim opisem.
 type Tryb = "modal" | "inline";
@@ -98,14 +98,14 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
               try { const m = await zapiszSlot(s); const t = `⚡ Zapisano: ${m.nazwa} · sezon ${m.sezon}`; if (Platform.OS === "web") window.alert(t); }
               catch (e) { if (Platform.OS === "web") window.alert(e instanceof Error ? e.message : "Nie udało się zapisać."); }
             }}
-            style={({ pressed }) => [{ flex: 1, backgroundColor: K.akcent2, borderRadius: 14, paddingVertical: 14, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.9 : 1, ...cien }]}
+            style={({ pressed }) => [{ flex: 1, backgroundColor: K.akcent2, borderRadius: 14, paddingVertical: 14, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.9 : 1, ...cien, ...web({ backgroundImage: "linear-gradient(180deg, #8ff0b4 0%, #3fd47f 55%, #239a55 100%)", boxShadow: "0 4px 0 #17703c, 0 10px 18px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.6)", transform: pressed ? "translateY(3px)" : "none" }) }]}
           >
             <Text style={{ color: "#0c2a18", fontSize: 15, fontWeight: "900", fontFamily: CZCIONKA }}>⚡ Szybki zapis</Text>
             <Text style={{ color: "#0c2a18", fontSize: 10.5, fontFamily: CZCIONKA }}>{s.slotId ? "nadpisuje zapis tej kariery" : "tworzy zapis tej kariery"}</Text>
           </Pressable>
           <Pressable
             onPress={() => setOknoZapisu(true)}
-            style={({ pressed }) => [{ flex: 1, backgroundColor: K.akcent, borderRadius: 14, paddingVertical: 14, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.9 : 1, ...cien }]}
+            style={({ pressed }) => [{ flex: 1, backgroundColor: K.akcent, borderRadius: 14, paddingVertical: 14, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.9 : 1, ...cien, ...web({ backgroundImage: G.zloto, boxShadow: "0 4px 0 #9c6a07, 0 10px 18px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.7)", transform: pressed ? "translateY(3px)" : "none" }) }]}
           >
             <Text style={{ color: "#15300c", fontSize: 15, fontWeight: "900", fontFamily: CZCIONKA }}>💾 Zapisz jako…</Text>
             <Text style={{ color: "#15300c", fontSize: 10.5, fontFamily: CZCIONKA }}>wybierz slot / nowy / plik</Text>
@@ -122,10 +122,11 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
                     onPress={() => setOtw(w.key)}
                     style={({ pressed }) => [{
                       backgroundColor: K.karta, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: K.linia,
-                      opacity: pressed ? 0.85 : 1, minHeight: 112, ...cien,
+                      opacity: pressed ? 0.9 : 1, minHeight: 112, ...cien,
+                      ...web({ backgroundImage: G.karta, boxShadow: pressed ? "0 1px 0 rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)" : "0 4px 0 rgba(0,0,0,0.45), 0 10px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.10)", transform: pressed ? "translateY(3px)" : "none", transition: "transform 80ms, box-shadow 80ms" }),
                     }]}
                   >
-                    <View style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.liniaMocna, alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+                    <View style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: K.karta2, borderWidth: 1, borderColor: K.liniaMocna, alignItems: "center", justifyContent: "center", marginBottom: 10, ...web({ backgroundImage: G.ciemny, boxShadow: "0 3px 0 rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.18), 0 0 10px rgba(255,206,71,0.12)" }) }}>
                       <Text style={{ fontSize: 22 }}>{w.ikona}</Text>
                     </View>
                     <Text style={{ color: K.tekst, fontSize: 15.5, fontWeight: "800", fontFamily: CZCIONKA }}>{w.nazwa}</Text>

@@ -27,8 +27,8 @@ export function KartaDnia({ s, data, wydarzenia, dzis, zablokowany, onClose, ods
   const DZ = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
   return (
     <Modal visible={!!data} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "90%", borderTopWidth: 2, borderColor: K.akcent }}>
+      <View style={st.zaslona}>
+        <View style={[st.arkusz, { maxHeight: "90%" }]}>
           <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 30 }}>
             <Text style={{ color: K.akcent, fontWeight: "900", fontSize: 12, letterSpacing: 0.6, fontFamily: CZCIONKA }}>{DZ[data.getDay()].toUpperCase()}</Text>
             <Text style={[st.tytul, { fontSize: 20 }]}>📅 {fmtData(data)}</Text>

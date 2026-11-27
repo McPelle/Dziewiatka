@@ -35,8 +35,8 @@ export function Trening({ s, widoczny, onClose, odswiez, otworzProfil }: {
 
   return (
     <Modal visible={widoczny} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "92%", paddingBottom: 20 }}>
+      <View style={st.zaslona}>
+        <View style={[st.arkusz, { maxHeight: "92%", paddingBottom: 20 }]}>
           <ScrollView contentContainerStyle={{ padding: 18 }}>
             <Text style={st.tytul}>🏋 Centrum treningowe</Text>
             <Text style={[st.maly, { marginTop: 2, marginBottom: 10 }]}>Fokus i intensywność kształtują rozwój kadry. Trening indywidualny i naukę pozycji ustawiasz w profilu zawodnika.</Text>

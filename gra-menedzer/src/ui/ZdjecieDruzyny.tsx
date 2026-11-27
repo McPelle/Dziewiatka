@@ -219,8 +219,8 @@ export function GaleriaZdjec({ s, widoczny, onClose, odswiez, klubId }: { s: Sta
 
   return (
     <Modal visible={widoczny} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "94%", paddingBottom: 20 }}>
+      <View style={st.zaslona}>
+        <View style={[st.arkusz, { maxHeight: "94%", paddingBottom: 20 }]}>
           <ScrollView contentContainerStyle={{ padding: 18 }}>
             <Text style={st.tytul}>📸 Zdjęcia drużyny</Text>
             <Text style={[st.maly, { marginBottom: 10 }]}>Pamiątkowe zdjęcie całej kadry na początek każdego sezonu.</Text>

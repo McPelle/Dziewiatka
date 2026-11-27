@@ -28,8 +28,8 @@ export function Sztab({ s, widoczny, onClose, odswiez }: { s: StanGry; widoczny:
 
   return (
     <Modal visible={widoczny} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "90%", paddingBottom: 20 }}>
+      <View style={st.zaslona}>
+        <View style={[st.arkusz, { maxHeight: "90%", paddingBottom: 20 }]}>
           <ScrollView contentContainerStyle={{ padding: 18 }}>
             <Text style={st.tytul}>🧰 Sztab szkoleniowy</Text>
             <Text style={[st.maly, { marginTop: 2, marginBottom: 10 }]}>

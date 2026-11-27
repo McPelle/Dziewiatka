@@ -245,8 +245,8 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
       <Akademia s={s} widoczny={akademia} onClose={() => setAkademia(false)} odswiez={odswiez} />
       <Trening s={s} widoczny={trening} onClose={() => setTrening(false)} odswiez={odswiez} otworzProfil={(id) => { setTrening(false); setProfil(id); }} />
       <Modal visible={!!sfg} transparent animationType="slide" onRequestClose={() => setSfg(null)}>
-        <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-          <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "80%", paddingBottom: 20 }}>
+        <View style={st.zaslona}>
+          <View style={[st.arkusz, { maxHeight: "80%", paddingBottom: 20 }]}>
             <ScrollView contentContainerStyle={{ padding: 18 }}>
               <Text style={st.tytul}>Wykonawca: {sfg === "karne" ? "rzuty karne" : sfg === "wolne" ? "rzuty wolne" : "rzuty rożne"}</Text>
               <Pressable style={[st.przyciskMaly, { alignItems: "center", marginVertical: 8, borderColor: K.akcent }]} onPress={() => { if (sfg) ustawWykonawca(s, sfg, null); setSfg(null); odswiez(); }}>

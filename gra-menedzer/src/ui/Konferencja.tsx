@@ -5,7 +5,7 @@ import { grafika3D } from "./three/Stadion3DWidok";
 import { glosDostepny, glosWlaczony, mow, plecZImienia, ustawGlos, zamilknij } from "./three/glos";
 import { odpowiedzKonferencja } from "../engine/sezon";
 import type { StanGry } from "../engine/types";
-import { CZCIONKA, K, st } from "./styl";
+import { CZCIONKA, K, st, web } from "./styl";
 
 const Efekt = ({ et, v }: { et: string; v?: number }) => (!v ? null : (
   <Text style={[st.maly, { color: v > 0 ? K.zielony : K.czerwony, marginRight: 10 }]}>{et} {v > 0 ? "▲" : "▼"}</Text>
@@ -30,8 +30,8 @@ export function KonferencjaEkran({ s, odswiez }: { s: StanGry; odswiez: () => vo
   };
   return (
     <Modal visible={!!k} transparent animationType="slide" onRequestClose={() => { odpowiedzKonferencja(s, -1); odswiez(); }}>
-      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.65)", justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "90%", paddingBottom: 20, borderTopWidth: 2, borderColor: K.akcent }}>
+      <View style={st.zaslona}>
+        <View style={[st.arkusz, { maxHeight: "90%", paddingBottom: 20 }]}>
           {k && (
             <ScrollView contentContainerStyle={{ padding: 18 }}>
               {Platform.OS === "web" && grafika3D() && (
@@ -52,7 +52,7 @@ export function KonferencjaEkran({ s, odswiez }: { s: StanGry; odswiez: () => vo
                 {k.ile ? <Text style={st.maly}>pytanie {k.nr}/{k.ile}</Text> : null}
               </View>
               <Text style={[st.maly, { marginTop: 4 }]}>{k.media ? `${k.media} · ` : ""}{k.kontekst}</Text>
-              <View style={{ marginTop: 10, backgroundColor: K.karta2, borderRadius: 12, padding: 12, borderLeftWidth: 3, borderLeftColor: K.niebieski }}>
+              <View style={{ marginTop: 10, backgroundColor: K.karta2, borderRadius: 12, padding: 12, borderLeftWidth: 3, borderLeftColor: K.niebieski, ...web({ backgroundImage: "linear-gradient(90deg, rgba(90,169,255,0.18) 0%, rgba(255,255,255,0.02) 60%)", boxShadow: "0 3px 0 rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)" }) }}>
                 <Text style={[st.tekst, { fontSize: 16.5, fontWeight: "800", lineHeight: 22 }]}>„{k.pytanie}"</Text>
               </View>
               <Text style={[st.maly, { marginTop: 10 }]}>Twoja odpowiedź:</Text>

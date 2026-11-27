@@ -5,7 +5,7 @@ import { dzisiaj } from "../engine/dzien";
 import { dataOkresu } from "../engine/okres";
 import { ileKolejek } from "../engine/sezon";
 import type { StanGry } from "../engine/types";
-import { CZCIONKA, K, st } from "./styl";
+import { CZCIONKA, K, st, web } from "./styl";
 import { KartaDnia } from "./KartaDnia";
 import { KATALOG, planNa } from "../engine/planDnia";
 
@@ -85,8 +85,8 @@ export function KalendarzMiesiac({ s, widoczny, onClose }: { s: StanGry; widoczn
   };
   return (
     <Modal visible={widoczny} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "92%", borderTopWidth: 2, borderColor: K.akcent }}>
+      <View style={st.zaslona}>
+        <View style={[st.arkusz, { maxHeight: "92%" }]}>
           <ScrollView contentContainerStyle={{ padding: 14, paddingBottom: 28 }}>
             <View style={[st.wiersz, { justifyContent: "space-between", marginBottom: 8, gap: 4 }]}>
               <Pressable onPress={() => zmien(-12)} style={st.przyciskMaly}><Text style={st.przyciskMalyTekst}>«</Text></Pressable>
@@ -127,7 +127,7 @@ export function KalendarzMiesiac({ s, widoczny, onClose }: { s: StanGry; widoczn
                   if (!d) return <View key={i} style={{ flex: 1, aspectRatio: 1, margin: 1.5 }} />;
                   const kl = klucz(d), z = zdarzenia.get(kl) ?? [], teraz = kl === klucz(dzis), wyb = kl === wybrany;
                   return (
-                    <Pressable key={i} onPress={() => { setWybrany(kl); setKarta(d); }} style={{ flex: 1, aspectRatio: 1, margin: 1.5, borderRadius: 7, padding: 2, backgroundColor: okno(d) ? "rgba(90,169,255,0.10)" : K.karta, borderWidth: teraz || wyb ? 2 : 1, borderColor: teraz ? K.akcent : wyb ? K.niebieski : K.linia }}>
+                    <Pressable key={i} onPress={() => { setWybrany(kl); setKarta(d); }} style={{ flex: 1, aspectRatio: 1, margin: 1.5, borderRadius: 7, padding: 2, backgroundColor: okno(d) ? "rgba(90,169,255,0.10)" : K.karta, borderWidth: teraz || wyb ? 2 : 1, borderColor: teraz ? K.akcent : wyb ? K.niebieski : K.linia, ...web({ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.01) 55%, rgba(0,0,0,0.22) 100%)", boxShadow: teraz ? "0 0 12px rgba(255,206,71,0.55), 0 2px 0 rgba(0,0,0,0.5)" : wyb ? "0 0 10px rgba(90,169,255,0.5), 0 2px 0 rgba(0,0,0,0.5)" : "0 2px 0 rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)" }) }}>
                       <Text style={{ color: d < dzis && !teraz ? K.szary : K.tekst, fontSize: 11, fontWeight: "800", fontFamily: CZCIONKA }}>{d.getDate()}</Text>
                       <Text style={{ fontSize: 12, textAlign: "center" }}>{z.slice(0, 2).map((x) => x.ikona).join("")}{planNa(s, d) ? KATALOG[planNa(s, d)!.rodzaj].ikona : ""}</Text>
                       {z[0]?.kolor ? <View style={{ height: 3, borderRadius: 2, backgroundColor: z[0].kolor, marginTop: 1 }} /> : null}

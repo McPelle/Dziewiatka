@@ -118,7 +118,7 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
 
   return (
     <Modal visible={widoczny} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
+      <View style={st.zaslona}>
         <View style={[{ backgroundColor: K.tlo, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: "88%", paddingBottom: 20, borderTopWidth: 2, borderColor: K.akcent }, web({ backgroundImage: G.tlo, boxShadow: "0 -12px 40px rgba(0,0,0,0.6)" })]}>
           {z && (
             <ScrollView contentContainerStyle={{ padding: 18 }}>

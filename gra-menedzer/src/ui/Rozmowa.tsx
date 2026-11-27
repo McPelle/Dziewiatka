@@ -7,7 +7,7 @@ import { OpcjaRozmowy, TematRozmowy, TON_ETYKIETA, tematyRozmowy, zastosujRozmow
 import type { StanGry, Zawodnik } from "../engine/types";
 import { tlumaczDla, jezykiTrenera, jezykZawodnika, NAZWA_JEZYKA, NAZWA_POZIOMU, PO_JEZYKU, polski, poziom, rozumienie, wypowiedz } from "../engine/jezyki";
 import { Twarz } from "./Twarz";
-import { K, st } from "./styl";
+import { K, st, web } from "./styl";
 
 export function Rozmowa({ s, z, widoczny, onClose, odswiez }: { s: StanGry; z: Zawodnik | undefined; widoczny: boolean; onClose: () => void; odswiez: () => void }) {
   const [temat, setTemat] = useState<TematRozmowy | null>(null);
@@ -37,7 +37,7 @@ export function Rozmowa({ s, z, widoczny, onClose, odswiez }: { s: StanGry; z: Z
   const Dymek = ({ tekst, trenera }: { tekst: string; trenera?: boolean }) => (
     <View style={[st.wiersz, { gap: 8, marginTop: 8, flexDirection: trenera ? "row-reverse" : "row" }]}>
       {trenera ? <Twarz seed={s.trener} rozmiar={32} zdjecie={s.trenerZdjecie} jersey="#2b2f45" /> : <Twarz seed={z.imie + z.nazwisko} rozmiar={32} zdjecie={z.zdjecie} cechy={z.twarz} kraj={z.kraj} />}
-      <View style={{ flex: 1, backgroundColor: trenera ? K.karta2 : "rgba(90,169,255,0.14)", borderRadius: 12, padding: 10, maxWidth: "85%" }}>
+      <View style={{ flex: 1, backgroundColor: trenera ? K.karta2 : "rgba(90,169,255,0.14)", borderRadius: 14, padding: 10, maxWidth: "85%", borderWidth: 1, borderColor: trenera ? "rgba(255,206,71,0.25)" : "rgba(90,169,255,0.35)", ...(trenera ? { borderTopRightRadius: 4 } : { borderTopLeftRadius: 4 }), ...web({ backgroundImage: trenera ? "linear-gradient(180deg, #23493a 0%, #15301f 100%)" : "linear-gradient(180deg, rgba(90,169,255,0.28) 0%, rgba(40,80,140,0.22) 100%)", boxShadow: "0 3px 0 rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)" }) }}>
         {(() => { if (trenera) return <Text style={st.tekst}>{tekst}</Text>; const w = wypowiedz(s, z, tekst, { ton: tekst === reakcja && wynik ? (wynik.delta >= 0 ? "plus" : "minus") : undefined }); return (<>
           <Text style={st.tekst}>{w.tekst}</Text>
           {w.tlumaczenie && <Text style={[st.maly, { fontStyle: "italic", marginTop: 3 }]}>↳ {w.poziom === "podstawy" ? "chodzi mu o to" : w.tlumaczNazwa ? `tłumaczy ${w.tlumaczNazwa}` : NAZWA_JEZYKA[w.jezyk]}: „{w.tlumaczenie}”</Text>}
@@ -48,8 +48,8 @@ export function Rozmowa({ s, z, widoczny, onClose, odswiez }: { s: StanGry; z: Z
 
   return (
     <Modal visible={widoczny} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "88%", paddingBottom: 20 }}>
+      <View style={st.zaslona}>
+        <View style={[st.arkusz, { maxHeight: "88%", paddingBottom: 20 }]}>
           <ScrollView contentContainerStyle={{ padding: 18 }}>
             {Platform.OS === "web" && grafika3D() && <View style={{ marginBottom: 12 }}><Rozmowa3D klub={s.kluby[s.mojKlub]} z={z} emocja={emocja} mowi={mowi} trofea={0} /></View>}
             <View style={[st.wiersz, { gap: 12 }]}>

@@ -103,8 +103,8 @@ export function Dziennik({ s, widoczny, onClose }: { s: StanGry; widoczny: boole
 
   return (
     <Modal visible={widoczny} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "92%", paddingBottom: 20 }}>
+      <View style={st.zaslona}>
+        <View style={[st.arkusz, { maxHeight: "92%", paddingBottom: 20 }]}>
           <ScrollView contentContainerStyle={{ padding: 18 }}>
             <Text style={st.tytul}>📖 Dziennik kariery</Text>
             <Text style={[st.maly, { marginBottom: 10 }]}>{s.trener} — najważniejsze chwile na ławce trenerskiej.</Text>

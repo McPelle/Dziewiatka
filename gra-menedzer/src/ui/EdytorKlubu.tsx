@@ -43,8 +43,8 @@ export function EdytorKlubu({ s, klubId, onClose, odswiez }: { s: StanGry; klubI
 
   return (
     <Modal visible={!!klub} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "92%", paddingBottom: 20 }}>
+      <View style={st.zaslona}>
+        <View style={[st.arkusz, { maxHeight: "92%", paddingBottom: 20 }]}>
           {klub && (
             <ScrollView contentContainerStyle={{ padding: 18 }}>
               <View style={[st.wiersz, { gap: 12 }]}>

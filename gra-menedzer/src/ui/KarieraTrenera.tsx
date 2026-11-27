@@ -42,8 +42,8 @@ export function KarieraTrenera({ s, widoczny, onClose, odswiez }: { s: StanGry; 
 
   return (
     <Modal visible={widoczny} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-        <View style={{ backgroundColor: K.tlo, borderTopLeftRadius: 18, borderTopRightRadius: 18, maxHeight: "92%", paddingBottom: 20 }}>
+      <View style={st.zaslona}>
+        <View style={[st.arkusz, { maxHeight: "92%", paddingBottom: 20 }]}>
           <ScrollView contentContainerStyle={{ padding: 18 }}>
             {Platform.OS === "web" && grafika3D() && <View style={{ marginBottom: 12 }}><Gablota3D historia={s.historia ?? []} /></View>}
             {(() => { const r = rekordyKlubu(s); return r.mecze > 0 ? (
