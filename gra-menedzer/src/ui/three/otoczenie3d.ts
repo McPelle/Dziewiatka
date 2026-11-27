@@ -16,7 +16,9 @@ const MIASTA_SREDNIE = new Set(["Częstochowa", "Radom", "Toruń", "Rzeszów", "
   "Grudziądz", "Słupsk", "Kalisz", "Jaworzno", "Nowy Sącz", "Jelenia Góra", "Siedlce", "Mielec", "Stalowa Wola", "Inowrocław", "Lubin", "Głogów", "Piła",
   "Stargard", "Tczew", "Wejherowo", "Starogard Gdański", "Pruszków", "Świnoujście", "Chojnice", "Malbork", "Kwidzyn", "Sopot", "Rumia", "Skierniewice",
   "Świdnik", "Łęczna", "Nowy Targ", "Oświęcim", "Chrzanów", "Bochnia", "Gorlice", "Zakopane", "Brodnica", "Włocławek", "Kołobrzeg", "Police", "Wieliczka",
-  "Grodzisk Mazowiecki", "Lębork", "Bytów", "Kartuzy", "Kościerzyna", "Puck", "Pruszcz Gdański", "Myślenice", "Andrychów", "Wadowice", "Limanowa", "Szczecinek"]);
+  "Grodzisk Mazowiecki", "Lębork", "Bytów", "Kartuzy", "Kościerzyna", "Puck", "Pruszcz Gdański", "Myślenice", "Andrychów", "Wadowice", "Limanowa", "Szczecinek",
+  // warmińsko-mazurskie, podlaskie i III liga gr. I
+  "Ełk", "Suwałki", "Łomża", "Ostróda", "Iława", "Giżycko", "Kętrzyn", "Bartoszyce", "Mrągowo", "Szczytno", "Działdowo", "Augustów", "Zambrów", "Grajewo", "Bielsk Podlaski", "Hajnówka", "Sokółka", "Siemiatycze", "Braniewo", "Pisz", "Olecko", "Lidzbark Warmiński", "Nowe Miasto Lubawskie", "Gołdap", "Mława", "Ciechanów", "Sieradz", "Łowicz", "Tomaszów Mazowiecki", "Mińsk Mazowiecki", "Nowy Dwór Mazowiecki", "Ząbki"]);
 
 /** Miasto czy wieś: nadpisanie z kształtu stadionu → lista miast → liczba klubów z miejscowości → liga i pojemność. */
 export function typOtoczenia(klub: Klub, s: StanGry | null, ks?: KsztaltStadionu): TypOtoczenia {
