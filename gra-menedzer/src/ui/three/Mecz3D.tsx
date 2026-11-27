@@ -19,7 +19,7 @@ import { animuj, stworzPostac, wyglad3D, type Postac } from "./zawodnik3d";
 import { gwizdek, kopniecie, napiecie, reakcjaTrybun } from "./dzwiek";
 
 export type Kamera = "auto" | "tv" | "bramka" | "gora" | "blisko";
-export interface Ustawienia3D { noc: boolean; pogoda: "slonce" | "deszcz" | "snieg" | "mgla"; widzowie: number; lekka: boolean; derby?: boolean; pusto?: boolean }
+export interface Ustawienia3D { noc: boolean; pogoda: "slonce" | "deszcz" | "snieg" | "mgla"; widzowie: number; lekka: boolean; derby?: boolean; pusto?: boolean; godz?: string }
 
 /** Ustawienie slotu: [głębokość od własnej bramki 0–100, pozycja boczna 0–100]. */
 const SLOT_XY: Record<PozycjaSzczegolowa, [number, number]> = {

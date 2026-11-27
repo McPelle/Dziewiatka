@@ -1,3 +1,4 @@
+import { CoDzisWazne } from "./ZywySwiat";
 import { useState } from "react";
 import { Alert, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
@@ -298,7 +299,10 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
           <Text style={st.przyciskTekst}>Zakończ sezon — awanse i spadki ›</Text>
         </Pressable>
       ) : (
-        <PanelDnia s={s} odswiez={odswiez} pokazMecz={() => { if (rywalId) pokazMecz(); }} />
+        <>
+          <PanelDnia s={s} odswiez={odswiez} pokazMecz={() => { if (rywalId) pokazMecz(); }} />
+          <CoDzisWazne s={s} />
+        </>
       )}
 
       <View style={[st.karta, st.wiersz, { justifyContent: "space-between" }]}>

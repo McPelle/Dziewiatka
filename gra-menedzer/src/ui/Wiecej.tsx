@@ -4,6 +4,7 @@ import type { StanGry } from "../engine/types";
 import { ZapiszGre } from "./ZapiszGre";
 import { liczbaGlosow } from "./three/glos";
 import { Reprezentacja } from "./Reprezentacja";
+import { PrasaKibice } from "./ZywySwiat";
 import { zapiszSlot } from "./zapis";
 import { Finanse } from "./Finanse";
 import { Sztab } from "./Sztab";
@@ -65,6 +66,7 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
           <Text style={[st.maly, { marginTop: 3 }]}>{klub.nazwa} — wszystkie działy w jednym miejscu.</Text>
         </View>
         {Platform.OS === "web" && <UstawieniaGrafiki />}
+        <PrasaKibice s={s} />
         <Reprezentacja s={s} />
         <View style={{ flexDirection: "row", gap: 8, marginHorizontal: 12, marginTop: 10 }}>
           <Pressable

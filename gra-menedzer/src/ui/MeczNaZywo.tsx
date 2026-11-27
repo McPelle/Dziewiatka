@@ -6,6 +6,7 @@ import { FORMACJE } from "../engine/mecz";
 import { dograjDoKonca, krokMinuty, mowaWPrzerwie, NAZWA_NAST, okrzyk, OKRZYKI, podpowiedzi, przerwa, rozpocznijMeczNaZywo, zmianaGracza, zmienTaktyke, type MeczLive, type Mowa, type Okrzyk } from "../engine/meczNaZywo";
 import { maOswietlenie } from "../engine/sezon";
 import { jestDerby } from "../engine/derby";
+import { godzinaMeczu } from "../engine/zywySwiat";
 import type { Nastawienie, StanGry } from "../engine/types";
 import { Herb } from "./Herb";
 import { LogoLigi } from "./LogoLigi";
@@ -25,13 +26,14 @@ function warunki(s: StanGry, domId: string, goscId: string): Ustawienia3D {
   const k = s.kluby[domId];
   const d = dzisiaj(s).data, mies = d.getMonth() + 1;
   const h = (s.sezon * 31 + s.kolejka * 7 + domId.length) % 100;
-  const noc = maOswietlenie(k) && (mies >= 10 || mies <= 3 ? h < 55 : h < (k.poziom <= 3 ? 40 : 15));
+  const gm = godzinaMeczu(s, domId, s.kolejka, d);
+  const noc = maOswietlenie(k) && gm.wieczor;
   const zima = mies === 12 || mies <= 2, jesien = mies >= 10 && mies <= 11;
   const pogoda: Ustawienia3D["pogoda"] = zima && h % 3 === 0 ? "snieg" : (jesien || mies === 3 || mies === 4) && h % 4 === 1 ? "deszcz" : jesien && h % 9 === 2 ? "mgla" : h % 11 === 3 ? "deszcz" : "slonce";
   const pusto = domId === s.mojKlub && (s.zakazTrybun ?? 0) > 0; // kara ZPN: mecz przy pustych trybunach
   const widzowie = pusto ? 0 : Math.round(k.pojemnosc * Math.min(0.95, 0.3 + k.renoma * 0.55));
   const lekka = typeof window !== "undefined" && (window as any).localStorage?.getItem("dz_lekka") === "1";
-  return { noc, pogoda, widzowie, lekka, derby: !!jestDerby(s, domId, goscId), pusto };
+  return { noc, pogoda, widzowie, lekka, derby: !!jestDerby(s, domId, goscId), pusto, godz: gm.godz };
 }
 
 const KLUCZ_LIVE = "dz_mecz_live";
@@ -167,7 +169,7 @@ export function MeczNaZywo({ s, para, onKoniec, onAnuluj }: { s: StanGry; para: 
         <View style={[st.wiersz, { justifyContent: "center", gap: 10, paddingVertical: 4, backgroundColor: "#071710" }]}>
           <LogoLigi nazwa={s.ligi[kd.poziom - 1]?.nazwa ?? ""} poziom={kd.poziom} rozmiar={18} />
           <Text style={{ color: K.akcent, fontWeight: "900", fontFamily: CZCIONKA }}>{minuta}</Text>
-          <Text style={st.maly}>{ust.noc ? "🌙 pod reflektorami" : "☀️ dzień"} · {{ slonce: "pogodnie", deszcz: "🌧 deszcz", snieg: "❄️ śnieg (pomarańczowa piłka)", mgla: "🌫 mgła" }[ust.pogoda]} · {ust.pusto ? "🚷 puste trybuny (kara ZPN)" : `${ust.widzowie.toLocaleString("pl")} widzów`}{ust.derby ? " · ⚔ DERBY" : ""}</Text>
+          <Text style={st.maly}>🕒 {ust.godz} · {ust.noc ? "🌙 pod reflektorami" : "☀️ dzień"} · {{ slonce: "pogodnie", deszcz: "🌧 deszcz", snieg: "❄️ śnieg (pomarańczowa piłka)", mgla: "🌫 mgła" }[ust.pogoda]} · {ust.pusto ? "🚷 puste trybuny (kara ZPN)" : `${ust.widzowie.toLocaleString("pl")} widzów`}{ust.derby ? " · ⚔ DERBY" : ""}</Text>
         </View>
         {/* pasek przewagi */}
         <View style={{ flexDirection: "row", height: 4 }}><View style={{ flex: Math.max(0.05, 0.5 + m.momentum * 0.5), backgroundColor: K.akcent }} /><View style={{ flex: Math.max(0.05, 0.5 - m.momentum * 0.5), backgroundColor: K.niebieski }} /></View>

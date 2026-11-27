@@ -2,6 +2,7 @@
 // a gracz przechodzi przez dni tygodnia: regeneracja → treningi (z raportami) → [środa: puchar] → odprawa → MECZ → odpoczynek.
 // Każdy dzień treningowy nalicza 1/3 tygodniowego treningu (reszta dolicza się przy meczu, gdy przeskoczysz do meczu).
 import { postepBudow } from "./budowy";
+import { godzinaMeczu } from "./zywySwiat";
 import { dateKolejki, kalendarzSzczebla } from "./kalendarz";
 import { moznaPuchar } from "./puchar";
 import { ileKolejek, kontekstTreningu, rozwojTreningowy, zagrajKolejke } from "./sezon";
@@ -37,7 +38,7 @@ export function planTygodnia(s: StanGry): Dzien[] {
   for (let i = 0; i < 7; i++) {
     const data = new Date(pon); data.setDate(pon.getDate() + i);
     let typ: TypDnia, tytul: string, ikona: string;
-    if (i === mecz) { typ = "mecz"; tytul = "Mecz ligowy"; ikona = "⚽"; }
+    if (i === mecz) { typ = "mecz"; const para = lg?.terminarz[s.kolejka]?.find(([a, b]) => a === s.mojKlub || b === s.mojKlub); tytul = `Mecz ligowy${para ? ` · godz. ${godzinaMeczu(s, para[0], s.kolejka, data).godz}` : ""}`; ikona = "⚽"; }
     else if (i > mecz) { typ = "wolne"; tytul = "Odpoczynek po meczu · mecz juniorów"; ikona = "🛌"; }
     else if (i === 0) { typ = "regeneracja"; tytul = "Regeneracja i raport medyczny"; ikona = "🩺"; }
     else if (i === 2 && puchar) { typ = "puchar"; tytul = "Mecz pucharowy (środa)"; ikona = "🏆"; }
