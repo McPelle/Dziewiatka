@@ -101,6 +101,17 @@ function bandy(sponsorzy: string[], led: boolean, odl = 4): THREE.Group {
 }
 
 export interface OpcjeStadionu { noc: boolean; snieg: boolean; deszcz: boolean; widzowie: number; budowy?: Budowa[]; lekka?: boolean }
+const OS_Y = new THREE.Vector3(0, 1, 0);
+let _tekstKib: THREE.CanvasTexture | null = null;
+/** Sylwetka kibica (głowa + tułów) — biała z przezroczystością; kolor koszulki/szalika nadaje kolor instancji. */
+function teksturaKibica(): THREE.Texture {
+  if (_tekstKib || typeof document === "undefined") return _tekstKib ?? new THREE.Texture();
+  const c = document.createElement("canvas"); c.width = 32; c.height = 64; const g = c.getContext("2d")!;
+  g.fillStyle = "#ffffff"; g.beginPath(); g.ellipse(16, 13, 7, 8, 0, 0, Math.PI * 2); g.fill(); // głowa
+  g.beginPath(); g.moveTo(3, 64); g.lineTo(4, 34); g.quadraticCurveTo(16, 22, 28, 34); g.lineTo(29, 64); g.closePath(); g.fill(); // tułów
+  g.fillStyle = "rgba(0,0,0,0.25)"; g.fillRect(4, 40, 24, 3); // cień kołnierza
+  _tekstKib = new THREE.CanvasTexture(c); _tekstKib.colorSpace = THREE.SRGBColorSpace; return _tekstKib;
+}
 export interface Stadion3D { grupa: THREE.Group; kibice?: THREE.InstancedMesh; kibiceBaza: Float32Array; reflektory: THREE.Object3D[]; siatki: THREE.Mesh[]; aktualizuj: (t: number, emocje: number) => void }
 
 /** Typowy stadion (kluby bez prawdziwego kształtu): trybuny wg pojemności — jak dotąd (podzialTrybun). */
@@ -189,32 +200,71 @@ export function zbudujStadion(s: StanGry | null, klub: Klub, o: OpcjeStadionu): 
   }
   const strony = tryb?.strony ?? {};
   // ——— kibice (instancje; osobno dla każdej trybuny, by chować je razem z trybuną przy kamerze „na trybunie") ———
-  const grupyKibicow: { im: THREE.InstancedMesh; baza: Float32Array }[] = [];
+  // każdy kibic: próg wstawania (różne reakcje), czy ma szalik; młyn (trybuna za bramką gospodarzy) stoi i skacze cały mecz
+  const grupyKibicow: { im: THREE.InstancedMesh; baza: Float32Array; prog: Float32Array; mlyn: boolean; szal?: THREE.InstancedMesh; szalIdx?: Int32Array; yaw: Float32Array }[] = [];
   const wsz = zrodla.reduce((a, z) => a + (z.dolne.length + z.gorne.length) / 3, 0);
-  const ile = Math.min(o.lekka ? 1500 : 6000, Math.round(wsz * Math.min(1, o.widzowie / Math.max(1, poj))));
+  // gęsto: miejsca co ~0,55 m w każdym rzędzie; kibic = lekka sylwetka (2 trójkąty) zwrócona do boiska → dużo więcej postaci
+  const ile = Math.min(o.lekka ? 9000 : 22000, Math.round(wsz * Math.min(1, o.widzowie / Math.max(1, poj))));
   if (ile > 0) {
     const frac = ile / wsz;
-    const geoK = new THREE.BoxGeometry(0.42, 0.9, 0.3), matK = new THREE.MeshStandardMaterial({ roughness: 0.9 });
+    const geoK = new THREE.PlaneGeometry(0.5, 0.9), matK = new THREE.MeshLambertMaterial({ map: teksturaKibica(), alphaTest: 0.45, side: THREE.DoubleSide });
+    (geoK as unknown as { parameters: { height: number } }).parameters.height = 0.9;
     const mtx = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), sc = new THREE.Vector3(1, 1, 1), col = new THREE.Color();
     const kolory = [kol1, kol2, "#222222", "#3a4a6a", "#d0d0d0", "#7a2a2a", kol1];
-    const wybierz = (arr: number[]): number[] => {
-      const n = arr.length / 3, k = Math.min(n, Math.round(n * frac)), idx = Array.from({ length: n }, (_, i) => i);
-      for (let i = 0; i < k; i++) { const j = i + Math.floor(r() * (n - i)); const t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
-      return idx.slice(0, k);
-    };
-    for (const z of zrodla) {
-      const dol = wybierz(z.dolne), gor = wybierz(z.gorne), n = dol.length + gor.length;
+    void frac;
+    // Rozmieszczenie jak na prawdziwym meczu: każde miejsce dostaje „atrakcyjność” — trybuna główna (S) pierwsza, potem
+    // naprzeciwko (N), za bramkami (W/E) i narożniki na końcu; dolne rzędy i okolice linii środkowej przed górą i rogami;
+    // młyn za bramką gospodarzy zawsze gęsty; sektor gości zbity w jednym rogu; ludzie przychodzą grupkami (plamy).
+    // Zajmujemy `ile` najlepszych miejsc — przy małej frekwencji pełny środek głównej i młyn, puste końce i góra.
+    const PRIO: Record<string, number> = { S: 1, L: 1, N: 0.72, W: 0.42, E: 0.42, X: 0.18 };
+    const szum = (x: number, y: number) => { const h = Math.sin(Math.floor(x / 3.2) * 12.9898 + Math.floor(y / 1.6) * 78.233) * 43758.5453; return (h - Math.floor(h)) - 0.5; };
+    const kand: { zi: number; tier: 0 | 1; i: number; s: number }[] = [];
+    zrodla.forEach((z, zi) => {
+      const pr = PRIO[z.klucz] ?? 0.4;
+      for (const tier of [0, 1] as const) { const arr = tier ? z.gorne : z.dolne; const n = arr.length / 3;
+        for (let i = 0; i < n; i++) {
+          const x = arr[i * 3], y = arr[i * 3 + 1], zz = arr[i * 3 + 2];
+          let s = pr - tier * 0.28 - Math.min(1, y / 25) * 0.18 + szum(x + zi * 50, y + tier * 30) * 0.32 + r() * 0.06;
+          if (z.klucz === "S" || z.klucz === "N" || z.klucz === "L") s -= (Math.abs(x) / (DL / 2)) * 0.3; // środek trybuny lepszy niż rogi
+          else s -= (Math.abs(zz) / (SZ / 2)) * 0.15;
+          if ((z.klucz === "W" || z.klucz === "E") && x < 0 && Math.abs(zz) < SZ * 0.3 && tier === 0) s += 1.1; // młyn gospodarzy
+          if ((z.klucz === "W" || z.klucz === "E") && x > 0 && zz < -SZ * 0.12 && zz > -SZ * 0.42 && tier === 0) s += 0.55; // sektor gości
+          kand.push({ zi, tier, i, s });
+        } }
+    });
+    kand.sort((a, b) => b.s - a.s);
+    const wybrane = zrodla.map(() => ({ dol: [] as number[], gor: [] as number[] }));
+    for (const c of kand.slice(0, ile)) (c.tier ? wybrane[c.zi].gor : wybrane[c.zi].dol).push(c.i);
+    for (let zi = 0; zi < zrodla.length; zi++) {
+      const z = zrodla[zi];
+      const dol = wybrane[zi].dol, gor = wybrane[zi].gor, n = dol.length + gor.length;
       if (!n) continue;
-      const im = new THREE.InstancedMesh(geoK, matK, n), baza = new Float32Array(n * 3);
+      const im = new THREE.InstancedMesh(geoK, matK, n), baza = new Float32Array(n * 3), yaw = new Float32Array(n);
       let k = 0;
       for (const [arr, lista] of [[z.dolne, dol], [z.gorne, gor]] as [number[], number[]][]) for (const i of lista) {
         v.set(arr[i * 3] + (r() - 0.5) * 0.15, arr[i * 3 + 1], arr[i * 3 + 2]);
         baza[k * 3] = v.x; baza[k * 3 + 1] = v.y; baza[k * 3 + 2] = v.z;
-        mtx.compose(v, q, sc); im.setMatrixAt(k, mtx); im.setColorAt(k, col.set(kolory[Math.floor(r() * kolory.length)])); k++;
+        yaw[k] = Math.atan2(-v.x, -v.z) + (r() - 0.5) * 0.3; q.setFromAxisAngle(OS_Y, yaw[k]);
+        sc.set(1, 0.66, 1); v.y -= 0.15; mtx.compose(v, q, sc); im.setMatrixAt(k, mtx); im.setColorAt(k, col.set(kolory[Math.floor(r() * kolory.length)])); k++;
       }
+      q.identity(); sc.set(1, 1, 1);
       const nDol = dol.length, ukryj = z.ukryj;
       if (ukryj) im.onBeforeRender = (_r, _s, cam) => { const u = ukryj(cam); im.count = u === 2 ? 0 : u === 1 ? nDol : n; };
-      im.castShadow = false; grupa.add(im); grupyKibicow.push({ im, baza });
+      im.castShadow = false; grupa.add(im);
+      const prog = new Float32Array(n); for (let i = 0; i < n; i++) prog[i] = r();
+      // szaliki: ok. 35% kibiców (w młynie 70%) — cienki pasek w barwach klubu, unoszony nad głowę i wymachiwany
+      let sx = 0, cnt = 0; for (let i = 0; i < n; i++) { sx += baza[i * 3]; cnt++; } const srX = cnt ? sx / cnt : 0;
+      const mlyn = Math.abs(srX) > DL / 2 - 2 && srX < 0;
+      const ileSz = Math.round(n * (mlyn ? 0.7 : 0.35)); const szalIdx = new Int32Array(ileSz);
+      for (let i = 0; i < ileSz; i++) szalIdx[i] = Math.floor(r() * n);
+      let szal: THREE.InstancedMesh | undefined;
+      if (ileSz && !o.lekka) {
+        szal = new THREE.InstancedMesh(new THREE.BoxGeometry(0.95, 0.12, 0.02), new THREE.MeshBasicMaterial({ color: kol1 }), ileSz);
+        for (let i = 0; i < ileSz; i++) { szal.setColorAt(i, col.set(i % 2 ? kol1 : kol2)); mtx.makeScale(0, 0, 0); szal.setMatrixAt(i, mtx); }
+        szal.frustumCulled = false; if (ukryj) szal.onBeforeRender = (_r, _s, cam) => { szal!.count = ukryj(cam) === 2 ? 0 : ileSz; };
+        grupa.add(szal);
+      }
+      grupyKibicow.push({ im, baza, prog, mlyn, szal, szalIdx, yaw });
     }
   }
   const glowni = grupyKibicow.slice().sort((a, b) => b.baza.length - a.baza.length)[0];
@@ -296,15 +346,40 @@ export function zbudujStadion(s: StanGry | null, klub: Klub, o: OpcjeStadionu): 
     bud.position.set(pos[0], 0, pos[1]); grupa.add(bud);
   }
   const mtx = new THREE.Matrix4(), v = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3(1, 1, 1);
+  let klatka = 0, ostE = -1;
+  const v2 = new THREE.Vector3(), sc2 = new THREE.Vector3(), q2 = new THREE.Quaternion(), eul = new THREE.Euler(), m2 = new THREE.Matrix4();
   const aktualizuj = (t: number, emocje: number) => {
-    // kibice: podskakują i falują przy emocjach (gol, groźna akcja)
-    if (emocje > 0.05) for (const { im, baza } of grupyKibicow) {
-      const n = baza.length / 3;
-      for (let i = 0; i < n; i += 1) {
-        const skok = Math.max(0, Math.sin(t * 9 + i * 1.7)) * 0.45 * emocje;
-        v.set(baza[i * 3], baza[i * 3 + 1] + skok, baza[i * 3 + 2]); mtx.compose(v, q, sc); im.setMatrixAt(i, mtx);
+    // kibice: siedzą; przy groźnej akcji wstają (każdy z innym progiem), przy golu skaczą; młyn stoi i skacze cały mecz;
+    // szaliki unoszone nad głowy i wymachiwane. Aktualizacja co 2. klatkę (wydajność), a w spokoju tylko po zmianie emocji.
+    klatka++;
+    const spokoj = emocje < 0.03 && Math.abs(emocje - ostE) < 0.01;
+    if (!(spokoj && !grupyKibicow.some((g) => g.mlyn)) && klatka % 2 === 0) {
+      ostE = emocje;
+      const stoj = Math.min(1, emocje * 1.7);
+      for (const g of grupyKibicow) {
+        const { im, baza, prog, mlyn, yaw } = g; const n = baza.length / 3;
+        if (spokoj && !mlyn) continue;
+        for (let i = 0; i < n; i++) {
+          const wstal = mlyn || stoj > prog[i];
+          const h = wstal ? 1 : 0.66;
+          const skok = (mlyn ? Math.max(0, Math.sin(t * 6.5 + (i % 7) * 0.4)) * 0.28 : 0) + (wstal && emocje > 0.6 ? Math.max(0, Math.sin(t * 9 + i * 1.7)) * 0.45 * emocje : 0);
+          v2.set(baza[i * 3], baza[i * 3 + 1] - (1 - h) * 0.45 + skok, baza[i * 3 + 2]); sc2.set(1, h, 1);
+          q2.setFromAxisAngle(OS_Y, yaw[i]); m2.compose(v2, q2, sc2); im.setMatrixAt(i, m2);
+        }
+        im.instanceMatrix.needsUpdate = true;
+        if (g.szal && g.szalIdx) {
+          const pokaz = mlyn || emocje > 0.35;
+          for (let j = 0; j < g.szalIdx.length; j++) {
+            const i = g.szalIdx[j];
+            if (!pokaz) { m2.makeScale(0, 0, 0); g.szal.setMatrixAt(j, m2); continue; }
+            const kat = Math.sin(t * (mlyn ? 5 : 8) + j * 0.9) * 0.6; // wymachiwanie
+            v2.set(baza[i * 3], baza[i * 3 + 1] + 0.95 + Math.abs(Math.sin(t * 4 + j)) * 0.15, baza[i * 3 + 2]);
+            eul.set(0, Math.atan2(-baza[i * 3], -baza[i * 3 + 2]), kat); q2.setFromEuler(eul); sc2.set(1, 1, 1);
+            m2.compose(v2, q2, sc2); g.szal.setMatrixAt(j, m2);
+          }
+          g.szal.instanceMatrix.needsUpdate = true;
+        }
       }
-      im.instanceMatrix.needsUpdate = true;
     }
     grupa.traverse((x) => { if (x.name === "wysiegnik") x.rotation.y = Math.sin(t * 0.15) * 0.6; if (x.name === "robotnik") x.position.y = Math.abs(Math.sin(t * 3 + x.id)) * 0.08; });
   };
