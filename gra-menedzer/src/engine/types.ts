@@ -412,6 +412,8 @@ export interface StanGry {
   konferencja?: Konferencja;
   motywacjaMeczu?: number;
   jesienZapisana?: number; // sezon, w którym zapisano stan meczów po rundzie jesiennej
+  okres?: import("./okres").Okres; // trwający okres przygotowawczy (lato/zima)
+  zimaSezon?: number; // sezon, w którym rozegrano już przerwę zimową
   dzien?: number; // dzień tygodnia w kalendarzu (0 = poniedziałek … 6 = niedziela); mecz ligowy w sobotę
   treningiDni?: number; // ile dni treningowych tego tygodnia już wykonano (każdy = 1/3 tygodniowego treningu)
   raportyDni?: { data: string; tytul: string; ikona: string; wpisy: string[] }[]; // dziennik kalendarza (ostatnie dni)

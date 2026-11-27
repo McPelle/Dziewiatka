@@ -15,11 +15,12 @@ export function rokJesieni(sezon: number): number {
 }
 
 /** Surowa data danej kolejki (do okien transferowych i wyświetlania). */
-export function dateKolejki(sezon: number, liczbaKolejek: number, kolejka: number): Date {
+export function dateKolejki(sezon: number, liczbaKolejek: number, kolejka: number, kal?: KalSzczebla): Date {
   const half = Math.ceil(liczbaKolejek / 2);
   const rJ = rokJesieni(sezon), rW = rJ + 1;
-  if (kolejka < half) { const d = new Date(rJ, 7, 2); d.setDate(d.getDate() + kolejka * 7); return d; }
-  const d = new Date(rW, 2, 1); d.setDate(d.getDate() + (kolejka - half) * 7); return d;
+  const [mJ, dJ] = kal?.startJesien ?? [8, 2], [mW, dW] = kal?.startWiosna ?? [3, 1];
+  if (kolejka < half) { const d = new Date(rJ, mJ - 1, dJ); d.setDate(d.getDate() + kolejka * 7); return d; }
+  const d = new Date(rW, mW - 1, dW); d.setDate(d.getDate() + (kolejka - half) * 7); return d;
 }
 
 /** Data (tekst) danej kolejki wg rytmu jesień/wiosna. */
@@ -91,4 +92,34 @@ export function dataNajblizszej(s: StanGry, liczbaKolejek: number): { tekst: str
 /** Czy właśnie zaczyna się runda wiosenna (po przerwie zimowej). */
 export function koniecPrzerwyZimowej(s: StanGry, liczbaKolejek: number): boolean {
   return s.kolejka === Math.ceil(liczbaKolejek / 2);
+}
+
+// ——— Kalendarz szczebli: start rund i okresy przygotowawcze (lato / zima) ———
+// Wartości wg typowych terminarzy PZPN/ZPN (Ekstraklasa startuje pod koniec lipca, klasy A/B pod koniec sierpnia;
+// runda wiosenna: Ekstraklasa koniec stycznia/luty, niższe ligi marzec–kwiecień). Urlop i przygotowania liczone w dniach.
+export interface KalSzczebla { startJesien: [number, number]; startWiosna: [number, number]; urlopLato: number; urlopZima: number; przygLato: number; przygZima: number }
+// Realne terminarze 2026/27 (PZPN B1L/B2L/B3L, ekstraklasa.org, ramowe terminarze K-PZPN i ZZPN; MZPN i Pomorski ZPN —
+// wiosna wg 2025/26). Urlop + przygotowania = przerwa między ostatnią a pierwszą kolejką danej rundy.
+const KAL: { re: RegExp; k: KalSzczebla }[] = [
+  { re: /ekstraklasa/i, k: { startJesien: [7, 25], startWiosna: [1, 30], urlopLato: 27, urlopZima: 21, przygLato: 37, przygZima: 28 } },
+  { re: /\b1\.? liga|\bi liga/i, k: { startJesien: [7, 25], startWiosna: [2, 6], urlopLato: 24, urlopZima: 21, przygLato: 33, przygZima: 35 } },
+  { re: /\b2\.? liga|\bii liga/i, k: { startJesien: [7, 25], startWiosna: [2, 20], urlopLato: 24, urlopZima: 28, przygLato: 33, przygZima: 49 } },
+  { re: /\b3\.? liga|\biii liga/i, k: { startJesien: [8, 1], startWiosna: [2, 27], urlopLato: 28, urlopZima: 35, przygLato: 36, przygZima: 56 } },
+  { re: /iv liga/i, k: { startJesien: [8, 8], startWiosna: [3, 7], urlopLato: 26, urlopZima: 55, przygLato: 30, przygZima: 49 } },
+  { re: /v liga|okręgow/i, k: { startJesien: [8, 15], startWiosna: [3, 14], urlopLato: 30, urlopZima: 70, przygLato: 30, przygZima: 43 } },
+  { re: /klasa a/i, k: { startJesien: [8, 22], startWiosna: [3, 20], urlopLato: 42, urlopZima: 84, przygLato: 28, przygZima: 35 } },
+  { re: /klasa (b|c)/i, k: { startJesien: [8, 29], startWiosna: [3, 28], urlopLato: 49, urlopZima: 98, przygLato: 28, przygZima: 36 } },
+];
+export function kalendarzSzczebla(nazwaLigi: string, poziom: number): KalSzczebla {
+  return (KAL.find((x) => x.re.test(nazwaLigi)) ?? KAL[Math.min(KAL.length - 1, Math.max(0, poziom - 1))]).k;
+}
+/** Okres (lato/zima) dla poziomu: data startu urlopu, długość urlopu i przygotowań — tak, by kończyły się ze startem rundy. */
+export function okresyDlaPoziomu(s: StanGry, poziom: number, rodzaj: "lato" | "zima"): { start: Date; urlop: number; przygotowania: number } {
+  const k = kalendarzSzczebla(s.ligi[poziom - 1]?.nazwa ?? "", poziom);
+  const rok = rodzaj === "lato" ? rokJesieni(s.sezon) : rokJesieni(s.sezon) + 1;
+  const [m, d] = rodzaj === "lato" ? k.startJesien : k.startWiosna;
+  const startRundy = new Date(rok, m - 1, d);
+  const urlop = rodzaj === "lato" ? k.urlopLato : k.urlopZima, przyg = rodzaj === "lato" ? k.przygLato : k.przygZima;
+  const start = new Date(startRundy); start.setDate(start.getDate() - urlop - przyg);
+  return { start, urlop, przygotowania: przyg };
 }

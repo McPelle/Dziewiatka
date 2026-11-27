@@ -2,7 +2,7 @@
 // klub bierze ich na okres próbny, poznaje prawdziwą jakość STOPNIOWO (przedział szacunkowy zwęża się z
 // obserwacjami/treningiem), skaut dodaje werdykt — po kilkunastu tygodniach decyzja: podpisz albo odeślij.
 import { los, losInt, szansa, wybierz } from "./losuj";
-import { dlugoscKontraktu, generujKariere, KADRA, nowyZawodnik, pensjaDla, przejscieDoKlubu, zakresUmiej } from "./swiat";
+import { dlugoscKontraktu, generujKariere, KADRA, kontraktTyp, nowyZawodnik, pensjaDla, przejscieDoKlubu, zakresUmiej } from "./swiat";
 import { poziomSztabu } from "./sztab";
 import { oknoTransferowe } from "./kalendarz";
 import type { Pozycja, StanGry, Zawodnik } from "./types";
@@ -119,7 +119,7 @@ export function podpiszZTestow(s: StanGry, id: string): string | null {
   moj.testowani = (moj.testowani ?? []).filter((x) => x !== id);
   z.test = undefined;
   z.klubId = moj.id;
-  z.kontraktTyp = moj.poziom <= 3 ? "polprofesjonalny" : "amator";
+  z.kontraktTyp = kontraktTyp(moj.poziom);
   z.kontraktDo = s.sezon + dlugoscKontraktu(moj.poziom, false, z.wiek);
   z.pensja = pensjaDla(z.umiej, moj.poziom);
   { const uzyte = new Set(moj.zawodnicy.map((x) => s.zawodnicy[x].numer).filter((n) => n > 0)); let n = z.poz === "BR" ? 1 : 2; while (uzyte.has(n) && n < 99) n++; z.numer = n; }
@@ -144,4 +144,19 @@ export function sprzatnijRynekTestow(s: StanGry): void {
   if (mozeTesty(s) || !s.testRynek?.length) return;
   for (const id of s.testRynek) { const z = s.zawodnicy[id]; if (z) { z.test = undefined; if (!s.wolni.includes(id)) s.wolni.push(id); } }
   s.testRynek = [];
+}
+
+/** Obserwacje testowanych w okresie przygotowawczym (trening = pół obserwacji, sparing/mecz testowy = pełna). */
+export function obserwujTestowanych(s: StanGry, ile: number): string[] {
+  const moj = s.kluby[s.mojKlub];
+  const skaut = poziomSztabu(s, "skaut");
+  const out: string[] = [];
+  for (const id of moj.testowani ?? []) {
+    const z = s.zawodnicy[id]; if (!z || !z.test) continue;
+    const przed = (z.test.max - z.test.min);
+    z.test.obs += ile;
+    ustawBand(z, Math.floor(z.test.obs), skaut);
+    if (z.test.max - z.test.min < przed) out.push(`🧪 ${z.imie} ${z.nazwisko}: ${raportTestu(z)}`);
+  }
+  return out;
 }

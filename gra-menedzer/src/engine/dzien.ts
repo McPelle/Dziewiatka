@@ -1,10 +1,11 @@
 // Kalendarz dzień po dniu (jak w Football Managerze). Silnik rozgrywek pozostaje „kolejkowy" (1 kolejka = 1 tydzień),
 // a gracz przechodzi przez dni tygodnia: regeneracja → treningi (z raportami) → [środa: puchar] → odprawa → MECZ → odpoczynek.
 // Każdy dzień treningowy nalicza 1/3 tygodniowego treningu (reszta dolicza się przy meczu, gdy przeskoczysz do meczu).
-import { dateKolejki } from "./kalendarz";
+import { dateKolejki, kalendarzSzczebla } from "./kalendarz";
 import { moznaPuchar } from "./puchar";
 import { ileKolejek, kontekstTreningu, rozwojTreningowy, zagrajKolejke } from "./sezon";
 import { ETYKIETA_ATRYB } from "./atrybuty";
+import { dataOkresu, dzienOkresu, nazwaDnia, rozpocznijOkres } from "./okres";
 import type { StanGry, Zawodnik } from "./types";
 
 export type TypDnia = "regeneracja" | "trening" | "puchar" | "odprawa" | "mecz" | "wolne";
@@ -25,7 +26,8 @@ export function dzienMeczu(s: StanGry): number {
 /** Plan bieżącego tygodnia (7 dni). */
 export function planTygodnia(s: StanGry): Dzien[] {
   const mecz = dzienMeczu(s);
-  const dMeczu = dateKolejki(s.sezon, ileKolejek(s), s.kolejka);
+  const lg = s.ligi[s.kluby[s.mojKlub].poziom - 1];
+  const dMeczu = dateKolejki(s.sezon, ileKolejek(s), s.kolejka, kalendarzSzczebla(lg?.nazwa ?? "", lg?.poziom ?? 1));
   const pon = new Date(dMeczu); pon.setDate(pon.getDate() - mecz);
   const puchar = moznaPuchar(s);
   const plan: Dzien[] = [];
@@ -96,6 +98,15 @@ function raportMedyczny(s: StanGry): string[] {
 /** Przejdź do następnego dnia. Zwraca true, jeśli tego dnia rozegrano mecz Twojej drużyny (UI pokazuje relację). */
 export function dalejDzien(s: StanGry): boolean {
   if (s.koniecSezonu || s.zwolniony) return false;
+  // Przerwa zimowa: po rundzie jesiennej, przed pierwszym tygodniem wiosny — okres zimowy (urlop + przygotowania).
+  const pol = Math.ceil(ileKolejek(s) / 2);
+  if (!s.okres && s.kolejka === pol && (s.dzien ?? 0) === 0 && s.zimaSezon !== s.sezon) { s.zimaSezon = s.sezon; rozpocznijOkres(s, "zima"); }
+  if (s.okres) {
+    const dzO = dataOkresu(s);
+    const r = dzienOkresu(s);
+    if (r) zapiszRaport(s, { idx: 0, nazwa: nazwaDnia(dzO), data: dzO, typ: "wolne", tytul: r.tytul, ikona: r.ikona }, r.wpisy);
+    return false;
+  }
   const d = dzisiaj(s);
   if (d.typ === "mecz") {
     zagrajKolejke(s);
@@ -116,5 +127,6 @@ export function dalejDzien(s: StanGry): boolean {
 /** Przeskocz do dnia meczu (pozostałe dni treningowe wykonują się w tle). */
 export function doMeczu(s: StanGry) {
   let g = 0;
+  if (s.okres) { while (s.okres && g++ < 200) dalejDzien(s); return; }
   while (dzisiaj(s).typ !== "mecz" && g++ < 8) dalejDzien(s);
 }

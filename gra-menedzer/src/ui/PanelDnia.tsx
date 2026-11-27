@@ -3,10 +3,12 @@ import { Pressable, Text, View } from "react-native";
 import { dalejDzien, doMeczu, dzisiaj, fmtData, planTygodnia } from "../engine/dzien";
 import type { StanGry } from "../engine/types";
 import { CZCIONKA, K, st } from "./styl";
+import { PanelOkresu } from "./PanelOkresu";
 
 /** Panel kalendarza na pulpicie: dzisiejszy dzień, plan tygodnia, raport ostatniego dnia, przyciski Dalej / Do meczu. */
 export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => void; pokazMecz: () => void }) {
   const [rozwin, setRozwin] = useState(true);
+  if (s.okres) return <PanelOkresu s={s} odswiez={odswiez} />;
   const plan = planTygodnia(s);
   const d = dzisiaj(s);
   const raport = s.raportyDni?.[0];

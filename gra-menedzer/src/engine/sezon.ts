@@ -2,6 +2,7 @@ import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj"
 import { AFILIACJE, PRZYJAZNIE } from "../data/derby";
 import { klubyLigiZDanych, rodzenstwo, trafiaDo } from "./regiony";
 import { rozliczObietnice } from "./rozmowy";
+import { rozpocznijOkres } from "./okres";
 import { nrZespolu, powolaniaAI, zespolyKlubu } from "./rezerwy";
 import { konferencjaPo, konferencjaPrzed } from "./konferencje";
 import { autoSklad, raportAsystenta, dostepny, FORMACJE, ileSpozaUE, limitSpozaUE, zagrajMecz } from "./mecz";
@@ -309,6 +310,7 @@ export function rozpocznijKariere(s: StanGry, klubId: string) {
   przygotujKolejke(s);
   s.puchar = nowyPuchar(s);
   s.trening = "ogolny";
+  rozpocznijOkres(s, "lato"); if (s.okres) { const st0 = new Date(s.okres.start); st0.setDate(st0.getDate() + s.okres.dniUrlopu); s.okres.start = st0.toISOString(); s.okres.dniUrlopu = 0; } // nowa kariera zaczyna się od okresu przygotowawczego
   zasiejAkademie(s);          // startowy skład akademii U-19/U-17
   inicjujRozgrywkiJun(s);     // ligi i puchary juniorów w regionie
   s.sponsorzy = sponsorzyStartowi(s);
@@ -422,6 +424,7 @@ export function kosztObozu(s: StanGry, idx: number): number {
 }
 /** Czy obóz jest dostępny — w przerwie (od połowy sezonu), raz na sezon. */
 export function obozDostepny(s: StanGry): boolean {
+  return false; // obozy tylko w okresach przygotowawczych (lato/zima) — patrz okres.ts
   if (s.koniecSezonu || s.zwolniony) return false;
   if (s.obozSezon === s.sezon) return false;
   return s.kolejka >= Math.floor(ileKolejek(s) / 2);
@@ -2084,6 +2087,7 @@ export function nowySezon(s: StanGry) {
   s.celPodniesiony = false;  // dynamiczny cel znów możliwy
   rozwojSztabuILicencji(s);  // sztab rośnie, trener zdobywa licencje
   s.sezon++;
+  if (!s.zwolniony) rozpocznijOkres(s, "lato"); // okres letni: urlop + przygotowania (sparingi, obóz, testy)
   // Jubileusz klubu: okrągła rocznica założenia (25/50/75/100…) — mecz gali, oprawa kibiców, zastrzyk entuzjazmu.
   { const mk = s.kluby[s.mojKlub];
     if (mk?.zalozony) {
