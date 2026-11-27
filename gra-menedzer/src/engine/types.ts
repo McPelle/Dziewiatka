@@ -400,7 +400,8 @@ export interface StanGry {
   wedrujacaOprawa?: import("./oprawy").WedrujacaOprawa; // biało-czerwona oprawa z orłami krążąca po klubach
   trudnosc?: string; // poziom trudności: latwy | normalny | trudny | legendarny
   osiagniecia?: Record<string, number>; // id osiągnięcia → sezon odblokowania
-  osiagnieciaFlagi?: { trening?: boolean; mowa?: boolean };
+  osiagnieciaFlagi?: { trening?: boolean; mowa?: boolean; [k: string]: boolean | undefined };
+  wyzwanie?: import("./wyzwania").StanWyzwania; // tryb Wyzwania: aktywny scenariusz
   startPoziom?: number; // szczebel klubu na starcie kariery
   noweFlagi?: Record<string, { tekst: string; typ: string; sezon: number }[]>; // flagi dorabiane przez kibiców z czasem
   oprawyUzyte?: Record<string, string[]>; // podpisy pokazanych opraw każdego klubu — oprawa nigdy się nie powtarza // opinia policji o organizacji meczów 0–100

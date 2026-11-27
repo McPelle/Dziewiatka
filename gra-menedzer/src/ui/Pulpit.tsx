@@ -4,6 +4,7 @@ import { grafika3D } from "./three/Stadion3DWidok";
 import { bilansZRywalem } from "../engine/zywySwiat";
 import { Samouczek } from "./Samouczek";
 import { PodsumowanieSezonu } from "./PodsumowanieSezonu";
+import { KartaWyzwania } from "./Wyzwania";
 import { nowiWKlubie, Prezentacja } from "./Prezentacja";
 import { prognozaMeczu } from "../engine/pogoda";
 import { useState } from "react";
@@ -306,6 +307,7 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
         );
       })()}
 
+      <KartaWyzwania s={s} />
       {s.koniecSezonu && (magazyn || s.magazynSezon !== s.sezon) && <PodsumowanieSezonu s={s} onZamknij={() => { s.magazynSezon = s.sezon; setMagazyn(false); odswiez(); }} />}
       {s.koniecSezonu && <Pressable style={[st.przyciskMaly, { marginHorizontal: 12, marginTop: 10 }]} onPress={() => setMagazyn(true)}><Text style={st.przyciskMalyTekst}>📺 Magazyn — podsumowanie sezonu</Text></Pressable>}
       {s.koniecSezonu ? (

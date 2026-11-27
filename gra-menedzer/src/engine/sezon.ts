@@ -1,3 +1,4 @@
+import { sprawdzWyzwanieKolejka, sprawdzWyzwanieSezon } from "./wyzwania";
 import { dotacjaGminy, poMeczu, wyjazdBusem } from "./zywySwiat";
 import { czasNaKadre, przerwaNaKadre } from "./reprezentacje";
 import { utrudnieniaMeczu } from "./budowy";
@@ -1014,6 +1015,7 @@ export function zagrajKolejke(s: StanGry) {
   if (moznaPuchar(s)) rundaPucharu(s);
   for (const w of tydzienJezykow(s)) wiadomosc(s, w); // nauka polskiego cudzoziemców, kurs, tłumacz
   for (const w of sprawdzOsiagniecia(s)) wiadomosc(s, w); // osiągnięcia trenera
+  { const t = sprawdzWyzwanieKolejka(s); if (t) wiadomosc(s, t); } // tryb Wyzwania
   { const t = tydzienZgod(s, s.kluby[s.mojKlub]); if (t) wiadomosc(s, t); }
   { const t = tydzienLicencji(s); if (t) wiadomosc(s, t); } // kurs UEFA, egzamin, wymogi licencyjne ligi // życie zgód: jubileusze, zerwania, nowe układy
   { // wędrująca oprawa z orłami — po stadionach scen kibicowskich (przez zgody)
@@ -2161,6 +2163,7 @@ export function nowySezon(s: StanGry) {
   s.celPodniesiony = false;  // dynamiczny cel znów możliwy
   rozwojSztabuILicencji(s);  // sztab rośnie, trener zdobywa licencje
   realizujUmowyWstepne(s); // umowy wstępne: wolne transfery latem
+  { const t = sprawdzWyzwanieSezon(s); if (t) wiadomosc(s, t); } // tryb Wyzwania: ocena celu
   s.sezon++;
   dotacjaGminy(s); // klub amatorski: dotacja z gminy na nowy sezon
   if (!s.zwolniony) rozpocznijOkres(s, "lato"); // okres letni: urlop + przygotowania (sparingi, obóz, testy)
