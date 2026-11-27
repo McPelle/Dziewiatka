@@ -401,6 +401,7 @@ export interface StanGry {
   trudnosc?: string; // poziom trudności: latwy | normalny | trudny | legendarny
   osiagniecia?: Record<string, number>; // id osiągnięcia → sezon odblokowania
   osiagnieciaFlagi?: { trening?: boolean; mowa?: boolean; [k: string]: boolean | undefined };
+  budzetSezonu?: import("./budzetZarzadu").BudzetSezonu; // budżet sezonu uzgodniony z zarządem + rozliczenia kwartalne
   wydzial?: import("./wydzialGier").StanWydzialu; // protesty, oceny sędziów, zaległości płacowe / Izba PZPN
   wyzwanie?: import("./wyzwania").StanWyzwania; // tryb Wyzwania: aktywny scenariusz
   startPoziom?: number; // szczebel klubu na starcie kariery

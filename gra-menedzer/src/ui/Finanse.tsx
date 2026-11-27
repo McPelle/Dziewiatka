@@ -3,6 +3,7 @@ import { zl } from "../engine/losuj";
 import { aktywniSponsorzy, bilansKolejki, ileKolejek, nazwaSponsora } from "../engine/sezon";
 import type { StanGry } from "../engine/types";
 import { K, st } from "./styl";
+import { BudzetZarzadu } from "./BudzetZarzadu";
 
 /** Centrum finansów klubu (R1): kasa, przychody/koszty na kolejkę, sponsorzy, bilety/karnety, kara PZPN, prognoza sezonu. */
 export function Finanse({ s, widoczny, onClose }: { s: StanGry; widoczny: boolean; onClose: () => void }) {
@@ -37,6 +38,7 @@ export function Finanse({ s, widoczny, onClose }: { s: StanGry; widoczny: boolea
               {k.karaPunktowa ? <Text style={[st.maly, { color: K.czerwony, marginTop: 4 }]}>⚖️ Kara PZPN: −{k.karaPunktowa} pkt w tym sezonie (za zadłużenie). Ureguluj finanse, by ją cofnąć.</Text> : null}
             </View>
 
+            <BudzetZarzadu s={s} />
             <Text style={[st.naglowek, { marginTop: 4 }]}>Bilans na kolejkę</Text>
             {wiersz("Sponsorzy", `+${zl(Math.round(b.sponsor))}`, K.zielony)}
             {wiersz("Bilety (dzień meczowy)", `+${zl(Math.round(b.bilety))}`, K.zielony)}

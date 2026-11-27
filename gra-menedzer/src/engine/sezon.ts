@@ -1,3 +1,4 @@
+import { kwartalZarzadu } from "./budzetZarzadu";
 import { poMeczuWydzial, tydzienWydzialu } from "./wydzialGier";
 import { sprawdzWyzwanieKolejka, sprawdzWyzwanieSezon } from "./wyzwania";
 import { dotacjaGminy, poMeczu, wyjazdBusem } from "./zywySwiat";
@@ -1018,6 +1019,7 @@ export function zagrajKolejke(s: StanGry) {
   for (const w of tydzienJezykow(s)) wiadomosc(s, w); // nauka polskiego cudzoziemców, kurs, tłumacz
   for (const w of sprawdzOsiagniecia(s)) wiadomosc(s, w); // osiągnięcia trenera
   { const t = sprawdzWyzwanieKolejka(s); if (t) wiadomosc(s, t); } // tryb Wyzwania
+  { const t = kwartalZarzadu(s, ileKolejek(s)); if (t) wiadomosc(s, t); } // budżet sezonu: rozliczenie kwartalne
   tydzienWydzialu(s); // Wydział Gier, Kolegium Sędziów, Izba PZPN (zaległości płacowe)
   { const t = tydzienZgod(s, s.kluby[s.mojKlub]); if (t) wiadomosc(s, t); }
   { const t = tydzienLicencji(s); if (t) wiadomosc(s, t); } // kurs UEFA, egzamin, wymogi licencyjne ligi // życie zgód: jubileusze, zerwania, nowe układy
