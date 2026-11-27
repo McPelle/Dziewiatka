@@ -1109,4 +1109,69 @@ export const HERB_PO_NAZWIE: Record<string, string> = {
   "Żuraw Krzeszów": "5563",
   "Żuławy II Nowy Dwór Gdański": "pom-zulawy-nowy-dwor-gdanski",
   "Żuławy Nowy Dwór Gdański": "pom-zulawy-nowy-dwor-gdanski",
+  // herby znalezione w sieci (strony klubów, radarmeczy.pl, futbolowo.pl, abceo.pl)
+  "TLG Gdańsk": "zn-tlg-gdansk", // https://tlg.gda.pl/
+  "Wisełka Solec Kujawski": "zn-wiselka-solec-kujawski", // https://wiselkasolec.pl/o-nas/
+  "Orły Osowa": "zn-orly-osowa", // https://github.com/majkel1092-cmd/orly-osowa
+  "Jordania Sopot": "zn-jordania-sopot", // https://radarmeczy.pl/klub/493-jordania-sopot
+  "Barca Bolszewo": "zn-barca-bolszewo", // https://radarmeczy.pl/klub/1591-barca-bolszewo
+  "Wieniec Gowino": "zn-wieniec-gowino", // https://github.com/majkel1092-cmd/orly-osowa/tree/main/src/assets/crests
+  "LZS Kębłowo": "zn-lzs-keblowo", // https://github.com/majkel1092-cmd/orly-osowa/tree/main/src/assets/crests
+  "AP Kowale": "zn-ap-kowale", // https://apgkskowale.sportbm.com/groups/3307/
+  "FPT Banino": "zn-fpt-banino", // https://fpt.agro.pl/en/fpt-banino-club/
+  "Derby Ulikowo": "zn-derby-ulikowo", // https://radarmeczy.pl/klub/5714-derby-ulikowo
+  "Dynastia Gniew": "zn-dynastia-gniew", // https://radarmeczy.pl/klub/3074-dynastia-gniew
+  "Dąbrowiak Dąbrówka": "zn-dabrowiak-dabrowka", // https://radarmeczy.pl/klub/3070-dabrowiak-dabrowka
+  "Sadownik Waganiec": "zn-sadownik-waganiec", // https://radarmeczy.pl/klub/2213-sadownik-waganiec
+  "Motor Zwartowo": "zn-motor-zwartowo", // https://radarmeczy.pl/klub/4801-motor-zwartowo
+  "Nowi Nowa Cerkiew": "zn-nowi-nowa-cerkiew", // https://radarmeczy.pl/klub/4780-nowi-nowa-cerkiew
+  "Odra Szczecin": "zn-odra-szczecin", // https://radarmeczy.pl/klub/3710-odra-szczecin
+  "Pogoń II Skotniki": "zn-pogon-skotniki", // https://radarmeczy.pl/klub/4012-pogon-skotniki-krakow
+  "WSS Obrzynowo": "zn-wss-obrzynowo", // https://radarmeczy.pl/klub/3069-wss-obrzynowo
+  "Wicher Lichnowy": "zn-wicher-lichnowy", // https://radarmeczy.pl/klub/4729-wicher-lichnowy
+  "Wicher Reptowo": "zn-wicher-reptowo", // https://radarmeczy.pl/klub/5253-wicher-reptowo
+  "Wzgórze Raciążek": "zn-wzgorze-raciazek", // https://radarmeczy.pl/klub/523-wzgorze-raciazek
+  "Zawada II Nowy Sącz": "zn-zawada-nowy-sacz", // https://radarmeczy.pl/klub/730-zawada-nowy-sacz
+  "GKS Waganiec": "zn-sadownik-waganiec", // https://radarmeczy.pl/klub/2213-sadownik-waganiec
+  "AP II Kowale": "zn-ap-kowale", // https://apgkskowale.sportbm.com/groups/3307/
+  "TLG II Gdańsk": "zn-tlg-gdansk", // https://tlg.gda.pl/
+  "Victoria II/KS Skibno": "zn-victoria-ii-ks-skibno", // https://radarmeczy.pl/klub/5224-victoria-ii-ks-skibno
+  "Sokół Lubichowo": "zn-sokol-lubichowo", // https://sokollubichowo.futbolowo.pl/club/816
+  "GKS Gardeja": "zn-gks-gardeja", // https://gkgardej.futbolowo.pl/club/19009
+  "LKS Jodłownik": "zn-lks-jodlownik", // https://jod.futbolowo.pl/club/23714
+  "Motława Suchy Dąb": "zn-motlawa-suchy-dab", // https://motlawauks.futbolowo.pl/club/12581
+  "Pogoń Wierzchowo": "zn-pogon-wierzchowo", // https://pogonwierzchowo.futbolowo.pl/club/28051
+  "Relax Ryjewo": "zn-relax-ryjewo", // https://relax-ryjewo.futbolowo.pl/club/706
+  "Rowokół Smołdzino": "zn-rowokol-smoldzino", // https://rowokolsmoldzino.futbolowo.pl/club/7459
+  "Sokół Sokoliniec": "zn-sokol-sokoliniec", // https://ukssokolsokoliniec.futbolowo.pl/club/17504
+  "Sparta Konarzyny": "zn-sparta-konarzyny", // https://spartakonarzyny.futbolowo.pl/club/8417
+  "Unia Sieciemin": "zn-unia-sieciemin", // https://sieciemin.futbolowo.pl/club/24401
+  "Wisła Strzelce Górne": "zn-wisla-strzelce-gorne", // https://wisla-strzelce-gorne.futbolowo.pl/club/11074
+  "Włókniarz Toruń": "zn-wlokniarz-torun", // https://wlokniarztorun01.futbolowo.pl/club/4240
+  "KS Bytonia": "zn-ks-bytonia", // https://budmarbytonia.futbolowo.pl/club/20377
+  "Lech Dobre": "zn-lech-dobre", // https://mgkslech.futbolowo.pl/club/5356
+  "Wawrzynianka Wawrzeńczyce": "zn-wawrzynianka-wawrzenczyce", // https://ksnowawrzynianka.futbolowo.pl/club/1254
+  "Amatorka Mikołajki Pomorskie": "zn-amatorka-mikolajki-pomorskie", // https://relax-ryjewo.futbolowo.pl/club/34028
+  "Brda Wielkie Chełmy": "zn-brda-wielkie-chelmy", // https://sokollubichowo.futbolowo.pl/club/8429
+  "Hajka Zegrze Pomorskie": "zn-hajka-zegrze-pomorskie", // https://sieciemin.futbolowo.pl/club/27686
+  "Perła Czyczkowy": "zn-perla-czyczkowy", // https://sokollubichowo.futbolowo.pl/club/4164
+  "Powiśle Pawlice-Rakowiec": "zn-powisle-pawlice-rakowiec", // https://kppomorzanka.futbolowo.pl/club/767
+  "Skompensis Skępe": "zn-skompensis-skepe", // https://klubpnzgodachodecz.futbolowo.pl/club/29664
+  "Świt Radostowo": "zn-swit-radostowo", // https://relax-ryjewo.futbolowo.pl/club/814
+  "Iskra Kłanino": "zn-iskra-klanino", // https://sieciemin.futbolowo.pl/club/28057
+  "LKS Łebunia": "zn-lks-lebunia", // https://ksblekitnimotarzyno.futbolowo.pl/club/1818
+  "Pomorzanka Skórcz": "zn-pomorzanka-skorcz", // https://kppomorzanka.sportbm.com/
+  "Sopocka Akademia Piłkarska": "zn-sopocka-akademia-pilkarska", // https://www.apsopot.com/
+  "AP Merchel Kolbudy": "zn-ap-merchel-kolbudy", // https://apmerchelkolbudy.pl/
+  "AS Nowy Dwór Gdański": "zn-as-nowy-dwor-gdanski", // https://futbolowe.abceo.pl/akademia/as-nowy-dwor-gdanski
+  "Błękitni Ostrowice": "zn-blekitni-ostrowice", // https://futbolowe.abceo.pl/klub/blekitni-ostrowice
+  "Cassubian AP": "zn-cassubian-ap", // https://futbolowe.abceo.pl/klub/ap-cassubian-bolszewo
+  "Grom Kleszczewo": "zn-grom-kleszczewo", // https://futbolowe.abceo.pl/klub/grom-kleszczewo
+  "KS Szyk": "zn-ks-szyk", // https://futbolowe.abceo.pl/klub/ks-szyk
+  "KS Zaleskie": "zn-ks-zaleskie", // https://futbolowe.abceo.pl/klub/ks-zaleskie
+  "Korona Mętków": "zn-korona-metkow", // https://futbolowe.abceo.pl/klub/korona-metkow
+  "Kłos Kamienny Jaz": "zn-klos-kamienny-jaz", // https://futbolowe.abceo.pl/klub/klos-kamienny-jaz
+  "Sokół Szczypkowice": "zn-sokol-szczypkowice", // https://futbolowe.abceo.pl/klub/sokol-szczypkowice
+  "Solar Władysławowo": "zn-solar-wladyslawowo", // https://futbolowe.abceo.pl/klub/solar-wladyslawowo
+  "AP Przywidz": "zn-ap-przywidz", // https://futbolowe.abceo.pl/klub/ap-filsport-przywidz
 };
