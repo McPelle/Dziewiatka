@@ -2,6 +2,22 @@
 // Dzięki temu oryginalny herb pokazuje się w KAŻDEJ karierze i na każdej liście (nie tylko tam, gdzie dane klubu mają pole `herb`).
 // Kluby bez pliku herbu (brak w nadesłanych herbach) dostają generowany emblemat w barwach klubu.
 export const HERB_PO_NAZWIE: Record<string, string> = {
+  "ULKS Przydonica": "nowy-ulks-przydonica",
+  "Bytyń Nakielno": "nowy-bytyn-nakielno",
+  "Czapla Czaplinek": "nowy-czapla-czaplinek",
+  "Grab Grabowo": "nowy-grab-grabowo",
+  "KS Gwda Wielka": "nowy-ks-gwda-wielka",
+  "Parsęta Rościęcino": "nowy-parseta-rosciecino",
+  "Mustang Korzystno": "nowy-mustang-korzystno",
+  "Skrzydlaci Będargowo": "nowy-skrzydlaci-bedargowo",
+  "Pomorzanka Jarosławsko": "nowy-pomorzanka-jaroslawsko",
+  "Zorza Żarowo": "nowy-zorza-zarowo",
+  "Gryf Stargard": "nowy-gryf-stargard",
+  "Gryf Maszewo": "nowy-gryf-maszewo",
+  "Czcibor Bielin": "nowy-czcibor-bielin",
+  "Orzeł Dobra": "nowy-orzel-dobra",
+  "Getbol Podjuchy": "nowy-getbol-podjuchy",
+  "Kick Off Szczecin": "nowy-kick-off-szczecin",
   "LZS Wałdowo": "nowy-lzs-waldowo",
   "Feniks Łasin": "nowy-feniks-lasin",
   "Victoria Smólnik": "nowy-victoria-smolnik",

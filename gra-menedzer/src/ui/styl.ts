@@ -33,21 +33,36 @@ export const cien = {
   elevation: 3,
 } as const;
 
+// ——— Język wizualny 3D (web): gradienty, fazowania, światło na krawędziach, głębokie cienie ———
+const W = Platform.OS === "web";
+/** Styl tylko dla web (gradienty/cienie CSS) — na natywnych pomijany. */
+export const web = (o: Record<string, unknown>) => (W ? (o as object) : {});
+export const G = {
+  tlo: "radial-gradient(120% 70% at 50% -10%, #1c5a37 0%, #0a2416 45%, #04100a 100%)",
+  karta: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.015) 38%, rgba(0,0,0,0.12) 100%)",
+  zloto: "linear-gradient(180deg, #fff0a6 0%, #ffd54a 28%, #f2b322 62%, #d6930f 100%)",
+  szklo: "linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 50%, rgba(0,0,0,0.18) 100%)",
+  ciemny: "linear-gradient(180deg, #1a4430 0%, #10301f 100%)",
+};
+const cienKarty = "0 14px 28px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.09), inset 0 -1px 0 rgba(0,0,0,0.35)";
+const cienPrzycisku = "0 5px 0 #9c6a07, 0 12px 20px rgba(0,0,0,0.45), inset 0 2px 0 rgba(255,255,255,0.75), inset 0 -2px 0 rgba(0,0,0,0.18)";
+const cienMalego = "0 3px 0 rgba(0,0,0,0.45), 0 6px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)";
+
 export const st = StyleSheet.create({
-  ekran: { flex: 1, backgroundColor: K.tlo },
-  karta: { backgroundColor: K.karta, borderRadius: 16, padding: 16, marginHorizontal: 12, marginTop: 12, borderWidth: 1, borderColor: K.linia, ...cien },
-  tytul: { color: K.tekst, fontSize: 21, fontWeight: "800", letterSpacing: -0.3, fontFamily: CZCIONKA },
-  naglowek: { color: K.szary, fontSize: 11.5, fontWeight: "800", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 9, fontFamily: CZCIONKA },
+  ekran: { flex: 1, backgroundColor: K.tlo, ...web({ backgroundImage: G.tlo }) },
+  karta: { backgroundColor: K.karta, borderRadius: 18, padding: 16, marginHorizontal: 12, marginTop: 12, borderWidth: 1, borderColor: "rgba(255,255,255,0.08)", ...cien, ...web({ backgroundImage: G.karta, boxShadow: cienKarty }) },
+  tytul: { color: K.tekst, fontSize: 21, fontWeight: "800", letterSpacing: -0.3, fontFamily: CZCIONKA, ...web({ textShadow: "0 2px 6px rgba(0,0,0,0.5)" }) },
+  naglowek: { color: "#b8d9c5", fontSize: 11.5, fontWeight: "900", letterSpacing: 1.6, textTransform: "uppercase", marginBottom: 9, fontFamily: CZCIONKA, ...web({ textShadow: "0 1px 0 rgba(0,0,0,0.6)" }) },
   tekst: { color: K.tekst, fontSize: 15, fontFamily: CZCIONKA },
   maly: { color: K.szary, fontSize: 13, fontFamily: CZCIONKA },
   wiersz: { flexDirection: "row", alignItems: "center" },
-  przycisk: { backgroundColor: K.akcent, borderRadius: 13, paddingVertical: 15, alignItems: "center", marginHorizontal: 12, marginTop: 12, ...cien },
-  przyciskTekst: { color: "#15300c", fontSize: 16, fontWeight: "900", letterSpacing: 0.2, fontFamily: CZCIONKA },
-  przyciskMaly: { backgroundColor: K.karta2, borderRadius: 10, paddingVertical: 9, paddingHorizontal: 13, borderWidth: 1, borderColor: K.linia },
-  przyciskMalyTekst: { color: K.tekst, fontSize: 14, fontWeight: "700", fontFamily: CZCIONKA },
-  chip: { borderRadius: 18, paddingVertical: 7, paddingHorizontal: 14, backgroundColor: K.karta2, marginRight: 8, marginBottom: 8, borderWidth: 1, borderColor: K.linia },
-  chipAktywny: { backgroundColor: K.akcent, borderColor: K.akcent },
-  input: { backgroundColor: K.karta2, color: K.tekst, borderRadius: 10, padding: 13, fontSize: 16, borderWidth: 1, borderColor: K.linia, fontFamily: CZCIONKA },
+  przycisk: { backgroundColor: K.akcent, borderRadius: 14, paddingVertical: 15, alignItems: "center", marginHorizontal: 12, marginTop: 14, marginBottom: 4, ...cien, ...web({ backgroundImage: G.zloto, boxShadow: cienPrzycisku, borderWidth: 1, borderColor: "#b47a08" }) },
+  przyciskTekst: { color: "#2a1a00", fontSize: 16, fontWeight: "900", letterSpacing: 0.4, fontFamily: CZCIONKA, ...web({ textShadow: "0 1px 0 rgba(255,255,255,0.55)" }) },
+  przyciskMaly: { backgroundColor: K.karta2, borderRadius: 12, paddingVertical: 9, paddingHorizontal: 13, borderWidth: 1, borderColor: "rgba(255,255,255,0.10)", marginBottom: 3, ...web({ backgroundImage: G.szklo, boxShadow: cienMalego }) },
+  przyciskMalyTekst: { color: K.tekst, fontSize: 14, fontWeight: "800", fontFamily: CZCIONKA, ...web({ textShadow: "0 1px 2px rgba(0,0,0,0.6)" }) },
+  chip: { borderRadius: 18, paddingVertical: 7, paddingHorizontal: 14, backgroundColor: K.karta2, marginRight: 8, marginBottom: 8, borderWidth: 1, borderColor: "rgba(255,255,255,0.10)", ...web({ backgroundImage: G.szklo, boxShadow: "0 2px 0 rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12)" }) },
+  chipAktywny: { backgroundColor: K.akcent, borderColor: "#c48a0d", ...web({ backgroundImage: G.zloto, boxShadow: "0 2px 0 #9c6a07, 0 0 12px rgba(255,206,71,0.45), inset 0 1px 0 rgba(255,255,255,0.7)" }) },
+  input: { backgroundColor: K.karta2, color: K.tekst, borderRadius: 12, padding: 13, fontSize: 16, borderWidth: 1, borderColor: "rgba(255,255,255,0.10)", fontFamily: CZCIONKA, ...web({ boxShadow: "inset 0 2px 6px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.06)" }) },
 });
 
 export const KOLOR_POZ: Record<string, string> = { BR: "#ffce47", OBR: "#5aa9ff", POM: "#3fd47f", NAP: "#ff6470" };

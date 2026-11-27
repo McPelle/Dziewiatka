@@ -16,7 +16,7 @@ import { metaMenu } from "./src/ui/zapis";
 import { NowaGra } from "./src/ui/NowaGra";
 import { Pulpit } from "./src/ui/Pulpit";
 import { Sklad } from "./src/ui/Sklad";
-import { CZCIONKA, cien, K, st } from "./src/ui/styl";
+import { web, CZCIONKA, cien, K, st } from "./src/ui/styl";
 import { Tabela } from "./src/ui/Tabela";
 import { Terminarz } from "./src/ui/Terminarz";
 import { Transfery } from "./src/ui/Transfery";
@@ -160,7 +160,7 @@ function NaglowekKlubu({ s, onMenu, onNowa }: { s: StanGry; onMenu: () => void; 
   const kol = Math.min(ile, (s.kolejka ?? 0) + 1);
   const mot = koloryMotywu(s.kluby[s.mojKlub]?.nazwa ?? "");
   return (
-    <View style={[st.wiersz, { paddingHorizontal: 12, paddingTop: Platform.OS === "android" ? 32 : 8, paddingBottom: 10, backgroundColor: mot.tlo, borderBottomWidth: 2, borderBottomColor: mot.akcent, overflow: "hidden", ...cien }]}>
+    <View style={[st.wiersz, { paddingHorizontal: 12, paddingTop: Platform.OS === "android" ? 32 : 8, paddingBottom: 10, backgroundColor: mot.tlo, borderBottomWidth: 2, borderBottomColor: mot.akcent, overflow: "hidden", ...cien, ...web({ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.02) 45%, rgba(0,0,0,0.35) 100%)", boxShadow: `0 6px 18px rgba(0,0,0,0.55), 0 2px 12px ${mot.akcent}55` }) }]}>
       <MurawaTlo pasy={14} />
       <Pressable onPress={onMenu} style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 8, borderRadius: 12, backgroundColor: "rgba(0,0,0,0.22)", borderWidth: 1, borderColor: "rgba(255,255,255,0.22)", marginRight: 8, opacity: pressed ? 0.8 : 1 }]}>
         <Text style={{ color: K.akcent, fontSize: 16, fontWeight: "900", marginRight: 2 }}>‹</Text>
@@ -186,13 +186,13 @@ function NaglowekKlubu({ s, onMenu, onNowa }: { s: StanGry; onMenu: () => void; 
 
 function PasekZakladek({ zakladka, na, akcent = K.akcent }: { zakladka: Zakladka; na: (z: Zakladka) => void; akcent?: string }) {
   return (
-    <View style={[st.wiersz, { borderTopWidth: 1, borderTopColor: K.liniaMocna, backgroundColor: K.pas, paddingTop: 0, paddingBottom: Platform.OS === "ios" ? 2 : 8, paddingHorizontal: 4 }]}>
+    <View style={[st.wiersz, { borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.12)", backgroundColor: K.pas, paddingTop: 0, paddingBottom: Platform.OS === "ios" ? 2 : 8, paddingHorizontal: 4 }, web({ backgroundImage: "linear-gradient(180deg, #123423 0%, #081a10 100%)", boxShadow: "0 -8px 20px rgba(0,0,0,0.5)" })]}>
       {ZAKLADKI.map(([id, ikona, nazwa]) => {
         const akt = zakladka === id;
         return (
           <Pressable key={id} onPress={() => na(id)} style={{ flex: 1, alignItems: "center" }}>
             <View style={{ height: 3, alignSelf: "stretch", marginHorizontal: 10, borderBottomLeftRadius: 3, borderBottomRightRadius: 3, backgroundColor: akt ? akcent : "transparent" }} />
-            <View style={{ alignItems: "center", paddingTop: 6, paddingBottom: 4, paddingHorizontal: 4, borderRadius: 14, minWidth: 46 }}>
+            <View style={[{ alignItems: "center", paddingTop: 6, paddingBottom: 4, paddingHorizontal: 8, borderRadius: 14, minWidth: 50, marginTop: 3 }, akt ? web({ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03))", boxShadow: `inset 0 1px 0 rgba(255,255,255,0.18), 0 0 14px ${akcent}44` }) : {}]}>
               <Text style={{ fontSize: 19, opacity: akt ? 1 : 0.5, marginBottom: 2 }}>{ikona}</Text>
               <Text style={{ color: akt ? akcent : K.szary, fontSize: 10, fontWeight: akt ? "800" : "600", letterSpacing: 0.1, fontFamily: CZCIONKA }}>{nazwa}</Text>
             </View>

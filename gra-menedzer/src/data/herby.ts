@@ -2,6 +2,22 @@
 import type { ImageSourcePropType } from "react-native";
 
 export const HERBY: Record<string, ImageSourcePropType> = {
+  "nowy-ulks-przydonica": require("../../assets/herby/nowy-ulks-przydonica.png"),
+  "nowy-bytyn-nakielno": require("../../assets/herby/nowy-bytyn-nakielno.png"),
+  "nowy-czapla-czaplinek": require("../../assets/herby/nowy-czapla-czaplinek.png"),
+  "nowy-grab-grabowo": require("../../assets/herby/nowy-grab-grabowo.png"),
+  "nowy-ks-gwda-wielka": require("../../assets/herby/nowy-ks-gwda-wielka.png"),
+  "nowy-parseta-rosciecino": require("../../assets/herby/nowy-parseta-rosciecino.png"),
+  "nowy-mustang-korzystno": require("../../assets/herby/nowy-mustang-korzystno.png"),
+  "nowy-skrzydlaci-bedargowo": require("../../assets/herby/nowy-skrzydlaci-bedargowo.png"),
+  "nowy-pomorzanka-jaroslawsko": require("../../assets/herby/nowy-pomorzanka-jaroslawsko.png"),
+  "nowy-zorza-zarowo": require("../../assets/herby/nowy-zorza-zarowo.png"),
+  "nowy-gryf-stargard": require("../../assets/herby/nowy-gryf-stargard.png"),
+  "nowy-gryf-maszewo": require("../../assets/herby/nowy-gryf-maszewo.png"),
+  "nowy-czcibor-bielin": require("../../assets/herby/nowy-czcibor-bielin.png"),
+  "nowy-orzel-dobra": require("../../assets/herby/nowy-orzel-dobra.png"),
+  "nowy-getbol-podjuchy": require("../../assets/herby/nowy-getbol-podjuchy.png"),
+  "nowy-kick-off-szczecin": require("../../assets/herby/nowy-kick-off-szczecin.png"),
   "nowy-lzs-waldowo": require("../../assets/herby/nowy-lzs-waldowo.png"),
   "nowy-feniks-lasin": require("../../assets/herby/nowy-feniks-lasin.png"),
   "nowy-victoria-smolnik": require("../../assets/herby/nowy-victoria-smolnik.png"),

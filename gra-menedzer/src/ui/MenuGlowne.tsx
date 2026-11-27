@@ -10,7 +10,7 @@ import { Biuro3D } from "./three/Biuro3D";
 import type { Klub } from "../engine/types";
 
 const KLUB_DEMO = { id: "demo", nazwa: "Dziewiątka", pojemnosc: 9000, poziom: 2, obiekty: { zadaszenie: 2, telebim: 1 }, oswietlenie: true, murawa: "naturalna", miasto: "", renoma: 0.6 } as unknown as Klub;
-import { CZCIONKA, cien, K } from "./styl";
+import { CZCIONKA, cien, G, K, web } from "./styl";
 import { useEffect, useState } from "react";
 import { losowaCiekawostka } from "../data/ciekawostki";
 import { dzwiekiWlaczone, muzykaWlaczona, startMuzyki, stopMuzyki, ustawDzwieki, ustawMuzyke } from "./muzyka";
@@ -53,7 +53,7 @@ export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj, 
       {/* PRZYCISKI */}
       <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 26, flexGrow: 1, justifyContent: "center" }}>
         {klub ? (
-          <Pressable onPress={naKontynuuj} style={({ pressed }) => [{ backgroundColor: K.akcent, borderRadius: 16, padding: 15, flexDirection: "row", alignItems: "center", opacity: pressed ? 0.92 : 1, ...cien }]}>
+          <Pressable onPress={naKontynuuj} style={({ pressed }) => [{ backgroundColor: K.akcent, borderRadius: 16, padding: 15, flexDirection: "row", alignItems: "center", opacity: pressed ? 0.96 : 1, ...cien, ...web({ backgroundImage: G.zloto, boxShadow: "0 6px 0 #9c6a07, 0 16px 30px rgba(0,0,0,0.5), 0 0 24px rgba(255,206,71,0.35), inset 0 2px 0 rgba(255,255,255,0.75)", transform: pressed ? "translateY(4px)" : "none" }) }]}>
             <View style={{ borderRadius: 10, backgroundColor: "rgba(0,0,0,0.12)", padding: 3 }}><Herb klub={klub} rozmiar={36} /></View>
             <View style={{ flex: 1, marginLeft: 12 }}>
               <Text style={{ color: "#15300c", fontSize: 11.5, fontWeight: "900", letterSpacing: 1, textTransform: "uppercase", fontFamily: CZCIONKA }}>Kontynuuj karierę</Text>
@@ -76,8 +76,8 @@ export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj, 
         </Pressable>
 
         {/* Wczytaj grę */}
-        <Pressable onPress={naWczytaj} style={({ pressed }) => [{ marginTop: 12, backgroundColor: K.karta, borderRadius: 16, padding: 15, flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: K.liniaMocna, opacity: pressed ? 0.9 : 1, ...cien }]}>
-          <View style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: K.karta2, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: K.linia }}>
+        <Pressable onPress={naWczytaj} style={({ pressed }) => [{ marginTop: 12, backgroundColor: K.karta, borderRadius: 16, padding: 15, flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.12)", opacity: pressed ? 0.95 : 1, ...cien, ...web({ backgroundImage: "linear-gradient(160deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.02) 40%, rgba(0,0,0,0.25) 100%), linear-gradient(180deg, #17402b, #0c2618)", boxShadow: "0 6px 0 #04140b, 0 14px 26px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.14)", transform: pressed ? "translateY(4px)" : "none" }) }]}>
+          <View style={{ width: 44, height: 44, borderRadius: 13, backgroundColor: K.karta2, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", ...web({ backgroundImage: "linear-gradient(180deg, #2a6044, #123a26)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25), 0 3px 6px rgba(0,0,0,0.5)" }) }}>
             <Text style={{ fontSize: 20 }}>💾</Text>
           </View>
           <View style={{ flex: 1, marginLeft: 12 }}>
@@ -88,8 +88,8 @@ export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj, 
         </Pressable>
 
         {/* Szybki mecz */}
-        {naSzybki && <Pressable onPress={naSzybki} style={({ pressed }) => [{ marginTop: 12, backgroundColor: K.karta, borderRadius: 16, padding: 15, flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: K.liniaMocna, opacity: pressed ? 0.9 : 1, ...cien }]}>
-          <View style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: K.karta2, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: K.linia }}>
+        {naSzybki && <Pressable onPress={naSzybki} style={({ pressed }) => [{ marginTop: 12, backgroundColor: K.karta, borderRadius: 16, padding: 15, flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.12)", opacity: pressed ? 0.95 : 1, ...cien, ...web({ backgroundImage: "linear-gradient(160deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.02) 40%, rgba(0,0,0,0.25) 100%), linear-gradient(180deg, #17402b, #0c2618)", boxShadow: "0 6px 0 #04140b, 0 14px 26px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.14)", transform: pressed ? "translateY(4px)" : "none" }) }]}>
+          <View style={{ width: 44, height: 44, borderRadius: 13, backgroundColor: K.karta2, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", ...web({ backgroundImage: "linear-gradient(180deg, #2a6044, #123a26)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25), 0 3px 6px rgba(0,0,0,0.5)" }) }}>
             <Text style={{ fontSize: 20 }}>⚡</Text>
           </View>
           <View style={{ flex: 1, marginLeft: 12 }}>
@@ -99,8 +99,8 @@ export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj, 
           <Text style={{ color: K.akcent, fontSize: 22, fontWeight: "900" }}>›</Text>
         </Pressable>}
 
-        {naWyzwania && <Pressable onPress={naWyzwania} style={({ pressed }) => [{ marginTop: 12, backgroundColor: K.karta, borderRadius: 16, padding: 15, flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: K.liniaMocna, opacity: pressed ? 0.9 : 1, ...cien }]}>
-          <View style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: K.karta2, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: K.linia }}>
+        {naWyzwania && <Pressable onPress={naWyzwania} style={({ pressed }) => [{ marginTop: 12, backgroundColor: K.karta, borderRadius: 16, padding: 15, flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.12)", opacity: pressed ? 0.95 : 1, ...cien, ...web({ backgroundImage: "linear-gradient(160deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.02) 40%, rgba(0,0,0,0.25) 100%), linear-gradient(180deg, #17402b, #0c2618)", boxShadow: "0 6px 0 #04140b, 0 14px 26px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.14)", transform: pressed ? "translateY(4px)" : "none" }) }]}>
+          <View style={{ width: 44, height: 44, borderRadius: 13, backgroundColor: K.karta2, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", ...web({ backgroundImage: "linear-gradient(180deg, #2a6044, #123a26)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25), 0 3px 6px rgba(0,0,0,0.5)" }) }}>
             <Text style={{ fontSize: 20 }}>🎯</Text>
           </View>
           <View style={{ flex: 1, marginLeft: 12 }}>
