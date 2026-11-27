@@ -29,7 +29,7 @@ const BARWY_WOJ: Record<string, [string, string]> = {
 const NAZWY_LOGO = ["PKO BP Ekstraklasa", "Betclic 1. Liga", "Betclic 2. Liga", "Betclic 3. Liga"];
 const crestLigi = (idx: number, r = 38) => (
   <View style={{ width: r * 1.25, height: r, alignItems: "center", justifyContent: "center" }}>
-    <LogoLigi nazwa={NAZWY_LOGO[Math.min(idx, 3)]} poziom={idx + 1} rozmiar={idx === 0 ? r * 0.27 : r * 0.9} />
+    <LogoLigi nazwa={NAZWY_LOGO[Math.min(idx, 3)]} poziom={idx + 1} rozmiar={r * 0.9} znak />
   </View>);
 const KLUCZ_WOJ: Record<string, string> = { "Małopolskie": "małopolskie", "Pomorskie": "pomorskie", "Zachodniopomorskie": "zachodniopomorskie", "Kujawsko-pomorskie": "kujawsko-pomorskie" };
 const crestWoj = (label: string, r = 38) => {

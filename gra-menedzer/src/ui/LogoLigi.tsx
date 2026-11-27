@@ -15,6 +15,7 @@ const LOGA = {
   lm: require("../../assets/ligi/ligamistrzow.png"),
   le: require("../../assets/ligi/ligaeuropy.png"),
   lk: require("../../assets/ligi/ligakonferencji.png"),
+  ekstraklasaZnak: require("../../assets/ligi/ekstraklasa_znak.png"),
   zpnPom: require("../../assets/ligi/zpn_pomorski.png"),
   zpnKp: require("../../assets/ligi/zpn_kujawsko.png"),
   zpnZach: require("../../assets/ligi/zpn_zachodnio.png"),
@@ -23,9 +24,9 @@ const LOGA = {
   l4Zach: require("../../assets/ligi/4liga_zachodnio.png"),
 };
 // proporcje (szerokość / wysokość) wyciętych logo — bez tła, jasne wersje dla ciemnego interfejsu
-const PROP: Record<keyof typeof LOGA, number> = { ekstraklasa: 4.65, l1: 0.92, l2: 0.92, l3: 0.92, superpuchar: 0.835, pucharpolski: 0.575, lm: 1.05, le: 0.685, lk: 1.01, zpnPom: 1, zpnKp: 0.985, zpnZach: 1, zpnMal: 0.835, l4Kp: 0.775, l4Zach: 3.37 };
-export function LogoLigi({ nazwa, poziom, rozmiar = 28 }: { nazwa: string; poziom?: number; rozmiar?: number }) {
-  const k = kluczLogoLigi(nazwa, poziom);
+const PROP: Record<keyof typeof LOGA, number> = { ekstraklasa: 4.65, ekstraklasaZnak: 0.99, l1: 0.92, l2: 0.92, l3: 0.92, superpuchar: 0.835, pucharpolski: 0.575, lm: 1.05, le: 0.685, lk: 1.01, zpnPom: 1, zpnKp: 0.985, zpnZach: 1, zpnMal: 0.835, l4Kp: 0.775, l4Zach: 3.37 };
+export function LogoLigi({ nazwa, poziom, rozmiar = 28, znak }: { nazwa: string; poziom?: number; rozmiar?: number; znak?: boolean }) {
+  const k0 = kluczLogoLigi(nazwa, poziom); const k = k0 === "ekstraklasa" && znak ? "ekstraklasaZnak" : k0; // znak = sama piłka Ekstraklasy (małe miejsca)
   if (k) {
     const szer = rozmiar * PROP[k];
     return <Image source={LOGA[k]} style={{ width: szer, height: rozmiar, resizeMode: "contain" }} />;
