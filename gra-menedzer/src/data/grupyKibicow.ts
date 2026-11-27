@@ -120,20 +120,32 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Legia Warszawa",
    "GKS Tychy",
    "Odra Opole",
-   "Raków Częstochowa"
+   "Raków Częstochowa",
+   "Stomil Olsztyn"
   ]
  },
  "Jagiellonia Białystok": {
   "ultras": [
    "UJB – Ultras Jagiellonia Białystok",
-   "UJB - Ultras Jagiellonia Białystok"
+   "UJB - Ultras Jagiellonia Białystok",
+   "Stowarzyszenie Kibiców Jagiellonii Białystok „Dzieci Białegostoku”",
+   "BKKN – Białostocki Klub Kibiców Niepełnosprawnych"
   ],
   "zgody": [
    "Mazur Ełk",
    "MKS Mazur Ełk"
   ],
   "flagi": [
-   "Dzieci Białegostoku"
+   "Dzieci Białegostoku",
+   "The Best Fans",
+   "Fan Club Piasta",
+   "Antoniuk",
+   "Zielone Wzgórza",
+   "Hajnówka 100% Jaga",
+   "Łomża 100% Jaga",
+   "Klub Kibica Łapy",
+   "Cała Jaga zawsze razem",
+   "Wstań, unieś barwy"
   ],
   "fanklub": [
    "FANKLUB Bielsk Podlaski",
@@ -149,7 +161,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Sokółka",
    "FANKLUB Boćki",
    "FANKLUB Grajewo",
-   "FANKLUB Zambrów"
+   "FANKLUB Zambrów",
+   "FANKLUB Wysokie Mazowieckie",
+   "FANKLUB Choroszcz",
+   "FANKLUB Kędzierzyn-Koźle"
   ],
   "kosy": [
    "ŁKS Łomża",
@@ -158,7 +173,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Cracovia",
    "Legia Warszawa",
    "Wisła Kraków",
-   "Arka Gdynia"
+   "Arka Gdynia",
+   "Stomil Olsztyn"
   ]
  },
  "Raków Częstochowa": {
@@ -172,7 +188,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Videoton Szekesfehervar",
    "Stomil Olsztyn (układ)",
    "Lechia Gdańsk (układ)",
-   "Lechia Gdańsk"
+   "Lechia Gdańsk",
+   "Stomil Olsztyn"
   ],
   "flagi": [
    "Wieczny Raków"
@@ -344,7 +361,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Sandecja Nowy Sącz",
    "Wisła Płock",
    "Zagłębie Lubin",
-   "Zawisza Bydgoszcz"
+   "Zawisza Bydgoszcz",
+   "Stomil Olsztyn"
   ]
  },
  "Zagłębie Lubin": {
@@ -744,7 +762,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Resovia",
    "Rodło Kwidzyn",
    "Włocłavia Włocławek",
-   "Zagłębie Lubin"
+   "Zagłębie Lubin",
+   "Olimpia Elbląg",
+   "Stomil Olsztyn"
   ]
  },
  "Piast Gliwice": {
@@ -956,7 +976,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Chrobry Głogów",
    "Cracovia",
    "Legia Warszawa",
-   "Odra Opole"
+   "Odra Opole",
+   "Olimpia Elbląg"
   ]
  },
  "Chrobry Głogów": {
@@ -1128,7 +1149,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Włocłavia Włocławek",
    "Zagłębie Lubin",
    "Zawisza Bydgoszcz",
-   "ŁKS Łódź"
+   "ŁKS Łódź",
+   "Olimpia Elbląg"
   ]
  },
  "Miedź Legnica": {
@@ -1428,7 +1450,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Rodło Kwidzyn",
    "Wisła Kraków",
    "Zagłębie Lubin",
-   "Zawisza Bydgoszcz"
+   "Zawisza Bydgoszcz",
+   "Olimpia Elbląg"
   ]
  },
  "Arka Gdynia": {
@@ -1514,7 +1537,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Rodło Kwidzyn",
    "Wisła Płock",
    "ŁKS Łódź",
-   "Olimpia Elbląg"
+   "Olimpia Elbląg",
+   "Stomil Olsztyn",
+   "Jeziorak Iława"
   ]
  },
  "Bruk-Bet Termalica Nieciecza": {
@@ -1594,7 +1619,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Rodło Kwidzyn",
    "Unia Skierniewice",
    "Unia Wąbrzeźno",
-   "Włocłavia Włocławek"
+   "Włocłavia Włocławek",
+   "Sokół Ostróda"
   ]
  },
  "Sandecja Nowy Sącz": {
@@ -1879,7 +1905,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "KP Starogard Gdański",
    "Legia Chełmża",
    "Unia Wąbrzeźno",
-   "Wisła Płock"
+   "Wisła Płock",
+   "Stomil Olsztyn"
   ]
  },
  "Lechia Zielona Góra": {
@@ -2164,7 +2191,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Arka Gdynia",
-   "Rodło Kwidzyn"
+   "Rodło Kwidzyn",
+   "Olimpia Elbląg"
   ]
  },
  "Tarnovia Tarnów": {
@@ -2230,7 +2258,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Kujawiak Kowal",
    "Olimpia Grudziądz",
    "Unia Wąbrzeźno",
-   "Włocłavia Włocławek"
+   "Włocłavia Włocławek",
+   "Drwęca Nowe Miasto Lubawskie"
   ]
  },
  "Włocłavia Włocławek": {
@@ -2886,24 +2915,82 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  "Stomil Olsztyn": {
   "ultras": [
    "Stowarzyszenie Kibiców OKS Stomil Olsztyn",
-   "Stomilowcy Olsztyn"
+   "Stomilowcy Olsztyn",
+   "Ultras Hałastra",
+   "Socios Stomil"
   ],
   "zgody": [
    "Polonia Bydgoszcz",
    "Wisła Płock",
    "Lechia Gdańsk",
    "Hutnik Kraków",
-   "ŁKS Łomża"
+   "ŁKS Łomża",
+   "Raków Częstochowa"
   ],
   "kosy": [
-   "Olimpia Elbląg"
+   "Olimpia Elbląg",
+   "Legia Warszawa",
+   "Widzew Łódź",
+   "Arka Gdynia",
+   "Zawisza Bydgoszcz",
+   "Jagiellonia Białystok",
+   "Górnik Zabrze",
+   "Olimpia Grudziądz",
+   "Wigry Suwałki",
+   "Granica Kętrzyn",
+   "MKS Mazur Ełk"
+  ],
+  "fanklub": [
+   "FANKLUB Barczewo",
+   "FANKLUB Bartoszyce",
+   "FANKLUB Biskupiec",
+   "FANKLUB Dobre Miasto",
+   "FANKLUB Dywity",
+   "FANKLUB Działdowo",
+   "FANKLUB Gietrzwałd",
+   "FANKLUB Giżycko",
+   "FANKLUB Jonkowo",
+   "FANKLUB Kieźliny",
+   "FANKLUB Lidzbark Warmiński",
+   "FANKLUB Miłakowo",
+   "FANKLUB Morąg",
+   "FANKLUB Mrągowo",
+   "FANKLUB Nidzica",
+   "FANKLUB Nikielkowo",
+   "FANKLUB Olsztynek",
+   "FANKLUB Orneta",
+   "FANKLUB Ostróda",
+   "FANKLUB Pasłęk",
+   "FANKLUB Pasym",
+   "FANKLUB Radomsko",
+   "FANKLUB Samborowo",
+   "FANKLUB Spychowo",
+   "FANKLUB Stawiguda",
+   "FANKLUB Szczytno",
+   "FANKLUB Uniszewo",
+   "FANKLUB Wielbark",
+   "FCUK"
+  ],
+  "trybuna": [
+   "Sektor I trybuny krytej – młyn"
+  ],
+  "flagi": [
+   "Stomilowcy",
+   "Duma Warmii",
+   "Stomil nigdy nie zginie",
+   "Ratujmy nasz Stomil"
+  ],
+  "chuligani": [
+   "Denaturat Boys",
+   "HooliGang'00"
   ]
  },
  "Olimpia Elbląg": {
   "ultras": [
    "Stowarzyszenie Kibiców Olimpii Elbląg „776 p.n.e.”",
    "Ultras SMG'06",
-   "EZF '16"
+   "EZF '16",
+   "Ultras Olimpia"
   ],
   "zgody": [
    "Legia Warszawa",
@@ -2913,23 +3000,253 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "kosy": [
    "Stomil Olsztyn",
    "Jeziorak Iława",
-   "Arka Gdynia"
+   "Arka Gdynia",
+   "Widzew Łódź",
+   "Ruch Chorzów",
+   "Śląsk Wrocław",
+   "Lechia Gdańsk",
+   "Wisła Płock",
+   "Olimpia Grudziądz",
+   "Pomezania Malbork",
+   "ŁKS Łomża",
+   "MKS Mazur Ełk",
+   "Sokół Ostróda"
+  ],
+  "fanklub": [
+   "FANKLUB Braniewo",
+   "FANKLUB Frombork",
+   "FANKLUB Gronowo Elbląskie",
+   "FANKLUB Jegłownik",
+   "FANKLUB Markusy",
+   "FANKLUB Pasłęk",
+   "FANKLUB Pieniężno",
+   "FANKLUB Rychliki"
+  ],
+  "flagi": [
+   "Młoda Olimpia Elbląg",
+   "776 p.n.e.",
+   "Olimpijczycy"
+  ],
+  "chuligani": [
+   "Bully Boys'98"
   ]
  },
  "Wigry Suwałki": {
   "ultras": [
    "Vis Maior '99",
    "Blue Boys '22",
-   "Lucyfers '04"
+   "Lucyfers '04",
+   "Lucyfers'04"
   ],
   "zgody": [
-   "Granica Kętrzyn"
+   "Granica Kętrzyn",
+   "Olimpia Grudziądz"
   ],
   "kosy": [
    "Jagiellonia Białystok",
    "ŁKS Łomża",
    "Sparta Augustów",
+   "MKS Mazur Ełk",
+   "Stomil Olsztyn",
+   "Warmia Grajewo"
+  ],
+  "fanklub": [
+   "FANKLUB Przebród",
+   "FANKLUB Gołdap",
+   "FANKLUB Olecko"
+  ],
+  "flagi": [
+   "Suwalszczyzna",
+   "Fanatycy SKS"
+  ],
+  "chuligani": [
+   "Vis Maior'99"
+  ]
+ },
+ "ŁKS Łomża": {
+  "ultras": [
+   "Export Boys"
+  ],
+  "fanklub": [
+   "FANKLUB Kolno",
+   "FANKLUB Wizna",
+   "FANKLUB Piątnica",
+   "FANKLUB Śniadowo",
+   "FANKLUB Mątwica"
+  ],
+  "flagi": [
+   "Ełkaesiacy'03",
+   "Brigade'99",
+   "Łomżyca",
+   "W jedności siła ŁKS – rodzina"
+  ],
+  "zgody": [
+   "Stomil Olsztyn",
+   "Sparta 1951 Szepietowo",
+   "FK Voždovac Belgrad"
+  ],
+  "kosy": [
+   "Wigry Suwałki",
+   "Olimpia Elbląg",
+   "Jagiellonia Białystok",
+   "MKS Mazur Ełk",
+   "Warmia Grajewo",
+   "Granica Kętrzyn"
+  ]
+ },
+ "MKS Mazur Ełk": {
+  "ultras": [
+   "Ultras Mazur Ełk"
+  ],
+  "flagi": [
+   "Jedno miasto, jeden klub!",
+   "Mazurowcy"
+  ],
+  "chuligani": [
+   "Młody Mazur"
+  ],
+  "zgody": [
+   "Jagiellonia Białystok",
+   "Warmia Grajewo"
+  ],
+  "kosy": [
+   "Wigry Suwałki",
+   "Olimpia Elbląg",
+   "Stomil Olsztyn",
+   "ŁKS Łomża",
+   "Sparta Augustów",
+   "Granica Kętrzyn",
+   "Sokół Ostróda",
+   "Mazur Pisz"
+  ]
+ },
+ "Sokół Ostróda": {
+  "ultras": [
+   "Ultras'11"
+  ],
+  "flagi": [
+   "Ekipa z Pika"
+  ],
+  "kosy": [
+   "Olimpia Elbląg",
+   "MKS Mazur Ełk",
+   "Warmia Grajewo",
+   "Drwęca Nowe Miasto Lubawskie",
+   "Motor Lubawa",
+   "Granica Kętrzyn",
+   "Olimpia Grudziądz"
+  ]
+ },
+ "Jeziorak Iława": {
+  "ultras": [
+   "UFJ'06 – Ultras Fans Jeziorak"
+  ],
+  "flagi": [
+   "Jeziorowcy"
+  ],
+  "chuligani": [
+   "ZNW – Zdecydowani Na Wszystko"
+  ],
+  "kosy": [
+   "Olimpia Elbląg",
+   "Motor Lubawa",
+   "Arka Gdynia",
+   "Zatoka Braniewo",
+   "Granica Kętrzyn"
+  ]
+ },
+ "Granica Kętrzyn": {
+  "flagi": [
+   "KKS",
+   "AVE KKS!"
+  ],
+  "zgody": [
+   "Wigry Suwałki"
+  ],
+  "kosy": [
+   "Stomil Olsztyn",
+   "ŁKS Łomża",
+   "MKS Mazur Ełk",
+   "Warmia Grajewo",
+   "Sokół Ostróda",
+   "Jeziorak Iława",
+   "Motor Lubawa"
+  ]
+ },
+ "Warmia Grajewo": {
+  "ultras": [
+   "Fanatycy Warmii"
+  ],
+  "flagi": [
+   "Młoda Warmia"
+  ],
+  "zgody": [
    "MKS Mazur Ełk"
+  ],
+  "kosy": [
+   "ŁKS Łomża",
+   "Wigry Suwałki",
+   "Granica Kętrzyn",
+   "Sparta Augustów",
+   "Sparta 1951 Szepietowo",
+   "Sokół Ostróda",
+   "Mazur Pisz",
+   "Orzeł Kolno"
+  ]
+ },
+ "Mazur Pisz": {
+  "ultras": [
+   "GF – Grupa Fanatyków'04",
+   "Młoda Gwardia"
+  ],
+  "zgody": [
+   "Mławianka Mława"
+  ],
+  "kosy": [
+   "MKS Mazur Ełk",
+   "Warmia Grajewo",
+   "Znicz Biała Piska",
+   "Orlęta Reszel"
+  ]
+ },
+ "Motor Lubawa": {
+  "ultras": [
+   "Motorowcy"
+  ],
+  "zgody": [
+   "Błękitni Orneta"
+  ],
+  "kosy": [
+   "Sokół Ostróda",
+   "Jeziorak Iława",
+   "Drwęca Nowe Miasto Lubawskie",
+   "Granica Kętrzyn",
+   "Zatoka Braniewo",
+   "Czarni Olecko"
+  ]
+ },
+ "Drwęca Nowe Miasto Lubawskie": {
+  "flagi": [
+   "Nowomiejskie Lwy",
+   "Klub Sportowy Drwęca"
+  ],
+  "kosy": [
+   "Sokół Ostróda",
+   "Motor Lubawa",
+   "Sparta Brodnica",
+   "Świt Nowy Dwór Mazowiecki"
+  ]
+ },
+ "Orzeł Kolno": {
+  "zgody": [
+   "KS Śniadowo"
+  ],
+  "kosy": [
+   "Warmia Grajewo",
+   "Tur Bielsk Podlaski",
+   "Olimpia Zambrów",
+   "Ruch Wysokie Mazowieckie",
+   "Sparta Augustów"
   ]
  }
 };

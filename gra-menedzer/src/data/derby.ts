@@ -118,9 +118,9 @@ export const DERBY: ParaDerbowa[] = [
   // Zachodniopomorskie — rywalizacja ponadregionalna (Pogoń)
   { a: "Pogoń Szczecin", b: "Lechia Gdańsk", nazwa: "Derby Pomorza" },
   // Warmińsko-mazurskie i podlaskie (źródła: pl/en.wikipedia — List of derbies in Poland, artykuły klubów)
-  { a: "Olimpia Elbląg", b: "Stomil Olsztyn", nazwa: "Derby Warmii i Mazur" },
+  { a: "Olimpia Elbląg", b: "Stomil Olsztyn", nazwa: "Derby regionu" },
   { a: "Jeziorak Iława", b: "Stomil Olsztyn", nazwa: "Derby Warmii" },
-  { a: "Olimpia Elbląg", b: "Jeziorak Iława", nazwa: "Derby Warmii i Mazur" },
+  { a: "Olimpia Elbląg", b: "Jeziorak Iława", nazwa: "Derby regionu" },
   { a: "Olimpia Elbląg", b: "Concordia Elbląg", nazwa: "Derby Elbląga" },
   { a: "Stomil Olsztyn", b: "Warmia Olsztyn", nazwa: "Derby Olsztyna" },
   { a: "Jagiellonia Białystok", b: "ŁKS Łomża", nazwa: "Derby Podlasia" },
@@ -133,7 +133,14 @@ export const DERBY: ParaDerbowa[] = [
   { a: "Wigry Suwałki", b: "MKS Mazur Ełk", nazwa: "Derby regionu" },
   { a: "MKS Mazur Ełk", b: "Mazur Pisz", nazwa: "Derby Mazur" },
   { a: "MKS Mazur Ełk", b: "Płomień Ełk", nazwa: "Derby Ełku" },
-  { a: "Olimpia Elbląg", b: "GKS Wikielec", nazwa: "Derby Warmii i Mazur" },
+  { a: "Olimpia Elbląg", b: "GKS Wikielec", nazwa: "Derby regionu" },
+  { a: "Znicz Biała Piska", b: "GKS Wikielec", nazwa: "Derby województwa" },
+  { a: "Znicz Biała Piska", b: "Mamry Giżycko", nazwa: "Derby regionu" },
+  { a: "Znicz Biała Piska", b: "Mazur Pisz", nazwa: "Derby regionu" },
+  { a: "Sokół Ostróda", b: "Drwęca Nowe Miasto Lubawskie", nazwa: "Derby regionu" },
+  { a: "Drwęca Nowe Miasto Lubawskie", b: "Motor Lubawa", nazwa: "Derby regionu" },
+  { a: "Jeziorak Iława", b: "Motor Lubawa", nazwa: "Derby regionu" },
+  { a: "Warmia Grajewo", b: "ŁKS Łomża", nazwa: "Derby regionu" },
 ];
 
 // Mecze przyjaźni (zgody kibicowskie) — kibice się przyjaźnią: świetna atmosfera, komplet, bez podwyższonego ryzyka.
