@@ -57,6 +57,7 @@ export interface MeczLive {
   okrzyk?: { typ: Okrzyk; do: number }; mowa?: Mowa; motMoj: number; var: boolean; poziom: number;
   dotkniecia: Record<string, number>; // ile razy był przy piłce (heatmapa / aktywność)
   cieplo?: { dom: number[]; gosc: number[] }; // heatmapa: siatka 12×8 (gdzie toczyła się gra każdej drużyny)
+  reakcjaAI?: number; // minuta, w której trener rywala zareaguje na Twoją zmianę taktyki
   skroty?: { min: string; tekst: string; sek: PunktAkcji[]; gol: boolean }[]; // najważniejsze akcje do skrótu meczu
   /** Mecz pucharowy: przy remisie dogrywka (2×15) albo od razu rzuty karne — wg regulaminu ZPN / PZPN. */
   puchar?: { nazwa: string; dogrywka: boolean };
@@ -374,6 +375,18 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
   // AI: nastawienie i zmiany
   const ai = m.moja === "dom" ? m.gosc : m.dom;
   const roznicaAI = m.moja === "dom" ? m.gg - m.gd : m.gd - m.gg;
+  if (m.reakcjaAI != null && m.min >= m.reakcjaAI) { // reakcja trenera AI na Twoją zmianę taktyki
+    m.reakcjaAI = undefined;
+    const ja = m.moja === "dom" ? m.dom : m.gosc, fj = FORMACJE[ja.formacja], fa = FORMACJE[ai.formacja];
+    const tr = `${s.kluby[ai.klubId].trenerNazwisko ? `Trener ${s.kluby[ai.klubId].trenerNazwisko}` : `Trener ${s.kluby[ai.klubId].nazwa}`}`;
+    let t: string | null = null;
+    if (fj && fa && fj.NAP >= 3 && fa.OBR < 5) { ai.formacja = fa.NAP >= 2 ? "5-3-2" : "5-4-1"; t = `📋 ${tr} reaguje na Twoich trzech napastników — dokłada obrońcę, przechodzi na ${ai.formacja}.`; }
+    else if (ja.nastawienie === "ofensywne" && ai.nastawienie !== "obronne" && roznicaAI >= 0) { ai.nastawienie = "obronne"; t = `📋 ${tr} widzi, że ruszyliście do przodu — cofa linię i czeka na kontry.`; }
+    else if ((ja.nastawienie === "obronne" || ja.nastawienie === "autobus") && ai.nastawienie !== "ofensywne" && roznicaAI <= 0) { ai.nastawienie = "ofensywne"; t = `📋 ${tr} korzysta z Waszego cofnięcia — rywal przejmuje inicjatywę i atakuje wyżej.`; }
+    else if (fj && fa && fj.NAP <= 1 && fa.NAP < 2 && FORMACJE["4-4-2"]) { ai.formacja = "4-4-2"; t = `📋 ${tr} odpowiada na jednego napastnika — dokłada drugiego, gra 4-4-2.`; }
+    else if (fj && fa && fj.POM >= 5 && fa.POM < 5) { ai.formacja = "4-5-1"; t = `📋 ${tr} zagęszcza środek pola (4-5-1), żeby nie przegrać walki w drugiej linii.`; }
+    if (t) m.komentarz.unshift({ min: minTxt, typ: "taktyka", tekst: t });
+  }
   if (m.polowa === 2) {
     if (m.min >= 65 && roznicaAI < 0 && ai.nastawienie !== "ofensywne") { ai.nastawienie = "ofensywne"; m.komentarz.unshift({ min: minTxt, typ: "taktyka", tekst: `📋 Trener ${s.kluby[ai.klubId].nazwa} każe atakować — rywal otwiera się z tyłu.` }); }
     if (m.min >= 78 && roznicaAI > 0 && ai.nastawienie !== "obronne") { ai.nastawienie = "obronne"; m.komentarz.unshift({ min: minTxt, typ: "taktyka", tekst: `📋 ${s.kluby[ai.klubId].nazwa} cofa się do obrony i gra na czas.` }); }
@@ -551,6 +564,7 @@ export function zmienTaktyke(s: StanGry, m: MeczLive, o: { nastawienie?: Nastawi
   const z = m.moja === "dom" ? m.dom : m.gosc;
   if (o.nastawienie && o.nastawienie !== z.nastawienie) { z.nastawienie = o.nastawienie; s.taktyka.nastawienie = o.nastawienie; m.komentarz.unshift({ min: `${m.min}'`, typ: "taktyka", tekst: `📋 Zmiana nastawienia: ${NAZWA_NAST[o.nastawienie]}.` }); }
   if (o.formacja && o.formacja !== z.formacja && FORMACJE[o.formacja]) { z.formacja = o.formacja; m.komentarz.unshift({ min: `${m.min}'`, typ: "taktyka", tekst: `📋 Nowe ustawienie: ${o.formacja}.` }); }
+  if ((o.formacja || o.nastawienie) && Math.random() < 0.75) m.reakcjaAI = m.min + 2 + Math.floor(Math.random() * 5); // trener rywala obserwuje i reaguje po kilku minutach
 }
 export const OKRZYKI: Record<Okrzyk, { nazwa: string; opis: string }> = {
   naprzod: { nazwa: "📣 Naprzód!", opis: "więcej ataku, ale też więcej luk z tyłu i zmęczenia" },
