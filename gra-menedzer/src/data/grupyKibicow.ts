@@ -681,7 +681,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Jagiellonia Białystok",
    "Okocimski KS Brzesko",
    "Podhale Nowy Targ",
-   "Unia Tarnów"
+   "Unia Tarnów",
+   "BKS Bochnia"
   ]
  },
  "Widzew Łódź": {
@@ -1771,7 +1772,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Polonia Przemyśl",
    "KSZO Ostrowiec Świętokrzyski",
    "Korona Kielce",
-   "Resovia"
+   "Resovia",
+   "BKS Bochnia"
   ]
  },
  "Resovia": {
@@ -2220,7 +2222,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Okocimski KS Brzesko",
    "Podhale Nowy Targ",
    "Unia Tarnów",
-   "Wisła Kraków"
+   "Wisła Kraków",
+   "BKS Bochnia",
+   "Orzeł Dębno",
+   "Wisła Szczucin"
   ]
  },
  "Goplania Inowrocław": {
@@ -2496,7 +2501,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Podhale Nowy Targ",
    "Unia Oświęcim",
    "Unia Tarnów",
-   "Wisła Kraków"
+   "Wisła Kraków",
+   "BKS Bochnia"
   ]
  },
  "Unia Oświęcim": {
@@ -2511,7 +2517,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Beskid Andrychów",
-   "Podhale Nowy Targ"
+   "Podhale Nowy Targ",
+   "MKS Libiąż"
   ]
  },
  "Rodło Kwidzyn": {
@@ -3699,6 +3706,40 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  "Radunia Stężyca": {
   "ultras": [
    "Raduniacy"
+  ]
+ },
+ "Orzeł Dębno": {
+  "ultras": [
+   "Ultra Squad'04",
+   "Blue Brohters"
+  ],
+  "zgody": [
+   "Jadowniczanka Jadowniki"
+  ],
+  "kosy": [
+   "Pagen Gnojnik",
+   "Tarnovia Tarnów",
+   "Polan Żabno"
+  ]
+ },
+ "Przebój Wolbrom": {
+  "ultras": [
+   "Pasjonaci'09"
+  ],
+  "kosy": [
+   "KS Olkusz"
+  ]
+ },
+ "Wisła Szczucin": {
+  "ultras": [
+   "Azbestowa Horda"
+  ],
+  "kosy": [
+   "Tarnovia Tarnów",
+   "Okocimski Brzesko",
+   "Dąbrovia Dąbrowa Tarnowska",
+   "Tuchovia Tuchów",
+   "Polan Żabno"
   ]
  }
 };

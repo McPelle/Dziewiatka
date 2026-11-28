@@ -945,6 +945,11 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   // Kujawsko-Pomorskie (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
   "Cyklon Kończewice": 400,
   "MGKS Lubraniec": 500,
+  // Małopolska (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Wróblowianka Kraków": 50,
+  "Pogoń Kraków": 400,
+  "Pogoń II Skotniki": 400,
+  "Zjednoczeni Branice": 120,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

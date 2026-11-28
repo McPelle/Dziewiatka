@@ -1111,6 +1111,21 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   // Kujawsko-Pomorskie (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
   "Sokół Grzywna": 2009,
   "Gol Brodnica": 2012,
+  // Małopolska (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "LKS Wietrzychowice": 1975,
+  "Pogoń Kraków": 1948,
+  "Polan Żabno": 1918,
+  "Wisła Czarny Dunajec": 2013,
+  "Iskra Głogoczów": 1956,
+  "Sokół Borzęta": 2011,
+  "Hejnał Krzyszkowice": 1960,
+  "GKS Wierzchosławice": 2025,
+  "Łęgovia Łęg Tarnowski": 1948,
+  "Brzoza Brzezówka": 1998,
+  "Spartakus Radgoszcz": 1996,
+  "Gwiazda Brzegi": 1977,
+  "Wilga Koźmice Wielkie": 1947,
+  "Korona Mętków": 1997,
 };
 
 /** Rok założenia klubu (jeśli znany). */

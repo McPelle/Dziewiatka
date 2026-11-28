@@ -135,6 +135,14 @@ export const PRZYDOMKI: Record<string, string> = {
   "Styna Godziszewo": "Kociewscy Rossoneri",
   "Stolem Gniewino": "Stolemy",
   "Radunia Stężyca": "Duma Kaszub",
+  // Małopolska (runda 2) — przydomki potwierdzone w źródłach
+  "Beskid Andrychów": "Beskidowcy",
+  "MKS Fablok Chrzanów": "Chrzanowska Lokomotywa",
+  "Glinik Gorlice": "Duma Miasta Światła",
+  "Kolejarz Stróże": "Diabły",
+  "Unia Oświęcim": "Uniści",
+  "Wisła Szczucin": "Duma Powiśla",
+  "Wanda Kraków": "Wandeczka",
 };
 
 export function przydomek(nazwa: string): string | undefined {
