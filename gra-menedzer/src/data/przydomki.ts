@@ -182,6 +182,8 @@ export const PRZYDOMKI: Record<string, string> = {
   "ROW 1964 Rybnik": "Grubiorze",
   "Barycz Sułów": "Kabanosy",
   "Karkonosze Jelenia Góra": "Karki",
+  // Opolskie — południe (runda 2) — przydomki potwierdzone w źródłach
+  "Pogoń Prudnik": "Pogoniści",
 };
 
 export function przydomek(nazwa: string): string | undefined {

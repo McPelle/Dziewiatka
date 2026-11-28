@@ -1023,6 +1023,19 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "1.FC Chronstau Chrząstowice": 500,
   "TOR II Dobrzeń Wielki": 1300,
   "LZS Grodziec": 204,
+  // Opolskie — południe (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "GKS Grodków": 500,
+  "Orzeł Branice": 300,
+  "Czarni Otmuchów": 5000,
+  "LZS Racławiczki": 218,
+  "Chemik Kędzierzyn-Koźle": 3000,
+  "KS Skarbimierz": 2000,
+  "GLKS Kietrz": 3000,
+  "Śląsk Reńska Wieś": 2500,
+  "LZS II Racławiczki": 218,
+  "LKS Obrowiec": 200,
+  "LZS Lubrza": 100,
+  "Start Bogdanowice": 950,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

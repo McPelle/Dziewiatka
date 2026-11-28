@@ -3073,5 +3073,9 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
  {"a": "Stal II Brzeg", "b": "Fortuna Głogówek", "typ": "zgoda"},
  {"a": "Stal II Brzeg", "b": "Włókniarz Pabianice", "typ": "zgoda"},
  {"a": "Stal II Brzeg", "b": "Olimpia Lewin Brzeski", "typ": "kosa"},
- {"a": "Start II Namysłów", "b": "Odra Opole", "typ": "kosa"}
+ {"a": "Start II Namysłów", "b": "Odra Opole", "typ": "kosa"},
+ {"a": "GLKS Kietrz", "b": "Odra Wodzisław Śląski", "typ": "zgoda"},
+ {"a": "GLKS Kietrz", "b": "Odra Opole", "typ": "kosa"},
+ {"a": "GLKS Kietrz", "b": "Ruch Chorzów", "typ": "kosa"},
+ {"a": "GLKS Kietrz", "b": "Unia Racibórz", "typ": "kosa"}
 ];

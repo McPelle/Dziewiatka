@@ -1178,7 +1178,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Olimpia Elbląg",
    "Odra Opole",
    "Chemik Kędzierzyn-Koźle",
-   "Włókniarz Kietrz"
+   "Włókniarz Kietrz",
+   "GLKS Kietrz"
   ]
  },
  "Miedź Legnica": {
@@ -1361,7 +1362,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Widzew Łódź",
    "Wisła Kraków",
    "Włókniarz Kietrz",
-   "Start II Namysłów"
+   "Start II Namysłów",
+   "GLKS Kietrz"
   ]
  },
  "Stal Rzeszów": {
@@ -4387,6 +4389,20 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Odra Opole"
+  ]
+ },
+ "GLKS Kietrz": {
+  "ultras": [
+   "Trójkolorowi",
+   "Skiold Banda"
+  ],
+  "zgody": [
+   "Odra Wodzisław Śląski"
+  ],
+  "kosy": [
+   "Odra Opole",
+   "Ruch Chorzów",
+   "Unia Racibórz"
   ]
  }
 };

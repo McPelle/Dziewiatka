@@ -1399,6 +1399,15 @@ export const BARWY_KLUBOW: Record<string, [string, string]> = {
   "LZS Piotrówka": ["#d50000", "#ffffff"],
   "LZS Radawie": ["#0057b8", "#ffffff"],
   "Rzemiosło Dziewkowice": ["#d50000", "#000000"],
+  // Opolskie — południe (runda 2) — barwy z regiowyniki.pl / pl.wikipedia (odcienie przybliżone wg opisu barw)
+  "Pogoń Prudnik": ["#211288", "#ffffff"],
+  "Polonia Głubczyce": ["#0033a0", "#ffffff"],
+  "Czarni Otmuchów": ["#0033a0", "#ffffff"],
+  "Chemik Kędzierzyn-Koźle": ["#0033a0", "#ffffff"],
+  "Unia Krapkowice": ["#211288", "#ffffff"],
+  "GKS Głuchołazy": ["#211288", "#ffffff"],
+  "GLKS Kietrz": ["#0033a0", "#ffffff"],
+  "Śląsk Reńska Wieś": ["#14295c", "#ffffff"],
 };
 
 // Słowa-kolory w nazwie → barwa (gdy klubu nie ma w słowniku). Sprawdzane po kolei.
