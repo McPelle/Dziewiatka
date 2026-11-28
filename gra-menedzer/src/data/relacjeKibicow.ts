@@ -101,8 +101,7 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
  {
   "a": "Elana Toruń",
   "b": "Widzew Łódź",
-  "typ": "zgoda",
-  "nazwa": "Zgoda Elana Toruń – Widzew Łódź [sojusz WRWE; od 01.09.2018]"
+  "typ": "zgoda"
  },
  {
   "a": "Energetyk Gryfino",
@@ -287,14 +286,12 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
  {
   "a": "Ruch Chorzów",
   "b": "Widzew Łódź",
-  "typ": "zgoda",
-  "nazwa": "Zgoda Ruch Chorzów – Widzew Łódź [sojusz WRWE, od 2005]"
+  "typ": "zgoda"
  },
  {
   "a": "Ruch Chorzów",
   "b": "Wisła Kraków",
-  "typ": "zgoda",
-  "nazwa": "Zgoda Ruch Chorzów – Wisła Kraków [sojusz WRWE (Wisła–Ruch–Widzew–Elana)]"
+  "typ": "zgoda"
  },
  {
   "a": "Sandecja Nowy Sącz",
@@ -407,8 +404,7 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
  {
   "a": "Widzew Łódź",
   "b": "Wisła Kraków",
-  "typ": "uklad",
-  "nazwa": "Układ Widzew Łódź – Wisła Kraków [sojusz WRWE]"
+  "typ": "uklad"
  },
  {
   "a": "Arka Gdynia",
@@ -463,12 +459,6 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
   "b": "Pomezania Malbork",
   "typ": "kosa",
   "nazwa": "Kosa Arka Gdynia – Pomezania Malbork"
- },
- {
-  "a": "Arka Gdynia",
-  "b": "Rodło Kwidzyn",
-  "typ": "kosa",
-  "nazwa": "Kosa Arka Gdynia – Rodło Kwidzyn [dotyczy fan clubu: FC Prabuty]"
  },
  {
   "a": "Arka Gdynia",
@@ -1450,12 +1440,6 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
  },
  {
   "a": "Lechia Gdańsk",
-  "b": "Rodło Kwidzyn",
-  "typ": "kosa",
-  "nazwa": "Kosa Lechia Gdańsk – Rodło Kwidzyn [dotyczy fan clubu: FC Kwidzyn]"
- },
- {
-  "a": "Lechia Gdańsk",
   "b": "Ruch Chorzów",
   "typ": "kosa",
   "nazwa": "Kosa Lechia Gdańsk – Ruch Chorzów"
@@ -1899,12 +1883,6 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
   "nazwa": "Kosa Resovia – Widzew Łódź"
  },
  {
-  "a": "Rodło Kwidzyn",
-  "b": "Widzew Łódź",
-  "typ": "kosa",
-  "nazwa": "Kosa Rodło Kwidzyn – Widzew Łódź [dotyczy fan clubu: FC Grudziądz]"
- },
- {
   "a": "Ruch Chorzów",
   "b": "Włocłavia Włocławek",
   "typ": "kosa",
@@ -2137,89 +2115,505 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
   "b": "Śląsk Wrocław",
   "typ": "kosa",
   "nazwa": "Kosa Zagłębie Lubin – Śląsk Wrocław (Derby Dolnego Śląska)"
- }, { "a": "Stomil Olsztyn", "b": "Polonia Bydgoszcz", "typ": "zgoda"},
- { "a": "Stomil Olsztyn", "b": "Wisła Płock", "typ": "zgoda"},
- { "a": "Stomil Olsztyn", "b": "Lechia Gdańsk", "typ": "uklad"},
- { "a": "Stomil Olsztyn", "b": "Hutnik Kraków", "typ": "uklad"},
- { "a": "Stomil Olsztyn", "b": "ŁKS Łomża", "typ": "uklad"},
- { "a": "Olimpia Elbląg", "b": "Legia Warszawa", "typ": "zgoda"},
- { "a": "Olimpia Elbląg", "b": "Zagłębie Sosnowiec", "typ": "zgoda"},
- { "a": "Wigry Suwałki", "b": "Granica Kętrzyn", "typ": "zgoda"},
- { "a": "MKS Mazur Ełk", "b": "Jagiellonia Białystok", "typ": "zgoda"},
- { "a": "MKS Mazur Ełk", "b": "Warmia Grajewo", "typ": "zgoda"},
- { "a": "Wigry Suwałki", "b": "Jagiellonia Białystok", "typ": "kosa"},
- { "a": "Wigry Suwałki", "b": "ŁKS Łomża", "typ": "kosa"},
- { "a": "Wigry Suwałki", "b": "Sparta Augustów", "typ": "kosa"},
- { "a": "Wigry Suwałki", "b": "MKS Mazur Ełk", "typ": "kosa"},
- { "a": "Olimpia Elbląg", "b": "Stomil Olsztyn", "typ": "kosa"},
- { "a": "Olimpia Elbląg", "b": "Jeziorak Iława", "typ": "kosa"},
- { "a": "Olimpia Elbląg", "b": "Arka Gdynia", "typ": "kosa"},
- {"a": "Wigry Suwałki", "b": "Olimpia Grudziądz", "typ": "zgoda"},
- {"a": "ŁKS Łomża", "b": "Sparta 1951 Szepietowo", "typ": "zgoda"},
- {"a": "ŁKS Łomża", "b": "FK Voždovac Belgrad", "typ": "zgoda"},
- {"a": "Motor Lubawa", "b": "Błękitni Orneta", "typ": "zgoda"},
- {"a": "Orzeł Kolno", "b": "KS Śniadowo", "typ": "zgoda"},
- {"a": "Mazur Pisz", "b": "Mławianka Mława", "typ": "zgoda"},
- {"a": "Stomil Olsztyn", "b": "Raków Częstochowa", "typ": "uklad"},
- {"a": "Olimpia Elbląg", "b": "Radomiak Radom", "typ": "uklad"},
- {"a": "Olimpia Elbląg", "b": "Widzew Łódź", "typ": "kosa"},
- {"a": "Olimpia Elbląg", "b": "Ruch Chorzów", "typ": "kosa"},
- {"a": "Olimpia Elbląg", "b": "Śląsk Wrocław", "typ": "kosa"},
- {"a": "Olimpia Elbląg", "b": "Lechia Gdańsk", "typ": "kosa"},
- {"a": "Olimpia Elbląg", "b": "Wisła Płock", "typ": "kosa"},
- {"a": "Olimpia Elbląg", "b": "Olimpia Grudziądz", "typ": "kosa"},
- {"a": "Olimpia Elbląg", "b": "Pomezania Malbork", "typ": "kosa"},
- {"a": "Olimpia Elbląg", "b": "ŁKS Łomża", "typ": "kosa"},
- {"a": "Olimpia Elbląg", "b": "MKS Mazur Ełk", "typ": "kosa"},
- {"a": "Olimpia Elbląg", "b": "Sokół Ostróda", "typ": "kosa"},
- {"a": "Stomil Olsztyn", "b": "Legia Warszawa", "typ": "kosa"},
- {"a": "Stomil Olsztyn", "b": "Widzew Łódź", "typ": "kosa"},
- {"a": "Stomil Olsztyn", "b": "Arka Gdynia", "typ": "kosa"},
- {"a": "Stomil Olsztyn", "b": "Zawisza Bydgoszcz", "typ": "kosa"},
- {"a": "Stomil Olsztyn", "b": "Jagiellonia Białystok", "typ": "kosa"},
- {"a": "Stomil Olsztyn", "b": "Górnik Zabrze", "typ": "kosa"},
- {"a": "Stomil Olsztyn", "b": "Olimpia Grudziądz", "typ": "kosa"},
- {"a": "Stomil Olsztyn", "b": "Wigry Suwałki", "typ": "kosa"},
- {"a": "Stomil Olsztyn", "b": "Granica Kętrzyn", "typ": "kosa"},
- {"a": "Stomil Olsztyn", "b": "MKS Mazur Ełk", "typ": "kosa"},
- {"a": "Jagiellonia Białystok", "b": "ŁKS Łomża", "typ": "kosa"},
- {"a": "ŁKS Łomża", "b": "MKS Mazur Ełk", "typ": "kosa"},
- {"a": "ŁKS Łomża", "b": "Warmia Grajewo", "typ": "kosa"},
- {"a": "ŁKS Łomża", "b": "Granica Kętrzyn", "typ": "kosa"},
- {"a": "Wigry Suwałki", "b": "Warmia Grajewo", "typ": "kosa"},
- {"a": "MKS Mazur Ełk", "b": "Sparta Augustów", "typ": "kosa"},
- {"a": "MKS Mazur Ełk", "b": "Granica Kętrzyn", "typ": "kosa"},
- {"a": "MKS Mazur Ełk", "b": "Sokół Ostróda", "typ": "kosa"},
- {"a": "MKS Mazur Ełk", "b": "Mazur Pisz", "typ": "kosa"},
- {"a": "Warmia Grajewo", "b": "Granica Kętrzyn", "typ": "kosa"},
- {"a": "Warmia Grajewo", "b": "Sparta Augustów", "typ": "kosa"},
- {"a": "Warmia Grajewo", "b": "Sparta 1951 Szepietowo", "typ": "kosa"},
- {"a": "Warmia Grajewo", "b": "Sokół Ostróda", "typ": "kosa"},
- {"a": "Warmia Grajewo", "b": "Mazur Pisz", "typ": "kosa"},
- {"a": "Warmia Grajewo", "b": "Orzeł Kolno", "typ": "kosa"},
- {"a": "Sokół Ostróda", "b": "Drwęca Nowe Miasto Lubawskie", "typ": "kosa"},
- {"a": "Sokół Ostróda", "b": "Motor Lubawa", "typ": "kosa"},
- {"a": "Sokół Ostróda", "b": "Granica Kętrzyn", "typ": "kosa"},
- {"a": "Sokół Ostróda", "b": "Olimpia Grudziądz", "typ": "kosa"},
- {"a": "Jeziorak Iława", "b": "Motor Lubawa", "typ": "kosa"},
- {"a": "Jeziorak Iława", "b": "Arka Gdynia", "typ": "kosa"},
- {"a": "Jeziorak Iława", "b": "Zatoka Braniewo", "typ": "kosa"},
- {"a": "Jeziorak Iława", "b": "Granica Kętrzyn", "typ": "kosa"},
- {"a": "Drwęca Nowe Miasto Lubawskie", "b": "Motor Lubawa", "typ": "kosa"},
- {"a": "Drwęca Nowe Miasto Lubawskie", "b": "Sparta Brodnica", "typ": "kosa"},
- {"a": "Drwęca Nowe Miasto Lubawskie", "b": "Świt Nowy Dwór Mazowiecki", "typ": "kosa"},
- {"a": "Motor Lubawa", "b": "Granica Kętrzyn", "typ": "kosa"},
- {"a": "Motor Lubawa", "b": "Zatoka Braniewo", "typ": "kosa"},
- {"a": "Motor Lubawa", "b": "Czarni Olecko", "typ": "kosa"},
- {"a": "Mazur Pisz", "b": "Znicz Biała Piska", "typ": "kosa"},
- {"a": "Mazur Pisz", "b": "Orlęta Reszel", "typ": "kosa"},
- {"a": "Orzeł Kolno", "b": "Tur Bielsk Podlaski", "typ": "kosa"},
- {"a": "Orzeł Kolno", "b": "Olimpia Zambrów", "typ": "kosa"},
- {"a": "Orzeł Kolno", "b": "Ruch Wysokie Mazowieckie", "typ": "kosa"},
- {"a": "Orzeł Kolno", "b": "Sparta Augustów", "typ": "kosa"},
- {"a": "Granica Kętrzyn", "b": "Mazur Ełk", "typ": "kosa"},
- {"a": "Sokół Ostróda", "b": "Mazur Ełk", "typ": "kosa"},
- {"a": "Mazur Pisz", "b": "Mazur Ełk", "typ": "kosa"},
- {"a": "Warmia Grajewo", "b": "Mazur Ełk", "typ": "zgoda"},
- {"a": "Warmia Grajewo", "b": "Sparta Szepietowo", "typ": "kosa"}
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Polonia Bydgoszcz",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Wisła Płock",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Lechia Gdańsk",
+  "typ": "uklad"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Hutnik Kraków",
+  "typ": "uklad"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "ŁKS Łomża",
+  "typ": "uklad"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Legia Warszawa",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Zagłębie Sosnowiec",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Wigry Suwałki",
+  "b": "Granica Kętrzyn",
+  "typ": "zgoda"
+ },
+ {
+  "a": "MKS Mazur Ełk",
+  "b": "Jagiellonia Białystok",
+  "typ": "zgoda"
+ },
+ {
+  "a": "MKS Mazur Ełk",
+  "b": "Warmia Grajewo",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Wigry Suwałki",
+  "b": "Jagiellonia Białystok",
+  "typ": "kosa"
+ },
+ {
+  "a": "Wigry Suwałki",
+  "b": "ŁKS Łomża",
+  "typ": "kosa"
+ },
+ {
+  "a": "Wigry Suwałki",
+  "b": "Sparta Augustów",
+  "typ": "kosa"
+ },
+ {
+  "a": "Wigry Suwałki",
+  "b": "MKS Mazur Ełk",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Stomil Olsztyn",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Jeziorak Iława",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Arka Gdynia",
+  "typ": "kosa"
+ },
+ {
+  "a": "Wigry Suwałki",
+  "b": "Olimpia Grudziądz",
+  "typ": "zgoda"
+ },
+ {
+  "a": "ŁKS Łomża",
+  "b": "Sparta 1951 Szepietowo",
+  "typ": "zgoda"
+ },
+ {
+  "a": "ŁKS Łomża",
+  "b": "FK Voždovac Belgrad",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Motor Lubawa",
+  "b": "Błękitni Orneta",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Orzeł Kolno",
+  "b": "KS Śniadowo",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Mazur Pisz",
+  "b": "Mławianka Mława",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Raków Częstochowa",
+  "typ": "uklad"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Widzew Łódź",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Ruch Chorzów",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Śląsk Wrocław",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Lechia Gdańsk",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Wisła Płock",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Olimpia Grudziądz",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Pomezania Malbork",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "ŁKS Łomża",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "MKS Mazur Ełk",
+  "typ": "kosa"
+ },
+ {
+  "a": "Olimpia Elbląg",
+  "b": "Sokół Ostróda",
+  "typ": "kosa"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Legia Warszawa",
+  "typ": "kosa"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Widzew Łódź",
+  "typ": "kosa"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Arka Gdynia",
+  "typ": "kosa"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Zawisza Bydgoszcz",
+  "typ": "kosa"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Jagiellonia Białystok",
+  "typ": "kosa"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Górnik Zabrze",
+  "typ": "kosa"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Olimpia Grudziądz",
+  "typ": "kosa"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Wigry Suwałki",
+  "typ": "kosa"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "Granica Kętrzyn",
+  "typ": "kosa"
+ },
+ {
+  "a": "Stomil Olsztyn",
+  "b": "MKS Mazur Ełk",
+  "typ": "kosa"
+ },
+ {
+  "a": "Jagiellonia Białystok",
+  "b": "ŁKS Łomża",
+  "typ": "kosa"
+ },
+ {
+  "a": "ŁKS Łomża",
+  "b": "MKS Mazur Ełk",
+  "typ": "kosa"
+ },
+ {
+  "a": "ŁKS Łomża",
+  "b": "Warmia Grajewo",
+  "typ": "kosa"
+ },
+ {
+  "a": "ŁKS Łomża",
+  "b": "Granica Kętrzyn",
+  "typ": "kosa"
+ },
+ {
+  "a": "Wigry Suwałki",
+  "b": "Warmia Grajewo",
+  "typ": "kosa"
+ },
+ {
+  "a": "MKS Mazur Ełk",
+  "b": "Sparta Augustów",
+  "typ": "kosa"
+ },
+ {
+  "a": "MKS Mazur Ełk",
+  "b": "Granica Kętrzyn",
+  "typ": "kosa"
+ },
+ {
+  "a": "MKS Mazur Ełk",
+  "b": "Sokół Ostróda",
+  "typ": "kosa"
+ },
+ {
+  "a": "MKS Mazur Ełk",
+  "b": "Mazur Pisz",
+  "typ": "kosa"
+ },
+ {
+  "a": "Warmia Grajewo",
+  "b": "Granica Kętrzyn",
+  "typ": "kosa"
+ },
+ {
+  "a": "Warmia Grajewo",
+  "b": "Sparta Augustów",
+  "typ": "kosa"
+ },
+ {
+  "a": "Warmia Grajewo",
+  "b": "Sparta 1951 Szepietowo",
+  "typ": "kosa"
+ },
+ {
+  "a": "Warmia Grajewo",
+  "b": "Sokół Ostróda",
+  "typ": "kosa"
+ },
+ {
+  "a": "Warmia Grajewo",
+  "b": "Mazur Pisz",
+  "typ": "kosa"
+ },
+ {
+  "a": "Warmia Grajewo",
+  "b": "Orzeł Kolno",
+  "typ": "kosa"
+ },
+ {
+  "a": "Sokół Ostróda",
+  "b": "Drwęca Nowe Miasto Lubawskie",
+  "typ": "kosa"
+ },
+ {
+  "a": "Sokół Ostróda",
+  "b": "Motor Lubawa",
+  "typ": "kosa"
+ },
+ {
+  "a": "Sokół Ostróda",
+  "b": "Granica Kętrzyn",
+  "typ": "kosa"
+ },
+ {
+  "a": "Sokół Ostróda",
+  "b": "Olimpia Grudziądz",
+  "typ": "kosa"
+ },
+ {
+  "a": "Jeziorak Iława",
+  "b": "Motor Lubawa",
+  "typ": "kosa"
+ },
+ {
+  "a": "Jeziorak Iława",
+  "b": "Arka Gdynia",
+  "typ": "kosa"
+ },
+ {
+  "a": "Jeziorak Iława",
+  "b": "Zatoka Braniewo",
+  "typ": "kosa"
+ },
+ {
+  "a": "Jeziorak Iława",
+  "b": "Granica Kętrzyn",
+  "typ": "kosa"
+ },
+ {
+  "a": "Drwęca Nowe Miasto Lubawskie",
+  "b": "Motor Lubawa",
+  "typ": "kosa"
+ },
+ {
+  "a": "Drwęca Nowe Miasto Lubawskie",
+  "b": "Sparta Brodnica",
+  "typ": "kosa"
+ },
+ {
+  "a": "Drwęca Nowe Miasto Lubawskie",
+  "b": "Świt Nowy Dwór Mazowiecki",
+  "typ": "kosa"
+ },
+ {
+  "a": "Motor Lubawa",
+  "b": "Granica Kętrzyn",
+  "typ": "kosa"
+ },
+ {
+  "a": "Motor Lubawa",
+  "b": "Zatoka Braniewo",
+  "typ": "kosa"
+ },
+ {
+  "a": "Motor Lubawa",
+  "b": "Czarni Olecko",
+  "typ": "kosa"
+ },
+ {
+  "a": "Mazur Pisz",
+  "b": "Znicz Biała Piska",
+  "typ": "kosa"
+ },
+ {
+  "a": "Mazur Pisz",
+  "b": "Orlęta Reszel",
+  "typ": "kosa"
+ },
+ {
+  "a": "Orzeł Kolno",
+  "b": "Tur Bielsk Podlaski",
+  "typ": "kosa"
+ },
+ {
+  "a": "Orzeł Kolno",
+  "b": "Olimpia Zambrów",
+  "typ": "kosa"
+ },
+ {
+  "a": "Orzeł Kolno",
+  "b": "Ruch Wysokie Mazowieckie",
+  "typ": "kosa"
+ },
+ {
+  "a": "Orzeł Kolno",
+  "b": "Sparta Augustów",
+  "typ": "kosa"
+ },
+ {
+  "a": "Granica Kętrzyn",
+  "b": "Mazur Ełk",
+  "typ": "kosa"
+ },
+ {
+  "a": "Sokół Ostróda",
+  "b": "Mazur Ełk",
+  "typ": "kosa"
+ },
+ {
+  "a": "Mazur Pisz",
+  "b": "Mazur Ełk",
+  "typ": "kosa"
+ },
+ {
+  "a": "Warmia Grajewo",
+  "b": "Mazur Ełk",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Warmia Grajewo",
+  "b": "Sparta Szepietowo",
+  "typ": "kosa"
+ },
+ {
+  "a": "Mazovia Mińsk Mazowiecki",
+  "b": "Pogoń Siedlce",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Mazovia Mińsk Mazowiecki",
+  "b": "Podlasie Biała Podlaska",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Mazovia Mińsk Mazowiecki",
+  "b": "Polonia Warszawa",
+  "typ": "kosa"
+ },
+ {
+  "a": "Pelikan Łowicz",
+  "b": "Unia Skierniewice",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Lechia Tomaszów Mazowiecki",
+  "b": "Pelikan Łowicz",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Lechia Tomaszów Mazowiecki",
+  "b": "Unia Skierniewice",
+  "typ": "zgoda"
+ },
+ {
+  "a": "Pelikan Łowicz",
+  "b": "Świt Nowy Dwór Mazowiecki",
+  "typ": "kosa"
+ },
+ {
+  "a": "Unia Skierniewice",
+  "b": "Świt Nowy Dwór Mazowiecki",
+  "typ": "kosa"
+ },
+ {
+  "a": "Lechia Tomaszów Mazowiecki",
+  "b": "Świt Nowy Dwór Mazowiecki",
+  "typ": "kosa"
+ },
+ {
+  "a": "Polonia Warszawa",
+  "b": "Świt Nowy Dwór Mazowiecki",
+  "typ": "kosa"
+ },
+ {
+  "a": "Legia Warszawa",
+  "b": "Pelikan Łowicz",
+  "typ": "kosa"
+ },
+ {
+  "a": "Pelikan Łowicz",
+  "b": "Radomiak Radom",
+  "typ": "kosa"
+ },
+ {
+  "a": "Lechia Gdańsk",
+  "b": "Polonia Bytom",
+  "typ": "kosa"
+ },
+ {
+  "a": "GKS Katowice",
+  "b": "Lechia Gdańsk",
+  "typ": "kosa"
+ },
+ {
+  "a": "Górnik Zabrze",
+  "b": "Lechia Gdańsk",
+  "typ": "kosa"
+ },
+ {
+  "a": "Legia Warszawa",
+  "b": "Polonia Bytom",
+  "typ": "kosa"
+ }
 ];

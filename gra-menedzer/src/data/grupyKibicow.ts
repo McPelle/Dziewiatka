@@ -72,7 +72,6 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Śląsk Wrocław",
    "Lechia Gdańsk",
    "Pogoń Szczecin",
-   "KKS Kalisz",
    "Zagłębie Sosnowiec",
    "KKS 1925 Kalisz",
    "Wisła Kraków"
@@ -121,7 +120,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "GKS Tychy",
    "Odra Opole",
    "Raków Częstochowa",
-   "Stomil Olsztyn"
+   "Stomil Olsztyn",
+   "Lechia Gdańsk"
   ]
  },
  "Jagiellonia Białystok": {
@@ -257,7 +257,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Widzew Łódź",
    "Piast Gliwice",
    "Odra Opole",
-   "Polonia Bytom"
+   "Polonia Bytom",
+   "Lechia Gdańsk"
   ]
  },
  "Legia Warszawa": {
@@ -362,7 +363,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Wisła Płock",
    "Zagłębie Lubin",
    "Zawisza Bydgoszcz",
-   "Stomil Olsztyn"
+   "Stomil Olsztyn",
+   "Pelikan Łowicz",
+   "Polonia Bytom"
   ]
  },
  "Zagłębie Lubin": {
@@ -494,8 +497,7 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Radomscy Chuligani"
   ],
   "zgody": [
-   "Legia Warszawa",
-   "Olimpia Elbląg"
+   "Legia Warszawa"
   ],
   "fanklub": [
    "FANKLUB Białobrzegi",
@@ -515,7 +517,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "GKS Tychy",
    "Polonia Warszawa",
    "Resovia Rzeszów",
-   "Resovia"
+   "Resovia",
+   "Pelikan Łowicz"
   ]
  },
  "Korona Kielce": {
@@ -566,9 +569,7 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Śląsk Wrocław",
-   "Hetman Zamość",
-   "wcześniej układ od 28.04.2018)",
-   "Górnik Łęczna"
+   "Hetman Zamość"
   ],
   "flagi": [
    "Motorowcy"
@@ -760,7 +761,6 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Polonia Bydgoszcz",
    "Raków Częstochowa",
    "Resovia",
-   "Rodło Kwidzyn",
    "Włocłavia Włocławek",
    "Zagłębie Lubin",
    "Olimpia Elbląg",
@@ -1064,7 +1064,6 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "FANKLUB Żuromin"
   ],
   "zgody": [
-   "Sandecja Nowy Sącz",
    "Ligallo Fondo Norte (Real Saragossa)",
    "Ligallo Fondo Norte - Real Saragossa (układ)"
   ],
@@ -1086,7 +1085,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Pogoń Siedlce",
    "Radomiak Radom",
    "Wisła Płock",
-   "Znicz Pruszków"
+   "Znicz Pruszków",
+   "Mazovia Mińsk Mazowiecki",
+   "Świt Nowy Dwór Mazowiecki"
   ]
  },
  "Ruch Chorzów": {
@@ -1227,7 +1228,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Zagłębie Sosnowiec",
    "BKS Stal Bielsko-Biała",
    "Piast Gliwice",
-   "Ruch Chorzów"
+   "Ruch Chorzów",
+   "Lechia Gdańsk",
+   "Legia Warszawa"
   ]
  },
  "Pogoń Grodzisk Mazowiecki": {
@@ -1447,11 +1450,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Kaszubia Kościerzyna",
    "Legia Warszawa",
    "Motor Lublin",
-   "Rodło Kwidzyn",
    "Wisła Kraków",
    "Zagłębie Lubin",
    "Zawisza Bydgoszcz",
-   "Olimpia Elbląg"
+   "Olimpia Elbląg",
+   "Polonia Bytom",
+   "GKS Katowice",
+   "Górnik Zabrze"
   ]
  },
  "Arka Gdynia": {
@@ -1534,7 +1539,6 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Jagiellonia Białystok",
    "Motor Lublin",
    "Pomezania Malbork",
-   "Rodło Kwidzyn",
    "Wisła Płock",
    "ŁKS Łódź",
    "Olimpia Elbląg",
@@ -1937,7 +1941,6 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  },
  "Elana Toruń": {
   "ultras": [
-   "Młoda Elana (h)",
    "Ultras Elana Toruń",
    "Zorganizowana Grupa Kibolska"
   ],
@@ -1946,7 +1949,6 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Widzew Łódź",
-   "KKS Kalisz",
    "KS Myszków",
    "KKS 1925 Kalisz"
   ],
@@ -2027,8 +2029,6 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Młoda Kotwica"
   ],
   "zgody": [
-   "KKS Kalisz",
-   "MKS Karlino",
    "Sokół Karlino",
    "KKS 1925 Kalisz",
    "Gryf Słupsk"
@@ -2172,14 +2172,6 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Energetyk Gryfino",
    "Odra Chojna",
    "Stilon Gorzów Wielkopolski"
-  ]
- },
- "Okocimski Brzesko": {
-  "ultras": [
-   "BF - Brzescy Fanatycy"
-  ],
-  "fanklub": [
-   "FANKLUB Jasień"
   ]
  },
  "Pomezania Malbork": {
@@ -2413,14 +2405,6 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Olimp Złocieniec"
   ]
  },
- "MKS Karlino": {
-  "ultras": [
-   "Ultras Karlino'11"
-  ],
-  "zgody": [
-   "Kotwica Kołobrzeg"
-  ]
- },
  "Apator Toruń": {
   "ultras": [
    "Ultra Familiares'08"
@@ -2489,12 +2473,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Ultras Rodło"
   ],
   "kosy": [
-   "Arka Gdynia",
-   "Lechia Gdańsk",
    "Olimpia Grudziądz",
    "Pogoń Prabuty",
-   "Pomezania Malbork",
-   "Widzew Łódź"
+   "Pomezania Malbork"
   ]
  },
  "Gryf Wejherowo": {
@@ -2576,6 +2557,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Podhale Nowy Targ",
    "Sandecja Nowy Sącz",
    "Tarnovia Tarnów"
+  ],
+  "fanklub": [
+   "FANKLUB Jasień"
   ]
  },
  "Victoria 1918 Jaworzno": {
@@ -2669,10 +2653,7 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ]
  },
  "Unia Gniewkowo": {
-  "zgody": [
-   "Unia Wąbrzeźno",
-   "Unia Skierniewice"
-  ],
+  "zgody": [],
   "kosy": [
    "Sparta Brodnica",
    "Kujawiak Kowal",
@@ -2756,6 +2737,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Podlasie Biała Podlaska",
    "Pogoń Siedlce",
    "Stal Stalowa Wola"
+  ],
+  "fanklub": [
+   "FANKLUB Krasnystaw"
   ]
  },
  "KSZO Ostrowiec Świętokrzyski": {
@@ -2791,6 +2775,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Łada Biłgoraj",
    "Stal Stalowa Wola",
    "Podlasie Biała Podlaska"
+  ],
+  "fanklub": [
+   "FANKLUB Szczebrzeszyn",
+   "FANKLUB Tomaszów Lubelski"
   ]
  },
  "Czarni Połaniec": {
@@ -2819,6 +2807,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Igloopol Dębica",
    "JKS 1909 Jarosław",
    "Sandecja Nowy Sącz"
+  ],
+  "fanklub": [
+   "FANKLUB Pustków",
+   "FANKLUB Bobrowa"
   ]
  },
  "Naprzód Jędrzejów": {
@@ -2853,6 +2845,12 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Stal Rzeszów",
    "Karpaty Krosno",
    "Podlasie Biała Podlaska"
+  ],
+  "fanklub": [
+   "FANKLUB Cmolas",
+   "FANKLUB Kolbuszowa",
+   "FANKLUB Majdan Królewski",
+   "FANKLUB Osiek"
   ]
  },
  "Star Starachowice": {
@@ -2900,7 +2898,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Warszawianka Warszawa",
-   "Pogoń Siedlce"
+   "Pogoń Siedlce",
+   "Mazovia Mińsk Mazowiecki"
   ],
   "kosy": [
    "Orlęta Radzyń Podlaski",
@@ -2910,6 +2909,15 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Hetman Zamość",
    "Górnik Łęczna",
    "Orlęta Łuków"
+  ],
+  "fanklub": [
+   "FANKLUB Chotyłów",
+   "FANKLUB Komarno",
+   "FANKLUB Leśna Podlaska",
+   "FANKLUB Swory",
+   "FANKLUB Sokołów Podlaski",
+   "FANKLUB Łomazy",
+   "FANKLUB Terespol"
   ]
  },
  "Stomil Olsztyn": {
@@ -2994,8 +3002,7 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Legia Warszawa",
-   "Zagłębie Sosnowiec",
-   "Radomiak Radom"
+   "Zagłębie Sosnowiec"
   ],
   "kosy": [
    "Stomil Olsztyn",
@@ -3257,6 +3264,51 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Olimpia Zambrów",
    "Ruch Wysokie Mazowieckie",
    "Sparta Augustów"
+  ]
+ },
+ "Mazovia Mińsk Mazowiecki": {
+  "ultras": [
+   "EP'11",
+   "MM'15"
+  ],
+  "zgody": [
+   "Pogoń Siedlce",
+   "Podlasie Biała Podlaska"
+  ],
+  "kosy": [
+   "Polonia Warszawa"
+  ]
+ },
+ "Pelikan Łowicz": {
+  "ultras": [
+   "Pelikan Łowicz 1945 - Duma i Tradycja"
+  ],
+  "chuligani": [
+   "Green Birds"
+  ],
+  "zgody": [
+   "Unia Skierniewice",
+   "Lechia Tomaszów Mazowiecki"
+  ],
+  "kosy": [
+   "Świt Nowy Dwór Mazowiecki",
+   "Legia Warszawa",
+   "Radomiak Radom"
+  ]
+ },
+ "Świt Nowy Dwór Mazowiecki": {
+  "ultras": [
+   "Ultras Świt"
+  ],
+  "chuligani": [
+   "MKS Stoned Hunters"
+  ],
+  "kosy": [
+   "Drwęca Nowe Miasto Lubawskie",
+   "Pelikan Łowicz",
+   "Unia Skierniewice",
+   "Lechia Tomaszów Mazowiecki",
+   "Polonia Warszawa"
   ]
  }
 };

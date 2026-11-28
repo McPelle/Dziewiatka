@@ -141,6 +141,19 @@ export const DERBY: ParaDerbowa[] = [
   { a: "Drwęca Nowe Miasto Lubawskie", b: "Motor Lubawa", nazwa: "Derby regionu" },
   { a: "Jeziorak Iława", b: "Motor Lubawa", nazwa: "Derby regionu" },
   { a: "Warmia Grajewo", b: "ŁKS Łomża", nazwa: "Derby regionu" },
+  // audyt 28.11.2026 (en.wikipedia — List of football rivalries in Poland)
+  { a: "Gwardia Koszalin", b: "Kotwica Kołobrzeg", nazwa: "Wielkie Derby Pomorza" },
+  { a: "Gryf Słupsk", b: "Gwardia Koszalin", nazwa: "Wielkie Derby Pomorza" },
+  { a: "Arka Gdynia", b: "Bałtyk Gdynia", nazwa: "Derby Gdyni" },
+  { a: "Lechia Gdańsk", b: "Gedania Gdańsk", nazwa: "Derby Gdańska" },
+  { a: "Lechia Gdańsk", b: "Stoczniowiec Gdańsk", nazwa: "Derby Gdańska" },
+  { a: "Korona Kielce", b: "KSZO Ostrowiec Świętokrzyski", nazwa: "Derby Świętokrzyskie" },
+  { a: "Hutnik Kraków", b: "KSZO Ostrowiec Świętokrzyski", nazwa: "Derby hutnicze" },
+  { a: "Hutnik Kraków", b: "Stal Stalowa Wola", nazwa: "Derby hutnicze" },
+  { a: "KSZO Ostrowiec Świętokrzyski", b: "Stal Stalowa Wola", nazwa: "Derby hutnicze" },
+  { a: "Avia Świdnik", b: "Motor Lublin", nazwa: "Derby Lubelszczyzny" },
+  { a: "Siarka Tarnobrzeg", b: "Stal Stalowa Wola", nazwa: "Wielkie Derby Podkarpacia" },
+  { a: "Odra Opole", b: "Śląsk Wrocław", nazwa: "Derby Opola i Wrocławia" },
 ];
 
 // Mecze przyjaźni (zgody kibicowskie) — kibice się przyjaźnią: świetna atmosfera, komplet, bez podwyższonego ryzyka.
