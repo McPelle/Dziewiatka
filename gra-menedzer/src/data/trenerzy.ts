@@ -1,6 +1,6 @@
-// Trenerzy klubów (pierwszi szkoleniowcy). REALNI, AKTUALNI trenerzy tam, gdzie są udokumentowani
-// (Ekstraklasa, I–III liga, część IV/V ligi pomorskie+małopolskie) — z historią kariery. Pozostałym
-// klubom (głównie klasa okręgowa → B) silnik dobiera wiarygodnego, wygenerowanego szkoleniowca, żeby
+// Trenerzy klubów (pierwsi szkoleniowcy). REALNI, AKTUALNI trenerzy tylko od Ekstraklasy do II ligi (poziom 1–3),
+// z historią kariery. Od III ligi do klasy B (we wszystkich województwach) silnik zawsze dobiera wiarygodnego,
+// wygenerowanego szkoleniowca z własną historią (wpisy niższych klubów poniżej są ignorowane), żeby
 // „tryb trenera" działał wszędzie. Źródła realnych danych: Wikipedia, 90minut.pl, Transfermarkt, strony klubów.
 import { losInt, wybierz } from "../engine/losuj";
 import type { Klub, KontraktTyp, StanGry } from "../engine/types";
@@ -270,12 +270,18 @@ function generujHistorie(aktObjecie: number, poziom: number): WpisHistorii[] {
   return out;
 }
 
+/** Stare zapisy: kluby od III ligi w dół dostają wygenerowanego trenera zamiast prawdziwego (prawdziwi tylko E → II liga). */
+export function trenerzyGenerowaniNizej(s: StanGry): void {
+  for (const [id, k] of Object.entries(s.kluby)) if (k.poziom >= 4 && k.trenerReal && id !== s.mojKlub) przypiszTrenera(s, k);
+}
+
 /** Przypisuje trenera do klubu: realny jeśli udokumentowany, inaczej wygenerowany (z historią). */
 export function przypiszTrenera(s: StanGry, klub: Klub): void {
   const sezon = s.sezon;
   klub.trenerKontraktTyp = kontraktTypPoziom(klub.poziom);
   klub.trenerPensja = pensjaTrenera(klub.poziom);
-  const real = TRENERZY[klub.nazwa];
+  // prawdziwi trenerzy tylko Ekstraklasa → II liga (poziom 1–3); od III ligi w dół zawsze wygenerowani (z historią)
+  const real = klub.poziom <= 3 ? TRENERZY[klub.nazwa] : undefined;
   if (real) {
     klub.trenerImie = real.imie;
     klub.trenerNazwisko = real.nazwisko;

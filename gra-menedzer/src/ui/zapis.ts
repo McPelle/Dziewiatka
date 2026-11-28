@@ -4,6 +4,7 @@ import { Platform } from "react-native";
 import { aktualizujTypyKontraktow, wartoscKontraktuTrenera } from "../engine/sezon";
 import { zarejestrujBarwy } from "../engine/wlasnyKlub";
 import { losujAgenta, maAgenta, odswiezKarieryRealne } from "../engine/swiat";
+import { trenerzyGenerowaniNizej } from "../data/trenerzy";
 import type { StanGry } from "../engine/types";
 
 const KLUCZ = "menedzer-zapis-1";
@@ -174,6 +175,7 @@ function przygotuj(s: StanGry): StanGry {
   migrujTrenera(s);
   for (const l of s.ligi ?? []) l.nazwa = l.nazwa.replace(/^Betclic ([12]) Liga$/, "Betclic $1. Liga"); // jednolite nazwy lig centralnych (drzewo awansów PZPN)
   zasiejRejestr(s); // historia transferów (stary zapis — ruchy z okna startowego)
+  trenerzyGenerowaniNizej(s); // od III ligi w dół trenerzy wygenerowani
   odswiezKarieryRealne(s); // prawdziwe historie zawodników (Ekstraklasa → II liga) także w starych zapisach
   zarejestrujBarwy(s);          // barwy klubów stworzonych przez gracza
   aktualizujTypyKontraktow(s); // stare zapisy: wyrównaj kontrakty do szczebla klubu (np. amatorzy w IV/III lidze)
