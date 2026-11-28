@@ -17,6 +17,7 @@ import { grafika3D } from "./three/Stadion3DWidok";
 import { mow, plecZImienia, zamilknij } from "./three/glos";
 import { gwizdek } from "./three/dzwiek";
 import type { Ustawienia3D } from "./three/Mecz3D";
+import { jestMlodziezowcem, wymogMlodziezowca } from "../engine/swiat";
 
 type Etap = "start" | "szatnia" | "rozgrzewka" | "mowa";
 const PLAN_ROZGRZEWKI: Cwiczenie[] = ["rozruch", "rozciaganie", "dziadek", "podania", "sprinty", "strzaly"];
@@ -96,6 +97,15 @@ export function PrzedMeczem({ s, m, stroje, ust, wyborStrojow, onGotowe }: { s: 
         <Text style={st.tekst}>🏃 2. Rozgrzewka na boisku (3D)</Text>
         <Text style={st.tekst}>🗣 3. Ostatnie słowa trenera przed wyjściem</Text>
       </View>
+      {(() => { // przepis PZPN o młodzieżowcu: brak U-21 w jedenastce = walkower 0:3 po meczu
+        const wym = m.puchar ? 0 : wymogMlodziezowca(klub.poziom); const ma = mojZ.start.filter((id) => s.zawodnicy[id] && jestMlodziezowcem(s.zawodnicy[id])).length;
+        if (!wym || ma >= wym) return null;
+        return (
+          <View style={[st.karta, { marginHorizontal: 0, borderColor: K.czerwony, borderWidth: 2 }]}>
+            <Text style={[st.tekst, { color: K.czerwony, fontWeight: "900" }]}>⚠ Brak młodzieżowca w jedenastce: {ma}/{wym}</Text>
+            <Text style={[st.maly, { marginTop: 4 }]}>Przepis PZPN: na tym szczeblu w składzie musi być {wym} zawodnik U-21. Bez tego mecz zostanie zweryfikowany jako walkower 0:3. Popraw skład w zakładce „Skład” przed rozpoczęciem.</Text>
+          </View>
+        ); })()}
       {(() => { const ryw = s.kluby[ich.klubId]; if (!ryw.trenerNazwisko) return null; const w = wypowiedzTrenera(ryw.trenerKraj, ryw.trenerPolski, Math.random() < 0.5 ? "szacunek" : "wygrac"); return (
         <View style={[st.karta, { marginHorizontal: 0 }]}>
           <Text style={st.naglowek}>🎙 Trener rywala przed meczem</Text>

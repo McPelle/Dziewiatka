@@ -35,10 +35,7 @@ import { awanseSpadkiJun, inicjujRozgrywkiJun, juniorKolejka } from "./ligaJunio
 import { dateKolejki, kalendarzSzczebla, oknoTransferowe, type InfoOkna } from "./kalendarz";
 import { odlegloscDrogowa } from "../data/miasta";
 import { odswiezRynekTestow, rozwojTestow, sprzatnijRynekTestow } from "./testy";
-import {
-  BILET, noweId, celSezonu, dlugoscKontraktu, KADRA, kontraktTyp, ligaKlubu, losujAgenta, maAgenta, nadajNumery, NAZWA_KONTRAKTU, nowyZawodnik, pensjaDla,
-  jestMlodziezowcem, naliczSezonDoKariery, przejscieDoKlubu, PREMIA_AWANS, polaczRezerwy, silaKlubu, SPONSOR_SEZON, tabelaLigi, terminarz, uzupelnijWolnych, wartosc, WIDZOWIE, wpisKarieryOtwarty, wymogMlodziezowca, zakresUmiej,
-} from "./swiat";
+import { BILET, noweId, celSezonu, dlugoscKontraktu, KADRA, kontraktTyp, ligaKlubu, losujAgenta, maAgenta, nadajNumery, NAZWA_KONTRAKTU, nowyZawodnik, pensjaDla, jestMlodziezowcem, naliczSezonDoKariery, przejscieDoKlubu, PREMIA_AWANS, polaczRezerwy, silaKlubu, SPONSOR_SEZON, tabelaLigi, terminarz, uzupelnijWolnych, wartosc, WIDZOWIE, wpisKarieryOtwarty, wymogMlodziezowca, zakresUmiej,  } from "./swiat";
 
 /** Prowizja agenta przy podpisaniu/przedłużeniu (zł) — zależna od pensji i długości umowy. */
 export function prowizjaAgenta(pensjaKol: number, dlugosc: number): number {
@@ -393,6 +390,19 @@ export function przygotujKolejke(s: StanGry) {
     const auto = autoSklad(s, s.mojKlub, s.taktyka.formacja).filter((id) => !zostaja.includes(id));
     s.taktyka.sklad = [...zostaja, ...auto].slice(0, 11);
     s.taktyka.reczneSloty = false;
+  }
+  // Przepis PZPN o młodzieżowcu: gdy po zmianach w składzie brakuje wymaganych U-21, asystent wstawia dostępnego młodzieżowca
+  // w miejsce najsłabszego zawodnika z pola (bez tego mecz zostałby zweryfikowany jako walkower 0:3).
+  { const wym = wymogMlodziezowca(poziom); const mlodzi = () => s.taktyka.sklad.filter((id) => jestMlodziezowcem(s.zawodnicy[id])).length;
+    let zmiana = 0;
+    while (mlodzi() < wym) {
+      const kandydat = s.kluby[s.mojKlub].zawodnicy.map((id) => s.zawodnicy[id]).filter((z) => z && jestMlodziezowcem(z) && z.poz !== "BR" && !s.taktyka.sklad.includes(z.id) && dostepny(s, z)).sort((a, b) => b.umiej - a.umiej)[0];
+      const slaby = s.taktyka.sklad.map((id) => s.zawodnicy[id]).filter((z) => z && z.poz !== "BR" && !jestMlodziezowcem(z)).sort((a, b) => a.umiej - b.umiej)[0];
+      if (!kandydat || !slaby) break;
+      s.taktyka.sklad = s.taktyka.sklad.map((id) => (id === slaby.id ? kandydat.id : id)); zmiana++;
+      wiadomosc(s, `🧑‍🏫 Asystent: w składzie zabrakło młodzieżowca (przepis PZPN) — ${kandydat.imie} ${kandydat.nazwisko} zagra zamiast ${slaby.imie} ${slaby.nazwisko}.`);
+    }
+    if (zmiana) s.taktyka.reczneSloty = false;
   }
   // Zaległe mecze: odrabianie przełożonego spotkania w środku tygodnia zostawia kadrę zmęczoną na najbliższą kolejkę.
   if ((s.zaleglosc ?? 0) > 0) {
@@ -773,9 +783,12 @@ export function zagrajKolejke(s: StanGry) {
           : `Walkower 3:0 dla Was — rywal wystawił nieuprawnionego zawodnika (${powod}).`);
         return w;
       }
+      // Skład, który faktycznie wyszedł na boisko: przy meczu oglądanym na żywo — jedenastka z transmisji.
+      const live = moj && s.meczLive?.koniec && s.meczLive.dom.klubId === dom && s.meczLive.gosc.klubId === gosc ? s.meczLive : undefined;
+      const skladMoj = live ? (live.dom.klubId === s.mojKlub ? live.dom.start : live.gosc.start) : s.taktyka.sklad;
       // Przepis PZPN: za mało młodzieżowców w jedenastce = walkower 0:3 (I liga 1, II/III liga 2, IV+ 1).
       const wymogM = moj ? wymogMlodziezowca(s.kluby[s.mojKlub].poziom) : 0;
-      const maM = s.taktyka.sklad.filter((id) => jestMlodziezowcem(s.zawodnicy[id])).length;
+      const maM = skladMoj.filter((id) => jestMlodziezowcem(s.zawodnicy[id])).length;
       if (wymogM > 0 && maM < wymogM) {
         const uSiebie = dom === s.mojKlub;
         const w = { dom, gosc, gd: uSiebie ? 0 : 3, gg: uSiebie ? 3 : 0, zdarzenia: [] };
@@ -787,7 +800,7 @@ export function zagrajKolejke(s: StanGry) {
       // Przepis PZPN o cudzoziemcach: za dużo zawodników spoza UE w jedenastce = walkower 0:3.
       if (moj) {
         const limit = limitSpozaUE(s.kluby[s.mojKlub].poziom);
-        if (ileSpozaUE(s, s.taktyka.sklad) > limit) {
+        if (ileSpozaUE(s, skladMoj) > limit) {
           const uSiebie = dom === s.mojKlub;
           const w = { dom, gosc, gd: uSiebie ? 0 : 3, gg: uSiebie ? 3 : 0, zdarzenia: [] };
           s.ostatnieOceny = [];
