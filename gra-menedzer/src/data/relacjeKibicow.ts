@@ -3069,5 +3069,9 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
  {"a": "Barycz Sułów", "b": "Polonia Świdnica", "typ": "kosa"},
  {"a": "Karkonosze Jelenia Góra", "b": "Olimpia Kowary", "typ": "zgoda"},
  {"a": "Karkonosze Jelenia Góra", "b": "Górnik Wałbrzych", "typ": "kosa"},
- {"a": "Stilon Gorzów Wielkopolski", "b": "Chrobry Głogów (1985-1995 i od 2012 r.)", "typ": "zgoda"}
+ {"a": "Stilon Gorzów Wielkopolski", "b": "Chrobry Głogów (1985-1995 i od 2012 r.)", "typ": "zgoda"},
+ {"a": "Stal II Brzeg", "b": "Fortuna Głogówek", "typ": "zgoda"},
+ {"a": "Stal II Brzeg", "b": "Włókniarz Pabianice", "typ": "zgoda"},
+ {"a": "Stal II Brzeg", "b": "Olimpia Lewin Brzeski", "typ": "kosa"},
+ {"a": "Start II Namysłów", "b": "Odra Opole", "typ": "kosa"}
 ];

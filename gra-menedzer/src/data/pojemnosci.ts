@@ -1010,6 +1010,19 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Raków II Częstochowa": 200,
   // Lubuskie — Zielona Góra (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
   "Zorza Port 2000 Mostki": 1000,
+  // Opolskie — północ (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Orzeł Źlinice": 224,
+  "TOR Dobrzeń Wielki": 1300,
+  "Stal II Brzeg": 2000,
+  "OKS Olesno": 528,
+  "Skalnik Gracze": 1000,
+  "LZS Ligota Turawska": 400,
+  "Motor Praszka": 500,
+  "Silesius Kotórz Mały": 700,
+  "Olimpia Lewin Brzeski": 3500,
+  "1.FC Chronstau Chrząstowice": 500,
+  "TOR II Dobrzeń Wielki": 1300,
+  "LZS Grodziec": 204,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

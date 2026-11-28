@@ -223,6 +223,12 @@ export const TRENERZY: Record<string, TrenerReal> = {
   "Stilon Gorzów Wielkopolski": { imie: "Karol", nazwisko: "Gliwiński" }, // Lubuskie — Gorzów / III liga gr. III; lubuskizpn.pl (2026-07-23)
   "Warta Gorzów Wielkopolski": { imie: "Mariusz", nazwisko: "Łabiak" }, // Lubuskie — Gorzów / III liga gr. III; pl.wikipedia.org (2026-11-28 (infoboks Wikipedii; brak potwierdzenia w innym źródle))
   "Polonia Nysa": { imie: "Adrian", nazwisko: "Pajączkowski" }, // Lubuskie — Gorzów / III liga gr. III; kspolonianysa.pl (2026-09-25 („Adrian Pajączkowski nowym trenerem Polonii Nysa”))
+  "Victoria Żyrowa": { imie: "Kamil", nazwisko: "Jakubczak" }, // Opolskie — północ; pilkaopolska.pl (2026-07-27)
+  "Fortuna Głogówek": { imie: "Rafał", nazwisko: "Wolny" }, // Opolskie — północ; opolska360.pl (2026-08-20)
+  "TOR Dobrzeń Wielki": { imie: "Wojciech", nazwisko: "Kaszub" }, // Opolskie — północ; pilkaopolska.pl (2026-08-14)
+  "Piast Namysłów": { imie: "Wojciech", nazwisko: "Baczyński" }, // Opolskie — północ; pilkaopolska.pl (2026-07-30)
+  "Grom Zawiść": { imie: "Radosław", nazwisko: "Kołbuc" }, // Opolskie — północ; pilkaopolska.pl (2026-07-30)
+  "Odra Kąty Opolskie": { imie: "Mateusz", nazwisko: "Tworek" }, // Opolskie — północ; lzsodrakatyopolskie.futbolowo.pl (2026-09)
 };
 
 /** Licencja UEFA właściwa dla szczebla (realia PZPN: im wyżej, tym wyższy wymóg). */

@@ -1360,7 +1360,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Stomil Olsztyn",
    "Widzew Łódź",
    "Wisła Kraków",
-   "Włókniarz Kietrz"
+   "Włókniarz Kietrz",
+   "Start II Namysłów"
   ]
  },
  "Stal Rzeszów": {
@@ -4196,7 +4197,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "USN - Ultras Start Namysłów",
    "SNH - Start Namysłów Hooligans",
    "MSU - Młody Start Ultras",
-   "Chłopcy z Pułaskiego"
+   "Chłopcy z Pułaskiego",
+   "Ultras Start Namysłów",
+   "Start Namysłów Hooligans",
+   "Młody Start Ultras"
   ],
   "kosy": [
    "Odra Opole",
@@ -4359,6 +4363,30 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "zgody": [
    "Olimpia Kowary"
+  ]
+ },
+ "Stal II Brzeg": {
+  "ultras": [
+   "Młoda Stal Brzeg",
+   "Stalowcy 1967 On Tour"
+  ],
+  "zgody": [
+   "Fortuna Głogówek",
+   "Włókniarz Pabianice"
+  ],
+  "kosy": [
+   "Olimpia Lewin Brzeski"
+  ]
+ },
+ "Start II Namysłów": {
+  "ultras": [
+   "Ultras Start Namysłów",
+   "Start Namysłów Hooligans",
+   "Młody Start Ultras",
+   "Chłopcy z Pułaskiego"
+  ],
+  "kosy": [
+   "Odra Opole"
   ]
  }
 };
