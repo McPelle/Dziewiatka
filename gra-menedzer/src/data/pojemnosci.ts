@@ -937,6 +937,9 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Wrzos II Borne Sulinowo": 600,
   // Małopolska (runda 4) (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
   "Spółdzielca Grabno": 100,
+  // Pomorskie (runda 4) (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Latarnik Choczewo": 490,
+  "Latarnik II Choczewo": 490,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

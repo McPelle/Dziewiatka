@@ -90,22 +90,47 @@ export function wojLigi(nazwaLigi: string): Woj[] | null {
 }
 const odl = (a: string, b: string) => { const p = MIASTA[a], q = MIASTA[b]; if (!p || !q) return Infinity; return Math.hypot(p[0] - q[0], (p[1] - q[1]) * 0.62); };
 
-/** Czy klub, spadając z ligi `gorna`, trafia (regionalnie) do ligi `dolna` (jednej z jej podgrup). */
+/** Dokładnie JEDNA grupa (podokręg), do której klub trafia, spadając z ligi `gorna` — deterministycznie, dla każdego klubu
+ *  6 województw (od Ekstraklasy po klasę B): 1) grupa, w której klub już występuje w danych (lub jej poddrzewo);
+ *  2) grupa, w której poddrzewie gra najwięcej klubów z jego miejscowości (np. Kraków → podokręg Kraków);
+ *  3) najbliższa geograficznie grupa jego województwa. Inne województwo — nigdy. */
+const _grupa = new Map<string, string | null>();
+export function grupaSpadku(k: Pick<Klub, "nazwa" | "miasto">, gorna: string): string | null {
+  const klucz = `${k.nazwa}|${k.miasto}|${gorna}`;
+  if (_grupa.has(klucz)) return _grupa.get(klucz)!;
+  const woj = wojKlubu(k);
+  const dz = [...(drzewo().get(gorna)?.dzieci ?? [])].filter((n) => { const x = wojLigi(n); return !x || (!!woj && x.includes(woj)); });
+  let wynik: string | null = null;
+  if (dz.length === 1) wynik = dz[0];
+  else if (dz.length > 1) {
+    const zKlubem = dz.filter((n) => drzewo().get(n)?.kluby.has(k.nazwa));
+    if (zKlubem.length) wynik = zKlubem.sort()[0];
+    else {
+      // ile klubów z tej miejscowości gra w poddrzewie grupy
+      const ileZMiasta = (n: string, seen = new Set<string>()): number => {
+        const w = drzewo().get(n); if (!w || seen.has(n)) return 0; seen.add(n);
+        let c = 0; for (const sc of SCIEZKI) for (const l of sc.ligi) if (l.nazwa === n) { c += l.kluby.filter((x) => x.miasto === k.miasto).length; break; }
+        for (const d of w.dzieci) c += ileZMiasta(d, seen);
+        return c;
+      };
+      const oceny = dz.map((n) => ({ n, c: drzewo().get(n)?.miasta.has(k.miasto) ? ileZMiasta(n) : 0 })).filter((x) => x.c > 0);
+      if (oceny.length) wynik = oceny.sort((a, b) => b.c - a.c || a.n.localeCompare(b.n))[0].n;
+      else {
+        let bd = Infinity;
+        for (const n of dz) for (const c of drzewo().get(n)?.miasta ?? []) { const d = odl(k.miasto, c); if (d < bd) { bd = d; wynik = n; } }
+      }
+    }
+  }
+  _grupa.set(klucz, wynik);
+  return wynik;
+}
+/** Czy klub, spadając z ligi `gorna`, trafia (regionalnie) do ligi `dolna` (dokładnie jednej z jej podgrup). */
 export function trafiaDo(k: Pick<Klub, "nazwa" | "miasto">, gorna: string, dolna: string): boolean {
   const wd = wojLigi(dolna);
   const woj = wojKlubu(k);
   if (wd) {
     if (!woj || !wd.includes(woj)) return false;      // inne województwo — nigdy
-    const dz = [...(drzewo().get(gorna)?.dzieci ?? [])].filter((n) => { const x = wojLigi(n); return !x || !woj || x.includes(woj); });
-    if (dz.length <= 1) return true;                    // jedna liga tego województwa niżej
-    // kilka grup niżej (podokręgi) — decyduje miasto: należy do poddrzewa grupy albo najbliższa grupa
-    const w = drzewo().get(dolna);
-    if (w?.kluby.has(k.nazwa) || w?.miasta.has(k.miasto)) return true;
-    const kto = dz.find((n) => { const x = drzewo().get(n); return x?.kluby.has(k.nazwa) || x?.miasta.has(k.miasto); });
-    if (kto) return kto === dolna;
-    let best = "", bd = Infinity;
-    for (const n of dz) for (const c of drzewo().get(n)?.miasta ?? []) { const d = odl(k.miasto, c); if (d < bd) { bd = d; best = n; } }
-    return best === dolna;                              // brak współrzędnych → poza tą grupą (nie zgadujemy)
+    return grupaSpadku(k, gorna) === dolna;
   }
   return true; // liga centralna niżej — każdy klub
 }

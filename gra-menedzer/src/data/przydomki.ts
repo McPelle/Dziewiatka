@@ -129,6 +129,8 @@ export const PRZYDOMKI: Record<string, string> = {
   "Polonia Iłowo": "Poloniści",
   "Rominta Gołdap": "Kresowiacy",
   "Zatoka Braniewo": "Duma Warmii",
+  // Pomorskie (runda 4) (runda 2) — przydomki potwierdzone w źródłach
+  "Piast Człuchów": "Duma Człuchowa",
 };
 
 export function przydomek(nazwa: string): string | undefined {

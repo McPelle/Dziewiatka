@@ -1281,6 +1281,12 @@ export const BARWY_KLUBOW: Record<string, [string, string]> = {
   "MKS Korsze": ["#008c3a", "#ffffff"],
   "Warmia Wrzesina": ["#4fa3e0", "#000000"],
   "Granica Bezledy": ["#000000", "#ffffff"],
+  // Pomorskie (runda 4) (runda 2) — barwy z regiowyniki.pl / pl.wikipedia (odcienie przybliżone wg opisu barw)
+  "Wda Czarna Woda": ["#1e5aa8", "#ffd700"],
+  "LKS Łebunia": ["#000000", "#d2122e"],
+  "Sokół Szczypkowice": ["#008000", "#000000"],
+  "KS Bytonia": ["#000000", "#ffd700"],
+  "GKS Gardeja": ["#1e5aa8", "#d2122e"],
 };
 
 // Słowa-kolory w nazwie → barwa (gdy klubu nie ma w słowniku). Sprawdzane po kolei.

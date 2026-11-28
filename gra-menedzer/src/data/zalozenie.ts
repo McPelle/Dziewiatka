@@ -1098,6 +1098,10 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Start Kamień": 1968,
   "Partyzant Dojazdów": 1947,
   "SPRiN Regulice": 1995,
+  // Pomorskie (runda 4) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Sokół Ełganowo": 1956,
+  "KS Włynkówko": 2006,
+  "Sobieski Gniew": 2011,
 };
 
 /** Rok założenia klubu (jeśli znany). */
