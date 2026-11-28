@@ -1573,6 +1573,9 @@ export const BARWY_KLUBOW: Record<string, [string, string]> = {
   "LKS Obrowiec": ["#008000", "#dc143c"],
   "LZS Kujawy": ["#dc143c", "#0057b8"],
   "Partyzant Kazimierz": ["#008000", "#ffffff"],
+  // Lubuskie (runda 7) (runda 2) — barwy z regiowyniki.pl / pl.wikipedia (odcienie przybliżone wg opisu barw)
+  "Leśnik Słone": ["#008c3a", "#ffffff"],
+  "Korona Wschowa": ["#d00000", "#0047ab"],
 };
 
 // Słowa-kolory w nazwie → barwa (gdy klubu nie ma w słowniku). Sprawdzane po kolei.

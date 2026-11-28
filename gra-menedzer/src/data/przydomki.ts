@@ -191,6 +191,8 @@ export const PRZYDOMKI: Record<string, string> = {
   "GKS Głuchołazy": "biało-niebiescy",
   // Lubuskie (runda 7) (runda 2) — przydomki potwierdzone w źródłach
   "Zorza Ochla": "Zorzałka",
+  // Lubuskie (runda 7) (runda 2) — przydomki potwierdzone w źródłach
+  "Leśnik Słone": "Leśnicy",
 };
 
 export function przydomek(nazwa: string): string | undefined {

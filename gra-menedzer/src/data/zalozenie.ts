@@ -1462,6 +1462,8 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "LZS Kujawy": 1935,
   "Polonia Ściborzyce Wielkie": 2004,
   "Pogoń Wojnowice": 1984,
+  // Lubuskie (runda 7) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Sparta Nietkowice": 2015,
 };
 
 /** Rok założenia klubu (jeśli znany). */
