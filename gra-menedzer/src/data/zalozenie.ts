@@ -1054,6 +1054,10 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Hajka Zegrze Pomorskie": 1972,
   "Kłos Kamienny Jaz": 1950,
   "Unia Sieciemin": 1956,
+  // Kujawsko-Pomorskie (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Cis Cekcyn": 1974,
+  "Kikolanka-Ogończyk Kikół": 1998,
+  "Kujawy Markowice": 1949,
 };
 
 /** Rok założenia klubu (jeśli znany). */

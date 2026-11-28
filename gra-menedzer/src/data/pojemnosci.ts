@@ -880,6 +880,15 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Sztorm Szczecin": 300,
   "AP Szczecinek": 1500,
   "Gavia Choszczno": 750,
+  // Kujawsko-Pomorskie (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Wda II Świecie": 3500,
+  "Start Warlubie": 800,
+  "Czarni Nakło nad Notecią": 4500,
+  "Start Radziejów": 5000,
+  "Zdrój Ciechocinek": 500,
+  "Mień Lipno": 3000,
+  "Tarant Wójcin": 500,
+  "Mień II Lipno": 3000,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

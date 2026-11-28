@@ -91,6 +91,12 @@ export const PRZYDOMKI: Record<string, string> = {
   "Stal Szczecin": "Stalowcy",
   "Hutnik Szczecin": "Duma Stołczyna",
   "Energetyk Gryfino": "Energia",
+  // Kujawsko-Pomorskie (runda 2) — przydomki potwierdzone w źródłach
+  "Legia Chełmża": "Trójkolorowi",
+  "Goplania Inowrocław": "Kolejorz",
+  "Czarni Wierzchosławice": "Wierzchołki",
+  "Stal Grudziądz": "Staleczka",
+  "Unia Janikowo": "Duma Kujaw",
 };
 
 export function przydomek(nazwa: string): string | undefined {

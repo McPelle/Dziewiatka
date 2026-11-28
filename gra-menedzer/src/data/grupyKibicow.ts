@@ -2653,7 +2653,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ]
  },
  "Unia Gniewkowo": {
-  "zgody": [],
+  "zgody": [
+   "Noteć Łabiszyn"
+  ],
   "kosy": [
    "Sparta Brodnica",
    "Kujawiak Kowal",
