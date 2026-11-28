@@ -471,6 +471,7 @@ export interface StanGry {
   wiadomosci: Wiadomosc[];
   oferty: Oferta[];
   historia: Historia[];
+  rejestrTransferow?: import("./rejestrTransferow").WpisTransferu[]; // historia transferów wszystkich klubów (10 sezonów)
   karieryWersja?: number; // wersja bazy prawdziwych karier, z którą zsynchronizowano zapis
   xiKolejki?: XIKolejki; // najlepsza jedenastka ostatniej kolejki (Twoja liga)
   xiHistoria?: XIKolejki[]; // archiwum jedenastek kolejek z sezonu

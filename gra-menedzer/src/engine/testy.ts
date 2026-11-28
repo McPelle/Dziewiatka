@@ -1,3 +1,4 @@
+import { ostatniKlub, zapiszTransfer } from "./rejestrTransferow";
 import { zakazTransferow } from "./wydzialGier";
 // Zawodnicy na testach (realia niższych lig, IV liga → klasa B). Testowani to WOLNI zawodnicy (wolna karta):
 // klub bierze ich na okres próbny, poznaje prawdziwą jakość STOPNIOWO (przedział szacunkowy zwęża się z
@@ -127,7 +128,7 @@ export function podpiszZTestow(s: StanGry, id: string): string | null {
   z.pensja = pensjaDla(z.umiej, moj.poziom);
   { const uzyte = new Set(moj.zawodnicy.map((x) => s.zawodnicy[x].numer).filter((n) => n > 0)); let n = z.poz === "BR" ? 1 : 2; while (uzyte.has(n) && n < 99) n++; z.numer = n; }
   moj.zawodnicy.push(z.id);
-  z.kariera = generujKariere(s, z, moj.nazwa);
+  { const skad = ostatniKlub(z); z.kariera = generujKariere(s, z, moj.nazwa); zapiszTransfer(s, z, skad, moj.nazwa, "testy"); }
   przejscieDoKlubu(s, z, moj.nazwa);
   wiad(s, `✍️ Po testach podpisujesz ${z.imie} ${z.nazwisko} (OVR ${Math.floor(z.umiej)}) — kontrakt do ${z.kontraktDo}.`);
   return null;

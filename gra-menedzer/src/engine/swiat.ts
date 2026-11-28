@@ -1,3 +1,4 @@
+import { zasiejRejestr } from "./rejestrTransferow";
 import { KLUBY_PRAWDZIWE, LIGI_NAZWY, ROZMIAR_LIGI, WYMIANA_DOMYSLNA, type Sciezka } from "../data/kluby";
 import { RENOMA_BONUS, RENOMA_POZIOM } from "../data/renoma";
 import { rokZalozenia } from "../data/zalozenie";
@@ -642,6 +643,7 @@ export function nowaGra(trener: string, sciezka: Sciezka = SCIEZKA_DOMYSLNA): St
   polaczRezerwy(s);
   odswiezRynekSztabu(s); // rynek wolnych specjalistów sztabu (bez klubu) na start
   generujPuleSedziow(s); // kadra sędziowska: realni centralni + generowani regionalni (wg PZPN)
+  zasiejRejestr(s); // prawdziwe transfery z letniego okna sezonu startowego
   return s;
 }
 

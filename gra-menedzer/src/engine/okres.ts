@@ -7,6 +7,7 @@ import { autoSklad, silaSkladu } from "./mecz";
 import { kontekstTreningu, rozwojTreningowy } from "./sezon";
 import { generujKariere, kontraktTyp, dlugoscKontraktu, nowyZawodnik, pensjaDla, przejscieDoKlubu, KADRA } from "./swiat";
 import { okresyDlaPoziomu } from "./kalendarz";
+import { ostatniKlub, zapiszTransfer } from "./rejestrTransferow";
 import { mozeTesty, obserwujTestowanych, odswiezRynekTestow, wezNaTesty } from "./testy";
 import type { StanGry, Zawodnik } from "./types";
 import { opisAkt, planNa, wykonajAktywnosc } from "./planDnia";
@@ -144,6 +145,7 @@ export function pozyskajKandydata(s: StanGry, id: string): string | null {
   s.wolni = s.wolni.filter((x) => x !== id);
   if (s.okres) s.okres.kandydaci = (s.okres.kandydaci ?? []).filter((x) => x !== id);
   z.kariera = generujKariere(s, z, moj.nazwa); przejscieDoKlubu(s, z, moj.nazwa);
+  zapiszTransfer(s, z, ostatniKlub({ ...z, kariera: z.kariera.slice(0, -1) }), moj.nazwa, "wyroznienie");
   return null;
 }
 

@@ -189,6 +189,7 @@ export function realizujUmowyWstepne(s: StanGry) {
     const stary = z.klubId ? s.kluby[z.klubId] : undefined;
     if (stary) stary.zawodnicy = stary.zawodnicy.filter((x) => x !== z.id);
     z.klubId = null; s.wolni.push(z.id);
+    (z as { _umowaWstepna?: boolean })._umowaWstepna = true;
     const r = negocjujTransfer(s, z.id, { kwota: 0, pensja: warunki.pensja, lata: warunki.lata, premia: warunki.premia, klauzula: warunki.klauzula || undefined });
     wiad(s, r.ok ? `✈️ ${z.imie} ${z.nazwisko} dołącza na mocy umowy wstępnej (wolny transfer).` : `⚠ Umowa wstępna z ${z.imie} ${z.nazwisko} nie doszła do skutku: ${r.powod}`);
   }

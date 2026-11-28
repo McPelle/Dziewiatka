@@ -1,3 +1,4 @@
+import { HistoriaTransferow } from "./HistoriaTransferow";
 import { useState } from "react";
 import { Osiagniecia } from "./Osiagniecia";
 import { MapaWojewodztwa } from "./MapaWojewodztwa";
@@ -40,6 +41,7 @@ const WPISY: Wpis[] = [
   { key: "sztab", ikona: "🧰", nazwa: "Sztab", opis: "Asystenci i specjaliści", grupa: "Zespół", tryb: "modal" },
   { key: "stroje", ikona: "🎽", nazwa: "Stroje", opis: "Barwy i komplety meczowe", grupa: "Zespół", tryb: "inline" },
   { key: "finanse", ikona: "💰", nazwa: "Finanse", opis: "Budżet, wpływy i koszty", grupa: "Klub", tryb: "modal" },
+  { key: "historiaTr", ikona: "🔄", nazwa: "Historia transferów", opis: "Przyszli i odeszli — sezon po sezonie", grupa: "Klub", tryb: "inline" },
   { key: "sponsorzy", ikona: "🤝", nazwa: "Sponsorzy", opis: "Umowy, patroni i naming", grupa: "Klub", tryb: "inline" },
   { key: "sklep", ikona: "🛍", nazwa: "Sklep klubowy", opis: "Szaliki, koszulki, ceny i sprzedaż", grupa: "Klub", tryb: "inline" },
   { key: "karty", ikona: "🃏", nazwa: "Album kart", opis: "Karty kadry i karty specjalne", grupa: "Zespół", tryb: "inline" },
@@ -66,6 +68,7 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
       <View style={st.ekran}>
         <PasekPowrotu tytul={wpis.nazwa} ikona={wpis.ikona} onBack={zamknij} />
         <View style={{ flex: 1 }}>
+          {inlineOtwarte === "historiaTr" && <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 40 }}><HistoriaTransferow s={s} klub={s.kluby[s.mojKlub]} /></ScrollView>}
           {inlineOtwarte === "sponsorzy" && <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 40 }}><Sponsorzy s={s} odswiez={odswiez} /></ScrollView>}
           {inlineOtwarte === "sklep" && <Sklep s={s} odswiez={odswiez} />}
           {inlineOtwarte === "karty" && <AlbumKart s={s} />}

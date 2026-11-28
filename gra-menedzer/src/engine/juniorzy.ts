@@ -3,6 +3,7 @@
 //  - juniorzy szybko rozwijają się (gra U-21 + szkolenie), poziom akademii przyspiesza,
 //  - możesz promować juniora do pierwszego zespołu; absolwenci (>21 l.) awansują albo odchodzą.
 // Juniorzy mają klubId = Twój klub, ale NIE są w k.zawodnicy (dopóki ich nie promujesz) — stąd osobna lista k.juniorzy.
+import { ostatniKlub, zapiszTransfer } from "./rejestrTransferow";
 import { los, losInt, szansa, wybierz } from "./losuj";
 import { KADRA, kontraktTyp, nowyZawodnik, pensjaDla, zakresUmiej } from "./swiat";
 import { rozwinAtrybuty } from "./atrybuty";
@@ -111,7 +112,7 @@ export function promujJuniora(s: StanGry, id: string): string | null {
   if (k.zawodnicy.length >= 26) return "Kadra pierwszego zespołu jest pełna (max 26).";
   const z = s.zawodnicy[id];
   k.juniorzy = (k.juniorzy ?? []).filter((x) => x !== id);
-  k.zawodnicy.push(id);
+  k.zawodnicy.push(id); zapiszTransfer(s, z, undefined, k.nazwa, "akademia");
   z.kontraktTyp = k.poziom <= 3 ? "polprofesjonalny" : kontraktTyp(k.poziom); // junior w pierwszym zespole — umowa wg szczebla
   z.kontraktDo = s.sezon + 3;
   z.pensja = Math.round(pensjaDla(z.umiej, k.poziom) * 0.6);
@@ -141,7 +142,7 @@ export function wypozyczJuniora(s: StanGry, id: string): string | null {
   z.doplataMacierzystego = 0;
   z.klubId = cel.id;
   z.numer = numerWolny(s, cel, z);
-  cel.zawodnicy.push(z.id);
+  cel.zawodnicy.push(z.id); zapiszTransfer(s, z, k.nazwa, cel.nazwa, "wypozyczenie");
   wiadomosc(s, `🧳 ${z.imie} ${z.nazwisko} (${z.wiek} l.) wypożyczony z akademii do ${cel.nazwa} (${cel.poziom > k.poziom ? "niższa liga" : "inna liga"}) — ogra się w seniorach i wróci silniejszy.`);
   return null;
 }
@@ -166,7 +167,7 @@ export function juniorzyNowySezon(s: StanGry): void {
       k.juniorzy = (k.juniorzy ?? []).filter((x) => x !== id);
       const prog = zakresUmiej(k.poziom)[0];
       if (z.umiej >= prog - 4 && k.zawodnicy.length < 26) {
-        k.zawodnicy.push(id);
+        k.zawodnicy.push(id); zapiszTransfer(s, z, undefined, k.nazwa, "akademia");
         z.kontraktTyp = k.poziom <= 3 ? "polprofesjonalny" : "amator";
         z.kontraktDo = s.sezon + 2;
         z.pensja = Math.round(pensjaDla(z.umiej, k.poziom) * 0.7);

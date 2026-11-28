@@ -1,4 +1,5 @@
 import { dwumecz, opisWyniku, rozstrzygnij } from "./rozstrzygniecie";
+import { ostatniKlub, zapiszTransfer } from "./rejestrTransferow";
 import { ogloszenieReorganizacji, zastosujReorganizacje } from "./reorganizacja";
 import { zakazTransferow } from "./wydzialGier";
 import { pzpnPoKolejce, pzpnPrzedKolejka, pzpnPrzedSkladem } from "./pzpnCykl";
@@ -1418,7 +1419,7 @@ function tydzien(s: StanGry) {
           wyplacOdsprzedaz(s, zz, kwota, moj.id);
           if (s.kapitan === zz.id) s.kapitan = null;
           s.taktyka.sklad = s.taktyka.sklad.filter((x) => x !== zz.id);
-          przejscieDoKlubu(s, zz, kupiec.nazwa);
+          przejscieDoKlubu(s, zz, kupiec.nazwa); zapiszTransfer(s, zz, moj.nazwa, kupiec.nazwa, "klauzula", kwota);
           zz.klubId = kupiec.id; zz.kontraktDo = s.sezon + dlugoscKontraktu(kupiec.poziom); delete zz.klauzula;
           wiadomosc(s, `💸 ${kupiec.nazwa} aktywował klauzulę wykupu (${zl(kwota)}) ${zz.imie} ${zz.nazwisko} — zawodnik odchodzi, klauzuli nie dało się zablokować.`);
           if (ulubiony) { // klauzula to nie Twoja wina — kibice smutni, ale łagodniej
@@ -2303,7 +2304,7 @@ export function nowySezon(s: StanGry) {
       mk.juniorzy = (mk.juniorzy ?? []).filter((id) => id !== jun.id);
       jun.odsprzedaz = { klubId: mk.id, proc: 20 };
       const duzy = Object.values(s.kluby).filter((k) => k.poziom <= 2 && k.id !== mk.id)[0];
-      jun.klubId = duzy?.id ?? null; if (duzy) duzy.zawodnicy.push(jun.id);
+      jun.klubId = duzy?.id ?? null; if (duzy) { duzy.zawodnicy.push(jun.id); przejscieDoKlubu(s, jun, duzy.nazwa); zapiszTransfer(s, jun, mk.nazwa, duzy.nazwa, "ekwiwalent", ekwiwalent); }
       mk.kasa += ekwiwalent;
       s.zaufanieKibicow = Math.max(0, (s.zaufanieKibicow ?? 60) - 2);
       wiadomosc(s, `🦅 ${duzy?.nazwa ?? "Duży klub"} podkupił z akademii młodego ${jun.imie} ${jun.nazwisko} (pot. ${Math.floor(jun.potencjal)}). Ekwiwalent za wyszkolenie ${zl(ekwiwalent)} + 20% od dalszej odsprzedaży. Kibice żałują, ale to szansa dla chłopaka.`);
@@ -2369,7 +2370,7 @@ export function nowySezon(s: StanGry) {
         const ocena = z.potencjal - z.umiej > 22 ? " — duży talent! 🌟" : z.potencjal - z.umiej > 14 ? " — zapowiada się dobrze" : "";
         wiadomosc(s, `Z akademii do U-21 dołącza ${z.imie} ${z.nazwisko} (${z.wiek} l., ${z.poz}, umiej. ${Math.floor(z.umiej)}/pot. ${Math.floor(z.potencjal)})${ocena}.`);
       } else {
-        k.zawodnicy.push(z.id);
+        k.zawodnicy.push(z.id); zapiszTransfer(s, z, undefined, k.nazwa, "akademia");
         const uzyte = new Set(k.zawodnicy.map((x) => s.zawodnicy[x].numer).filter((n) => n > 0)); let n = z.poz === "BR" ? 1 : 2; while (uzyte.has(n) && n < 99) n++; z.numer = n;
       }
     }
@@ -2478,6 +2479,7 @@ function odswiezAI(s: StanGry, klubId: string) {
   const usun = zs.slice(0, Math.max(0, zs.length - 18) + 3);
   for (const z of usun) {
     k.zawodnicy = k.zawodnicy.filter((x) => x !== z.id);
+    zapiszTransfer(s, z, k.nazwa, undefined, "rozwiazanie");
     z.klubId = null;
     if (z.wiek < 33) s.wolni.push(z.id);
     else delete s.zawodnicy[z.id];
@@ -2489,14 +2491,14 @@ function odswiezAI(s: StanGry, klubId: string) {
     while (jest < ile) {
       const z = nowyZawodnik(s, k.poziom, poz as never);
       z.klubId = k.id;
-      k.zawodnicy.push(z.id);
+      k.zawodnicy.push(z.id); zapiszTransfer(s, z, undefined, k.nazwa, "nowy");
       jest++;
     }
   }
   while (k.zawodnicy.length < 18) {
     const z = nowyZawodnik(s, k.poziom, wybierz(KADRA));
     z.klubId = k.id;
-    k.zawodnicy.push(z.id);
+    k.zawodnicy.push(z.id); zapiszTransfer(s, z, undefined, k.nazwa, "nowy");
   }
 }
 
@@ -2526,6 +2528,7 @@ export function rynekAI(s: StanGry) {
     wyplacOdsprzedaz(s, kand, cena, seller.id); // klauzula odsprzedaży: % z dalszego transferu wraca do klubu-wychowawcy
     seller.zawodnicy = seller.zawodnicy.filter((x) => x !== kand.id);
     kand.klubId = buyer.id; buyer.zawodnicy.push(kand.id);
+    przejscieDoKlubu(s, kand, buyer.nazwa); zapiszTransfer(s, kand, seller.nazwa, buyer.nazwa, "kupno", cena);
     kand.pensja = pensjaDla(kand.umiej, buyer.poziom);
     const uzyte = new Set(buyer.zawodnicy.map((x) => s.zawodnicy[x].numer).filter((n) => n > 0));
     let n = kand.poz === "BR" ? 1 : 2; while (uzyte.has(n) && n < 99) n++; kand.numer = n;
@@ -2539,7 +2542,8 @@ export function rynekAI(s: StanGry) {
     const idx = s.wolni.findIndex((id) => { const z = s.zawodnicy[id]; return z && z.umiej >= zakresUmiej(buyer.poziom)[0] - 6; });
     if (idx < 0) continue;
     const z = s.zawodnicy[s.wolni[idx]]; s.wolni.splice(idx, 1);
-    z.klubId = buyer.id; buyer.zawodnicy.push(z.id); z.pensja = pensjaDla(z.umiej, buyer.poziom);
+    zapiszTransfer(s, z, ostatniKlub(z), buyer.nazwa, "wolny");
+    z.klubId = buyer.id; buyer.zawodnicy.push(z.id); z.pensja = pensjaDla(z.umiej, buyer.poziom); przejscieDoKlubu(s, z, buyer.nazwa);
     const uzyte = new Set(buyer.zawodnicy.map((x) => s.zawodnicy[x].numer).filter((nn) => nn > 0));
     let n = z.poz === "BR" ? 1 : 2; while (uzyte.has(n) && n < 99) n++; z.numer = n;
   }
@@ -2572,6 +2576,7 @@ function wygasanieKontraktow(s: StanGry) {
       if (k.id === s.mojKlub) {
         // nie przedłużyłeś — zawodnik odchodzi za darmo (prawo Bosmana)
         k.zawodnicy = k.zawodnicy.filter((x) => x !== id);
+        zapiszTransfer(s, z, k.nazwa, undefined, "bosman");
         z.klubId = null;
         z.kontraktDo = s.sezon;
         s.wolni.push(id);
@@ -2582,6 +2587,7 @@ function wygasanieKontraktow(s: StanGry) {
         z.kontraktTyp = kontraktTyp(k.poziom);
       } else {
         k.zawodnicy = k.zawodnicy.filter((x) => x !== id);
+        zapiszTransfer(s, z, k.nazwa, undefined, "koniec");
         z.klubId = null;
         z.kontraktDo = s.sezon;
         if (z.wiek < 33) s.wolni.push(id);
@@ -3315,7 +3321,7 @@ export function wypozyczDoSiebie(s: StanGry, zawodnikId: string): string | null 
   parent.zawodnicy = parent.zawodnicy.filter((x) => x !== z.id);
   z.klubId = moj.id;
   moj.zawodnicy.push(z.id);
-  przejscieDoKlubu(s, z, moj.nazwa);
+  przejscieDoKlubu(s, z, moj.nazwa); zapiszTransfer(s, z, parent.nazwa, moj.nazwa, "wypozyczenie", oplata);
   { const uzyte = new Set(moj.zawodnicy.map((x) => s.zawodnicy[x].numer)); let n = z.poz === "BR" ? 1 : 2; while (uzyte.has(n) && n < 99) n++; z.numer = n; }
   const dop = z.doplataMacierzystego ? `, ${parent.nazwa} dopłaca ${zl(z.doplataMacierzystego)}/kol. do pensji` : "";
   wiadomosc(s, `Wypożyczono ${z.imie} ${z.nazwisko} z ${parent.nazwa} do końca sezonu${oplata ? ` (opłata ${zl(oplata)})` : ""}${dop}.`);
@@ -3347,7 +3353,7 @@ export function wypozyczNaZewnatrz(s: StanGry, zawodnikId: string): string | nul
   s.taktyka.sklad = s.taktyka.sklad.filter((x) => x !== z.id);
   if (s.kapitan === z.id) s.kapitan = null;
   z.klubId = cel.id;
-  cel.zawodnicy.push(z.id);
+  cel.zawodnicy.push(z.id); przejscieDoKlubu(s, z, cel.nazwa); zapiszTransfer(s, z, moj.nazwa, cel.nazwa, "wypozyczenie");
   const dop = z.doplataMacierzystego ? ` (dopłacasz ${zl(z.doplataMacierzystego)}/kol. do pensji)` : "";
   wiadomosc(s, `${z.imie} ${z.nazwisko} wypożyczony do ${cel.nazwa}${cel.poziom > moj.poziom ? " (niższa liga)" : ""} na sezon${dop} — będzie grał i się rozwijał.`);
   return null;
@@ -3356,6 +3362,7 @@ export function wypozyczNaZewnatrz(s: StanGry, zawodnikId: string): string | nul
 /** Powrót jednego zawodnika z wypożyczenia do klubu macierzystego (przywraca pensję, numer, rozwój). */
 function wrocZWypozyczenia(s: StanGry, z: Zawodnik) {
   const dom = z.macierzysty ? s.kluby[z.macierzysty] : undefined;
+  { const gdzie = z.klubId ? s.kluby[z.klubId]?.nazwa : undefined; const wraca = (dom ?? s.kluby[s.mojKlub])?.nazwa; if (gdzie && wraca && gdzie !== wraca) zapiszTransfer(s, z, gdzie, wraca, "powrot"); }
   if (z.klubId && s.kluby[z.klubId]) s.kluby[z.klubId].zawodnicy = s.kluby[z.klubId].zawodnicy.filter((x) => x !== z.id);
   if (z.wiek <= 23 && z.umiej < z.potencjal) z.umiej = Math.min(z.potencjal, z.umiej + los(0.5, 1.5)); // ogranie
   const wrocDo = dom ?? s.kluby[s.mojKlub];
@@ -3516,6 +3523,7 @@ export function negocjujTransfer(s: StanGry, zawodnikId: string, o: OfertaTransf
   } else if (wolny) {
     s.wolni = s.wolni.filter((x) => x !== z.id);
   }
+  { const st = z.klubId && z.kontraktTyp !== "amator" ? s.kluby[z.klubId] : undefined; zapiszTransfer(s, z, st?.nazwa ?? (z.klubId ? s.kluby[z.klubId]?.nazwa : ostatniKlub(z)), moj.nazwa, st && o.kwota > 0 ? "kupno" : (z as { _umowaWstepna?: boolean })._umowaWstepna ? "umowaWstepna" : "wolny", st ? o.kwota : undefined); }
   moj.kasa -= terazRazem;
   z.klubId = moj.id;
   z.pensja = o.pensja;
@@ -3622,8 +3630,10 @@ export function kup(s: StanGry, zawodnikId: string): string | null {
     if (wazny && !szansa(0.25)) return `${stary.nazwa} nie chce sprzedać ${z.nazwisko} — to ważny zawodnik.`;
     stary.zawodnicy = stary.zawodnicy.filter((x) => x !== z.id);
     stary.kasa += cena;
+    zapiszTransfer(s, z, stary.nazwa, moj.nazwa, cena > 0 ? "kupno" : "wolny", cena);
   } else {
     s.wolni = s.wolni.filter((x) => x !== z.id);
+    zapiszTransfer(s, z, ostatniKlub(z), moj.nazwa, "wolny");
   }
   moj.kasa -= cena + premia + prowizja;
   z.klubId = moj.id;
@@ -3660,6 +3670,7 @@ export function wykupKlauzula(s: StanGry, zawodnikId: string): string | null {
     return `${z.imie} ${z.nazwisko} jest zadowolony i mimo klauzuli nie chce schodzić niżej.`;
   const stary = s.kluby[z.klubId];
   stary.zawodnicy = stary.zawodnicy.filter((x) => x !== z.id);
+  zapiszTransfer(s, z, stary.nazwa, moj.nazwa, "klauzula", z.klauzula);
   stary.kasa += z.klauzula;
   moj.kasa -= koszt;
   z.klubId = moj.id; z.pensja = pensja; z.kontraktTyp = kontraktTyp(moj.poziom); z.kontraktDo = s.sezon + dlug;
@@ -3706,7 +3717,7 @@ export function przyjmijOferte(s: StanGry, idx: number): string | null {
   if (s.kapitan === z.id) s.kapitan = null;
   moj.zawodnicy = moj.zawodnicy.filter((x) => x !== z.id);
   kupiec.zawodnicy.push(z.id);
-  przejscieDoKlubu(s, z, kupiec.nazwa);
+  przejscieDoKlubu(s, z, kupiec.nazwa); zapiszTransfer(s, z, moj.nazwa, kupiec.nazwa, "kupno", o.kwota);
   z.klubId = kupiec.id;
   z.kontraktTyp = kontraktTyp(kupiec.poziom);
   z.kontraktDo = s.sezon + dlugoscKontraktu(kupiec.poziom);
@@ -3742,6 +3753,7 @@ export function zwolnijZawodnika(s: StanGry, zawodnikId: string): string | null 
   moj.kasa -= odprawa;
   { const o = wpisKarieryOtwarty(z); if (o) { naliczSezonDoKariery(z); o.do = s.sezon; } } // zamknij etap kariery
   moj.zawodnicy = moj.zawodnicy.filter((x) => x !== z.id);
+  zapiszTransfer(s, z, moj.nazwa, undefined, "rozwiazanie");
   z.klubId = null;
   z.kontraktDo = s.sezon;
   s.wolni.push(z.id);

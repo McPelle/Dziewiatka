@@ -5,6 +5,7 @@ import { Extranet } from "./Extranet";
 import { budowyKlubu, oglosPrzetarg, opisUtrudnien, trwaBudowa } from "../engine/budowy";
 import { PrzetargPanel, TrwajaceBudowy } from "./Budowy";
 import { useState } from "react";
+import { HistoriaTransferow } from "./HistoriaTransferow";
 import { Alert, Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import STADIONY_JSON from "../../assets/stadiony.json";
 import { zl } from "../engine/losuj";
@@ -149,6 +150,7 @@ export function WidokKlubu({ s, klubId, onClose, odswiez, onZawodnik }: { s: Sta
                   <Text style={[st.maly, { marginTop: 4 }]}>🎆 Opraw pokazanych przez kibiców: {(s.oprawyUzyte?.[klub.nazwa] ?? []).length} (żadna się nie powtarza)</Text>
                   {sank.map((t, i) => <Text key={i} style={[st.maly, { color: K.czerwony }]}>{t}</Text>)}
                 </View>); })()}
+              <HistoriaTransferow s={s} klub={klub} onZawodnik={(id) => (onZawodnik ? onZawodnik(id) : setProfil(id))} />
               <View style={{ marginTop: 16 }}>
                 <Stroje s={s} klub={klub} />
               </View>

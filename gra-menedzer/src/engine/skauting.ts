@@ -1,5 +1,6 @@
 // Rozbudowany scouting talentów — serce pracy skauta. Wysyłanie w regiony świata,
 // odkrywanie ukrytych, młodych, bezklubowych talentów; ściąganie zgodne z przepisami FIFA/PZPN.
+import { ostatniKlub, zapiszTransfer } from "./rejestrTransferow";
 import { los, losInt, szansa, wybierz } from "./losuj";
 import { generujKariere, KADRA, kontraktTyp, nowyZawodnik, pensjaDla, przejscieDoKlubu } from "./swiat";
 import { rozwinAtrybuty } from "./atrybuty";
@@ -143,7 +144,7 @@ export function sciagnijTalent(s: StanGry, id: string): string | null {
   z.kontraktDo = s.sezon + 3;
   z.pensja = Math.round(pensjaDla(z.umiej, moj.poziom) * 0.5);
   moj.zawodnicy.push(z.id);
-  z.kariera = generujKariere(s, z, moj.nazwa);
+  { const skad = ostatniKlub(z); z.kariera = generujKariere(s, z, moj.nazwa); zapiszTransfer(s, z, skad, moj.nazwa, "skauting"); }
   przejscieDoKlubu(s, z, moj.nazwa);
   { const uzyte = new Set(moj.zawodnicy.map((x) => s.zawodnicy[x].numer)); let n = z.poz === "BR" ? 1 : 2; while (uzyte.has(n) && n < 99) n++; z.numer = n; }
   s.odkryci = (s.odkryci ?? []).filter((x) => x !== id);
