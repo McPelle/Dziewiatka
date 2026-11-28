@@ -870,6 +870,16 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Pasja Kleosin": 300,
   "Skra Wizna": 300,
   "GKS Gródek": 100,
+  // Zachodniopomorskie (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Orzeł Mrzeżyno": 1000,
+  "Pogoń Połczyn-Zdrój": 500,
+  "Legion Strączno": 200,
+  "Rybak Trzebież": 600,
+  "Czapla Czaplinek": 250,
+  "Kick Off Szczecin": 300,
+  "Sztorm Szczecin": 300,
+  "AP Szczecinek": 1500,
+  "Gavia Choszczno": 750,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

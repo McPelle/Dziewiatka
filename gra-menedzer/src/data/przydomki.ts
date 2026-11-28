@@ -86,6 +86,11 @@ export const PRZYDOMKI: Record<string, string> = {
   // Podlaskie (runda 2) — przydomki potwierdzone w źródłach
   "Warmia Grajewo": "Wilki",
   "Biebrza Goniądz": "Niedźwiedzie",
+  // Zachodniopomorskie (runda 2) — przydomki potwierdzone w źródłach
+  "Okręt Szczecin": "Okrętowcy",
+  "Stal Szczecin": "Stalowcy",
+  "Hutnik Szczecin": "Duma Stołczyna",
+  "Energetyk Gryfino": "Energia",
 };
 
 export function przydomek(nazwa: string): string | undefined {

@@ -1267,6 +1267,11 @@ export const BARWY_KLUBOW: Record<string, [string, string]> = {
   "MOSP Białystok": ["#ff0000", "#ffff00"],
   "Narew Choroszcz": ["#6a2c91", "#ffffff"],
   "GKS Miastkowo": ["#1b8a3a", "#000000"],
+  // Zachodniopomorskie (runda 2) — barwy z regiowyniki.pl / pl.wikipedia (odcienie przybliżone wg opisu barw)
+  "Sokół Sokoliniec": ["#0050b5", "#ffffff"],
+  "Kłos Kamienny Jaz": ["#000000", "#ffffff"],
+  "Unia Sieciemin": ["#6a0dad", "#000000"],
+  "Odra Szczecin": ["#d7141a", "#ffffff"],
 };
 
 // Słowa-kolory w nazwie → barwa (gdy klubu nie ma w słowniku). Sprawdzane po kolei.
