@@ -226,6 +226,8 @@ export const TRENERZY: Record<string, TrenerReal> = {
   "Odra Kąty Opolskie": { imie: "Mateusz", nazwisko: "Tworek" }, // Opolskie — północ; lzsodrakatyopolskie.futbolowo.pl (2026-09)
   "GKS Grodków": { imie: "Marcin", nazwisko: "Raczkowski" }, // Opolskie — południe; nto.pl: „GKS Triobud Grodków robi furorę w Football World Klasie Okręgowej. Apetyt beniaminka rośnie w miarę jedzenia” (prowadzi zespół od połowy sezonu 2024 (2026-09)
   "Czarni Otmuchów": { imie: "Adrian", nazwisko: "Klakla" }, // Opolskie — południe; czarni-otmuchow.pl (2026-09)
+  "Ruch Zdzieszowice": { imie: "Daniel", nazwisko: "Rychlewicz" }, // Opolskie (runda 8); tygodnik-krapkowicki.pl (2026-09-30)
+  "MKS Gogolin": { imie: "Adam", nazwisko: "Sobek" }, // Opolskie (runda 8); tygodnik-krapkowicki.pl (2026-08-20)
 };
 
 /** Licencja UEFA właściwa dla szczebla (realia PZPN: im wyżej, tym wyższy wymóg). */

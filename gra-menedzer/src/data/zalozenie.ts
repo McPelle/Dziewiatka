@@ -1464,6 +1464,8 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Pogoń Wojnowice": 1984,
   // Lubuskie (runda 7) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
   "Sparta Nietkowice": 2015,
+  // Opolskie (runda 8) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Agra Zawada (k. Opola)": 1950,
 };
 
 /** Rok założenia klubu (jeśli znany). */

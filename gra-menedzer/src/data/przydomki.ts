@@ -193,6 +193,8 @@ export const PRZYDOMKI: Record<string, string> = {
   "Zorza Ochla": "Zorzałka",
   // Lubuskie (runda 7) (runda 2) — przydomki potwierdzone w źródłach
   "Leśnik Słone": "Leśnicy",
+  // Opolskie (runda 8) (runda 2) — przydomki potwierdzone w źródłach
+  "Agra Zawada (k. Opola)": "Bociany",
 };
 
 export function przydomek(nazwa: string): string | undefined {

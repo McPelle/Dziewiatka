@@ -1567,6 +1567,9 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Żubr Drohiczyn": 500,
   "Iskra Wyszki": 800,
   "KS Narewka": 350,
+  // Opolskie (runda 8) (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "OKS II Olesno": 528,
+  "Sparta Dębie": 100,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */
