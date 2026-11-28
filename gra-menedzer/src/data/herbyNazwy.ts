@@ -2,6 +2,9 @@
 // Dzięki temu oryginalny herb pokazuje się w KAŻDEJ karierze i na każdej liście (nie tylko tam, gdzie dane klubu mają pole `herb`).
 // Kluby bez pliku herbu (brak w nadesłanych herbach) dostają generowany emblemat w barwach klubu.
 export const HERB_PO_NAZWIE: Record<string, string> = {
+  "Góra Idzbark": "nowy-gora-idzbark",
+  "UKS Rozwój Iława": "nowy-uks-rozwoj-ilawa",
+  "Vel Dąbrówno": "nowy-vel-dabrowno",
   "Warmianka Bęsia": "nowy-warmianka-besia",
   "Szansa Reszel": "nowy-szansa-reszel",
   "Iskra Smykówko": "nowy-iskra-smykowko",

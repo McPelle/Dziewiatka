@@ -33,7 +33,7 @@ export function ZespolyKlubu({ s, odswiez }: { s: StanGry; odswiez: () => void }
             return (
               <View key={z.id} style={[st.wiersz, { paddingVertical: 4, borderTopWidth: 1, borderTopColor: K.linia }]}>
                 <Text style={{ color: KOLOR_POZ[z.poz], width: 34, fontWeight: "700", fontSize: 12 }}>{z.pozS ? SKROT_POZ[z.pozS] : z.poz}</Text>
-                <Text style={[st.tekst, { flex: 1, fontSize: 13.5 }]} numberOfLines={1}>{z.imie[0]}. {z.nazwisko}{jestMlodziezowcem(z) ? " (U-21)" : ""}</Text>
+                <Text style={[st.tekst, { flex: 1, fontSize: 13.5 }]} numberOfLines={1}>{z.imie[0]}. {z.nazwisko}{jestMlodziezowcem(z) ? " (młodzieżowiec)" : ""}</Text>
                 <Text style={{ color: K.tekst, fontWeight: "800", width: 30 }}>{Math.floor(z.umiej)}</Text>
                 {jest ? (
                   <Pressable style={[st.przyciskMaly, { borderColor: K.czerwony }]} onPress={() => { odeslijDoZespolu(s, z.id); odswiez(); }}>

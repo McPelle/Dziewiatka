@@ -102,6 +102,22 @@ export const PRZYDOMKI: Record<string, string> = {
   "Kabel Kraków": "Kablarze",
   "Przebój Wolbrom": "Trójkolorowi",
   "Clepardia Kraków": "Cleosia",
+  // podlaskie (runda 4) (runda 2) — przydomki potwierdzone w źródłach
+  "Tur Bielsk Podlaski": "Tury",
+  "Cresovia Siemiatycze": "Cresa",
+  "Sparta Augustów": "Spartanie",
+  // kujawsko-pomorskie (runda 4) (runda 2) — przydomki potwierdzone w źródłach
+  "Wisła Dobrzyń nad Wisłą": "Wiślacy",
+  "Pogoń Mogilno": "Pogoniści",
+  "Unia Wąbrzeźno": "Unici",
+  "Start Pruszcz": "Startowcy",
+  "Kujawiak Kowal": "Kujawiacy",
+  "Chełminianka Chełmno": "Duma Ziemi Chełmińskiej",
+  "Wisła Nowe": "Nadwiślańskie Lwy",
+  "Unia Gniewkowo": "Unici",
+  "Pałuczanka Żnin": "Pałuczanie",
+  "Gopło Kruszwica": "Goplanie",
+  "Zdrój Ciechocinek": "Zdrojanie",
 };
 
 export function przydomek(nazwa: string): string | undefined {

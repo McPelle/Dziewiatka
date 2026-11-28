@@ -84,7 +84,7 @@ function AkademiaWidok({ s, poziom, nabor, kosztAk, rozbuduj, otworz }: any) {
         <Text style={[st.maly, { marginTop: 4 }]}>Nabór rocznikowy: {nabor.minIlu}–{nabor.maxIlu} · potencjał do <Text style={{ fontWeight: "800" }}>{nabor.potencjalDo}</Text> · talent {nabor.szansaTalentu}%</Text>
       </View>
 
-      <Text style={[st.naglowek, { marginTop: 16 }]}>Wychowankowie w pierwszym zespole (U-21) — {mlodzi.length}</Text>
+      <Text style={[st.naglowek, { marginTop: 16 }]}>Wychowankowie w pierwszym zespole (młodzieżowcy) — {mlodzi.length}</Text>
       {mlodzi.length === 0 ? (
         <Text style={st.maly}>Brak U-21 w kadrze pierwszego zespołu. Powołuj juniorów do seniorów w zakładkach U-19/U-17.</Text>
       ) : mlodzi.map((z: any) => {

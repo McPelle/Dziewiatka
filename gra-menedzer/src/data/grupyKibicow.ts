@@ -174,7 +174,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Legia Warszawa",
    "Wisła Kraków",
    "Arka Gdynia",
-   "Stomil Olsztyn"
+   "Stomil Olsztyn",
+   "Wissa Szczuczyn",
+   "Sparta Augustów",
+   "Sparta 1951 Szepietowo"
   ]
  },
  "Raków Częstochowa": {
@@ -977,7 +980,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Cracovia",
    "Legia Warszawa",
    "Odra Opole",
-   "Olimpia Elbląg"
+   "Olimpia Elbląg",
+   "Noteć Inowrocław"
   ]
  },
  "Chrobry Głogów": {
@@ -1910,7 +1914,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Legia Chełmża",
    "Unia Wąbrzeźno",
    "Wisła Płock",
-   "Stomil Olsztyn"
+   "Stomil Olsztyn",
+   "Wisła Nowe"
   ]
  },
  "Lechia Zielona Góra": {
@@ -1982,7 +1987,12 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Resovia",
    "Sparta Brodnica",
    "Włocłavia Włocławek",
-   "Zagłębie Lubin"
+   "Zagłębie Lubin",
+   "Pogoń Mogilno",
+   "Chełminianka Chełmno",
+   "Victoria Koronowo",
+   "Gopło Kruszwica",
+   "Unia Janikowo"
   ]
  },
  "Bałtyk Gdynia": {
@@ -2037,7 +2047,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Błękitni Stargard",
    "Flota Świnoujście",
    "Gryf Wejherowo",
-   "Gwardia Koszalin"
+   "Gwardia Koszalin",
+   "Noteć Inowrocław"
   ]
  },
  "Unia Tarnów": {
@@ -2091,7 +2102,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Odra Chojna",
    "Pogoń Lębork",
    "Pogoń Szczecin",
-   "Sokół Karlino"
+   "Sokół Karlino",
+   "Spójnia Świdwin"
   ]
  },
  "Pogoń Lębork": {
@@ -2141,7 +2153,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Widzew Łódź",
    "Włocłavia Włocławek",
    "Zawisza Bydgoszcz",
-   "ŁKS Łódź"
+   "ŁKS Łódź",
+   "Pogoń Mogilno",
+   "Chełminianka Chełmno"
   ]
  },
  "Flota Świnoujście": {
@@ -2215,7 +2229,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Polonia Bydgoszcz",
    "Sparta Brodnica",
    "Unia Gniewkowo",
-   "Unia Wąbrzeźno"
+   "Unia Wąbrzeźno",
+   "Chełminianka Chełmno",
+   "Pałuczanka Żnin",
+   "Notecianka Pakość"
+  ],
+  "zgody": [
+   "Czarni Nakło nad Notecią"
   ]
  },
  "Energetyk Gryfino": {
@@ -2251,7 +2271,12 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Olimpia Grudziądz",
    "Unia Wąbrzeźno",
    "Włocłavia Włocławek",
-   "Drwęca Nowe Miasto Lubawskie"
+   "Drwęca Nowe Miasto Lubawskie",
+   "Lech Rypin",
+   "Pałuczanka Żnin",
+   "Gopło Kruszwica",
+   "Notecianka Pakość",
+   "Unia Janikowo"
   ]
  },
  "Włocłavia Włocławek": {
@@ -2272,7 +2297,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Ruch Chorzów",
    "Sparta Brodnica",
    "Widzew Łódź",
-   "Wisła Kraków"
+   "Wisła Kraków",
+   "Wisła Dobrzyń nad Wisłą"
   ]
  },
  "GKM Grudziądz": {
@@ -2310,7 +2336,12 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Unia Gniewkowo",
    "Unia Wąbrzeźno",
    "Włocłavia Włocławek",
-   "Zawisza Bydgoszcz"
+   "Zawisza Bydgoszcz",
+   "Pogoń Mogilno",
+   "Victoria Koronowo",
+   "Pałuczanka Żnin",
+   "Gopło Kruszwica",
+   "Unia Janikowo"
   ]
  },
  "Unia Wąbrzeźno": {
@@ -2324,7 +2355,13 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Legia Chełmża",
    "Olimpia Grudziądz",
    "Sparta Brodnica",
-   "Zawisza Bydgoszcz"
+   "Zawisza Bydgoszcz",
+   "Pogoń Mogilno",
+   "Gopło Kruszwica",
+   "Unia Janikowo"
+  ],
+  "zgody": [
+   "Drwęca Golub-Dobrzyń"
   ]
  },
  "Kujawiak Kowal": {
@@ -2386,7 +2423,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Kaszubia Kościerzyna",
-   "Zawisza Bydgoszcz"
+   "Zawisza Bydgoszcz",
+   "Unia Janikowo"
   ]
  },
  "Odra Chojna": {
@@ -2475,7 +2513,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "kosy": [
    "Olimpia Grudziądz",
    "Pogoń Prabuty",
-   "Pomezania Malbork"
+   "Pomezania Malbork",
+   "Wisła Nowe"
   ]
  },
  "Gryf Wejherowo": {
@@ -2509,6 +2548,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  "Start Pruszcz": {
   "zgody": [
    "Kujawiak Kowal"
+  ],
+  "kosy": [
+   "Pomorzanin Serock"
   ]
  },
  "Sokół Karlino": {
@@ -2660,7 +2702,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Sparta Brodnica",
    "Kujawiak Kowal",
    "Legia Chełmża",
-   "Goplania Inowrocław"
+   "Goplania Inowrocław",
+   "Pogoń Mogilno",
+   "Pałuczanka Żnin",
+   "Gopło Kruszwica",
+   "Unia Janikowo"
   ]
  },
  "Noteć Czarnków": {
@@ -2680,7 +2726,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  },
  "Iskra Białogard": {
   "kosy": [
-   "Sokół Karlino"
+   "Sokół Karlino",
+   "Spójnia Świdwin"
   ]
  },
  "Sparta Gryfice": {
@@ -3019,7 +3066,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Pomezania Malbork",
    "ŁKS Łomża",
    "MKS Mazur Ełk",
-   "Sokół Ostróda"
+   "Sokół Ostróda",
+   "Wisła Nowe"
   ],
   "fanklub": [
    "FANKLUB Braniewo",
@@ -3057,7 +3105,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Sparta Augustów",
    "MKS Mazur Ełk",
    "Stomil Olsztyn",
-   "Warmia Grajewo"
+   "Warmia Grajewo",
+   "Sparta 1951 Szepietowo"
   ],
   "fanklub": [
    "FANKLUB Przebród",
@@ -3100,7 +3149,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Jagiellonia Białystok",
    "MKS Mazur Ełk",
    "Warmia Grajewo",
-   "Granica Kętrzyn"
+   "Granica Kętrzyn",
+   "Tur Bielsk Podlaski",
+   "Ruch Wysokie Mazowieckie",
+   "Pogoń Łapy",
+   "Sparta Augustów"
   ]
  },
  "MKS Mazur Ełk": {
@@ -3185,7 +3238,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Sokół Ostróda",
    "Jeziorak Iława",
    "Motor Lubawa",
-   "Mazur Ełk"
+   "Mazur Ełk",
+   "Sparta 1951 Szepietowo"
   ]
  },
  "Warmia Grajewo": {
@@ -3311,6 +3365,188 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Unia Skierniewice",
    "Lechia Tomaszów Mazowiecki",
    "Polonia Warszawa"
+  ]
+ },
+ "Tur Bielsk Podlaski": {
+  "ultras": [
+   "ulTURas'04"
+  ],
+  "kosy": [
+   "Orzeł Kolno",
+   "ŁKS Łomża",
+   "Sparta Szepietowo",
+   "Cresovia Siemiatycze",
+   "Sparta 1951 Szepietowo"
+  ]
+ },
+ "Pogoń Łapy": {
+  "ultras": [
+   "MG'05"
+  ],
+  "kosy": [
+   "ŁKS Łomża"
+  ]
+ },
+ "Cresovia Siemiatycze": {
+  "ultras": [
+   "Ultras Cresovia"
+  ],
+  "kosy": [
+   "Tur Bielsk Podlaski",
+   "Husar Nurzec"
+  ]
+ },
+ "Sparta 1951 Szepietowo": {
+  "ultras": [
+   "SFH"
+  ],
+  "zgody": [
+   "ŁKS Łomża"
+  ],
+  "kosy": [
+   "Warmia Grajewo",
+   "Ruch Wysokie Mazowieckie",
+   "Tur Bielsk Podlaski",
+   "Sparta Augustów",
+   "Wigry Suwałki",
+   "Olimpia Zambrów",
+   "Mazur Ełk",
+   "Orlęta Czyżew",
+   "Granica Kętrzyn",
+   "Jagiellonia Białystok"
+  ]
+ },
+ "Chełminianka Chełmno": {
+  "ultras": [
+   "ŁZC'01 - Łobuzy z Chełmna"
+  ],
+  "kosy": [
+   "Unia Wąbrzeźno",
+   "Pogoń Mogilno",
+   "Wda Świecie",
+   "Goplania Inowrocław",
+   "Pałuczanka Żnin",
+   "Gopło Kruszwica",
+   "Elana Toruń",
+   "Polonia Bydgoszcz"
+  ]
+ },
+ "Start Warlubie": {
+  "ultras": [
+   "Warlubska Patola"
+  ],
+  "kosy": [
+   "Wisła Nowe"
+  ]
+ },
+ "Gopło Kruszwica": {
+  "ultras": [
+   "Kruszwiccy Kibole"
+  ],
+  "kosy": [
+   "Lech Rypin",
+   "Chełminianka Chełmno",
+   "Wisła Nowe",
+   "Pałuczanka Żnin",
+   "Start Radziejów",
+   "Elana Toruń",
+   "Unia Gniewkowo",
+   "Unia Wąbrzeźno",
+   "Legia Chełmża",
+   "Sparta Brodnica"
+  ]
+ },
+ "Notecianka Pakość": {
+  "ultras": [
+   "UNP'25 - Ultras Notecianka Pakość"
+  ],
+  "kosy": [
+   "Pogoń Mogilno",
+   "Victoria Koronowo",
+   "Dąb Barcin",
+   "Unia Janikowo",
+   "Goplania Inowrocław",
+   "Noteć Inowrocław",
+   "Kujawiak Włocławek",
+   "Sparta Brodnica",
+   "Kujawianka Izbica Kujawska"
+  ],
+  "zgody": [
+   "Zagłębie Piechcin"
+  ]
+ },
+ "Szubinianka Szubin": {
+  "ultras": [
+   "SBN Szajka"
+  ],
+  "kosy": [
+   "Pałuczanka Żnin",
+   "Zagłębie Piechcin"
+  ],
+  "zgody": [
+   "Dąb Barcin"
+  ]
+ },
+ "Dąb Barcin": {
+  "ultras": [
+   "Junior Fans'05"
+  ],
+  "kosy": [
+   "Pałuczanka Żnin",
+   "Notecianka Pakość",
+   "Noteć Łabiszyn",
+   "Zagłębie Piechcin"
+  ],
+  "zgody": [
+   "Szubinianka Szubin"
+  ]
+ },
+ "Unia Janikowo": {
+  "ultras": [
+   "Kibicowska Unia Janikowo"
+  ],
+  "kosy": [
+   "Notecianka Pakość",
+   "Elana Toruń",
+   "Zagłębie Piechcin",
+   "Unia Gniewkowo",
+   "Unia Wąbrzeźno",
+   "KKS Kalisz",
+   "Legia Chełmża",
+   "Sparta Brodnica",
+   "KP Starogard Gdański",
+   "Pałuczanka Żnin",
+   "Noteć Gębice"
+  ]
+ },
+ "Noteć Inowrocław": {
+  "ultras": [
+   "UNI'23 - Ultras Noteć Inowrocław",
+   "Młoda Noteć"
+  ],
+  "kosy": [
+   "Notecianka Pakość",
+   "Astoria Bydgoszcz",
+   "Cuiavia Inowrocław",
+   "Śląsk Wrocław",
+   "Kotwica Kołobrzeg",
+   "Spójnia Stargard",
+   "Polonia Leszno"
+  ]
+ },
+ "Spójnia Świdwin": {
+  "ultras": [
+   "Kibice Spójni Świdwin"
+  ],
+  "zgody": [
+   "MKS Karlino"
+  ],
+  "kosy": [
+   "Iskra Białogard",
+   "Gwardia Koszalin",
+   "Gryf Polanów",
+   "Ikar Krosino",
+   "Światowid Łobez"
   ]
  }
 };

@@ -1272,6 +1272,15 @@ export const BARWY_KLUBOW: Record<string, [string, string]> = {
   "Kłos Kamienny Jaz": ["#000000", "#ffffff"],
   "Unia Sieciemin": ["#6a0dad", "#000000"],
   "Odra Szczecin": ["#d7141a", "#ffffff"],
+  // pomorskie (runda 4) (runda 2) — barwy z regiowyniki.pl / pl.wikipedia (odcienie przybliżone wg opisu barw)
+  "TLG Gdańsk": ["#00843d", "#ffffff"],
+  "Cassubian AP": ["#1b2a4a", "#d2122e"],
+  "Sokół Lubichowo": ["#1e5aa8", "#000000"],
+  "Relax Ryjewo": ["#008000", "#ffd700"],
+  // warminsko-mazurskie (runda 4) (runda 2) — barwy z regiowyniki.pl / pl.wikipedia (odcienie przybliżone wg opisu barw)
+  "MKS Korsze": ["#008c3a", "#ffffff"],
+  "Warmia Wrzesina": ["#4fa3e0", "#000000"],
+  "Granica Bezledy": ["#000000", "#ffffff"],
 };
 
 // Słowa-kolory w nazwie → barwa (gdy klubu nie ma w słowniku). Sprawdzane po kolei.

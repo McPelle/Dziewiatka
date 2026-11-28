@@ -25,7 +25,7 @@ export function konferencjaPrzed(s: StanGry, rywalId: string, puchar: boolean): 
   if (!waga && !szansa(0.25)) return null;
   const pyt: PytanieKonf[] = [];
   const R = ryw.nazwa;
-  if (derby) pyt.push({ kontekst: "Przed derbami", pytanie: `${derby}! Miasto żyje tym meczem. Co powiesz kibicom?`, opcje: [
+  if (derby) pyt.push({ kontekst: "Przed derbami", pytanie: `${derby}! ${moj.miasto === ryw.miasto ? "Całe miasto żyje tym meczem" : /^Kosa/.test(derby) ? "Kibice obu klubów żyją tym meczem od tygodni" : "Cały region żyje tym meczem"}. Co powiesz kibicom?`, opcje: [
     { tekst: "To najważniejszy mecz sezonu — zostawimy na boisku serce.", morale: 3, zarzad: 1, kibice: 4, motywacja: 0.02, odzew: "Kibice wniebowzięci, szatnia nakręcona." },
     { tekst: "Traktujemy to jak każdy inny mecz.", morale: 0, zarzad: 1, kibice: -2, motywacja: 0, odzew: "Chłodny przekaz — trybuny liczyły na więcej emocji." },
     { tekst: `${R}? Pokażemy im, kto rządzi w regionie.`, morale: 4, zarzad: -1, kibice: 3, motywacja: 0.03, odzew: "Prowokacja! Rywal przyklei to w szatni — będzie gorąco." } ] });

@@ -1062,6 +1062,35 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Olimpia Chocznia": 1990,
   "Wisła Szczucin": 1948,
   "Strażak Karsy": 1995,
+  // pomorskie (runda 4) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Salos Rumia": 1993,
+  "Dolina Speranda Niepoględzie": 2004,
+  "AP Kowale": 2019,
+  "TLG Gdańsk": 2023,
+  "Cassubian AP": 2017,
+  "Barca Bolszewo": 2016,
+  "Sopocka Akademia Piłkarska": 2014,
+  "KP Gdynia AP": 2015,
+  "Arka Prusewo": 2006,
+  "Korona Cedry Małe": 2007,
+  // kujawsko-pomorskie (runda 4) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Sportis Łochowo": 2018,
+  "Snajper Rogowo": 2017,
+  // warminsko-mazurskie (runda 4) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Vel Dąbrówno": 1974,
+  "Warmia Wrzesina": 2010,
+  // zachodniopomorskie (runda 4) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Wieża Postomino": 2003,
+  "Chrobry Drzonowo": 2015,
+  "AP Żaki Szczecin": 2013,
+  "Spójnia Świdwin": 1969,
+  "Gryf Maszewo": 2025,
+  "Orzeł Dobra": 2019,
+  "Klon Krzymów": 1972,
+  "Rolpol Chlebowo": 1955,
+  "Rurzyca Nawodna": 2009,
+  "Vimobilia Będzino": 2005,
+  "GKS Kołbaskowo/Przecław": 2023,
 };
 
 /** Rok założenia klubu (jeśli znany). */

@@ -197,7 +197,7 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
         {wymM > 0 && (
           <Text style={[st.maly, { marginTop: 6, color: maMlodziezowca ? K.zielony : K.czerwony, fontWeight: "700" }]}>
             {maMlodziezowca ? `🟢 Młodzieżowcy (rocznik 2006 i młodsi) w składzie: ${ileM}/${wymM} — OK` : `⚠ Młodzieżowcy w składzie: ${ileM}/${wymM}! Muszą grać cały mecz — inaczej walkower 0:3 (przepis PZPN).`}
-            {s.mlodziezoweWystepy != null ? `  ·  wystąpień U-21 w sezonie: ${s.mlodziezoweWystepy}` : ""}
+            {s.mlodziezoweWystepy != null ? `  ·  wystąpień młodzieżowców w sezonie: ${s.mlodziezoweWystepy}` : ""}
           </Text>
         )}
         {s.kluby[s.mojKlub].rezerwaId && (
