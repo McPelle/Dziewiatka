@@ -4,6 +4,232 @@
 export interface Przyspiewka { tekst: string; typ: "doping" | "miasto" | "zgoda" | "rywal" | "okrzyk"; rywal?: string }
 export interface PrzyspiewkiKlubu { hymn?: string; przyspiewki: Przyspiewka[] }
 export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
+"Stomil Olsztyn": {
+"przyspiewki": [
+{
+"tekst": "Historia ta! Tak długo trwa! Jesteśmy z Tobą już od wielu lat! Po życia kres! Aż trwa ta więź! Nic nie jest w stanie zniszczyć jej! Stomil ole!",
+"typ": "doping"
+},
+{
+"tekst": "Tam gdzie tysiące jezior! Pełno lasów, dzikich zwierząt! Jest kraina wiecznej wiary! Stomil Olsztyn klub nas stary!",
+"typ": "miasto"
+},
+{
+"tekst": "Moja jedyna miłość to OKS. W naszych żyłach płynie biało-niebieska krew. Dziś na stadionie nasza drużyna gra. Wstańcie koledzy z ławek, Stomil trzy punkty ma.",
+"typ": "doping"
+},
+{
+"tekst": "Zawsze za Nią pójdziemy, nawet po życia kres. Stomil my Cię kochamy, serce za OKS!",
+"typ": "doping"
+},
+{
+"tekst": "Jej oddałem serce swe. Ona najpiękniejszym snem. Nie zdradziła nigdy mnie. Kocham ją, a Ona mnie. Dwa kolory mienią się. Jezior błękit oraz biel. To drużyna z Olsztyna. A na imię Stomil ma!",
+"typ": "miasto"
+},
+{
+"tekst": "Leoleoleole! Leeeeeeooooo! Stoooooooomiiiiil! Oooooolsztyyyn!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Jesteśmy zawsze tam, gdzie nasz OKS gra. Aejaooo! Hej Stomil gol!",
+"typ": "doping"
+},
+{
+"tekst": "Pamiętam, że jestem z Olsztyna. Pamiętam i mam to we krwi. Pamiętam i nie zapomnę. Nigdy nie zejdę na psy!",
+"typ": "miasto"
+},
+{
+"tekst": "To my, to my, Stomil Olsztyn to my!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Olsztyński Stomil polski klub. Potężny i wspaniały. Biało-niebieskie barwy ma. A w herbie jest kormoran. I chociaż klub ten stary jest, każdy mu wierny jest.",
+"typ": "miasto"
+},
+{
+"tekst": "To my fanatycy z warmińskiej stolicy. A Stomil! Za OKS! Pójdziemy aż po życia kres!",
+"typ": "miasto"
+},
+{
+"tekst": "Olalaoli! Olalaole! Dziś Stomil wygra, a my za to najebiemy się!",
+"typ": "doping"
+},
+{
+"tekst": "Obojętnie gdzie grasz, tam spodziewaj się nas. Bo najlepszy w Polsce jest tylko Stomil OKS!",
+"typ": "doping"
+},
+{
+"tekst": "Nieważne w której lidze Stomil gra. Na zawsze swych kibiców wiernych ma. Jesteśmy zawsze tam, gdzie nasz OKS gra. Stomilu Ty nigdy nie będziesz sam.",
+"typ": "doping"
+},
+{
+"tekst": "Zabawa trwa, Stomil z Olsztyna!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Lalalalalalala! I wszyscy „hej sialala”! OKS trzy punkty ma! OKS wygra mecz. A my śpiewamy pieśń…",
+"typ": "doping"
+},
+{
+"tekst": "Wczoraj obiecałaś mi na pewno, że trzy punkty dzisiaj będą. Ja zaufałem Ci… Wiara! Nasza wiara nie zachwiana! Bo jest w Tobie zakochana. Stomil! Stomil, Stomil hej OKS!",
+"typ": "doping"
+},
+{
+"tekst": "Olsztyn czeka, my czekamy! Na zdobycie pierwszej bramy!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Stomil ole! Stomil ole! Stomil Olsztyn aejaoo!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Dumą Warmii jest? Tylko Stomil OKS!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Ludzie mówią mi: weź dorośnij ty. Głośno mówię ja: Stomil to mój świat…",
+"typ": "doping"
+},
+{
+"tekst": "Marsz! Do boju marsz! Zwycięstwo czeka nas… Więc wstań! Głowę do góry wznieś! Śpiewaj naszą pieśń! Forza OKS!",
+"typ": "doping"
+},
+{
+"tekst": "Jeden pije setek kilka, drugi piwem pasie brzuch. Nasz ideał – nożna piłka, wieczna walka wieczny trud. Hej Stomil Olsztyn! Tylko nasz OKS Olsztyn może wszystkim szczęście dać!",
+"typ": "doping"
+},
+{
+"tekst": "Forza OKS, Forza OKS, Forza Forza Forza OKS!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Nie dla nas dziś porażki smak. Nie dla nas forma zła! Niech z gardeł wszystkich płynie pieśń! Stomil Olsztyn wygra mecz!",
+"typ": "doping"
+},
+{
+"tekst": "Lalala Lalala! Stomil Olsztyn! Lalala Lalala! Duma Warmii! Lalala Lalala! Tysiąc jezior! Lalala Lalala! Wszyscy wiedzą! Oooo Stomil Olsztyn! Oooo OKS!",
+"typ": "miasto"
+},
+{
+"tekst": "Kto wygra mecz? Stomil! Kto? Stomil! Kto? Stomil Stomil Stomil! Do boju, do boju, do boju OKS!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Literka O! Literka K! Literka S! Jak OKS!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Stomil Olsztyn kocham Cię! Tobie dałem serce swe! Serce swoje jedyne! Dałem swojej drużynie!",
+"typ": "doping"
+},
+{
+"tekst": "Czy wygrywasz, czy nie, ja i tak kocham Cię. W moim sercu Stomil i na dobre i na złe!",
+"typ": "doping"
+},
+{
+"tekst": "Sektor biało-niebieski! Sektor biało-niebieski!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Stomil Olsztyn Polonia! Stomil Olsztyn Polonia! Stomil Olsztyn Polonia!",
+"typ": "zgoda",
+"rywal": "Polonia Bydgoszcz"
+},
+{
+"tekst": "Wiele wrażeń, niejeden promil! Tak się bawi Hutnik i Stomil!",
+"typ": "zgoda",
+"rywal": "Hutnik Kraków"
+}
+]
+},
+"Granica Kętrzyn": {
+"przyspiewki": [
+{
+"tekst": "Grać na całego, i walczyć do upadłego! Grać na całego, i walczyć do upadłego!",
+"typ": "doping"
+},
+{
+"tekst": "Tańczymy lambada, lambada, lambada, tańczymy lambada, małego walczyka, hej! Tańczą go kibice, kibice, kibice, tańczą go kibice Granicy z Kętrzyna, hej!",
+"typ": "doping"
+},
+{
+"tekst": "Trzy kolory mienią się, zieleń, błękit oraz biel, całe życie śpiewać chcę, vivat, vivat KKS!",
+"typ": "doping"
+},
+{
+"tekst": "Hej KKS-ie, klubie kochany, masz dziś 3 punkty, mecz jest wygrany, więc kto jest z nami, niech razem śpiewa: kto wygra mecz? Granica! Kto? Granica! Do boju, do boju, do boju, Granica!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Granico, kocham cię, Tobie dałem serce swe, serce swoje jedyne, dałem ukochanej drużynie, lalalalalalala",
+"typ": "doping"
+},
+{
+"tekst": "Jesteśmy z wami, Granica, jesteśmy z wami!",
+"typ": "doping"
+},
+{
+"tekst": "Duma Mazur jest, tylko Kętrzyn KKS, tylko Kętrzyn KKS",
+"typ": "miasto"
+},
+{
+"tekst": "Czy wygrywasz, czy nie, ja i tak kocham cię, w moim sercu KKS, i na dobre, i na złe",
+"typ": "doping"
+},
+{
+"tekst": "Nasza Granico, my wspieramy cię, bo w naszych sercach jest kętrzyński KKS, aż po życia kres",
+"typ": "doping"
+},
+{
+"tekst": "Na północnym wschodzie Polski, gdzie niełatwo żyje się, w małym mieście urodzony, co nazywa Kętrzyn się…",
+"typ": "miasto"
+},
+{
+"tekst": "My jesteśmy kętrzyniacy, cała Polska o tym wie, naszym klubem jest Granica, czy szanujesz ją czy nie, w piękne barwy jest ubrana, za nie oddam życie swe, czy wygrywasz czy przegrywasz, ja Granicę kochać chcę",
+"typ": "miasto"
+},
+{
+"tekst": "Niebiesko-biało-zieloni, ten mecz musimy wygrać, wygramy, wygramy, wygramy! Kto wygra mecz? Granica! Do boju, do boju, do boju KKS!",
+"typ": "doping"
+},
+{
+"tekst": "Kętrzyńska Granica KKS, kętrzyńska Granica KKS",
+"typ": "okrzyk"
+},
+{
+"tekst": "Kętrzyn to my, Kętrzyn to my, heja heja Kętrzyn to my!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Kętrzyn czeka, my czekamy, na zdobycie pierwszej bramy!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Granica to jest potęga, Granica najlepsza jest, Granicę trzeba szanować, Granica KKS, lalalalala",
+"typ": "doping"
+},
+{
+"tekst": "Naszym klubem KKS, cała Polska o tym wie, ta drużyna z Mazur jest, to Granica KKS, lalalala",
+"typ": "miasto"
+},
+{
+"tekst": "Wczoraj obiecałaś mi na pewno, że trzy punkty dzisiaj będą, zaufaliśmy ci, wiara, nasza wiara nie zachwiana, będę śpiewać aż do rana, a ty wygrasz mecz, hej Kętrzyn gol!",
+"typ": "doping"
+},
+{
+"tekst": "Granica Kętrzyn, sialalalala, Granica Kętrzyn, sialalalala…",
+"typ": "okrzyk"
+},
+{
+"tekst": "Tooo myyyy, fanatycy z kętrzyńskiej Granicy, za Kętrzyn, za KKS, pójdziemy aż po życia kres, KKS!",
+"typ": "miasto"
+},
+{
+"tekst": "Hej Kętrzyn gol, sialalalalalala",
+"typ": "okrzyk"
+}
+]
+},
 "Arka Gdynia": {
 "przyspiewki": [
 {
