@@ -929,6 +929,12 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   // zachodniopomorskie (runda 4) (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
   "Biali Sądów": 1000,
   "Bizon Cerkwica": 224,
+  // Zachodniopomorskie (runda 4) (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Iskra Białogard": 4000,
+  "Drawa Drawno": 500,
+  "Hubertus Biały Bór": 250,
+  "Wrzos Borne Sulinowo": 600,
+  "Wrzos II Borne Sulinowo": 600,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

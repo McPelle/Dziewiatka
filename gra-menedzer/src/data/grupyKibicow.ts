@@ -2103,7 +2103,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Pogoń Lębork",
    "Pogoń Szczecin",
    "Sokół Karlino",
-   "Spójnia Świdwin"
+   "Spójnia Świdwin",
+   "Darłovia Darłowo"
   ]
  },
  "Pogoń Lębork": {
@@ -2250,7 +2251,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "kosy": [
    "Błękitni Stargard",
    "Flota Świnoujście",
-   "Gwardia Koszalin"
+   "Gwardia Koszalin",
+   "Olimp Złocieniec"
   ]
  },
  "Sparta Brodnica": {
@@ -2571,6 +2573,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Energetyk Gryfino",
    "Odra Chojna",
    "Pogoń Barlinek"
+  ],
+  "kosy": [
+   "Olimp Złocieniec",
+   "Osadnik Myślibórz"
   ]
  },
  "Pogoń Barlinek": {
@@ -2581,6 +2587,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Energetyk Gryfino",
    "Odra Chojna",
    "Dąb Dębno"
+  ],
+  "kosy": [
+   "Olimp Złocieniec",
+   "Osadnik Myślibórz"
   ]
  },
  "Rega Trzebiatów": {
@@ -2727,7 +2737,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
  "Iskra Białogard": {
   "kosy": [
    "Sokół Karlino",
-   "Spójnia Świdwin"
+   "Spójnia Świdwin",
+   "Darłovia Darłowo"
+  ],
+  "zgody": [
+   "Gryf Polanów"
   ]
  },
  "Sparta Gryfice": {
@@ -2751,7 +2765,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Drawa Drawsko Pomorskie",
-   "Odra Chojna"
+   "Odra Chojna",
+   "Pogoń Barlinek",
+   "Dąb Dębno",
+   "Energetyk Gryfino"
   ]
  },
  "Kolejarz Stróże": {
@@ -3546,7 +3563,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Gwardia Koszalin",
    "Gryf Polanów",
    "Ikar Krosino",
-   "Światowid Łobez"
+   "Światowid Łobez",
+   "Światowid 63 Łobez"
   ]
  }
 };

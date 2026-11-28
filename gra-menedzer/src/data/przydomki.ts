@@ -118,6 +118,9 @@ export const PRZYDOMKI: Record<string, string> = {
   "Pałuczanka Żnin": "Pałuczanie",
   "Gopło Kruszwica": "Goplanie",
   "Zdrój Ciechocinek": "Zdrojanie",
+  // Zachodniopomorskie (runda 4) (runda 2) — przydomki potwierdzone w źródłach
+  "Darłovia Darłowo": "Darłoviacy",
+  "Vineta Wolin": "Wikingowie",
 };
 
 export function przydomek(nazwa: string): string | undefined {
