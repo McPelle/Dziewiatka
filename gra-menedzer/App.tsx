@@ -7,6 +7,8 @@ import type { StanGry } from "./src/engine/types";
 import { HerbGry, MurawaTlo, PlakietkaBeta } from "./src/ui/Grafika";
 import { Herb } from "./src/ui/Herb";
 import { MenuGlowne } from "./src/ui/MenuGlowne";
+import { TerazGra } from "./src/ui/Odtwarzacz";
+import { startMuzyki } from "./src/ui/muzyka";
 import { SzybkiMecz } from "./src/ui/SzybkiMecz";
 import { Wyzwania } from "./src/ui/Wyzwania";
 import { losowaCiekawostka } from "./src/data/ciekawostki";
@@ -37,6 +39,11 @@ const ZAKLADKI: [Zakladka, string, string][] = [
 ];
 
 export default function App() {
+  useEffect(() => { // soundtrack startuje po pierwszym dotknięciu (zasady autoodtwarzania przeglądarek) i gra w całej grze
+    if (Platform.OS !== "web" || typeof window === "undefined") return;
+    const go = () => startMuzyki(); window.addEventListener("pointerdown", go, { once: true });
+    return () => window.removeEventListener("pointerdown", go);
+  }, []);
   const [stan, setStan] = useState<StanGry | null>(null);
   const [laduje, setLaduje] = useState(true);
   const [, setWersja] = useState(0);
@@ -89,6 +96,7 @@ export default function App() {
   return (
     <SafeAreaView style={st.ekran}>
       <StatusBar style="light" />
+      <TerazGra />
       {ekran === "menu" && <MenuGlowne stan={stan} meta={laduje ? metaMenu() : null} czeka={czekaNaZapis} naKontynuuj={() => (laduje ? setCzekaNaZapis(true) : wejdzDoGry())} naNowa={() => setEkran("nowa")} naWczytaj={() => setEkran("wczytaj")} naSzybki={() => setEkran("szybki")} naWyzwania={() => setEkran("wyzwania")} />}
       {ekran === "szybki" && <SzybkiMecz onWstecz={() => setEkran("menu")} />}
       {ekran === "wyzwania" && <Wyzwania ukonczone={stan?.osiagnieciaFlagi} onWstecz={() => setEkran("menu")} onStart={(s) => { setStan(s); zapisz(s); wejdzDoGry(); }} />}
