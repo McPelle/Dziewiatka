@@ -128,6 +128,78 @@ export const TRENERZY: Record<string, TrenerReal> = {
   "Mazur Pisz": { imie: "Dzmitry", nazwisko: "Baiduk" }, // klasa okręgowa W-M gr. 1; stomil.olsztyn.pl 25.09.2026 ('podopieczni Dzmitrego Baiduka')
   "Olimpia II Elbląg": { imie: "Bartłomiej", nazwisko: "Florek" }, // klasa okręgowa W-M gr. 2; zksolimpia.pl/ii-zespol (Kadra: Trener Florek Bartłomiej)
   "Puszcza Hajnówka": { imie: "Artur", nazwisko: "Dakowicz" }, // klasa okręgowa podlaska; bielsk.eu (mecz 03.10.2026)
+  // === IV liga, V liga i okręgówki — pomorskie, kujawsko-pomorskie, zachodniopomorskie, małopolskie (stan 28.11.2026; pewność wysoka/średnia) ===
+  "Czarni Pruszcz Gdański": { imie: "Krystian", nazwisko: "Ryczkowski", od: 2025, odMiesiac: "styczeń" }, // pomorskie IV liga pomorska; https://dziennikbaltycki.pl/nowa-jakosc-w-klubie-czarni-pruszcz-gdanski-doswiadc
+  "Cartusia Kartuzy": { imie: "Adam", nazwisko: "Billewicz", od: 2026, odMiesiac: "lipiec" }, // pomorskie IV liga pomorska; https://kurierkaszubski.eu/pilka-nozna-iv-liga/ (06.07.2026) ; https://kurierkas
+  "Arka II Gdynia": { imie: "Łukasz", nazwisko: "Kowalski" }, // pomorskie IV liga pomorska; https://www.trojmiasto.pl/sport/Awans-i-koniec-pilkarskiego-Wybrzeza-Gdansk-Tren
+  "Pogoń Lębork": { imie: "Mateusz", nazwisko: "Michniewicz" }, // pomorskie IV liga pomorska; https://www.lebork24.info/2026/11/07/zwyciestwo-z-aniolami-garczegorze-30-dzis-p
+  "Gryf Wejherowo": { imie: "Mateusz", nazwisko: "Czaja" }, // pomorskie IV liga pomorska; https://radiogdansk.pl/sport/2026/11/14/trener-gryfa-wejherowo-koniec-jednej-ser
+  "Gryf Słupsk": { imie: "Dominik", nazwisko: "Kaczmarek", od: 2026, odMiesiac: "wrzesień" }, // pomorskie IV liga pomorska; https://radiogdansk.pl/sport/2026/09/15/gryf-slupsk-ma-kolejnego-nowego-trenera/
+  "Sokół Bożepole Wielkie": { imie: "Paweł", nazwisko: "Kolus" }, // pomorskie IV liga pomorska; https://radiogdansk.pl/sport/2026/08/09/start-iv-ligi-popis-jaguara-i-hat-trick-
+  "Radunia Stężyca": { imie: "Mateusz", nazwisko: "Bucholc", od: 2024, odMiesiac: "październik" }, // pomorskie IV liga pomorska; https://kurierkaszubski.eu/pilka-nozna-iv-liga-12/ (10.10.2026: podopieczni tren
+  "Anioły Garczegorze": { imie: "Tadeusz", nazwisko: "Wanat" }, // pomorskie IV liga pomorska; https://radiogdansk.pl/sport/2026/03/22/dziwny-mecz-gryfa-slupsk-i-aniolow-garcz
+  "Stoczniowiec Gdańsk": { imie: "Paweł", nazwisko: "Pagieła" }, // pomorskie IV liga pomorska; https://www.laczynaspilka.pl/aktualnosci/pilka-w-regionie/stoczniowiec-gdansk-wr
+  "Jaguar Gdańsk": { imie: "Jacek", nazwisko: "Paszulewicz" }, // pomorskie IV liga pomorska; https://radiogdansk.pl/sport/2026/08/09/start-iv-ligi-popis-jaguara-i-hat-trick-
+  "Chojniczanka II Chojnice": { imie: "Tomasz", nazwisko: "Fojut" }, // pomorskie IV liga pomorska; https://mkschojniczanka.pl/ (relacje [II zespół], np. Pogoń Lębork – Chojniczank
+  "Dolina Speranda Niepoględzie": { imie: "Adam", nazwisko: "Pietras" }, // pomorskie IV liga pomorska; https://radiogdansk.pl/sport/2026/08/09/start-iv-ligi-popis-jaguara-i-hat-trick-
+  "Unia Solec Kujawski": { imie: "Szymon", nazwisko: "Maziarz", od: 2025, odMiesiac: "lipiec" }, // kujawsko-pomorskie IV liga kujawsko-pomorska; https://metropoliabydgoska.pl/unia-solec-kujawski-ma-nowego-trenera-legenda-regi
+  "Wisła Dobrzyń nad Wisłą": { imie: "Szymon", nazwisko: "Moszczyński" }, // kujawsko-pomorskie IV liga kujawsko-pomorska; https://wloclawek.naszemiasto.pl/kujawiak-lumac-kowal-wisla-dobrzyn-zdjecia-z-me
+  "Pogoń Mogilno": { imie: "Jakub", nazwisko: "Łaganowski", od: 2025, odMiesiac: "czerwiec" }, // kujawsko-pomorskie IV liga kujawsko-pomorska; https://www.pogonmogilno.pl/jakub-laganowski-trenerem-pierwszego-zespolu-pogoni-
+  "Sparta Brodnica": { imie: "Krystian", nazwisko: "Janczak" }, // kujawsko-pomorskie IV liga kujawsko-pomorska; https://czasbrodnicy.pl/pl/13_sport/29312434_sparta-brodnica-rozpoczyna-przygoto
+  "Start Pruszcz": { imie: "Adam", nazwisko: "Góral" }, // kujawsko-pomorskie IV liga kujawsko-pomorska; https://sportoweswiecie.pl/node/4312 (VIII 2026) ; https://sportoweswiecie.pl/no
+  "Kujawiak Kowal": { imie: "Tomasz", nazwisko: "Malkowski" }, // kujawsko-pomorskie IV liga kujawsko-pomorska; https://wloclawek.naszemiasto.pl/kujawiak-lumac-kowal-lech-rypin-zdjecia-z-meczu
+  "Pomorzanin Serock": { imie: "Remigiusz", nazwisko: "Kuś", od: 2026, odMiesiac: "lipiec" }, // kujawsko-pomorskie Klasa okręgowa — kujawsko-pomorska I; https://sportoweswiecie.pl/node/4225 (15.07.2026); https://sportoweswiecie.pl/no
+  "Grom Osie": { imie: "Damian", nazwisko: "Ejankowski" }, // kujawsko-pomorskie Klasa okręgowa — kujawsko-pomorska I; https://sportoweswiecie.pl/node/4171 (02.07.2026); https://sportoweswiecie.pl/no
+  "Wisła Gruczno": { imie: "Filip", nazwisko: "Skory" }, // kujawsko-pomorskie Klasa okręgowa — kujawsko-pomorska I; https://sportoweswiecie.pl/node/4183 (07.07.2026); https://sportoweswiecie.pl/no
+  "Gryf Sicienko": { imie: "Kacper", nazwisko: "Wróblewski", od: 2025, odMiesiac: "czerwiec" }, // kujawsko-pomorskie Klasa okręgowa — kujawsko-pomorska I; https://sportoweswiecie.pl/node/4150 (26.06.2026); https://sportoweswiecie.pl/no
+  "Wda II Świecie": { imie: "Patryk", nazwisko: "Strzębała" }, // kujawsko-pomorskie Klasa okręgowa — kujawsko-pomorska I; https://sportoweswiecie.pl/node/4159 (06.2026); https://sportoweswiecie.pl/node/
+  "Kotwica Kołobrzeg": { imie: "Krzysztof", nazwisko: "Sobieszczuk", od: 2025, odMiesiac: "listopad" }, // zachodniopomorskie IV liga zachodniopomorska; https://e-kg.pl/artykul/zmiana-trenera-krzysztof-n2182049 ; https://miastokolobr
+  "Sparta Gryfice": { imie: "Krzysztof", nazwisko: "Kubacki", od: 2025, odMiesiac: "czerwiec" }, // zachodniopomorskie IV liga zachodniopomorska; https://superportal24.pl/sparta-gryfice-ma-nowego-trenera-1-20819
+  "Dąb Dębno": { imie: "Karol", nazwisko: "Gliwiński" }, // zachodniopomorskie IV liga zachodniopomorska; https://www.chojna24.pl/2026/03/karol-gliwinski-na-pewno-debno-chciao.html (III 
+  "Orzeł Wałcz": { imie: "Hubert", nazwisko: "Pilarski", od: 2026, odMiesiac: "wrzesień" }, // zachodniopomorskie IV liga zachodniopomorska; https://info-walcz.pl/na-trenerskiej-karuzeli/
+  "Cracovia II": { imie: "Andrzej", nazwisko: "Paszkiewicz" }, // małopolskie IV liga TEXOM małopolska; https://www.podkarpacielive.pl/pl/wydarzenia/60634,cracovia-ii---victoria-1918-j
+  "Termalica Bruk-Bet II Nieciecza": { imie: "Waldemar", nazwisko: "Dzierżanowski" }, // małopolskie IV liga TEXOM małopolska; https://4ligamalopolska.pl/?sp_team=bruk-bet-termalica-ii-nieciecza (profil 2026
+  "Orzeł Ryczów": { imie: "Damian", nazwisko: "Rębisz", od: 2025, odMiesiac: "maj" }, // małopolskie IV liga TEXOM małopolska; https://futmal.pl/news/zmiana-trenera-w-ryczowie (18.05.2026) ; https://4ligamal
+  "Glinik Gorlice": { imie: "Łukasz", nazwisko: "Krzysztoń" }, // małopolskie IV liga TEXOM małopolska; https://gorlice24.pl/pl/13_sport/50251_glinik-gorlice-zakonczyl-runde-widac-prog
+  "Dalin Myślenice": { imie: "Przemysław", nazwisko: "Senderski" }, // małopolskie IV liga TEXOM małopolska; https://4ligamalopolska.pl/?sp_team=dalin-myslenice ; https://dalin.futbolowo.pl
+  "Hutnik II Kraków": { imie: "Mariusz", nazwisko: "Bienias", od: 2025, odMiesiac: "grudzień" }, // małopolskie IV liga TEXOM małopolska; https://4ligamalopolska.pl/?sp_team=hutnik-ii-krakow ; https://futmal.pl/news (B
+  "Beskid Andrychów": { imie: "Tomasz", nazwisko: "Moskała" }, // małopolskie IV liga TEXOM małopolska; https://4ligamalopolska.pl/?sp_team=beskid-andrychow (profil drużyny 2026/27, I 
+  "Lubań Maniowy": { imie: "Łukasz", nazwisko: "Schreiner" }, // małopolskie IV liga TEXOM małopolska; https://podhaleregion.pl/pilka-nozna-4-liga-luban-ogrywa-outsidera-watra-przegry
+  "Wolania Wola Rzędzińska": { imie: "Daniel", nazwisko: "Popiela", od: 2025, odMiesiac: "czerwiec" }, // małopolskie IV liga TEXOM małopolska; https://futmal.pl/news/wolania-z-nowym-trenerem (30.06.2026)
+  "Kalwarianka Kalwaria Zebrzydowska": { imie: "Bogdan", nazwisko: "Zając", od: 2026, odMiesiac: "lipiec" }, // małopolskie IV liga TEXOM małopolska; https://futmal.pl/news/bogdan-zajac-trenerem-czwartoligowca (01.07.2026) ; https
+  "Pcimianka Pcim": { imie: "Bartosz", nazwisko: "Pawlik", od: 2026, odMiesiac: "listopad" }, // małopolskie IV liga TEXOM małopolska; https://futmal.pl/news/pcimianka-zaprezentowala-nowego-trenera-2 (23.11.2026)
+  "Unia Tarnów": { imie: "Paweł", nazwisko: "Węgrzyn" }, // małopolskie IV liga TEXOM małopolska; https://4ligamalopolska.pl/?sp_team=unia-tarnow (profil 2026/27)
+  "BKS Bochnia": { imie: "Jakub", nazwisko: "Drwal" }, // małopolskie IV liga TEXOM małopolska; https://4ligamalopolska.pl/?sp_team=bks-bochnia (profil 2026/27) ; https://futma
+  "Limanovia Limanowa": { imie: "Mateusz", nazwisko: "Ryś" }, // małopolskie IV liga TEXOM małopolska; https://limanowa.in/sport/trener-limanovii-zmiennicy-pokazali-ze-mozna-na-nich-l
+  "Poprad Muszyna": { imie: "Robert", nazwisko: "Kubiela", od: 2025, odMiesiac: "lipiec" }, // małopolskie IV liga TEXOM małopolska; https://4ligamalopolska.pl/?sp_team=poprad-muszyna ; https://futmal.pl/news/popr
+  "Błękitni Modlnica": { imie: "Krzysztof", nazwisko: "Szumiec" }, // małopolskie IV liga TEXOM małopolska; https://gazetakrakowska.pl/oni-swietowali-awans-oto-druzyny-z-malopolski-ktore-s
+  "Watra Białka Tatrzańska": { imie: "Marek", nazwisko: "Kowalski", od: 2026, odMiesiac: "październik" }, // małopolskie IV liga TEXOM małopolska; https://podhaleregion.pl/watra-bialka-tatrzanska-ma-nowego-trenera-marek-kowalsk
+  "Orzeł Myślenice": { imie: "Krzysztof", nazwisko: "Zawora", od: 2025, odMiesiac: "grudzień" }, // małopolskie V liga (zachód); https://futmal.pl/news/nowy-trener-wybrany-zawora-poprowadzi-piatoligowca (04.12
+  "Sokół Kocmyrzów Baranówka": { imie: "Piotr", nazwisko: "Trzepatowski", od: 2026, odMiesiac: "październik" }, // małopolskie V liga (zachód); https://futmal.pl/news/sokol-z-nowym-szkoleniowcem-2 (09.10.2026)
+  "AP Kmita Zabierzów": { imie: "Radosław", nazwisko: "Salwach", od: 2026, odMiesiac: "lipiec" }, // małopolskie V liga (zachód); https://futmal.pl/news/kmita-z-nowym-trenerem-1 (23.06.2026)
+  "Przebój Wolbrom": { imie: "Mariusz", nazwisko: "Porębski", od: 2025, odMiesiac: "czerwiec" }, // małopolskie V liga (zachód); https://futmal.pl/news/porebski-trenerem-piatoligowca (25.06.2026)
+  "Proszowianka Proszowice": { imie: "Łukasz", nazwisko: "Mika", od: 2025, odMiesiac: "czerwiec" }, // małopolskie Klasa okręgowa (Kraków I); https://futmal.pl/news/proszowianka-zaprezentowala-nowego-trenera (30.06.2026)
+  "Spartak Charsznica": { imie: "Kamil", nazwisko: "Dąbrowski", od: 2026, odMiesiac: "lipiec" }, // małopolskie Klasa okręgowa (Kraków I); https://futmal.pl/news/mistrz-a-klasy-z-nowym-trenerem (21.07.2026)
+  "Grębałowianka Kraków": { imie: "Jakub", nazwisko: "Pasionek", od: 2025, odMiesiac: "czerwiec" }, // małopolskie Klasa okręgowa (Kraków II); https://futmal.pl/news/grebalowianka-ma-nowego-trenera-1 (18.06.2026)
+  "Pogoń Kraków": { imie: "Piotr", nazwisko: "Mrozek", od: 2026, odMiesiac: "październik" }, // małopolskie Klasa okręgowa (Kraków II); https://futmal.pl/news/nadszedl-kres-misji-szweda-pogon-w-trenerem-tymczasowym (
+  "Wiarusy Igołomia": { imie: "Piotr", nazwisko: "Kurylonek", od: 2025, odMiesiac: "maj" }, // małopolskie Klasa okręgowa (Kraków III / Myślenice); https://futmal.pl/news/zmiana-trenera-w-igolomi (27.05.2026)
+  "Poprad Rytro": { imie: "Wojciech", nazwisko: "Tajduś" }, // małopolskie V liga (wschód); https://limanowa.in/sport/turbacz-zatrzymal-poprad-kolejne-zwyciestwo-w-meczu-na
+  "Wisła Czarny Dunajec": { imie: "Łukasz", nazwisko: "Pazurkiewicz" }, // małopolskie V liga (wschód); https://podhaleregion.pl (Wielki finał w Czarnym Dunajcu..., 06-07.10.2026)
+  "Turbacz Mszana Dolna": { imie: "Damian", nazwisko: "Gniecki", od: 2026, odMiesiac: "lipiec" }, // małopolskie V liga (wschód); https://limanowa.in/sport/turbacz-rozpoczyna-przygotowania-trzy-sparingi-i-mecz-
+  "Podhale II Nowy Targ": { imie: "Grzegorz", nazwisko: "Hajnos" }, // małopolskie V liga (wschód); https://podhaleregion.pl/wisla-nie-zwalnia-rezerwy-podhala-zatrzymaly-turbacza-o
+  "Dąbrovia Dąbrowa Tarnowska": { imie: "Tomasz", nazwisko: "Juszczyk", od: 2025, odMiesiac: "czerwiec" }, // małopolskie V liga (wschód); https://futmal.pl/news/dabrovia-z-nowym-trenerem (26.06.2026)
+  "Polan Żabno": { imie: "Konrad", nazwisko: "Tyrpuła", od: 2026, odMiesiac: "lipiec" }, // małopolskie V liga (wschód); https://limanowa.in/sport/byly-szkoleniowiec-orkana-szczyrzyc-wraca-do-v-ligi/50
+  "LKS Nowa Jastrząbka": { imie: "Piotr", nazwisko: "Brożek", od: 2025, odMiesiac: "czerwiec" }, // małopolskie V liga (wschód); https://futmal.pl/news/nowa-jastrzabka-z-nowym-trenerem (30.06.2026)
+  "Łosoś Łososina Dolna": { imie: "Jakub", nazwisko: "Czernecki", od: 2026, odMiesiac: "lipiec" }, // małopolskie V liga (wschód); https://futmal.pl/news/nowy-trener-beniaminka-1 (15.07.2026)
+  "Okocimski KS Brzesko": { imie: "Mateusz", nazwisko: "Krokosz", od: 2025, odMiesiac: "czerwiec" }, // małopolskie V liga (wschód); https://futmal.pl/news/okocimski-ma-nowego-trenera (25.06.2026)
+  "Kolejarz Stróże": { imie: "Robert", nazwisko: "Święs", od: 2025, odMiesiac: "czerwiec" }, // małopolskie V liga (wschód); https://futmal.pl/news/swies-poprowadzi-kolejarza (27.06.2026)
+  "Orawa Jabłonka": { imie: "Paweł", nazwisko: "Batkiewicz", od: 2026, odMiesiac: "wrzesień" }, // małopolskie V liga (wschód); https://podhaleregion.pl/wisla-nie-zwalnia-rezerwy-podhala-zatrzymaly-turbacza-o
+  "Harnaś Tymbark": { imie: "Adrian", nazwisko: "Mrózek" }, // małopolskie Klasa okręgowa (Limanowa-Podhale); https://limanowa.in/sport/niesamowity-harnas-w-tymbarku-rozbita-kolejna-druzyna/
+  "Babia Góra Lipnica Wielka": { imie: "Grzegorz", nazwisko: "Szczepaniec" }, // małopolskie Klasa okręgowa (Limanowa-Podhale); https://podhaleregion.pl/ (Po meczu w Lipnicy Wielkiej wybuchła dyskusja..., 02.
+  "Wierchy Pasierbiec": { imie: "Sebastian", nazwisko: "Wójcik" }, // małopolskie Klasa okręgowa (Limanowa-Podhale); https://limanowa.in/sport/wierchy-pasierbiec-awansowaly-do-klasy-okregowej/50838
+  "Orkan Niedźwiedź": { imie: "Piotr", nazwisko: "Kaczor" }, // małopolskie Klasa okręgowa (Limanowa-Podhale); https://limanowa.in/sport/orkan-niedzwiedz-pisze-swoja-historie/51033 (10.08.202
+  "Sokół Maszkienice": { imie: "Tomasz", nazwisko: "Świerczek", od: 2026, odMiesiac: "sierpień" }, // małopolskie Klasa okręgowa (Bochnia-Brzesko); https://futmal.pl/news/swierczek-trenerem-sokola (19.08.2026)
+  "Ikar Odporyszów": { imie: "Marcin", nazwisko: "Zając", od: 2025, odMiesiac: "czerwiec" }, // małopolskie Klasa okręgowa (Żabno-Tarnów); https://futmal.pl/news/zmiana-trenera-w-odporyszowie (26.06.2026)
 };
 
 /** Licencja UEFA właściwa dla szczebla (realia PZPN: im wyżej, tym wyższy wymóg). */
