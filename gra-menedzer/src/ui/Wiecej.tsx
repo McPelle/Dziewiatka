@@ -66,10 +66,10 @@ export function Wiecej({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
       <View style={st.ekran}>
         <PasekPowrotu tytul={wpis.nazwa} ikona={wpis.ikona} onBack={zamknij} />
         <View style={{ flex: 1 }}>
-          {inlineOtwarte === "sponsorzy" && <Sponsorzy s={s} odswiez={odswiez} />}
+          {inlineOtwarte === "sponsorzy" && <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 40 }}><Sponsorzy s={s} odswiez={odswiez} /></ScrollView>}
           {inlineOtwarte === "sklep" && <Sklep s={s} odswiez={odswiez} />}
           {inlineOtwarte === "karty" && <AlbumKart s={s} />}
-          {inlineOtwarte === "stroje" && <Stroje s={s} klub={s.kluby[s.mojKlub]} />}
+          {inlineOtwarte === "stroje" && <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 40 }}><Stroje s={s} klub={s.kluby[s.mojKlub]} /></ScrollView>}
           {inlineOtwarte === "puchar" && <PucharEkran s={s} />}
         </View>
       </View>
