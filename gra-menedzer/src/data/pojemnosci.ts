@@ -942,6 +942,9 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Latarnik II Choczewo": 490,
   // Zachodniopomorskie (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
   "Dąbrovia Stara Dąbrowa": 500,
+  // Kujawsko-Pomorskie (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Cyklon Kończewice": 400,
+  "MGKS Lubraniec": 500,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

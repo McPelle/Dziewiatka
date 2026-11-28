@@ -1108,6 +1108,9 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   // Zachodniopomorskie (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
   "Chrobry Boleszkowice": 1955,
   "Czapla Czaplinek": 2025,
+  // Kujawsko-Pomorskie (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Sokół Grzywna": 2009,
+  "Gol Brodnica": 2012,
 };
 
 /** Rok założenia klubu (jeśli znany). */
