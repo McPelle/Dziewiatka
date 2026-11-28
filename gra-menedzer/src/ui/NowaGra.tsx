@@ -33,10 +33,10 @@ const BARWY_WOJ: Record<string, [string, string]> = {
 const NAZWY_LOGO = ["PKO BP Ekstraklasa", "Betclic 1. Liga", "Betclic 2. Liga", "Betclic 3. Liga"];
 const crestLigi = (idx: number, r = 38) => idx === 0
   ? <View style={{ width: r * 3.4, height: r, justifyContent: "center" }}><LogoLigi nazwa={NAZWY_LOGO[0]} poziom={1} rozmiar={r * 0.68} /></View> // pełne logo PKO BP Ekstraklasy
-  : <View style={{ width: r * 1.25, height: r, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={NAZWY_LOGO[Math.min(idx, 3)]} poziom={idx + 1} rozmiar={r * 0.9} /></View>;
+  : <View style={{ width: r * 1.25, height: r, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={NAZWY_LOGO[Math.min(idx, 3)]} poziom={idx + 1} rozmiar={r * 0.9} maxSzer={r * 1.25} /></View>;
 const KLUCZ_WOJ: Record<string, string> = { "Małopolskie": "małopolskie", "Pomorskie": "pomorskie", "Zachodniopomorskie": "zachodniopomorskie", "Kujawsko-pomorskie": "kujawsko-pomorskie", "Warmińsko-mazurskie": "warmińsko-mazurskie", "Podlaskie": "podlaskie" };
 // województwo = herb jego wojewódzkiego ZPN (oryginalne logo związku, bez tła)
-const crestWoj = (label: string, r = 38) => <View style={{ width: r * 1.15, height: r * 1.15, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={`${label} ZPN`} rozmiar={r * 1.1} /></View>;
+const crestWoj = (label: string, r = 38) => <View style={{ width: r * 1.15, height: r * 1.15, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={`${label} ZPN`} rozmiar={r * 1.1} maxSzer={r * 1.15} /></View>;
 
 /** Najniższa klasa rozgrywkowa województwa (podlaskie kończy się na klasie A — brak klasy B). */
 const najnizsza = (label: string) => (label === "Podlaskie" ? "klasa A" : "klasa B");
@@ -235,7 +235,7 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
         <Pasek tytul={woj.label} pod={`Wybierz szczebel (IV liga → ${najnizsza(woj.label)})`} onBack={() => setWidok({ typ: "root" })} />
         <ScrollView contentContainerStyle={{ padding: 10, paddingBottom: 26 }}>
           {poziomy.map((p) => (
-            <Pozycja key={p.label} herb={<View style={{ width: 46, height: 38, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={`${p.label} ${woj.label}`} rozmiar={30} /></View>} tytul={p.label} pod={p.grupy.length > 1 ? `${p.grupy.length} grup` : nazwaLigi(p.grupy[0].nazwa)}
+            <Pozycja key={p.label} herb={<View style={{ width: 46, height: 38, alignItems: "center", justifyContent: "center" }}><LogoLigi nazwa={`${p.label} ${woj.label}`} rozmiar={30} maxSzer={46} /></View>} tytul={p.label} pod={p.grupy.length > 1 ? `${p.grupy.length} grup` : nazwaLigi(p.grupy[0].nazwa)}
               onPress={() => p.grupy.length > 1 ? setWidok({ typ: "wojLevel", wi: widok.wi, label: p.label, grupy: p.grupy }) : otworzKluby(p.grupy[0].sciezkaId, p.grupy[0].idx, p.grupy[0].nazwa, { typ: "woj", wi: widok.wi })} />
           ))}
         </ScrollView>

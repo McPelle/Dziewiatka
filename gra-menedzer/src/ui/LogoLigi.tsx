@@ -35,12 +35,15 @@ const LOGA = {
   l4Mal: require("../../assets/ligi/4liga_malopolska.png"),
 };
 // proporcje (szerokość / wysokość) wyciętych logo — bez tła, jasne wersje dla ciemnego interfejsu
-const PROP: Record<keyof typeof LOGA, number> = { ekstraklasa: 4.65, ekstraklasaZnak: 0.99, l1: 0.92, l2: 0.92, l3: 0.924, superpuchar: 0.835, pucharpolski: 0.575, lm: 1.05, le: 0.685, lk: 1.01, zpnPom: 1, zpnKp: 0.985, zpnZach: 1, zpnMal: 0.835, l4Kp: 0.785, l4Zach: 3.213, zpnWm: 0.756, l4Mal: 0.662, zpnPod: 0.835, l4Wm: 0.753, ppWm: 0.654, zpnLub: 0.989, zpnOpo: 3.45, l4Opo: 1.302, okrOpo: 4.891, aOpo: 3.262, bOpo: 3.019 };
-export function LogoLigi({ nazwa, poziom, rozmiar = 28, znak }: { nazwa: string; poziom?: number; rozmiar?: number; znak?: boolean }) {
+const PROP: Record<keyof typeof LOGA, number> = { ekstraklasa: 4.65, ekstraklasaZnak: 0.99, l1: 0.92, l2: 0.92, l3: 0.924, superpuchar: 0.835, pucharpolski: 0.575, lm: 1.05, le: 0.685, lk: 1.01, zpnPom: 1, zpnKp: 0.985, zpnZach: 1, zpnMal: 0.835, l4Kp: 0.785, l4Zach: 3.213, zpnWm: 0.756, l4Mal: 0.662, zpnPod: 0.835, l4Wm: 0.753, ppWm: 0.654, zpnLub: 0.989, zpnOpo: 1.06, l4Opo: 1.302, okrOpo: 0.982, aOpo: 1.035, bOpo: 1.0 };
+export function LogoLigi({ nazwa, poziom, rozmiar = 28, znak, maxSzer }: { nazwa: string; poziom?: number; rozmiar?: number; znak?: boolean; maxSzer?: number }) {
   const k0 = kluczLogoLigi(nazwa, poziom); const k = k0 === "ekstraklasa" && znak ? "ekstraklasaZnak" : k0; // znak = sama piłka Ekstraklasy (małe miejsca)
   if (k) {
-    const szer = rozmiar * PROP[k];
-    return <Image source={LOGA[k]} style={{ width: szer, height: rozmiar, resizeMode: "contain" }} />;
+    // szerokie logo nie może wychodzić poza swoje miejsce: maks. 1,6× wysokości (pełne logo Ekstraklasy — wyjątek, ma własną ramkę)
+    const maks = maxSzer ?? (k === "ekstraklasa" ? Infinity : rozmiar * 1.6);
+    const szer = Math.min(rozmiar * PROP[k], maks);
+    const wys = szer / PROP[k];
+    return <Image source={LOGA[k]} style={{ width: szer, height: wys, resizeMode: "contain" }} />;
   }
   const skrot = /Puchar|PP/i.test(nazwa) ? "🏆" : /IV liga/i.test(nazwa) ? "IV" : /V liga/i.test(nazwa) ? "V" : /okręg/i.test(nazwa) ? "OKR" : /klasa A|A klasa/i.test(nazwa) ? "A" : /klasa B|B klasa/i.test(nazwa) ? "B" : /klasa C|C klasa/i.test(nazwa) ? "C" : "•";
   return (

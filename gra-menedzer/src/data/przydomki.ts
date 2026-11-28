@@ -184,6 +184,11 @@ export const PRZYDOMKI: Record<string, string> = {
   "Karkonosze Jelenia Góra": "Karki",
   // Opolskie — południe (runda 2) — przydomki potwierdzone w źródłach
   "Pogoń Prudnik": "Pogoniści",
+  // Lubuskie (runda 2) (runda 2) — przydomki potwierdzone w źródłach
+  "Zjednoczeni Przytoczna": "GieKaeS",
+  "Korona Kożuchów": "Polmowcy",
+  // Opolskie (runda 2) (runda 2) — przydomki potwierdzone w źródłach
+  "GKS Głuchołazy": "biało-niebiescy",
 };
 
 export function przydomek(nazwa: string): string | undefined {

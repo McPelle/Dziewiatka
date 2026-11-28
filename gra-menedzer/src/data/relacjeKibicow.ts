@@ -3077,5 +3077,10 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
  {"a": "GLKS Kietrz", "b": "Odra Wodzisław Śląski", "typ": "zgoda"},
  {"a": "GLKS Kietrz", "b": "Odra Opole", "typ": "kosa"},
  {"a": "GLKS Kietrz", "b": "Ruch Chorzów", "typ": "kosa"},
- {"a": "GLKS Kietrz", "b": "Unia Racibórz", "typ": "kosa"}
+ {"a": "GLKS Kietrz", "b": "Unia Racibórz", "typ": "kosa"},
+ {"a": "Korona Kożuchów", "b": "Promień Żary", "typ": "kosa"},
+ {"a": "Korona Kożuchów", "b": "Sprotavia Szprotawa", "typ": "kosa"},
+ {"a": "Korona Kożuchów", "b": "Stilon Gorzów Wielkopolski", "typ": "kosa"},
+ {"a": "Korona Kożuchów", "b": "Czarni Żagań", "typ": "kosa"},
+ {"a": "Korona Kożuchów", "b": "MKS Nowe Miasteczko", "typ": "kosa"}
 ];

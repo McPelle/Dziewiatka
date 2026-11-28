@@ -3873,7 +3873,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Wisła Kraków",
    "Zagłębie Lubin",
    "Pogoń II Świebodzin",
-   "Korona II Kożuchów"
+   "Korona II Kożuchów",
+   "Korona Kożuchów"
   ]
  },
  "Carina Gubin": {
@@ -3916,7 +3917,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Promień Żary",
    "Miedź Legnica",
    "Górnik Wałbrzych",
-   "Korona II Kożuchów"
+   "Korona II Kożuchów",
+   "Korona Kożuchów"
   ]
  },
  "Dozamet Nowa Sól": {
@@ -4082,7 +4084,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Górnik Wałbrzych",
    "Polonia Świdnica",
    "Czarni II Żagań",
-   "Korona II Kożuchów"
+   "Korona II Kożuchów",
+   "Korona Kożuchów"
   ]
  },
  "Stal Jasień": {
@@ -4403,6 +4406,18 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Odra Opole",
    "Ruch Chorzów",
    "Unia Racibórz"
+  ]
+ },
+ "Korona Kożuchów": {
+  "ultras": [
+   "Ultras Polmo"
+  ],
+  "kosy": [
+   "Promień Żary",
+   "Sprotavia Szprotawa",
+   "Stilon Gorzów Wielkopolski",
+   "Czarni Żagań",
+   "MKS Nowe Miasteczko"
   ]
  }
 };
