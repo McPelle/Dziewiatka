@@ -368,7 +368,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Zawisza Bydgoszcz",
    "Stomil Olsztyn",
    "Pelikan Łowicz",
-   "Polonia Bytom"
+   "Polonia Bytom",
+   "Polonia Iłowo"
   ]
  },
  "Zagłębie Lubin": {
@@ -1460,7 +1461,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Olimpia Elbląg",
    "Polonia Bytom",
    "GKS Katowice",
-   "Górnik Zabrze"
+   "Górnik Zabrze",
+   "Zatoka Braniewo"
   ]
  },
  "Arka Gdynia": {
@@ -1547,7 +1549,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "ŁKS Łódź",
    "Olimpia Elbląg",
    "Stomil Olsztyn",
-   "Jeziorak Iława"
+   "Jeziorak Iława",
+   "DKS Dobre Miasto"
   ]
  },
  "Bruk-Bet Termalica Nieciecza": {
@@ -3012,7 +3015,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Olimpia Grudziądz",
    "Wigry Suwałki",
    "Granica Kętrzyn",
-   "MKS Mazur Ełk"
+   "MKS Mazur Ełk",
+   "Błękitni Orneta",
+   "Zatoka Braniewo"
   ],
   "fanklub": [
    "FANKLUB Barczewo",
@@ -3084,7 +3089,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "ŁKS Łomża",
    "MKS Mazur Ełk",
    "Sokół Ostróda",
-   "Wisła Nowe"
+   "Wisła Nowe",
+   "DKS Dobre Miasto",
+   "Zatoka Braniewo"
   ],
   "fanklub": [
    "FANKLUB Braniewo",
@@ -3256,7 +3263,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Jeziorak Iława",
    "Motor Lubawa",
    "Mazur Ełk",
-   "Sparta 1951 Szepietowo"
+   "Sparta 1951 Szepietowo",
+   "Mamry Giżycko",
+   "Mrągowia Mrągowo",
+   "DKS Dobre Miasto",
+   "Tęcza Biskupiec"
   ]
  },
  "Warmia Grajewo": {
@@ -3296,7 +3307,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Warmia Grajewo",
    "Znicz Biała Piska",
    "Orlęta Reszel",
-   "Mazur Ełk"
+   "Mazur Ełk",
+   "MKS Ruciane-Nida"
   ]
  },
  "Motor Lubawa": {
@@ -3324,7 +3336,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Sokół Ostróda",
    "Motor Lubawa",
    "Sparta Brodnica",
-   "Świt Nowy Dwór Mazowiecki"
+   "Świt Nowy Dwór Mazowiecki",
+   "DKS Dobre Miasto",
+   "Unia Susz"
   ]
  },
  "Orzeł Kolno": {
@@ -3565,6 +3579,105 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Ikar Krosino",
    "Światowid Łobez",
    "Światowid 63 Łobez"
+  ]
+ },
+ "Syrena Młynary": {
+  "ultras": [
+   "Ultras Syrena Młynary"
+  ],
+  "zgody": [
+   "Błękitni Orneta"
+  ],
+  "kosy": [
+   "Wałsza Pieniężno",
+   "Zatoka Braniewo"
+  ]
+ },
+ "GKS Wikielec": {
+  "ultras": [
+   "Wikielec Fans"
+  ],
+  "zgody": [
+   "GKS Ossa Biskupiec"
+  ]
+ },
+ "Mrągowia Mrągowo": {
+  "ultras": [
+   "Mrągowiacy"
+  ],
+  "kosy": [
+   "Granica Kętrzyn"
+  ]
+ },
+ "Start Nidzica": {
+  "ultras": [
+   "Szlachta Nidzica"
+  ]
+ },
+ "DKS Dobre Miasto": {
+  "ultras": [
+   "Młody DKS"
+  ],
+  "kosy": [
+   "Błękitni Orneta",
+   "Olimpia Elbląg",
+   "Mazur Ełk",
+   "Granica Kętrzyn",
+   "Drwęca Nowe Miasto Lubawskie",
+   "Arka Gdynia",
+   "Zatoka Braniewo"
+  ]
+ },
+ "Rominta Gołdap": {
+  "ultras": [
+   "Cresoviacy'07"
+  ],
+  "kosy": [
+   "Czarni Olecko"
+  ],
+  "zgody": [
+   "Pogoń Banie Mazurskie"
+  ]
+ },
+ "Tęcza Biskupiec": {
+  "ultras": [
+   "Tęcza Biskupiec Fans"
+  ],
+  "kosy": [
+   "Granica Kętrzyn"
+  ]
+ },
+ "Unia Susz": {
+  "ultras": [
+   "Fanatycy z Suskiej Dziczy"
+  ],
+  "kosy": [
+   "Drwęca Nowe Miasto Lubawskie",
+   "Pogoń Prabuty"
+  ]
+ },
+ "Zatoka Braniewo": {
+  "ultras": [
+   "UZB – Ultras Zatoka Braniewo"
+  ],
+  "kosy": [
+   "Jeziorak Iława",
+   "Motor Lubawa",
+   "Syrena Młynary",
+   "Błękitni Orneta",
+   "DKS Dobre Miasto",
+   "Stomil Olsztyn",
+   "Olimpia Elbląg",
+   "Lechia Gdańsk"
+  ]
+ },
+ "Znicz Biała Piska": {
+  "ultras": [
+   "Kibice Znicz Biała Piska"
+  ],
+  "kosy": [
+   "Mazur Pisz",
+   "Wissa Szczuczyn"
   ]
  }
 };

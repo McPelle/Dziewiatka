@@ -121,6 +121,14 @@ export const PRZYDOMKI: Record<string, string> = {
   // Zachodniopomorskie (runda 4) (runda 2) — przydomki potwierdzone w źródłach
   "Darłovia Darłowo": "Darłoviacy",
   "Vineta Wolin": "Wikingowie",
+  // Warmińsko-mazurskie (runda 4) (runda 2) — przydomki potwierdzone w źródłach
+  "Mazur Pisz": "Duma Mazur",
+  "Błękitni Orneta": "Duma Miasta Smoka",
+  "DKS Dobre Miasto": "Synowie Warmii",
+  "Motor Lubawa": "Motorowcy",
+  "Polonia Iłowo": "Poloniści",
+  "Rominta Gołdap": "Kresowiacy",
+  "Zatoka Braniewo": "Duma Warmii",
 };
 
 export function przydomek(nazwa: string): string | undefined {

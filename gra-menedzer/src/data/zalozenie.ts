@@ -1091,6 +1091,13 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Rurzyca Nawodna": 2009,
   "Vimobilia Będzino": 2005,
   "GKS Kołbaskowo/Przecław": 2023,
+  // Małopolska (runda 4) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "JKS Zelków": 1999,
+  "Lesisko Kraków": 2024,
+  "Olimpia Czaple Wielkie": 1999,
+  "Start Kamień": 1968,
+  "Partyzant Dojazdów": 1947,
+  "SPRiN Regulice": 1995,
 };
 
 /** Rok założenia klubu (jeśli znany). */

@@ -935,6 +935,8 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Hubertus Biały Bór": 250,
   "Wrzos Borne Sulinowo": 600,
   "Wrzos II Borne Sulinowo": 600,
+  // Małopolska (runda 4) (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Spółdzielca Grabno": 100,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */
