@@ -1409,6 +1409,26 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "1.FC Chronstau Chrząstowice": 1975,
   "LKS Chmielowice": 1999,
   "LZS Kamienica Nyska": 1950,
+  // Lubuskie (runda 3) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Maksymilian Gorzów Wielkopolski": 2007,
+  "Delta Stare Polichno": 1948,
+  "Błyskawica Lipie Góry": 2001,
+  "Leśnik Rąpin": 1978,
+  "KS Wysoka": 1988,
+  "Iskra Gorzów Wielkopolski": 2005,
+  "Leśnik Lemierzyce": 1953,
+  "Obra Policko": 1965,
+  "Zorza Ochla": 1947,
+  "Czarni Pałck": 1975,
+  "Kado Górzyn": 1949,
+  "Tramp Osiecznica": 1995,
+  "Odra Radnica": 1961,
+  "Odra Glińsk": 2011,
+  "Lubusze Rusinów": 1950,
+  "Rakovia Raków": 1977,
+  "Liwno Zabór": 1994,
+  "Kormoran Sława": 2025,
+  "Perła Cybinka": 2009,
 };
 
 /** Rok założenia klubu (jeśli znany). */
