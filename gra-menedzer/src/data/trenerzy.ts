@@ -228,6 +228,12 @@ export const TRENERZY: Record<string, TrenerReal> = {
   "Czarni Otmuchów": { imie: "Adrian", nazwisko: "Klakla" }, // Opolskie — południe; czarni-otmuchow.pl (2026-09)
   "Ruch Zdzieszowice": { imie: "Daniel", nazwisko: "Rychlewicz" }, // Opolskie (runda 8); tygodnik-krapkowicki.pl (2026-09-30)
   "MKS Gogolin": { imie: "Adam", nazwisko: "Sobek" }, // Opolskie (runda 8); tygodnik-krapkowicki.pl (2026-08-20)
+  "Chemik Kędzierzyn-Koźle": { imie: "Mateusz", nazwisko: "Bachem" }, // Opolskie (runda 8); tygodnik-krapkowicki.pl (2026-10-14)
+  "Unia Krapkowice": { imie: "Krzysztof", nazwisko: "Pluta" }, // Opolskie (runda 8); tygodnik-krapkowicki.pl (2026-10-14)
+  "LZS Racławiczki": { imie: "Tomasz", nazwisko: "Matysek" }, // Opolskie (runda 8); tygodnik-krapkowicki.pl (2026-08-27)
+  "LZS Żywocice": { imie: "Adam", nazwisko: "Gondek" }, // Opolskie (runda 8); tygodnik-krapkowicki.pl (2026-11-26)
+  "LZS Walce": { imie: "Leszek", nazwisko: "Juszczak" }, // Opolskie (runda 8); tygodnik-krapkowicki.pl (2026-11-26)
+  "Górnik Januszkowice": { imie: "Mariusz", nazwisko: "Kapłon" }, // Opolskie (runda 8); tygodnik-krapkowicki.pl (2026-09-02)
 };
 
 /** Licencja UEFA właściwa dla szczebla (realia PZPN: im wyżej, tym wyższy wymóg). */

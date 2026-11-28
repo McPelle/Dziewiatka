@@ -1466,6 +1466,8 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Sparta Nietkowice": 2015,
   // Opolskie (runda 8) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
   "Agra Zawada (k. Opola)": 1950,
+  // Opolskie (runda 8) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "GLKS Kamiennik": 1946,
 };
 
 /** Rok założenia klubu (jeśli znany). */

@@ -2,6 +2,7 @@
 // Dzięki temu oryginalny herb pokazuje się w KAŻDEJ karierze i na każdej liście (nie tylko tam, gdzie dane klubu mają pole `herb`).
 // Kluby bez pliku herbu (brak w nadesłanych herbach) dostają generowany emblemat w barwach klubu.
 export const HERB_PO_NAZWIE: Record<string, string> = {
+  "LZS Kórnica-Nowy Dwór": "nowy-opob-lzs-kornica-nowy-dwor",
   "SKS Dąbrowa": "nowy-opo1-sks-dabrowa",
   "Zatoka Gdańsk": "nowy-zatoka-gdansk",
   "Jutrzenka Ostrężnica": "nowy-jutrzenka-ostreznica",
