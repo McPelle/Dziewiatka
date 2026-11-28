@@ -1,3 +1,4 @@
+import { strefyTabeli } from "../engine/sezon";
 import { ProfilZawodnika } from "./ProfilZawodnika";
 import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
@@ -22,8 +23,8 @@ export function Tabela({ s }: { s: StanGry }) {
   const [xiIdx, setXiIdx] = useState<number | null>(null);
   const liga = s.ligi[poziom - 1];
   const tabela = tabelaLigi(s, liga);
-  const awans = poziom > 1 ? s.wymiana[poziom - 2] : 0;
-  const spadek = poziom < s.ligi.length ? s.wymiana[poziom - 1] : 0;
+  const strefy = strefyTabeli(s, poziom, tabela.length);
+  const wStrefie = (i: number, z: [number, number] | null) => !!z && i + 1 >= z[0] && i + 1 <= z[1];
 
   const zawodnicyLigi = (): Zawodnik[] =>
     liga.kluby.flatMap((kid) => s.kluby[kid].zawodnicy.map((id) => s.zawodnicy[id]));
@@ -87,12 +88,12 @@ export function Tabela({ s }: { s: StanGry }) {
               {tabela.map((w, i) => {
                 const k = s.kluby[w.klubId];
                 const moj = w.klubId === s.mojKlub;
-                const kolor = i < awans ? K.zielony : i >= tabela.length - spadek ? K.czerwony : "transparent";
+                const kolor = i < strefy.awans ? K.zielony : i >= tabela.length - strefy.spadek ? K.czerwony : wStrefie(i, strefy.barazA) ? "#7fd0ff" : wStrefie(i, strefy.barazU) ? "#ffb347" : "transparent";
                 return (
                   <Pressable key={w.klubId} onPress={() => setPodglad(w.klubId)} style={[st.wiersz, { paddingVertical: 7, marginVertical: 1.5, borderRadius: 10, backgroundColor: moj ? "rgba(255,206,71,0.12)" : i % 2 ? "rgba(255,255,255,0.025)" : "transparent" },
                     web(moj ? { backgroundImage: "linear-gradient(90deg, rgba(255,206,71,0.28), rgba(255,206,71,0.06))", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.18), 0 0 14px rgba(255,206,71,0.25)" } : { boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" })]}>
                     <View style={[{ width: 24, height: 24, borderRadius: 7, alignItems: "center", justifyContent: "center", marginRight: 6, backgroundColor: kolor === "transparent" ? "rgba(255,255,255,0.06)" : kolor },
-                      web({ backgroundImage: kolor === K.zielony ? "linear-gradient(180deg,#6ff0a4,#1f9a52)" : kolor === K.czerwony ? "linear-gradient(180deg,#ff8a93,#c22b38)" : "linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.03))", boxShadow: "0 2px 0 rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35)" })]}>
+                      web({ backgroundImage: kolor === K.zielony ? "linear-gradient(180deg,#6ff0a4,#1f9a52)" : kolor === K.czerwony ? "linear-gradient(180deg,#ff8a93,#c22b38)" : kolor === "#7fd0ff" ? "linear-gradient(180deg,#a9e2ff,#3a8fc7)" : kolor === "#ffb347" ? "linear-gradient(180deg,#ffd08a,#d9822b)" : "linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.03))", boxShadow: "0 2px 0 rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35)" })]}>
                       <Text style={{ color: kolor === "transparent" ? K.tekst : "#08130c", fontWeight: "900", fontSize: 12 }}>{i + 1}</Text>
                     </View>
                     <Herb klub={k} rozmiar={22} />
@@ -107,7 +108,12 @@ export function Tabela({ s }: { s: StanGry }) {
                 );
               })}
             </View>
-            <Text style={[st.maly, { marginHorizontal: 12, marginTop: 8 }]}>Zielone: awans ({awans}) · czerwone: spadek ({spadek})</Text>
+            <Text style={[st.maly, { marginHorizontal: 12, marginTop: 8 }]}>{[
+              strefy.awans ? `Zielone: awans bezpośredni (${strefy.awans})` : "",
+              strefy.barazA ? `niebieskie: baraż o awans (${strefy.barazA[0] === strefy.barazA[1] ? strefy.barazA[0] : `${strefy.barazA[0]}–${strefy.barazA[1]}`}. miejsce)` : "",
+              strefy.barazU ? `pomarańczowe: baraż o utrzymanie — dwumecz z wicemistrzem III ligi (${strefy.barazU[0]}–${strefy.barazU[1]}.)` : "",
+              strefy.spadek ? `czerwone: spadek (${strefy.spadek}${poziom === 4 && /3\.? ?Liga/i.test(liga.nazwa) ? " bazowo — liczba zależy od spadkowiczów z II ligi, wg uchwały PZPN VI/85" : ""})` : "",
+            ].filter(Boolean).join(" · ")}</Text>
             <View style={st.karta}>
               <Text style={st.naglowek}>Najlepsza obrona</Text>
               {[...tabela].sort((a, b) => a.bs - b.bs).slice(0, 3).map((w, i) => (

@@ -23,7 +23,7 @@ const GORA = [
     { nazwa: "Śląsk Wrocław", skrot: "ŚW", miasto: "Wrocław", herb: "308" },
     { nazwa: "Wieczysta Kraków", skrot: "WK", miasto: "Kraków", herb: "5936", stadion: "Stadion Miejski w Krakowie", adres: "ul. Kazimierza Chałupnika 16, 31-462 Kraków" },
   ] },
-  { nazwa: "Betclic 1 Liga", kluby: [
+  { nazwa: "Betclic 1. Liga", kluby: [
     { nazwa: "Polonia Warszawa", skrot: "PW", miasto: "Warszawa", herb: "306" },
     { nazwa: "ŁKS Łódź", skrot: "ŁŁ", miasto: "Łódź", herb: "3948" },
     { nazwa: "Lechia Gdańsk", skrot: "LG", miasto: "Gdańsk", herb: "313" },
@@ -43,7 +43,7 @@ const GORA = [
     { nazwa: "Chrobry Głogów", skrot: "CG", miasto: "Głogów", herb: "394" },
     { nazwa: "Odra Opole", skrot: "OO", miasto: "Opole", herb: "443", stadion: "Stadion Opolski", adres: "ul. L. Olejnika 1, 45-839 Opole" },
   ] },
-  { nazwa: "Betclic 2 Liga", kluby: [
+  { nazwa: "Betclic 2. Liga", kluby: [
     { nazwa: "Znicz Pruszków", skrot: "ZP", miasto: "Pruszków", herb: "414" },
     { nazwa: "GKS Tychy", skrot: "GT", miasto: "Tychy", herb: "325" },
     { nazwa: "Górnik Łęczna", skrot: "GŁ", miasto: "Łęczna", herb: "267", stadion: "Stadion Górnika Łęczna", adres: "al. Jana Pawła II 13, 21-010 Łęczna" },

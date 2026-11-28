@@ -28,8 +28,8 @@ const k = (nazwa: string, skrot: string, miasto: string): KlubDane => ({ nazwa, 
 
 export const LIGI_NAZWY = [
   "PKO BP Ekstraklasa",
-  "Betclic 1 Liga",
-  "Betclic 2 Liga",
+  "Betclic 1. Liga",
+  "Betclic 2. Liga",
   "III liga",
   "IV liga",
   "Klasa okręgowa",

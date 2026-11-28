@@ -171,6 +171,7 @@ export async function zapiszSlot(s: StanGry, opcje: { nowy?: boolean; id?: strin
 function przygotuj(s: StanGry): StanGry {
   migrujKariere(s);
   migrujTrenera(s);
+  for (const l of s.ligi ?? []) l.nazwa = l.nazwa.replace(/^Betclic ([12]) Liga$/, "Betclic $1. Liga"); // jednolite nazwy lig centralnych (drzewo awansów PZPN)
   odswiezKarieryRealne(s); // prawdziwe historie zawodników (Ekstraklasa → II liga) także w starych zapisach
   zarejestrujBarwy(s);          // barwy klubów stworzonych przez gracza
   aktualizujTypyKontraktow(s); // stare zapisy: wyrównaj kontrakty do szczebla klubu (np. amatorzy w IV/III lidze)

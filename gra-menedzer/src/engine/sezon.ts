@@ -677,8 +677,11 @@ export function premiaZaCel(s: StanGry): number {
  * Wierne reformie PZPN z 7.06.2024 (obowiązuje od 2024/25) oraz regulaminom Pomorskiego/Małopolskiego ZPN:
  *  • Ekstraklasa↔I liga: I liga 1–2 awans bezpośredni + 3–6 baraż o 1 miejsce; Ekstraklasa spada 16–18 BEZ barażu o utrzymanie → b=1, rb=0.
  *  • I↔II liga: II liga 1–2 bezpośrednio + 3–6 baraż; I liga baraż o utrzymanie zniesiony (2018) → b=1, rb=0.
- *  • II↔III liga: III liga mistrz grupy bezpośrednio + wicemistrz baraż; II liga spada bezpośrednio + 13–14 baraż o utrzymanie → b=1, rb=1.
- *  • III↔IV liga: IV liga mistrz bezpośrednio + wicemistrz baraż (dwustopniowy); III liga spada bez barażu o utrzymanie → b=1, rb=0.
+ *  • II↔III liga (Regulamin 1./2./3. Ligi 2026/27, uchwała VI/78, art. 11): 4 mistrzów grup III ligi bezpośrednio; II liga 15–18
+ *    spada; wicemistrzowie grup — I etap baraży (2 mecze, pary i gospodarze losowani), II etap — dwumecze z 13. i 14. drużyną
+ *    II ligi (pierwszy mecz u drużyny III ligi) → osobna funkcja granicaIIiIII.
+ *  • III↔IV liga (uchwała VI/85 z 7.06.2024, art. 5–6): w każdej grupie awansują mistrzowie IV lig jej 4 województw + zwycięzca
+ *    baraży ich wicemistrzów (półfinały i finał, pary i gospodarze losowani); spadek z III ligi zmienny → granicaIIIiIV.
  *  • IV↔V liga: V liga/okręgowa mistrz + baraż awansowy; IV liga spada bezpośrednio → b=1, rb=0.
  *  • V↔klasa A: klasa A mistrz + baraż o awans do klasy okręgowej/V ligi (Pomorski/Małopolski ZPN) → b=1, rb=0.
  *  • klasa A↔klasa B: zwycięzca grupy B awansuje bezpośrednio, bez barażu → b=0, rb=0.
@@ -687,11 +690,26 @@ function regulyBarazy(poziomGorny: number, n: number): { b: number; rb: number }
   if (n < 2) return { b: 0, rb: 0 };
   if (poziomGorny === 1) return { b: 1, rb: 0 }; // Ekstraklasa/I liga
   if (poziomGorny === 2) return { b: 1, rb: 0 }; // I/II liga
-  if (poziomGorny === 3) return { b: 1, rb: 1 }; // II/III liga — II liga ma baraż o utrzymanie
-  if (poziomGorny === 4) return { b: 1, rb: 0 }; // III/IV liga
+  if (poziomGorny === 3) return { b: 0, rb: 0 }; // II/III liga — osobny format PZPN (granicaIIiIII)
+  if (poziomGorny === 4) return { b: 0, rb: 0 }; // III/IV liga — osobny format PZPN (granicaIIIiIV)
   if (poziomGorny === 5) return { b: 1, rb: 0 }; // IV liga/V liga — baraż awansowy do IV ligi
   if (poziomGorny === 6) return { b: 1, rb: 0 }; // V liga/klasa A — baraż o awans do klasy okręgowej/V ligi
   return { b: 0, rb: 0 };                        // klasa A/klasa B — mistrz grupy bezpośrednio
+}
+
+/** Strefy tabeli wg PZPN 2026/27 (do kolorowania): bezpośredni awans, baraż o awans, baraż o utrzymanie, spadek.
+ *  Ekstraklasa: 16–18 spadek. I liga: 1–2 awans, 3–6 baraż, 16–18 spadek. II liga: 1–2 awans, 3–6 baraż, 13–14 baraż
+ *  (dwumecz z wicemistrzem III ligi), 15–18 spadek. III liga: 1 awans, 2 baraż (I etap wicemistrzów), 15–18 spadek
+ *  (bazowo — liczba zależy od spadkowiczów z II ligi). Niżej — wg regulaminów ZPN (wymiana ścieżki). */
+export function strefyTabeli(s: StanGry, poziom: number, n: number): { awans: number; barazA: [number, number] | null; barazU: [number, number] | null; spadek: number } {
+  const central = /Ekstraklasa|[123]\.? ?Liga/i.test(s.ligi[poziom - 1]?.nazwa ?? "");
+  if (central && poziom === 1) return { awans: 0, barazA: null, barazU: null, spadek: 3 };
+  if (central && poziom === 2) return { awans: 2, barazA: [3, 6], barazU: null, spadek: 3 };
+  if (central && poziom === 3) return { awans: 2, barazA: [3, 6], barazU: [n - 5, n - 4], spadek: 4 };
+  if (central && poziom === 4) return { awans: 1, barazA: [2, 2], barazU: null, spadek: 4 };
+  const awans = poziom > 1 ? s.wymiana[poziom - 2] : 0;
+  const { b } = poziom > 1 ? regulyBarazy(poziom - 1, awans) : { b: 0 };
+  return { awans: awans - b, barazA: b > 0 ? [awans - b + 1, awans - b + 4 * b] : null, barazU: null, spadek: poziom < s.ligi.length ? s.wymiana[poziom - 1] : 0 };
 }
 
 /** Jeden mecz barażowy wg PZPN: na boisku WYŻEJ sklasyfikowanego (przewaga własnego boiska).
@@ -738,7 +756,8 @@ function baraz(s: StanGry, klubIds: string[], ileZostaje: number, kontekst: "awa
       next.push(zwyc);
     }
     if (pula.length % 2 === 1) next.push(pula[polowa]); // nieparzysta pula: środkowy wolny los
-    pula = next; // zwycięzcy w kolejności rozstawienia (wyżej rozstawiony zostaje gospodarzem w finale)
+    // PZPN (VI/77, VI/78): w finale gospodarzem jest drużyna WYŻEJ sklasyfikowana w tabeli sezonu zasadniczego
+    pula = next.sort((a, b) => klubIds.indexOf(a) - klubIds.indexOf(b));
   }
   return pula;
 }
@@ -1198,8 +1217,9 @@ function zasluzoneZaufanie(s: StanGry): number {
   const poz = tab.findIndex((w) => w.klubId === s.mojKlub) + 1;
   if (poz === 0) return s.zarzad;
   const poziom = s.kluby[s.mojKlub].poziom;
-  const promo = poziom > 1 ? s.wymiana[poziom - 2] : 2;
-  const spadkowcy = poziom < s.ligi.length ? s.wymiana[poziom - 1] : 0;
+  const st = strefyTabeli(s, poziom, n);
+  const promo = poziom > 1 ? st.awans + (st.barazA ? 1 : 0) : 2; // awans bezpośredni lub przez baraże (PZPN)
+  const spadkowcy = st.spadek;
   const nadSpadkiem = n - spadkowcy;
   if (s.cel === "Awans") return poz <= promo ? 85 : poz <= promo + 2 ? 60 : poz <= n / 2 ? 45 : 28;
   if (s.cel === "Górna połowa tabeli") return poz <= n / 2 ? 75 : poz <= n / 2 + 2 ? 52 : poz <= nadSpadkiem ? 40 : 25;
@@ -1580,6 +1600,110 @@ function awanseZRodzenstwa(s: StanGry, i: number, n: number): string[] {
   }
   return out;
 }
+
+// ——— Granice lig centralnych wg PZPN 2026/27 (uchwały VI/77, VI/78 z 14.05.2026; VI/85 z 7.06.2024) ———
+/** Siła „wirtualnego" rywala z grupy spoza symulacji (np. wicemistrz innej grupy III ligi) — średnia czołówki symulowanej ligi. */
+function silaWirtualna(s: StanGry, ids: string[]): number {
+  const t = ids.filter(Boolean).map((id) => silaKlubu(s, id));
+  return (t.length ? t.reduce((a, b) => a + b, 0) / t.length : 55) * los(0.94, 1.06);
+}
+/** Prawdziwy klub z danego województwa, który „przychodzi" z rozgrywek spoza symulacji (mistrz IV ligi innego województwa,
+ *  zwycięzca baraży innej grupy): najpierw kluby, które wcześniej wypadły z piramidy, potem kluby z danych (IV liga, III liga). */
+function klubZWojewodztwa(s: StanGry, woj: string, poziom: number, zrodla: string[] = []): string | null {
+  const wGrze = new Set(s.ligi.flatMap((l) => l.kluby).map((id) => s.kluby[id]?.nazwa));
+  const poza = Object.values(s.kluby).filter((k) => k.pozaPiramida && !k.wycofany && !k.rezerwaDla && !/\s(II|III|IV)(\s|$)/.test(k.nazwa) && wojKlubu(k) === woj && !wGrze.has(k.nazwa));
+  if (poza.length) { const k = [...poza].sort((a, b) => b.renoma - a.renoma)[Math.min(poza.length - 1, losInt(0, 2))]; return wprowadzKlub(s, k, poziom); }
+  for (const lg of zrodla) {
+    const dane = klubyLigiZDanych(lg).filter((d) => !wGrze.has(d.nazwa) && !/\s(II|III|IV)(\s|$)/.test(d.nazwa) && (wojKlubu(d) === woj || !wojKlubu(d)));
+    if (dane.length) return wprowadzKlub(s, dane[losInt(0, Math.min(dane.length - 1, 4))], poziom);
+  }
+  return null;
+}
+/** Klub z innej grupy III ligi (zwycięzca baraży spoza symulacji). */
+function klubZGrupy(s: StanGry, grupy: string[], poziom: number): string | null {
+  const wGrze = new Set(s.ligi.flatMap((l) => l.kluby).map((id) => s.kluby[id]?.nazwa));
+  const dane = tasuj(grupy.flatMap((g) => klubyLigiZDanych(g))).filter((d) => !wGrze.has(d.nazwa) && !/\s(II|III|IV)(\s|$)/.test(d.nazwa));
+  return dane.length ? wprowadzKlub(s, dane[0], poziom) : null;
+}
+
+/** II liga ↔ III liga (VI/78 art. 11): mistrz Twojej grupy III ligi awansuje bezpośrednio; II liga 15–18 spada;
+ *  I etap baraży — 4 wicemistrzów grup, 2 mecze (pary i gospodarze losowani, dogrywka i karne);
+ *  II etap — zwycięzcy grają DWUMECZE z 13. i 14. drużyną II ligi (pierwszy mecz u drużyny z III ligi). */
+function granicaIIiIII(s: StanGry, gorna: string[], dolnaE: string[]): { awans: string[]; wirt: string[]; spadaja: string[] } {
+  const nazwaG = s.ligi[2].nazwa, nazwaD = s.ligi[3].nazwa;
+  const mistrz = dolnaE[0], wice = dolnaE[1];
+  const awans = mistrz ? [mistrz] : [], wirt: string[] = [];
+  const spadaja = gorna.slice(Math.max(0, gorna.length - 4)); // 15–18 bezpośrednio
+  if (!wice || gorna.length < 16) return { awans, wirt, spadaja };
+  const moj = (id?: string) => !!id && id === s.mojKlub;
+  const sV = () => silaWirtualna(s, dolnaE.slice(1, 5));
+  // I etap: 4 wicemistrzów (Twój + 3 z grup spoza symulacji), losowanie par i gospodarzy
+  type U = { id?: string; sila: number };
+  const uczestnicy: U[] = tasuj([{ id: wice, sila: silaKlubu(s, wice) }, { sila: sV() }, { sila: sV() }, { sila: sV() }]);
+  const zwyc1: U[] = [];
+  for (const [a, b] of [[uczestnicy[0], uczestnicy[1]], [uczestnicy[2], uczestnicy[3]]]) {
+    const r = rozstrzygnij(a.sila, b.sila, { dogrywka: true });
+    const w = r.zwyciezca === "dom" ? a : b;
+    zwyc1.push(w);
+    if (moj(a.id) || moj(b.id)) {
+      const uSiebie = moj(a.id);
+      wiadomosc(s, moj(w.id) ? `⚽ Baraże o II ligę — I etap (${uSiebie ? "u siebie" : "na wyjeździe"}, wicemistrz innej grupy): ${r.tekst} — wygrana! Teraz dwumecz z drużyną II ligi.`
+        : `⚽ Baraże o II ligę — I etap (${uSiebie ? "u siebie" : "na wyjeździe"}): ${r.tekst} — porażka, zostajecie w ${nazwaD}.`);
+    }
+  }
+  // II etap: losowanie, kto gra z 13., a kto z 14. drużyną II ligi; dwumecz, pierwszy mecz u drużyny z III ligi
+  const [p1, p2] = tasuj(zwyc1);
+  const g13 = gorna[gorna.length - 6], g14 = gorna[gorna.length - 5];
+  for (const [u, g] of [[p1, g13], [p2, g14]] as [U, string][]) {
+    const d = dwumecz(u.sila, silaKlubu(s, g));
+    const wygralIII = d.zwyciezcaA;
+    if (moj(u.id) || moj(g)) {
+      const ja = moj(u.id) ? "III" : "II";
+      const wygralem = ja === "III" ? wygralIII : !wygralIII;
+      wiadomosc(s, `⚽ Baraże o II ligę — II etap, dwumecz ${moj(u.id) ? `z ${s.kluby[g].nazwa}` : "z wicemistrzem grupy III ligi"}: ${d.tekst} — ${wygralem ? (ja === "III" ? "AWANS do II ligi!" : "UTRZYMANIE w II lidze!") : (ja === "III" ? "porażka, zostajecie w III lidze." : "spadek do III ligi.")}`);
+    }
+    if (!wygralIII) continue;
+    spadaja.push(g);
+    if (u.id) awans.push(u.id);
+    else { const id = klubZGrupy(s, rodzenstwo(nazwaG, nazwaD), 3); if (id) wirt.push(id); }
+  }
+  return { awans, wirt, spadaja };
+}
+
+/** III liga ↔ IV liga (uchwała VI/85, art. 5–6): w grupie III ligi awansują mistrzowie IV lig wszystkich jej województw
+ *  oraz zwycięzca baraży ich wicemistrzów (półfinały i finał — jeden mecz, pary i gospodarze losowani). */
+function granicaIIIiIV(s: StanGry, dolnaE: string[]): { awans: string[]; wirt: string[] } {
+  const nazwaG = s.ligi[3].nazwa, nazwaD = s.ligi[4].nazwa;
+  const mojeWoj = wojLigi(nazwaD)?.[0];
+  const wojGrupy = (wojLigi(nazwaG) ?? []).filter((w) => w !== mojeWoj);
+  const mistrz = dolnaE[0], wice = dolnaE[1];
+  const awans = mistrz ? [mistrz] : [], wirt: string[] = [];
+  const zrodlaWoj = (w: string) => { const out: string[] = []; for (const g of rodzenstwo(nazwaG, nazwaD)) if ((wojLigi(g) ?? []).includes(w as never)) out.push(g); return out; };
+  // mistrzowie IV lig pozostałych województw grupy
+  for (const w of wojGrupy) { const id = klubZWojewodztwa(s, w, 4, zrodlaWoj(w)); if (id) wirt.push(id); }
+  if (!wice) return { awans, wirt };
+  // baraż wicemistrzów: Twój + 3 z pozostałych województw grupy
+  type U = { id?: string; sila: number; woj?: string };
+  const sV = () => silaWirtualna(s, dolnaE.slice(1, 4));
+  const pula: U[] = tasuj([{ id: wice, sila: silaKlubu(s, wice) }, ...wojGrupy.slice(0, 3).map((w) => ({ sila: sV(), woj: w }))]);
+  while (pula.length < 4) pula.push({ sila: sV() });
+  const gra = (a: U, b: U, runda: string): U => {
+    const r = rozstrzygnij(a.sila, b.sila, { dogrywka: dogrywkaWBarazu(s, 4) });
+    const w = r.zwyciezca === "dom" ? a : b;
+    if (a.id === s.mojKlub || b.id === s.mojKlub) {
+      const uSiebie = a.id === s.mojKlub;
+      wiadomosc(s, w.id === s.mojKlub ? `⚽ Baraże o III ligę — ${runda} (${uSiebie ? "u siebie" : "na wyjeździe"}, wicemistrz IV ligi ${uSiebie ? (b.woj ?? "") : (a.woj ?? "")}): ${r.tekst} — wygrana!`
+        : `⚽ Baraże o III ligę — ${runda} (${uSiebie ? "u siebie" : "na wyjeździe"}): ${r.tekst} — porażka.`);
+    }
+    return w;
+  };
+  const f1 = gra(pula[0], pula[1], "półfinał"), f2 = gra(pula[2], pula[3], "półfinał");
+  const [fa, fb] = tasuj([f1, f2]); // gospodarz finału losowany
+  const zw = gra(fa, fb, "finał");
+  if (zw.id) { awans.push(zw.id); if (zw.id === s.mojKlub) wiadomosc(s, "🎉 Awans do III ligi przez baraże wicemistrzów IV lig!"); }
+  else { const id = zw.woj ? klubZWojewodztwa(s, zw.woj, 4, zrodlaWoj(zw.woj)) : null; if (id) wirt.push(id); }
+  return { awans, wirt };
+}
 /** Wprowadza do piramidy klub z danych (reaktywuje go, jeśli wcześniej z niej wypadł). Kadra generowana na poziomie `poziom`. */
 function wprowadzKlub(s: StanGry, d: { nazwa: string; skrot: string; miasto: string; herb?: string; stadion?: string; adres?: string }, poziom: number): string {
   const stary = Object.values(s.kluby).find((k) => k.nazwa === d.nazwa && k.pozaPiramida);
@@ -1608,6 +1732,7 @@ function zalozNowyKlub(s: StanGry, ost: number): string | null {
     const rdzen = wybierz(ZALOZENIA);
     const nazwa = rdzen === "Orlik" ? `UKS Orlik ${miasto}` : `${rdzen} ${miasto}`;
     if (Object.values(s.kluby).some((k) => k.nazwa === nazwa)) continue;
+    { const w = wojKlubu({ nazwa, miasto: "" }); const wl = wojLigi(s.ligi[ost].nazwa)?.[0]; if (w && wl && w !== wl) continue; } // nazwa zajęta przez realny klub z innego województwa
     const id = wprowadzKlub(s, { nazwa, skrot: nazwa.split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase(), miasto, stadion: `Boisko w ${miasto}` }, ost + 1);
     const k = s.kluby[id];
     k.prawdziwy = false; k.zalozony = s.sezon + 1; k.renoma = 0.05; k.kasa = Math.round(k.kasa * 0.5); k.pojemnosc = 100;
@@ -1721,9 +1846,13 @@ export function nowySezon(s: StanGry) {
       } else wiadomosc(s, `📉 ${k.nazwa} wycofał się z rozgrywek ${s.ligi[i].nazwa} (problemy finansowe) — grupa w nowym sezonie będzie mniejsza.`);
     }
     const ileWycofanych = wycofani.length;
+    // Granice centralne wg PZPN 2026/27: II↔III liga i III↔IV liga mają własny format baraży.
+    let spadajaPZPN: string[] | null = null, wirtPZPN: string[] = [];
+    if (i === 2 && /2\.? ?Liga|II liga/i.test(s.ligi[2].nazwa)) { const g = granicaIIiIII(s, gorna, dolnaE); awansuja = g.awans; wirtPZPN = g.wirt; spadajaPZPN = g.spadaja; }
+    else if (i === 3 && /3\.? ?Liga|III liga/i.test(s.ligi[3].nazwa)) { const g = granicaIIIiIV(s, dolnaE); awansuja = g.awans; wirtPZPN = g.wirt; }
     wGore[i + 1] = awansuja;
-    // Awanse z grup-rodzeństwa (spoza Twojej piramidy, np. mistrz IV ligi innego województwa grupy III ligi).
-    const wirtualni = awanseZRodzenstwa(s, i, n);
+    // Awanse z grup-rodzeństwa (spoza Twojej piramidy, np. mistrzowie pozostałych grup III ligi → II liga).
+    const wirtualni = i === 3 && wirtPZPN.length ? wirtPZPN : [...awanseZRodzenstwa(s, i, n), ...wirtPZPN];
     // Ilu musi spaść, by liga zachowała rozmiar: przybywają awansujący + zgodni regionalnie z góry, ubywają awansujący wyżej.
     let ileSpada = Math.max(0, Math.min(gorna.length - 2, awansuja.length + wirtualni.length + zGory[i].length - wGore[i].length - (klasaZmienna(s.ligi[i].nazwa) ? 0 : ileWycofanych)));
     // Klasy okręgowe/A/B/C: liczebność grup realnie waha się co sezon (wycofania, nowe zgłoszenia, spadki zależne) — ±1.
@@ -1738,7 +1867,7 @@ export function nowySezon(s: StanGry) {
     const strefaUtrzym = rbE > 0 ? kandydaci.slice(kandydaci.length - directDown - 2 * rbE, kandydaci.length - directDown) : [];
     const utrzymani = rbE > 0 ? baraz(s, strefaUtrzym, rbE, "utrzymanie") : [];
     const spadekBaraz = strefaUtrzym.filter((id) => !utrzymani.includes(id));
-    const spadaja = [...kandydaci.slice(kandydaci.length - directDown), ...spadekBaraz];
+    const spadaja = spadajaPZPN ?? [...kandydaci.slice(kandydaci.length - directDown), ...spadekBaraz];
     if (s.mojKlub && awansBaraz.includes(s.mojKlub)) wiadomosc(s, "🎉 Awans przez baraże!");
     if (s.mojKlub && spadekBaraz.includes(s.mojKlub)) wiadomosc(s, "💔 Spadek po przegranym barażu o utrzymanie.");
     // Podział spadkowiczów: do Twojej ligi niżej tylko ci z tego regionu; reszta — do swoich lig (poza symulacją).
@@ -3657,7 +3786,8 @@ export function zapiszBaraz(s: StanGry, gd: number, gg: number, dogrywka: boolea
   // runda zakończona → finał (zwycięzcy w kolejności par; gospodarzem lepiej rozstawiony)
   const runda = b.mecze.filter((x) => x.runda === m.runda);
   if (m.runda === "Półfinał baraży" && runda.every((x) => x.zwyc)) {
-    const zw = runda.map((x) => x.zwyc!);
+    const tabM = tabelaLigi(s, s.ligi[s.kluby[s.mojKlub].poziom - 1]).map((w) => w.klubId);
+    const zw = runda.map((x) => x.zwyc!).sort((a, b) => tabM.indexOf(a) - tabM.indexOf(b)); // gospodarz finału: wyżej w tabeli
     if (zw.length >= 2 && !b.mecze.some((x) => x.runda === "Finał baraży")) {
       const fin = { runda: "Finał baraży", dom: zw[0], gosc: zw[1] } as { runda: string; dom: string; gosc: string; wynik?: string; zwyc?: string };
       b.mecze.push(fin);

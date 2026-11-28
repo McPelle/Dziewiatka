@@ -9,7 +9,7 @@ const R = (s: StanGry) => s as unknown as { reorganizacja?: Reorg };
 /** W połowie sezonu: rzadko ZPN ogłasza reorganizację dla szczebla wojewódzkiego (IV liga i niżej). */
 export function ogloszenieReorganizacji(s: StanGry, r: number, n: number): string | null {
   if (r !== Math.ceil(n / 2) || R(s).reorganizacja?.sezon === s.sezon || Math.random() > 0.09) return null;
-  const kand = s.wymiana.map((w, i) => ({ w, i })).filter((x) => x.i >= 3 && x.i + 1 < s.ligi.length); // granice od IV ligi w dół
+  const kand = s.wymiana.map((w, i) => ({ w, i })).filter((x) => x.i >= 4 && x.i + 1 < s.ligi.length); // tylko granice ZPN (IV liga ↔ niżej); III↔IV liga reguluje PZPN (VI/85)
   if (!kand.length) return null;
   const { w, i } = kand[Math.floor(Math.random() * kand.length)];
   const na = Math.max(1, Math.min(5, w + (Math.random() < 0.6 ? 1 : -1))); if (na === w) return null;
