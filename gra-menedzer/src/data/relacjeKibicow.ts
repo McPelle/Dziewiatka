@@ -2794,5 +2794,9 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
  {"a": "Zatoka Braniewo", "b": "Stomil Olsztyn", "typ": "kosa"},
  {"a": "Zatoka Braniewo", "b": "Olimpia Elbląg", "typ": "kosa"},
  {"a": "Zatoka Braniewo", "b": "Lechia Gdańsk", "typ": "kosa"},
- {"a": "Znicz Biała Piska", "b": "Wissa Szczuczyn", "typ": "kosa"}
+ {"a": "Znicz Biała Piska", "b": "Wissa Szczuczyn", "typ": "kosa"},
+ {"a": "Stolem Gniewino", "b": "Sokół Bożepole Wielkie", "typ": "zgoda"},
+ {"a": "Stolem Gniewino", "b": "Bałtyk Gdynia", "typ": "kosa"},
+ {"a": "Stolem Gniewino", "b": "Chojniczanka Chojnice", "typ": "kosa"},
+ {"a": "Wybrzeże Rewalskie Rewal", "b": "Flota Świnoujście", "typ": "kosa"}
 ];

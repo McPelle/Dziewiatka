@@ -940,6 +940,8 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   // Pomorskie (runda 4) (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
   "Latarnik Choczewo": 490,
   "Latarnik II Choczewo": 490,
+  // Zachodniopomorskie (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Dąbrovia Stara Dąbrowa": 500,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

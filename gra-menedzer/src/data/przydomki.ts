@@ -131,6 +131,10 @@ export const PRZYDOMKI: Record<string, string> = {
   "Zatoka Braniewo": "Duma Warmii",
   // Pomorskie (runda 4) (runda 2) — przydomki potwierdzone w źródłach
   "Piast Człuchów": "Duma Człuchowa",
+  // Pomorskie (runda 2) — przydomki potwierdzone w źródłach
+  "Styna Godziszewo": "Kociewscy Rossoneri",
+  "Stolem Gniewino": "Stolemy",
+  "Radunia Stężyca": "Duma Kaszub",
 };
 
 export function przydomek(nazwa: string): string | undefined {

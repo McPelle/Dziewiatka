@@ -1102,6 +1102,12 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Sokół Ełganowo": 1956,
   "KS Włynkówko": 2006,
   "Sobieski Gniew": 2011,
+  // Pomorskie (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "FPT Banino": 2023,
+  "Szpak Skórcz": 1999,
+  // Zachodniopomorskie (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Chrobry Boleszkowice": 1955,
+  "Czapla Czaplinek": 2025,
 };
 
 /** Rok założenia klubu (jeśli znany). */

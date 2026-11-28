@@ -1693,7 +1693,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "kosy": [
    "Arka Gdynia",
    "Olimpia Grudziądz",
-   "Pogoń Lębork"
+   "Pogoń Lębork",
+   "Stolem Gniewino"
   ]
  },
  "Stal Stalowa Wola": {
@@ -2007,7 +2008,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Arka Gdynia",
-   "Kaszubia Kościerzyna"
+   "Kaszubia Kościerzyna",
+   "Stolem Gniewino"
   ]
  },
  "Gryf Słupsk": {
@@ -2189,7 +2191,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Gryf Wejherowo",
    "Energetyk Gryfino",
    "Odra Chojna",
-   "Stilon Gorzów Wielkopolski"
+   "Stilon Gorzów Wielkopolski",
+   "Wybrzeże Rewalskie Rewal"
   ]
  },
  "Pomezania Malbork": {
@@ -3678,6 +3681,24 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "kosy": [
    "Mazur Pisz",
    "Wissa Szczuczyn"
+  ]
+ },
+ "Stolem Gniewino": {
+  "ultras": [
+   "Ultras Stolem",
+   "Młode Gniewino"
+  ],
+  "zgody": [
+   "Sokół Bożepole Wielkie"
+  ],
+  "kosy": [
+   "Bałtyk Gdynia",
+   "Chojniczanka Chojnice"
+  ]
+ },
+ "Radunia Stężyca": {
+  "ultras": [
+   "Raduniacy"
   ]
  }
 };
