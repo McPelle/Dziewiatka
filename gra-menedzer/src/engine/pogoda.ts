@@ -21,6 +21,8 @@ export function nadmorskie(miasto: string): boolean {
 const GORSKIE = [
   "Zakopane", "Nowy Targ", "Białka Tatrzańska", "Bukowina", "Poronin", "Muszyna", "Krynica", "Szczawnica",
   "Limanowa", "Maniowy", "Mszana Dolna", "Rabka", "Nowy Sącz", "Gorlice", "Andrychów", "Jordanów", "Sucha Beskidzka",
+  // Opolskie — Góry Opawskie (przedgórze Sudetów): zimą śnieg
+  "Głuchołazy", "Jarnołtówek", "Pokrzywna", "Biała", "Prudnik",
 ];
 /** Czy miejscowość jest górska/podgórska (większa szansa śniegu i mrozu zimą). */
 export function gorskie(miasto: string): boolean {
@@ -52,6 +54,11 @@ const DOLINY = [
   "Biskupiec", "Barczewo", "Morąg", "Olecko", "Orzysz", "Ryn", "Kętrzyn", "Lubawa", "Nowe Miasto Lubawskie",
   // Podlaskie — Pojezierze Augustowskie i Wschodniosuwalskie, doliny Narwi i Biebrzy
   "Augustów", "Sejny", "Łomża", "Wizna", "Goniądz", "Tykocin", "Supraśl",
+  // Lubuskie — doliny Odry, Warty, Obry i Bobru, Pojezierze Lubuskie i Łagowskie
+  "Gorzów Wielkopolski", "Kostrzyn", "Słubice", "Krosno Odrzańskie", "Nowa Sól", "Bytom Odrzański", "Santok", "Skwierzyna",
+  "Międzyrzecz", "Sulęcin", "Łagów", "Lubniewice", "Świebodzin", "Sława", "Żagań", "Gubin", "Cybinka", "Drezdenko",
+  // Opolskie — dolina Odry i Nysy Kłodzkiej, Jezioro Nyskie i Turawskie
+  "Opole", "Brzeg", "Krapkowice", "Kędzierzyn-Koźle", "Zdzieszowice", "Gogolin", "Nysa", "Otmuchów", "Turawa", "Ozimek", "Lewin Brzeski",
 ];
 // „Polski biegun zimna": Suwalszczyzna, północne Podlasie i wschodnie Mazury — najdłuższa i najmroźniejsza zima na niżu
 // (stacja IMGW Suwałki). Późną jesienią i wczesną wiosną częściej śnieg i mróz (jak w górach, nieco łagodniej).

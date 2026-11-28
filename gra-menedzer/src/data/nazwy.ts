@@ -51,3 +51,21 @@ export const NAZWISKA_GORALSKIE = [
   "Suleja", "Rzadkosz", "Dziubas", "Topór", "Sieczka", "Pawlikowski", "Jarząbek", "Gal", "Majerczyk", "Walczak",
   "Szczepaniak", "Palenik", "Kuchta", "Sowa", "Dziedzic", "Wnęk", "Potaczek", "Rusnak", "Michalczak", "Pierwoła",
 ];
+/** Nazwiska typowe dla Opolszczyzny (śląskie, w tym pochodzenia niemieckiego — mniejszość niemiecka, Śląsk Opolski). */
+export const NAZWISKA_SLASKIE = [
+  "Kowollik", "Kandziora", "Piechaczek", "Kotula", "Gawlik", "Pientka", "Wodarz", "Pyka", "Bonk", "Kandzia", "Mainka", "Kozub",
+  "Wycisk", "Sładek", "Prochota", "Paszek", "Kupka", "Hanke", "Ploch", "Wiench", "Kurpiers", "Matheja", "Kampa", "Brysch",
+  "Galuschka", "Kasperek", "Niestroj", "Lysko", "Kalla", "Piontek", "Morawiec", "Gabor", "Klimas", "Wiesiolek", "Smolarczyk", "Golasz",
+];
+/** Nazwiska typowe dla południowo-wschodniego Podlasia (mniejszość białoruska: Hajnówka, Bielsk Podlaski, Czeremcha). */
+export const NAZWISKA_PODLASKIE = [
+  "Kiryluk", "Jakimiuk", "Ostapczuk", "Kondratiuk", "Wasiluk", "Pietruczuk", "Szymaniuk", "Mironiuk", "Romaniuk", "Grygoruk",
+  "Kuptel", "Łukaszuk", "Charkiewicz", "Sidoruk", "Konachowicz", "Tichoniuk", "Hryniewicki", "Martyniuk", "Bondaruk", "Jaroszuk",
+  "Sawczuk", "Trochimiuk", "Nikołajuk", "Lewczuk", "Dmitruk", "Kalinowski", "Gierasimiuk", "Wawreniuk",
+];
+/** Nazwiska mazurskie i warmińskie (ludność rodzima Warmii i Mazur). */
+export const NAZWISKA_MAZURSKIE = [
+  "Kowalewski", "Jabłonowski", "Rogala", "Barczewski", "Kuczyński", "Grajewski", "Sadowski", "Liszewski", "Ruchniewicz",
+  "Swora", "Bałdyga", "Piotrowski", "Kropiwnicki", "Pianka", "Oleszkiewicz", "Gerss", "Sentkowski", "Kowalczyk",
+];
+

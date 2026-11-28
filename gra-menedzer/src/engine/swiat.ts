@@ -7,7 +7,7 @@ import { przypiszTrenera } from "../data/trenerzy";
 import { obsadzSztabKlubu, odswiezRynekSztabu } from "./sztab";
 import { generujPuleSedziow } from "../data/sedziowie";
 import { losujAgentaReal } from "../data/agenci";
-import { IMIONA, MIANA, MIEJSCOWOSCI, NAZWISKA, NAZWISKA_KASZUBSKIE, NAZWISKA_GORALSKIE, PRZEDROSTKI } from "../data/nazwy";
+import { IMIONA, MIANA, MIEJSCOWOSCI, NAZWISKA, NAZWISKA_KASZUBSKIE, NAZWISKA_GORALSKIE, PRZEDROSTKI, NAZWISKA_MAZURSKIE, NAZWISKA_PODLASKIE, NAZWISKA_SLASKIE } from "../data/nazwy";
 import ROSTERY_JSON from "../../assets/rostery.json";
 import ROSTERY_POZ_JSON from "../../assets/rostery-poz.json";
 import ROSTERY_PELNE_JSON from "../../assets/rostery-pelne.json";
@@ -77,6 +77,9 @@ function nazwiskoRegionalne(sciezka: string | undefined): string {
   // kolejność ważna: zach-pom i kuj-pom zawierają „pomor", ale nie są kaszubskie
   if (/zachodniopomor|kujawsko/.test(s)) return wybierz(NAZWISKA); // regiony osadnicze — pula krajowa
   if (/pomor/.test(s)) return szansa(0.45) ? wybierz(NAZWISKA_KASZUBSKIE) : wybierz(NAZWISKA); // Pomorze — kaszubskie
+  if (/^opolskie/.test(s)) return szansa(0.3) ? wybierz(NAZWISKA_SLASKIE) : wybierz(NAZWISKA); // Śląsk Opolski
+  if (/^podlaskie/.test(s)) return szansa(/bielsk|hajnów|hajnow/.test(s) ? 0.4 : 0.12) ? wybierz(NAZWISKA_PODLASKIE) : wybierz(NAZWISKA);
+  if (/^warmińsko|^warminsko/.test(s)) return szansa(0.12) ? wybierz(NAZWISKA_MAZURSKIE) : wybierz(NAZWISKA);
   if (/małopol|malopol/.test(s)) {
     const goral = /podhale|limanow|gorlic|nowy sącz|nowy sacz|tatr/.test(s) ? 0.5 : 0.18; // silniej na południu
     return szansa(goral) ? wybierz(NAZWISKA_GORALSKIE) : wybierz(NAZWISKA);

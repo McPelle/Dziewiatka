@@ -60,6 +60,11 @@ export const RENOMA_BONUS: Record<string, number> = {
   "Pomorzanin Toruń": 0.04,
   "Sparta Brodnica": 0.03,
   "Wda Świecie": 0.03,
+  // Warmińsko-mazurskie, podlaskie, lubuskie, opolskie — historyczne marki (parytet z pomorskim i małopolskim)
+  "Stomil Olsztyn": 0.12,          // Ekstraklasa 1994–2002
+  "Olimpia Elbląg": 0.05, "Jeziorak Iława": 0.04, "Wigry Suwałki": 0.06, "ŁKS Łomża": 0.03, "Olimpia Zambrów": 0.02,
+  "Stilon Gorzów Wielkopolski": 0.07, "Dozamet Nowa Sól": 0.04, "Promień Żary": 0.03, "Carina Gubin": 0.03, "Warta Gorzów Wielkopolski": 0.03,
+  "MKS Kluczbork": 0.05, "Polonia Nysa": 0.03, "Ruch Zdzieszowice": 0.03, "Małapanew Ozimek": 0.03, "Chemik Kędzierzyn-Koźle": 0.03, "Stal Brzeg": 0.03,
 };
 
 // Historyczny PRESTIŻ (bazowa „podłoga" renomy): marka i kibice wielkich/historycznych klubów trwają
@@ -78,6 +83,9 @@ export const PRESTIZ: Record<string, number> = {
   "Gryf Wejherowo": 0.36, "Polonia Bytom": 0.46, "Wieczysta Kraków": 0.5, "Hutnik Kraków": 0.4, "Garbarnia Kraków": 0.4,
   "Unia Tarnów": 0.38, "Tarnovia Tarnów": 0.34, "Sandecja Nowy Sącz": 0.42, "Podhale Nowy Targ": 0.36,
   "Resovia": 0.42, "Okocimski KS Brzesko": 0.34, "Limanovia Limanowa": 0.34,
+  // Warmia i Mazury, Podlasie, Ziemia Lubuska, Opolszczyzna
+  "Stomil Olsztyn": 0.4, "Olimpia Elbląg": 0.32, "Wigry Suwałki": 0.34, "Jeziorak Iława": 0.3,
+  "Stilon Gorzów Wielkopolski": 0.34, "Lechia Zielona Góra": 0.32, "Dozamet Nowa Sól": 0.28, "MKS Kluczbork": 0.32,
 };
 
 /** Podłoga renomy wynikająca z historycznego prestiżu (0 = brak). */

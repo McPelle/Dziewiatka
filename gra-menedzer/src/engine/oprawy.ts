@@ -24,7 +24,12 @@ export const NAZWA_RODZAJU: Record<RodzajOprawy, string> = {
 const SYMBOLE: Record<string, string[]> = {
   Gdańsk: ["🦁 lwy z herbu Gdańska", "🏗 żuraw nad Motławą", "⚓ okręt Hanzy"], Gdynia: ["⚓ kotwica", "⛵ żaglowiec", "🌊 morskie fale"],
   Kraków: ["🐉 smok wawelski", "🏰 Wawel", "👑 korona"], Szczecin: ["🦅 gryf pomorski", "⚓ port", "🏰 Zamek Książąt Pomorskich"],
-  Bydgoszcz: ["🏹 łuczniczka", "🌉 most nad Brdą"], Toruń: ["🏰 brama miejska", "🥨 pierniki z herbem", "⭐ Kopernik i gwiazdy"],
+  Bydgoszcz: ["🏹 łuczniczka", "🌉 most nad Brdą"],
+  Olsztyn: ["🏰 Zamek Kapituły Warmińskiej", "⭐ Kopernik", "🌲 las i jeziora"], "Elbląg": ["⚓ port i rzeka Elbląg", "✝️ krzyże z herbu"],
+  "Łomża": ["🌲 puszcza", "🏛 ratusz"], "Suwałki": ["❄️ biegun zimna", "🦌 łoś z Wigier"],
+  "Gorzów Wielkopolski": ["🌉 most nad Wartą", "⛪ katedra"], "Zielona Góra": ["🍇 winogrona i winnice", "🍷 Bachus"],
+  Opole: ["🏰 Wieża Piastowska", "🎤 amfiteatr festiwalu", "🦅 orzeł Piastów opolskich"], Nysa: ["⛲ Piękna Studnia", "⛪ bazylika"],
+  "Kędzierzyn-Koźle": ["⚗️ chemiczne Azoty", "🏰 twierdza Koźle"], Kluczbork: ["🔑 klucz z herbu"], Toruń: ["🏰 brama miejska", "🥨 pierniki z herbem", "⭐ Kopernik i gwiazdy"],
   Warszawa: ["🧜 syrenka", "🏰 Kolumna Zygmunta"], Poznań: ["🐐 koziołki", "🔑 klucze z herbu"], Łódź: ["🛶 łódź z herbu", "🏭 fabryczne kominy"],
   Wrocław: ["🦁 lew", "🌉 mosty"], Białystok: ["🦬 żubr", "⚔️ rycerz"], Katowice: ["⛏ górnicze kilofy", "🔥 hałdy i szyby"],
 };

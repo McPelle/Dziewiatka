@@ -22,6 +22,12 @@ export const DZIELNICE: Record<string, string[]> = {
   Koszalin: ["Rokosowo", "Lubiatowo", "Wilkowo"], Słupsk: ["Zatorze", "Ryczewo", "Westerplatte"], Tarnów: ["Mościce", "Grabówka", "Krzyż"],
   "Nowy Sącz": ["Gołąbkowice", "Wólki", "Zawada"], Włocławek: ["Zazamcze", "Południe", "Michelin"], Grudziądz: ["Strzemięcin", "Lotnisko", "Tarpno"],
   // Warmińsko-mazurskie i podlaskie — dzielnice/osiedla wg pl.wikipedia (artykuły miast, „Podział administracyjny”)
+  // Lubuskie i opolskie — dzielnice / osiedla wg pl.wikipedia
+  "Gorzów Wielkopolski": ["Zawarcie", "Górczyn", "Piaski", "Staszica", "Dolinki", "Karnin", "Manhattan", "Śródmieście", "Zakanale", "Os. Słoneczne"],
+  "Zielona Góra": ["Jędrzychów", "Chynów", "Przylep", "Ochla", "Łężyca", "Racula", "Zatonie", "Os. Pomorskie", "Os. Zastalowskie", "Os. Śląskie"],
+  "Opole": ["Zaodrze", "Śródmieście", "Nadodrze", "Gosławice", "Malinka", "Grotowice", "Groszowice", "Półwieś", "Szczepanowice", "Bierkowice", "Kolonia Gosławicka"],
+  "Kędzierzyn-Koźle": ["Kędzierzyn", "Koźle", "Kłodnica", "Blachownia", "Sławięcice", "Azoty", "Pogorzelec"],
+  "Nysa": ["Śródmieście", "Górna Wieś", "Podzamcze", "Radoszyn", "Konradowa", "Wyspa"],
   "Olsztyn": ["Śródmieście", "Zatorze", "Kortowo", "Jaroty", "Pieczewo", "Nagórki", "Zielona Górka", "Dajtki", "Gutkowo", "Redykajny", "Likusy", "Generałów"],
   "Elbląg": ["Śródmieście", "Stare Miasto", "Zatorze", "Zawada", "Nad Jarem", "Zakrzewo", "Rakowo", "Próchnik", "Dąbrowa", "Modrzewina", "Krasny Las", "Bielany"],
   "Ełk": ["Centrum", "Grunwaldzkie", "Jeziorna", "Szyba", "Konieczki", "Północ I", "Północ II", "Zatorze", "Baranki", "Bogdanowicza", "Kochanowskiego", "Pod Lasem"],
