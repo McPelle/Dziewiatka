@@ -1,6 +1,6 @@
 // Prawdziwe przyśpiewki kibiców (krótkie, z dopingu) — tylko znalezione w źródłach (śpiewniki kibiców, prace naukowe,
-// fora, opisy nagrań). Wulgaryzmy w grze są wykropkowane (cenzura w engine/przyspiewki.ts); przyśpiewki z przemocą,
-// rasistowskie, antysemickie i homofobiczne pominięte.
+// fora, opisy nagrań). Teksty dosłowne (także o „bitkach”, piwie, z odniesieniami religijnymi) — wulgaryzmy w grze są
+// wykropkowane (cenzura w engine/przyspiewki.ts); pominięte tylko rasistowskie, antysemickie, homofobiczne i polityczne.
 export interface Przyspiewka { tekst: string; typ: "doping" | "miasto" | "zgoda" | "rywal" | "okrzyk"; rywal?: string }
 export interface PrzyspiewkiKlubu { hymn?: string; przyspiewki: Przyspiewka[] }
 export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
