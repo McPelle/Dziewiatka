@@ -1247,6 +1247,12 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Carina Gubin": 1950,
   "Warta Gorzów Wielkopolski": 1945,
   "Polonia Nysa": 1946,
+  // Lubuskie — Zielona Góra (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Błękitni Toporów": 1961,
+  "Korona Wschowa": 2008,
+  "Błękitni Wierzbnica": 2015,
+  "Sokół Rozłogi": 1978,
+  "Zjednoczeni Lubrza": 1965,
 };
 
 /** Rok założenia klubu (jeśli znany). */

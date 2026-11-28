@@ -1347,6 +1347,8 @@ export const BARWY_KLUBOW: Record<string, [string, string]> = {
   "Carina Gubin": ["#000000", "#008000"],
   "Warta Gorzów Wielkopolski": ["#800000", "#000080"],
   "Polonia Nysa": ["#e30613", "#ffffff"],
+  // Lubuskie — Zielona Góra (runda 2) — barwy z regiowyniki.pl / pl.wikipedia (odcienie przybliżone wg opisu barw)
+  "Zjednoczeni Lubrza": ["#008c45", "#ffd700"],
 };
 
 // Słowa-kolory w nazwie → barwa (gdy klubu nie ma w słowniku). Sprawdzane po kolei.

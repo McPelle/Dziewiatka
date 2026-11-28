@@ -1008,6 +1008,8 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Carina Gubin": 2000,
   "Polonia Nysa": 2500,
   "Raków II Częstochowa": 200,
+  // Lubuskie — Zielona Góra (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Zorza Port 2000 Mostki": 1000,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */
