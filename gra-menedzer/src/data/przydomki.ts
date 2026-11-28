@@ -97,6 +97,11 @@ export const PRZYDOMKI: Record<string, string> = {
   "Czarni Wierzchosławice": "Wierzchołki",
   "Stal Grudziądz": "Staleczka",
   "Unia Janikowo": "Duma Kujaw",
+  // Małopolska (runda 2) — przydomki potwierdzone w źródłach
+  "BKS Bochnia": "Ekipa z Solnego Grodu",
+  "Kabel Kraków": "Kablarze",
+  "Przebój Wolbrom": "Trójkolorowi",
+  "Clepardia Kraków": "Cleosia",
 };
 
 export function przydomek(nazwa: string): string | undefined {

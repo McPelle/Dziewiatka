@@ -2616,5 +2616,6 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
   "b": "Polonia Bytom",
   "typ": "kosa"
  },
- {"a": "Noteć Łabiszyn", "b": "Unia Gniewkowo", "typ": "zgoda"}
+ {"a": "Noteć Łabiszyn", "b": "Unia Gniewkowo", "typ": "zgoda"},
+ {"a": "Zgoda Byczyna", "b": "Szczakowianka Jaworzno", "typ": "zgoda"}
 ];

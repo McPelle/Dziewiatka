@@ -889,6 +889,10 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Mień Lipno": 3000,
   "Tarant Wójcin": 500,
   "Mień II Lipno": 3000,
+  // Małopolska (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "MKS Libiąż": 977,
+  "Wisła Szczucin": 2300,
+  "Wisła II Szczucin": 2300,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

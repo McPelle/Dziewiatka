@@ -1058,6 +1058,10 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Cis Cekcyn": 1974,
   "Kikolanka-Ogończyk Kikół": 1998,
   "Kujawy Markowice": 1949,
+  // Małopolska (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Olimpia Chocznia": 1990,
+  "Wisła Szczucin": 1948,
+  "Strażak Karsy": 1995,
 };
 
 /** Rok założenia klubu (jeśli znany). */
