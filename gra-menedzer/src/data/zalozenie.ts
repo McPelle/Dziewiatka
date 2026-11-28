@@ -1432,6 +1432,23 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   // Opolskie (runda 3) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
   "LZS Strzeleczki": 1950,
   "Cukrownik Baborów": 1946,
+  // Opolskie (runda 7) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Victoria Żyrowa": 1919,
+  "LZS Starościn": 1974,
+  "Adamietz Kadłub": 1947,
+  "Źródło Krośnica": 1948,
+  "MKS Wołczyn": 2010,
+  "Piast Gorzów Śląski": 1968,
+  "Gazownik Wawelno": 1973,
+  "LKS Rybna": 1962,
+  "Rudatom Kępa": 1952,
+  "Fiorentina Nakło": 1952,
+  "LZS Borkowice": 1960,
+  "LZS Uszyce": 1948,
+  "LZS Popielów": 1946,
+  "Polonia Domaszowice": 1992,
+  "Pogoń Łosiów": 1947,
+  "Polonia Przylesie": 1945,
 };
 
 /** Rok założenia klubu (jeśli znany). */

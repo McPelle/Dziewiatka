@@ -201,13 +201,8 @@ export const TRENERZY: Record<string, TrenerReal> = {
   "Sokół Maszkienice": { imie: "Tomasz", nazwisko: "Świerczek", od: 2026, odMiesiac: "sierpień" }, // małopolskie Klasa okręgowa (Bochnia-Brzesko); https://futmal.pl/news/swierczek-trenerem-sokola (19.08.2026)
   "Ikar Odporyszów": { imie: "Marcin", nazwisko: "Zając", od: 2025, odMiesiac: "czerwiec" }, // małopolskie Klasa okręgowa (Żabno-Tarnów); https://futmal.pl/news/zmiana-trenera-w-odporyszowie (26.06.2026)
   "Tęcza Krosno Odrzańskie": { imie: "Mateusz", nazwisko: "Hałambiec" }, // Lubuskie — Zielona Góra; zachod.pl (2026-11-17)
-  "Zorza Ochla": { imie: "Maciej", nazwisko: "Wysocki" }, // Lubuskie — Zielona Góra; wzielonej.pl (2026-11-14)
-  "Czarni Drągowina": { imie: "Karol", nazwisko: "Madej" }, // Lubuskie — Zielona Góra; wzielonej.pl (2026-10-10)
   "TS Przylep": { imie: "Konrad", nazwisko: "Szymański" }, // Lubuskie — Zielona Góra; wzielonej.pl (2026-09-05)
-  "KP Świdnica": { imie: "Michał", nazwisko: "Grzelczyk" }, // Lubuskie — Zielona Góra; zachod.pl (2026-11-20)
   "Pogoń Wężyska": { imie: "Łukasz", nazwisko: "Czyżyk" }, // Lubuskie — Zielona Góra; zachod.pl (2026-07-27)
-  "Cargovia Kargowa": { imie: "Andrzej", nazwisko: "Kołodziej" }, // Lubuskie — Zielona Góra; zachod.pl (2026-07-01)
-  "Zjednoczeni Brody": { imie: "Tomasz", nazwisko: "Bahyrycz" }, // Lubuskie — Zielona Góra; zachod.pl (2026-09-12)
   "Błękitni Ołobok": { imie: "Daniel", nazwisko: "Lisowski" }, // Lubuskie — Zielona Góra; zachod.pl (2026-10-26)
   "Bóbr Bobrowice": { imie: "Karol", nazwisko: "Widerowski" }, // Lubuskie — Zielona Góra; zachod.pl (2026-11-26)
   "Sparta Łężyca": { imie: "Szymon", nazwisko: "Czarny" }, // Lubuskie — Zielona Góra; wzielonej.pl (2026-10-16)
@@ -242,7 +237,18 @@ function licencjaDlaPoziomu(poziom: number): "C" | "B" | "A" | "PRO" {
   return "C"; // klasa A/B — UEFA C / amator
 }
 
-/** Krótka, wiarygodna historia wygenerowanego trenera (kluby „z niższych półek", najnowsze pierwsze). */
+/** Krótka, wiarygodna historia wygenerowanego trenera (kluby „z niższych półek", 
+  "Zorza Ochla": { imie: "Maciej", nazwisko: "Wysocki" }, // Lubuskie (runda 7); rzg.pl (2026-11-03)
+  "Stal Sulęcin": { imie: "Eliasz", nazwisko: "Kowalew" }, // Lubuskie (runda 7); zachod.pl (2026-11-05)
+  "Róża Różanki": { imie: "Radosław", nazwisko: "Bubniak" }, // Lubuskie (runda 7); zachod.pl (2026-10-09)
+  "Sprotavia Szprotawa": { imie: "Sebastian", nazwisko: "Horodyski" }, // Lubuskie (runda 7); zachod.pl (2026-10-15)
+  "KP Świdnica": { imie: "Michał", nazwisko: "Grzelczyk" }, // Lubuskie (runda 7); zachod.pl (2026-08-31)
+  "Czarni Drągowina": { imie: "Karol", nazwisko: "Madej" }, // Lubuskie (runda 7); wzielonej.pl (2026-10-10)
+  "Zjednoczeni Brody": { imie: "Tomasz", nazwisko: "Bahyrycz" }, // Lubuskie (runda 7); zachod.pl (2026-09-12)
+  "Piast Karnin": { imie: "Tomasz", nazwisko: "Dolaciński" }, // Lubuskie (runda 7); zachod.pl (2026-08-08)
+  "Piast Iłowa": { imie: "Marcin", nazwisko: "Świrlik" }, // Lubuskie (runda 7); zachod.pl (2026-10-04)
+  "GKP Kłodawa": { imie: "Kamil", nazwisko: "Jaźwiński" }, // Lubuskie (runda 7); zachod.pl (2026-07-10)
+  "Cargovia Kargowa": { imie: "Andrzej", nazwisko: "Kołodziej" }, // Lubuskie (runda 7); zachod.pl (2026-07-01)najnowsze pierwsze). */
 function generujHistorie(aktObjecie: number, poziom: number): WpisHistorii[] {
   const ile = poziom <= 3 ? losInt(2, 4) : poziom <= 6 ? losInt(1, 3) : losInt(0, 2);
   const out: WpisHistorii[] = [];

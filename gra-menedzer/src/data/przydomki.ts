@@ -189,6 +189,8 @@ export const PRZYDOMKI: Record<string, string> = {
   "Korona Kożuchów": "Polmowcy",
   // Opolskie (runda 2) (runda 2) — przydomki potwierdzone w źródłach
   "GKS Głuchołazy": "biało-niebiescy",
+  // Lubuskie (runda 7) (runda 2) — przydomki potwierdzone w źródłach
+  "Zorza Ochla": "Zorzałka",
 };
 
 export function przydomek(nazwa: string): string | undefined {
