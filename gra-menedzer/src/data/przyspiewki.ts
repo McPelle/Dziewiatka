@@ -139,6 +139,50 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 "tekst": "Wiele wrażeń, niejeden promil! Tak się bawi Hutnik i Stomil!",
 "typ": "zgoda",
 "rywal": "Hutnik Kraków"
+},
+{
+"tekst": "W naszym mieście Olsztyn, gdzie apostoł w herbie jest, mamy swą drużynę, która zwie się OKS. OKS-ie, OKS-ie, ukochany klubie nasz, masz kibiców swoich w mieście, masz kibiców, masz. Aleluja, aleluja, alleluja OKS!",
+"typ": "miasto"
+},
+{
+"tekst": "Dla nas ten klub! Jest niczym Bóg! Kochamy Go! Hej Stomil gol!",
+"typ": "doping"
+},
+{
+"tekst": "Hej, hej, nalejcie piwa! Hej, hej, nalejcie piwa! Hej, hej, nalejcie piwa! Viva OKS-ie!",
+"typ": "doping"
+},
+{
+"tekst": "Płoną stadiony, płynie krew, OKS już tam jest! Płoną stadiony, płynie krew, OKS już tam jest!",
+"typ": "doping"
+},
+{
+"tekst": "Ile to już lat, czekam na ten fakt, pierwszej ligi smak, będę z Tobą tam… Zawsze tam gdzie Ty, do końca naszych dni. Przyjaźń święta rzecz, strzeż się wrogu, strzeż…",
+"typ": "doping"
+},
+{
+"tekst": "Tutaj ziomków mam, na wyniki s***. Wóda, browar, joint, Stomil Olsztyn front!",
+"typ": "doping"
+},
+{
+"tekst": "A gdy trening Cię już znudzi i przestaniesz w piłkę grać, możesz wtedy piłę rzucić i browary, wódę chlać! Hej Stomil Olsztyn! Tylko nasz OKS Olsztyn może wszystkim szczęście dać!",
+"typ": "doping"
+},
+{
+"tekst": "O mój OKS-ie, nie zdradzę Cię! Inni Cię zdradzili, drogo zapłacili, a ja NIE! A jak mi odpowiesz: olsztyński psie – w mordę walę gnoja, wypijam jabola za OKS!",
+"typ": "doping"
+},
+{
+"tekst": "Jak te topy na konopi, heja! Tak ja kocham Cię! Jak maniutkę, która się rozbiera! Tak ja kocham Cię! Jak te race na stadionach mienią! Tak ja kocham Cię! Jak avanti, gdy wrogowie wieją! Tak ja kocham Cię!",
+"typ": "doping"
+},
+{
+"tekst": "Jeden za wszystkich! Wszyscy za jednego! To święta rzecz… Denaturat Boys sialalala!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Denaturat Boys! Sialalalala, hej! Denaturat Boys! Sialalalala!",
+"typ": "okrzyk"
 }
 ]
 },
@@ -179,10 +223,6 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 {
 "tekst": "Nasza Granico, my wspieramy cię, bo w naszych sercach jest kętrzyński KKS, aż po życia kres",
 "typ": "doping"
-},
-{
-"tekst": "Na północnym wschodzie Polski, gdzie niełatwo żyje się, w małym mieście urodzony, co nazywa Kętrzyn się…",
-"typ": "miasto"
 },
 {
 "tekst": "My jesteśmy kętrzyniacy, cała Polska o tym wie, naszym klubem jest Granica, czy szanujesz ją czy nie, w piękne barwy jest ubrana, za nie oddam życie swe, czy wygrywasz czy przegrywasz, ja Granicę kochać chcę",
@@ -227,6 +267,15 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 {
 "tekst": "Hej Kętrzyn gol, sialalalalalala",
 "typ": "okrzyk"
+},
+{
+"tekst": "Na północnym wschodzie Polski, gdzie niełatwo żyje się, w małym mieście urodzony, co nazywa Kętrzyn się, za to Boże ci dziękuję, że nie jestem ełckim psem, w moim sercu jest Granica, kocham Kętrzyn KKS",
+"typ": "rywal",
+"rywal": "MKS Mazur Ełk"
+},
+{
+"tekst": "Dla nas ten klub jest niczym Bóg, kochamy go, hej Kętrzyn gol! Lalalala, lalalala…",
+"typ": "doping"
 }
 ]
 },
@@ -493,6 +542,24 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 {
 "tekst": "Macie to wygrać!",
 "typ": "doping"
+},
+{
+"tekst": "Wśród nocnej ciszy głos się rozchodzi. Wstańcie, Arkowcy, Lechia nadchodzi. Weźcie pałki, weźcie noże, Lechia kurwa żyć nie może. Wedle rozkazu.",
+"typ": "rywal",
+"rywal": "Lechia Gdańsk"
+},
+{
+"tekst": "Gdy dorośniesz synu mój, całą Lechię weź na ch.., potem cały stadion spal, niech te kurwy mają bal",
+"typ": "rywal",
+"rywal": "Lechia Gdańsk"
+},
+{
+"tekst": "Czy Ty wiesz Areczko, jak ja bardzo kocham Cię, bo mam żółte serce i niebieską w żyłach krew",
+"typ": "doping"
+},
+{
+"tekst": "Słuchaj, Jezu, jak Cię błaga lud, wróć Areczce pierwszą ligę, wróć",
+"typ": "doping"
 }
 ],
 "hymn": "Rota – hymn kibiców Arki („Żółte jest słońce, niebieskie niebo, to właśnie barwy klubu naszego”)"
@@ -644,6 +711,16 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 {
 "tekst": "Nawet w chwili złej...",
 "typ": "doping"
+},
+{
+"tekst": "Dziś Cracovio w wroga krwi umoczymy barwy swe i wciągniemy je na twarz, kiedy zechce nam się śmiać! Łowcy psów – Cracovia!",
+"typ": "rywal",
+"rywal": "Wisła Kraków"
+},
+{
+"tekst": "Nikt nam nie zrobi nic! Bo z nami jest Marszałek Śmigły-Rydz. Więc zarepetuj broń i w Białą Gwiazdę mierz. Za ból, za krew, za lata łez, Cracovii nadszedł czas!",
+"typ": "rywal",
+"rywal": "Wisła Kraków"
 }
 ],
 "hymn": "Hymn Cracovii (Maciej Maleńczuk) – „Kraków to stolica Polski, perła ukryta we mgle” … „nie zejdę na psy”"
@@ -707,6 +784,18 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 "tekst": "Tyskie k**** jazda!",
 "typ": "rywal",
 "rywal": "GKS Tychy"
+},
+{
+"tekst": "Zaśpiewaj pieśń i poczuj zew, trójkolorowa w naszych żyłach płynie krew, górniczy klub każdy go zna, będziemy zawsze tam, gdzie nasza...",
+"typ": "miasto"
+},
+{
+"tekst": "Aż po śmierć!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Naprzód GieKSiarze, ambicja każe, wygrać dziś ten mecz, bo to święta rzecz.",
+"typ": "doping"
 }
 ]
 },
@@ -920,6 +1009,10 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 "tekst": "Lepsza strona miasta",
 "typ": "rywal",
 "rywal": "Piast Gliwice"
+},
+{
+"tekst": "Bo ten klub, to my, w Górnik Zabrze wierzymy! Bo ten klub, to my, religia warta krwi!",
+"typ": "doping"
 }
 ],
 "hymn": "Oficjalny hymn Górnika Zabrze – „Słynna drużyna, którą każdy zna, tyle tytułów i pucharów ma”"
@@ -989,6 +1082,26 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 },
 {
 "tekst": "I znowu wyjazdowy mecz...",
+"typ": "doping"
+},
+{
+"tekst": "...kibicowską krew, Jaga ole!",
+"typ": "okrzyk"
+},
+{
+"tekst": "W Białymstoku naszym mieście, gdzie morowa wiara jest, ukochana ma drużyna, Jagiellonia BKS! Alleluja, alleluja, alleluja BKS! Alleluja, alleluja, Jagiellonia BKS!",
+"typ": "miasto"
+},
+{
+"tekst": "Jagiellonia Pany, żółto-czerwone szatany!",
+"typ": "okrzyk"
+},
+{
+"tekst": "W górę serca, zwycięży BKS, zwycięży BKS, zwycięży BKS!",
+"typ": "okrzyk"
+},
+{
+"tekst": "Pamiętam tylko to, o Jagiellonię szło, dla której kładłem cały świat u stóp, dla której całe zło zwalczałem pięścią swą, za co przyrzekła miłość aż po grób. Tysięcy gardeł zew, niosący głośno pieśń, lata spędzone na niejednej z dróg, setki przebytych tras, pamięta każdy z nas, na wielu z nich napotykany wróg.",
 "typ": "doping"
 }
 ],
@@ -1216,6 +1329,11 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 {
 "tekst": "Wielka Lechia Gdańsk!",
 "typ": "okrzyk"
+},
+{
+"tekst": "Wśród nocnej ciszy głos się rozchodzi. Wstańcie, Lechiści, Arka nadchodzi. Weźcie pałki i zapałki, podpalimy stadion Arki. Wedle rozkazu.",
+"typ": "rywal",
+"rywal": "Arka Gdynia"
 }
 ],
 "hymn": "Ooo Nasz! Ooo Nasz! (My wierzymy tylko w B.K.S. – hymn kibiców)"
@@ -1519,6 +1637,48 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 "tekst": "Dotykał Cię brat",
 "typ": "rywal",
 "rywal": "Raków Częstochowa"
+},
+{
+"tekst": "Na Zygmunta placu melanż / Wisła rozjebana jest / Szampan hukiem otwierany / Dzisiaj święto wielkie jest!",
+"typ": "rywal",
+"rywal": "Wisła Kraków"
+},
+{
+"tekst": "Młody legionisto, smutek z twarzy zmaż / Bo na Konwiktorskiej już za parę lat / Nie będzie nikogo, będą same zgliszcza / Polonia spalona, a Legia ma mistrza!",
+"typ": "rywal",
+"rywal": "Polonia Warszawa"
+},
+{
+"tekst": "Hej Legiunio! Hej Legiunio! / Tutaj twa Warszawska brać / Nie poddawaj dzisiaj się / Proszę Ciebie, k... mać!",
+"typ": "doping"
+},
+{
+"tekst": "Zwyciężymy, zwyciężymy / Berło w ręku będziem mieć / I korona też przypadnie / Będzie melanż, jak na sześć!",
+"typ": "doping"
+},
+{
+"tekst": "Hej Legiunio! Hej Legiunio! / Dziękuję Warszawska brać / Za twe męki, za twe siły / Wspólny melanż dzisiaj masz! / Bawimy się dzisiaj ludzie / Bo Legiunia Mistrzem jest",
+"typ": "doping"
+},
+{
+"tekst": "Boją się nas kibice angielscy / Boją się nas także holenderscy / Boi się nas policja angielska / Boi się nas także holenderska / Boi się nas Torcida Górnika / Boi się nas cały świat!",
+"typ": "doping"
+},
+{
+"tekst": "Tyle jeszcze jest meczów przed nami, / tylu wrogów padnie u naszych stóp. / Tyle jeszcze wyjazdów z zakazami, / ciebie Legio będę kochał aż po grób!",
+"typ": "doping"
+},
+{
+"tekst": "Pozdrawiamy was bracia za kratami, / pamiętajcie tych kilka prostych słów, / że my o was tu zawsze pamiętamy / i czekamy kiedy tu będziecie znów.",
+"typ": "doping"
+},
+{
+"tekst": "Deszcze niespokojne / Potargały sad / A my na tej wojnie / Ładnych parę lat / Do domu wrócimy / W piecu napalimy / Nakarmimy psa, psa, psa",
+"typ": "doping"
+},
+{
+"tekst": "CWKS, CWKS, CWKS to najlepszy w ekstraklasie zespół jest, / on kibiców ma tysiące, rozrabiają w całej Polsce, / CWKS, CWKS, CWKS",
+"typ": "doping"
 }
 ],
 "hymn": "Sen o Warszawie (Czesław Niemen); przy wyjściu piłkarzy kibice śpiewają „Mistrzem Polski jest Legia”"
@@ -1792,6 +1952,23 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 {
 "tekst": "Wszyscy do Nowego Targu!",
 "typ": "doping"
+},
+{
+"tekst": "Oddałem serce za drużynę, oddałem duszę, własną krew i wierzę, że kiedyś zasłynie lubelski klub nasz RKS. To my lubelscy fani, fani chuligani, za Motor, za RKS pójdziemy aż po życia kres",
+"typ": "doping"
+},
+{
+"tekst": "Gdy na świat się narodziłem, zrozumiałem wtedy że, że Motorek moim klubem, że Motorek znaczy śmierć. Więc do boju eRkaesie, więc do boju naprzód marsz, Ty najlepiej w całej Polsce, Ty najlepiej w piłkę grasz.",
+"typ": "doping"
+},
+{
+"tekst": "Śpiewam wam, już wiem, Motor moim klubem był i jest, jeszcze raz śpiewam wam: Motor mistrzem jest. Tam przyjaciół kilku mam, od lat z nimi zawsze jeżdżę, z nimi chlam, jeszcze raz śpiewam wam: Motor mistrzem jest.",
+"typ": "doping"
+},
+{
+"tekst": "A po meczu przychodzi bój, a po boju spokój, a policja wciąż bije nas, prosząc nas o spokój. A w pociągu zadyma jest, a w Radomiu izba, do Wrocławia dojedzie część, Avia stara p….",
+"typ": "rywal",
+"rywal": "Avia Świdnik"
 }
 ],
 "hymn": "Koziego Grodu Duma (przyśpiewka z trybun, nagrana jako oficjalny hymn) – „Koziego Grodu Duma, to Motor z Lublina”"
@@ -1817,6 +1994,10 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 },
 {
 "tekst": "Szlak przetarty",
+"typ": "doping"
+},
+{
+"tekst": "Niebiesko-czerwona krew w naszych żyłach płynie! To OKS!",
 "typ": "doping"
 }
 ],
@@ -2208,6 +2389,23 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 "tekst": "Jedziemy z...",
 "typ": "rywal",
 "rywal": "ŁKS Łódź"
+},
+{
+"tekst": "Macie wygrać, tak jak chcemy, bo was kurwa rozjebiemy",
+"typ": "doping"
+},
+{
+"tekst": "O mój MKS-ie, ja kocham Cię! Inni Cię zdradzili, Lecha polubili, ale ja nie! A jak ktoś mnie nazwie: ty szczeciński psie – w mordę leję chama, Pogoń ukochana, ja kocham Cię!",
+"typ": "rywal",
+"rywal": "Lech Poznań"
+},
+{
+"tekst": "Boją się nas kibice angielscy, boją się nas fani holenderscy, boi się nas cała bundesliga, boi się nas cała pierwsza liga, boi się nas policja angielska, boi się nas także holenderska. O Pogonio, Pogonio, Pogonio, boi się nas cały świat!",
+"typ": "doping"
+},
+{
+"tekst": "My Portowcy, my Portowcy, granatowo-bordowa krew. W naszych sercach zawsze Pogoń jest!",
+"typ": "doping"
 }
 ],
 "hymn": "My Portowcy (Quo Vadis, 2008) – „My Portowcy, my Portowcy, granatowo-bordowa krew”"
@@ -2621,6 +2819,10 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 "tekst": "Ja Odrę...",
 "typ": "rywal",
 "rywal": "Odra Opole"
+},
+{
+"tekst": "Ruchu nasz ukochany, my wspieramy zawsze Cię, głośny doping, mecz wygrany, to dziś dla nas liczy się. Ijale, ijaleo, ijaleoleole... Cały świat przemierzamy, Tyś potęgą wielką jest, za te barwy zwyciężamy, płynie w nas niebieska krew.",
+"typ": "doping"
 }
 ],
 "hymn": "Ruchu nasz kochany („Ruchu nasz kochany, ligowa drużyno, wszyscy Cię kochamy, chłopak wraz z dziewczyną”)"
@@ -2642,6 +2844,10 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 {
 "tekst": "Chodźcie śmiało, jest nas mało!",
 "typ": "doping"
+},
+{
+"tekst": "Budzi się do życia miasto Nowy Sącz, serce wypełnione biało-czarną krwią",
+"typ": "miasto"
 }
 ],
 "hymn": "Biało-Czarne Serce („Budzi się do życia miasto Nowy Sącz, serce wypełnione biało-czarną krwią”)"
@@ -2754,6 +2960,10 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 "tekst": "Ruda Śląska łowcy szczew...",
 "typ": "rywal",
 "rywal": "GKS Katowice"
+},
+{
+"tekst": "Nie zginęłaś i nie zginiesz, póki ciągle jeszcze płynie w nas niebieska krew",
+"typ": "doping"
 }
 ]
 },
@@ -2804,6 +3014,10 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 {
 "tekst": "Zielona rewolucja!",
 "typ": "okrzyk"
+},
+{
+"tekst": "Tak pisała się historia, gramy tutaj od stu lat. Żadne zło i żadna wojna nie zabiła wiary w nas. Warta...",
+"typ": "doping"
 }
 ],
 "hymn": "Hymn Warty Poznań (skomp. Sylwia Grzeszczak, 2011) – „Tak pisała się historia, gramy tutaj od stu lat”"
@@ -3230,6 +3444,33 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 {
 "tekst": "W szeregi ekstraklasy",
 "typ": "doping"
+},
+{
+"tekst": "Płoną perony, płynie krew, to szlak Wiślackiej wiary, rzucamy wokół śmierci zew, łopoczą nam sztandary. Niech chwała twoja wiecznie trwa, zwyciężaj Wisło ma, zwyciężaj Wisło ma!",
+"typ": "doping"
+},
+{
+"tekst": "U nas w mieście na Reymonta, gdzie najlepsza wiara jest, ukochana jest drużyna, co się Wisła Kraków zwie. Aleluja, aleluja, aleluja, nasz TS! Aleluja, aleluja, każdy dziś wie co to jest.",
+"typ": "miasto"
+},
+{
+"tekst": "Glory, Glory aleluja, Wisła wygra, nie ma zbuja! Glory, Glory aleluja, Wisła wygra dziś ten mecz na pewno!",
+"typ": "doping"
+},
+{
+"tekst": "W wolnym mieście Gdańsku, gdzie korona w herbie jest, mamy swego brata, który zwie się BKS. Aleluja, aleluja, aleluja BKS! Aleluja, aleluja, przyjacielem Wisły jest.",
+"typ": "zgoda",
+"rywal": "Lechia Gdańsk"
+},
+{
+"tekst": "I nad Odrą we Wrocławiu, gdzie orzełek w herbie jest, mamy swego brata, który zwie się WKS. Aleluja, aleluja, aleluja WKS! Aleluja, aleluja, przyjacielem Wisły jest.",
+"typ": "zgoda",
+"rywal": "Śląsk Wrocław"
+},
+{
+"tekst": "Kosa w ręku, krew na bucie, Wisła rządzi w Nowej Hucie!",
+"typ": "rywal",
+"rywal": "Hutnik Kraków"
 }
 ],
 "hymn": "Jak długo na Wawelu (Zwycięży Orzeł Biały, zwycięży polski ród, zwycięży nasza Wisła, bo to krakowski klub)"
@@ -3301,6 +3542,10 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 "tekst": "Miedź Legnica, a co to...",
 "typ": "rywal",
 "rywal": "Miedź Legnica"
+},
+{
+"tekst": "W herbie mamy młoty oraz miasta Lubin znak, w żyłach krew miedziana płynie od najmłodszych lat, wspierać Cię będziemy i na dobre i na złe, NASZE WIELKIE ZAGŁĘBIE!",
+"typ": "miasto"
 }
 ],
 "hymn": "Na zawsze (Eliteboys, 2005) – „Kiedy miałem pięć lat, wziął mnie ojciec na mecz”"
@@ -3602,6 +3847,10 @@ export const PRZYSPIEWKI: Record<string, PrzyspiewkiKlubu> = {
 "tekst": "„Literka” – wspólna śpiewka braci z Vinety i Świtu Skolwin",
 "typ": "zgoda",
 "rywal": "Vineta Wolin"
+},
+{
+"tekst": "...w mordę leję chama...",
+"typ": "okrzyk"
 }
 ]
 },
