@@ -419,7 +419,7 @@ export const OPOLSKIE_B8: Sciezka = {
   ],
 };
 export const OPOLSKIE_B9: Sciezka = {
-  id: "opolskie-b9", nazwa: "Opolskie — Nysa I (Otmuchów / Paczków)",
+  id: "opolskie-b9", nazwa: "Opolskie — Nysa / Otmuchów / Paczków",
   ligi: [...GORA,
     { nazwa: "Klasa okręgowa — opolska gr. 2", kluby: OPO_OKR_2 },
     { nazwa: "Klasa A — opolska gr. 2", kluby: OPO_A_2 },
@@ -427,7 +427,7 @@ export const OPOLSKIE_B9: Sciezka = {
   ],
 };
 export const OPOLSKIE_B10: Sciezka = {
-  id: "opolskie-b10", nazwa: "Opolskie — Nysa II (Grodków / Łambinowice)",
+  id: "opolskie-b10", nazwa: "Opolskie — Nysa / Grodków / Łambinowice",
   ligi: [...GORA,
     { nazwa: "Klasa okręgowa — opolska gr. 2", kluby: OPO_OKR_2 },
     { nazwa: "Klasa A — opolska gr. 2", kluby: OPO_A_2 },
