@@ -154,11 +154,6 @@ export const KSZTALTY_STADIONOW: Record<string, KsztaltStadionu> = {
     krzeselka: ["#1d3f94", "#ffffff"], wzor: "sektory",
     opis: "Stadion Miejski w Mielcu: piłkarski (bez bieżni od przebudowy), cztery zadaszone trybuny (?).",
   },
-  "Pogoń Siedlce": {
-    trybuny: { S: { u: 0.7, dach: true, d: 0.85 }, N: { u: 0.3, d: 0.6 } }, bieznia: "lekkoatletyczna",
-    krzeselka: ["#1d3f94", "#c8102e", "#ffffff"], wzor: "sektory",
-    opis: "Stadion ROSRRiT w Siedlcach: bieżnia lekkoatletyczna, zadaszona trybuna główna.",
-  },
   "Bruk-Bet Termalica Nieciecza": {
     trybuny: { S: { u: 0.4, dach: true }, N: { u: 0.3, dach: true }, W: { u: 0.15, d: 0.8 }, E: { u: 0.15, d: 0.8 } },
     wzor: "sektory", otoczenie: "wies",
@@ -311,6 +306,104 @@ export const KSZTALTY_STADIONOW: Record<string, KsztaltStadionu> = {
   "Puszcza Hajnówka": {
     trybuny: { S: { u: 0.74, dach: true, d: 0.75 }, N: { u: 0.26, d: 0.55 } }, bieznia: "lekkoatletyczna",
     wzor: "sektory", opis: "Stadion w Hajnówce: w pełni kryta trybuna główna z trzech segmentów (693) i dwie odkryte naprzeciw (2×124); 4-torowa bieżnia.",
+  },
+  // ——— Uzupełnienie 11.2026 (stadiony.net — zapisane strony, pl.wikipedia, radiokielce.pl) ———
+  // ——— Uzupełnienie 11.2026 (pl.wikipedia, stadiony.net [kopie stron], radiokielce.pl, stadiumdb.com przez wyszukiwarkę) ———
+  "Pogoń Siedlce": {
+    trybuny: { S: { u: 1, dach: true } },
+    wzor: "sektory", opis: "Stadion ROSRRiT w Siedlcach (2011): stadion piłkarski bez bieżni, na razie tylko jedna zadaszona trybuna (zachodnia) na ok. 2,9 tys. miejsc z sektorem gości; pozostałe trzy trybuny tylko w planach (źródło: pl.wikipedia – Pogoń Siedlce, Stadion ROSRRiT w Siedlcach).",
+  },
+  "Chrobry Głogów": {
+    trybuny: { S: { u: 0.6, dach: true }, N: { u: 0.4 } }, bieznia: "lekkoatletyczna",
+    wzor: "sektory", opis: "Stadion Miejski w Głogowie (przebudowa 2010): zadaszona trybuna główna (2 000 miejsc pod dachem z 2 817 siedzących, 3 817 ogółem), sześciotorowa tartanowa bieżnia; podgrzewana murawa (2021). Układ pozostałych trybun nieopisany (?) (źródło: pl.wikipedia – Stadion Miejski w Głogowie).",
+  },
+  "Chełmianka Chełm": {
+    trybuny: { S: { u: 0.55 }, N: { u: 0.45 } },
+    wzor: "sektory", opis: "Nowy Stadion Miejski w Chełmie (budowa od 2025, Mirbud, 95 mln zł, zakończenie planowane na koniec 2026): zwarta, prostokątna arena piłkarska bez bieżni, dwie trybuny wzdłuż boiska na łącznie 4,5 tys. widzów; zadaszenie — brak danych (?). Stary stadion z 1959 (nasypy z kredy, bieżnia) rozebrany (źródło: pl.wikipedia – Stadion Miejski w Chełmie, za stadiony.net).",
+  },
+  "Siarka Tarnobrzeg": {
+    trybuny: { S: { u: 0.6, dach: true }, N: { u: 0.4, stara: true } },
+    wzor: "sektory", opis: "Stadion Miejski w Tarnobrzegu: dominująca nowa zadaszona trybuna główna po stronie południowej (2010–2011, zaplecze do 2016), po przeciwnej stronie starsza trybuna nasypowa (źródło: pl.wikipedia – Stadion Miejski w Tarnobrzegu).",
+  },
+  "Star Starachowice": {
+    trybuny: { S: { u: 0.75, dach: true }, W: { u: 0.25, dach: true, d: 0.5 } }, bieznia: "lekkoatletyczna",
+    wzor: "sektory", opis: "Stadion Miejski przy ul. Szkolnej (przebudowa 2023–2025, Polski Ład): nowe, częściowo zadaszone trybuny dla ponad 2 tys. kibiców — główna zachodnia (1 559 miejsc w 9 rzędach) i zadaszona trybuna południowa dla gości; część siedzisk tworzy napis STAR; niebieska bieżnia lekkoatletyczna (źródło: radiokielce.pl 03.2025 i 2021, cus.starachowice.eu przez wyszukiwarkę).",
+  },
+  "BKS Bochnia": {
+    trybuny: { S: { u: 0.6, dach: true }, N: { u: 0.4 } },
+    wzor: "sektory", opis: "Stadion im. dr. Władysława Krupy (ul. Parkowa): kryta trybuna główna (ok. 1 000 siedzisk) i trybuna zachodnia z plastikowymi krzesełkami (2007; położenie względem głównej niepewne (?)); metalowa klatka dla gości; ok. 2 000 miejsc (źródło: pl.wikipedia – Bocheński KS).",
+  },
+  "KKS 1925 Kalisz": {
+    trybuny: { S: { u: 0.19, dach: true }, N: { u: 0.18, dach: true }, W: { u: 0.315, stara: true }, E: { u: 0.315, stara: true } }, bieznia: "lekkoatletyczna",
+    wzor: "sektory", opis: "Stadion Miejski w Kaliszu (ul. Łódzka, 2011–2017, otwarty 10.03.2018): częściowo zadaszona trybuna południowo-zachodnia (1 523) zintegrowana z trzykondygnacyjnym budynkiem, zadaszona trybuna północno-wschodnia (1 436), trybuna ziemna na 4 807 miejsc (rozmieszczenie na łukach — przybliżenie (?)), sektor gości 400; ośmiotorowa bieżnia, podgrzewana murawa (źródło: pl.wikipedia – Stadion Miejski w Kaliszu).",
+  },
+  "Gryf Wejherowo": {
+    trybuny: { S: { u: 0.55, dach: true }, N: { u: 0.45 } },
+    krzeselka: ["#f2c230", "#222222"], wzor: "sektory", otoczenie: "miasto",
+    opis: "Stadion WKS Gryf na Wzgórzu Wolności (w lesie): dwie trybuny wzdłuż boiska (1 050 krzesełek bez oparć, 6 sektorów); trybuna północna ze stalowym zadaszeniem na 10 dźwigarach, spikerką i szatniami; siedziska w żółto-czarne kwadraty, w sektorach kibiców czarne z żółtym napisem „GRYF” (źródło: pl.wikipedia – Gryf Wejherowo).",
+  },
+  "Radunia Stężyca": {
+    trybuny: { S: { u: 1, dach: true } }, bieznia: "lekkoatletyczna", otoczenie: "wies",
+    wzor: "sektory", opis: "Arena Radunia (2015–2017): zadaszona trybuna na 450 miejsc (pojemność obiektu 950), 4-torowa (6 na prostej) tartanowa bieżnia; reszta widowni nieopisana (źródło: pl.wikipedia – Arena Radunia, Radunia Stężyca).",
+  },
+  "KP Starogard Gdański": {
+    trybuny: { S: { u: 0.5 }, N: { u: 0.3 }, E: { u: 0.1, d: 0.5 }, W: { u: 0.1, d: 0.5 } },
+    wzor: "sektory", opis: "Stadion Miejski im. Kazimierza Deyny (przebudowa 2010–2011): dwie trybuny w kształcie litery L — wyższa główna zachodnia i niższa wschodnia (ramiona za bramkami — przybliżenie (?)); tylko 207 miejsc zadaszonych, 3 291 ogółem (źródło: stadiumdb.com przez wyszukiwarkę; stadiony.net lista).",
+  },
+  "Arkonia Szczecin": {
+    trybuny: { S: { u: 1, stara: true } }, otoczenie: "metropolia",
+    wzor: "sektory", opis: "Stadion Arkonii w Lasku Arkońskim (1923): w modernizacji od 2018 rozebrano dwie trybuny, pozostawiając jedną przy ul. Arkońskiej; boisko główne ze sztuczną trawą (źródło: pl.wikipedia – Stadion Arkonii Szczecin; zakończenie prac niepotwierdzone (?)).",
+  },
+  "Pogoń Barlinek": {
+    trybuny: { S: { u: 1, dach: true, d: 0.7 } }, bieznia: "lekkoatletyczna",
+    wzor: "sektory", opis: "Stadion im. Bronisława Bagińskiego (przebudowa 2010–2011): nowa trybuna główna z 960 krzesełkami i częściowym zadaszeniem, tartanowa 4-torowa (6 na prostej) bieżnia; nowy budynek klubowy 2018–2023; pojemność 2 000 (źródło: pl.wikipedia – Stadion Sportowy im. Bronisława Bagińskiego w Barlinku).",
+  },
+  "Unia Wąbrzeźno": {
+    trybuny: { S: { u: 1, dach: true } }, bieznia: "lekkoatletyczna",
+    wzor: "sektory", opis: "Stadion Miejski im. Jana Wesołowskiego: kryta trybuna przy boisku na 790 miejsc siedzących, 4-torowa poliuretanowa bieżnia i pełne zaplecze lekkoatletyczne (źródło: pl.wikipedia – Unia Wąbrzeźno).",
+  },
+  "Pomorzanin Toruń": {
+    trybuny: { S: { u: 0.6, dach: true }, N: { u: 0.4, d: 0.8 } }, bieznia: "lekkoatletyczna",
+    krzeselka: ["#1d5aa8", "#f2c230"], wzor: "sektory", otoczenie: "metropolia",
+    opis: "Stadion Miejski im. G. Duneckiego w Toruniu (6 000, 4 300 siedzących): 8-torowa bieżnia z certyfikatem IAAF, zadaszona trybuna wschodnia, krzesełka niebieskie i żółte; układ trybuny naprzeciw nieopisany (?) (źródło: pl.wikipedia – Stadion Miejski im. Grzegorza Duneckiego w Toruniu).",
+  },
+  "KTS Weszło": {
+    trybuny: { S: { u: 0.55, dach: true }, N: { u: 0.45, dach: true } },
+    krzeselka: ["#f07d00", "#222222"], wzor: "sektory", otoczenie: "metropolia",
+    opis: "Stadion Hutnika Warszawa (Marymoncka, PIG Architekci, otwarty 25.08.2021): po likwidacji wałów i bieżni dwie nowe zadaszone trybuny po obu stronach boiska (1 328 miejsc), ławki rezerwowych, prasa i VIP przy trybunie zachodniej; fotele pomarańczowe i czarne (źródło: stadiony.net, pl.wikipedia – Stadion Hutnika Warszawa).",
+  },
+  "Świt Nowy Dwór Mazowiecki": {
+    trybuny: { S: { u: 0.55, stara: true }, N: { u: 0.45, stara: true } },
+    wzor: "sektory", opis: "Stadion Miejski przy ul. Sportowej: dwie nasypowe trybuny wzdłuż linii bocznych (lata 60.), 2 900 miejsc siedzących z 3 400; tylko niewielka część trybuny głównej zadaszona, wieża komentatorska z 1974; oświetlenie 1 800 lx (źródło: stadiony.net, pl.wikipedia – Stadion Świtu Nowy Dwór Mazowiecki).",
+  },
+  "Pelikan Łowicz": {
+    trybuny: { S: { u: 0.55, dach: true }, W: { u: 0.45 } },
+    wzor: "sektory", opis: "Stadion Pelikana (ul. Starzyńskiego): zachodnia trybuna główna na 1 080 miejsc (dach od 2012), trybuna południowa za bramką na 860 (2008); strona wschodnia otwarta, na północy siedziba klubu i parkingi (źródło: stadiony.net).",
+  },
+  "Ząbkovia Ząbki": {
+    trybuny: { S: { u: 0.85, dach: true }, N: { u: 0.15, d: 0.4 } },
+    wzor: "sektory", opis: "Dozbud Arena (dawniej Dolcan Arena): pokaźna południowa trybuna główna z zadaszonymi miejscami dla 1 783 osób i zapleczem (2010–2012), sektor gości 250 na tymczasowej konstrukcji naprzeciw; tymczasową trybunę wschodnią rozebrano; oświetlenie 3 000 lx (źródło: stadiony.net, pl.wikipedia – Dozbud Arena).",
+  },
+  "Lechia Tomaszów Mazowiecki": {
+    trybuny: { S: { u: 0.7, dach: true }, N: { u: 0.3, d: 0.4 } }, bieznia: "lekkoatletyczna",
+    krzeselka: ["#c8102e", "#1f7a3a"], wzor: "sektory",
+    opis: "Stadion Miejski im. Braci Gadajów: trybuna zachodnia wzdłuż boiska i fragmentu południowego łuku (2019), ok. 300 miejsc w środku pod membranowym dachem, sektor gości na jej północnym końcu; po wschodniej stronie dwie metalowe przenośne trybuny; krzesełka czerwone i zielone; nowa pełnowymiarowa bieżnia (I etap 2025), II etap z nową trybuną od ul. Nowowiejskiej (źródło: stadiony.net, pl.wikipedia – Lechia Tomaszów Mazowiecki).",
+  },
+  "Tęcza Biskupiec": {
+    trybuny: { S: { u: 0.6 }, E: { u: 0.4 } }, bieznia: "lekkoatletyczna",
+    wzor: "sektory", opis: "Stadion Miejski im. A. Biedrzyckiego (nowy, otwarty 29.05.2022): 1 500 miejsc siedzących na dwóch odkrytych trybunach — północnej i wschodniej, bieżnia 415 m, boisko boczne (źródło: pl.wikipedia – Stadion Miejski w Biskupcu).",
+  },
+  "Polonia Pasłęk": {
+    trybuny: { S: { u: 0.64 }, N: { u: 0.36 } }, bieznia: "lekkoatletyczna",
+    wzor: "sektory", opis: "Stadion Polonii (ul. Kraszewskiego): dwie trybuny zbudowane niemal od podstaw w 2009 — główna północna na 700 i południowa na 396; 6-torowa bieżnia (2012) (źródło: stadiony.net; pl.wikipedia – Pasłęk).",
+  },
+  "Ruch Wysokie Mazowieckie": {
+    trybuny: { S: { u: 1, dach: true } },
+    wzor: "sektory", opis: "Stadion Miejski w Wysokiem Mazowieckiem (przebudowa, otwarcie 07.08.2016): zadaszone trybuny na 999 miejsc siedzących, oświetlenie 500 lx, tablica wyników (źródło: pl.wikipedia – Stadion Miejski w Wysokiem Mazowieckiem).",
+  },
+  "Polonia Środa Wielkopolska": {
+    trybuny: { S: { u: 1 } },
+    wzor: "sektory", opis: "Stadion Średzki (otwarty 23.09.2024, obok starego Stadionu 700-lecia): skromny obiekt piłkarski z jedną trybuną po stronie zachodniej, ok. 1 100 miejsc; zadaszenie — brak danych (źródło: stadiumdb.com przez wyszukiwarkę; stadiony.net lista).",
   },
 };
 
