@@ -11,6 +11,7 @@ import ROSTERY_JSON from "../../assets/rostery.json";
 import ROSTERY_POZ_JSON from "../../assets/rostery-poz.json";
 import ROSTERY_PELNE_JSON from "../../assets/rostery-pelne.json";
 import KARIERY_REALNE from "../../assets/kariery-realne.json";
+import KADRY_REALNE from "../../assets/kadry-realne.json";
 
 const ROSTERY = ROSTERY_JSON as unknown as Record<string, [string, string][]>;
 // Realne składy z pozycjami (herb → [imię, nazwisko, kategoria BR/OBR/POM/NAP]); źródło: Wikipedia.
@@ -281,11 +282,13 @@ function podzielLata(lat: number, ile: number): number[] {
  *  Klucz: „Imię Nazwisko|DD.MM.RRRR”. Ostatni wpis = obecny klub (do: null). Brak danych → undefined (gra NIE dopisuje
  *  wtedy wymyślonych klubów — pokazuje tylko obecny). */
 export function karieraRealna(s: StanGry, imie: string, nazwisko: string, dataUr: string | undefined, aktualnyKlub: string): WpisKariery[] | undefined {
-  const k = (KARIERY_REALNE as Record<string, { klub: string; od: number; do: number | null; mecze?: number; gole?: number; wyp?: boolean }[]>)[`${imie} ${nazwisko}|${dataUr ?? ""}`];
+  const k = (KARIERY_REALNE as unknown as Record<string, { klub: string; od: number; do: number | null; mecze?: number; gole?: number; wyp?: boolean }[]>)[`${imie} ${nazwisko}|${dataUr ?? ""}`];
   if (!k?.length) return undefined;
   const w: WpisKariery[] = k.filter((x) => x.od <= s.sezon).map((x) => ({ klub: x.klub, od: x.od, do: x.do, mecze: x.mecze ?? 0, gole: x.gole ?? 0, ...(x.wyp ? { wypozyczenie: true } : {}) }));
   if (!w.length) return undefined;
   const ost = w[w.length - 1];
+  // bieżący sezon (od lipca) nalicza gra na żywo — mecze z tego sezonu w źródle zerujemy, żeby nie liczyć ich dwa razy
+  if (ost.do === null && ost.od >= s.sezon) { ost.mecze = 0; ost.gole = 0; }
   // obecny klub zawsze na końcu (do: null) — sezon bieżący nalicza się w grze na żywo
   if (ost.klub !== aktualnyKlub || ost.do !== null) w.push({ klub: aktualnyKlub, od: Math.max(ost.do ?? s.sezon, ost.od), do: null, mecze: 0, gole: 0 });
   return w;
@@ -575,6 +578,14 @@ export function nowaGra(trener: string, sciezka: Sciezka = SCIEZKA_DOMYSLNA): St
           if (z.klauzula) z.klauzula = Math.max(10000, Math.round((wartosc(z) * los(1.5, 2.8)) / 1000) * 1000);
           z.klubId = klub.id;
           z.kariera = karieraRealna(s, imie, nazw, dataUr, klub.nazwa) ?? [{ klub: klub.nazwa, od: s.sezon, do: null, mecze: 0, gole: 0 }];
+          { // prawdziwe występy w reprezentacjach (seniorskiej i młodzieżowych) — z tych samych źródeł co kariera
+            const kd = (KADRY_REALNE as unknown as Record<string, { druzyna: string; od?: number | null; do?: number | null; mecze: number; gole?: number }[]>)[`${imie} ${nazw}|${dataUr ?? ""}`];
+            if (kd?.length) {
+              z.kadry = kd.map((x) => ({ druzyna: x.druzyna, od: x.od ?? undefined, do: x.do ?? null, mecze: x.mecze, gole: x.gole ?? 0 }));
+              const sen = kd.filter((x) => !/U-?\d|olimp|B$/i.test(x.druzyna));
+              if (sen.length) { const g = sen[sen.length - 1]; z.kadraStat = { kraj: g.druzyna, mecze: sen.reduce((a, x) => a + x.mecze, 0), gole: sen.reduce((a, x) => a + (x.gole ?? 0), 0), ...(g.od ? { debiut: String(Math.min(...sen.map((x) => x.od ?? 9999))) } : {}) }; }
+            }
+          }
           klub.zawodnicy.push(z.id);
         }
         const ileP = (p: Pozycja) => klub.zawodnicy.filter((id) => s.zawodnicy[id].poz === p).length;

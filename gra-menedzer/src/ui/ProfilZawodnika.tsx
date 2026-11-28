@@ -289,6 +289,15 @@ export function ProfilZawodnika({ s, zawodnikId, onClose, odswiez }: { s: StanGr
 
               <WykresRozwoju z={z} />
 
+              {z.kadry?.length ? <>
+                <Text style={[st.naglowek, { marginTop: 16 }]}>Reprezentacje (prawdziwe występy)</Text>
+                {z.kadry.map((k, i) => (
+                  <View key={i} style={[st.wiersz, { justifyContent: "space-between", paddingVertical: 3, borderTopWidth: 1, borderTopColor: K.linia }]}>
+                    <Text style={[st.tekst, { fontSize: 13.5, flex: 1 }]} numberOfLines={1}>{k.druzyna} <Text style={st.maly}>{k.od ?? ""}{k.do === null ? "–teraz" : k.do && k.do !== k.od ? `–${k.do}` : ""}</Text></Text>
+                    <Text style={[st.tekst, { fontSize: 13 }]}>{k.mecze} mecz.{z.poz !== "BR" ? ` · ${k.gole} gol.` : ""}</Text>
+                  </View>
+                ))}
+              </> : null}
               <Text style={[st.naglowek, { marginTop: 16 }]}>Historia kariery{z.realny ? " (prawdziwa — mecze i gole ligowe)" : ""}</Text>
               {(() => {
                 let sumM = 0, sumG = 0;

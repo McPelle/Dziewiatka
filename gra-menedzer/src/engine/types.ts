@@ -60,6 +60,7 @@ export interface Zawodnik {
   naukaPozycji?: { poz: PozycjaSzczegolowa; postep: number } | null; // nauka nowej pozycji (postęp 0–100)
   juniorMacierzysty?: boolean; // wypożyczony junior — po powrocie wraca do akademii (jeśli dalej U-19)
   kadraStat?: { kraj: string; mecze: number; gole: number; debiut?: string }; // kariera reprezentacyjna
+  kadry?: { druzyna: string; od?: number; do: number | null; mecze: number; gole: number }[]; // prawdziwe występy w reprezentacjach (seniorska + młodzieżowe)
   reprezentant?: string; // ostatnie powołanie do kadry (np. „Polska", „Polska U-21", kraj) — prestiż
   wychowanek?: string; // klub, którego jest wychowankiem (homegrown) — prestiż i premia zarządu
   test?: { do: number; obs: number; min: number; max: number; werdykt?: string }; // okres testowy: narastająca ocena skauta (przedział szac. OVR zwęża się z obserwacjami)
