@@ -1287,6 +1287,25 @@ export const BARWY_KLUBOW: Record<string, [string, string]> = {
   "Sokół Szczypkowice": ["#008000", "#000000"],
   "KS Bytonia": ["#000000", "#ffd700"],
   "GKS Gardeja": ["#1e5aa8", "#d2122e"],
+  // Lubuskie — Zielona Góra (runda 2) — barwy z regiowyniki.pl / pl.wikipedia (odcienie przybliżone wg opisu barw)
+  "Tęcza Krosno Odrzańskie": ["#dc143c", "#ffa500"],
+  "Unia Kunice Żary": ["#0000ff", "#ffffff"],
+  "Budowlani Lubsko": ["#0057b8", "#a9a9a9"],
+  "Zorza Port 2000 Mostki": ["#0057b8", "#ffd700"],
+  "ZAP Syrena Zbąszynek": ["#1f2a5a", "#ffffff"],
+  "Spartak Budachów": ["#0057b8", "#ffd700"],
+  "MKS Nowe Miasteczko": ["#e30613", "#007f44"],
+  "Lech Sulechów": ["#094fa4", "#ffffff"],
+  "Piast Czerwieńsk": ["#0057b8", "#ffffff"],
+  "Alfa Jaromirowice": ["#008c45", "#ffd700"],
+  "Fadom Nowogród Bobrzański": ["#0b5edb", "#ffffff"],
+  "Budowlani Gozdnica": ["#0057b8", "#e30613"],
+  "Polesie Białków": ["#000000", "#ffd700"],
+  "Iskra Wymiarki": ["#000000", "#ffd700"],
+  "Sparta Grabik": ["#008c45", "#ffffff"],
+  "Odra Klenica": ["#0057b8", "#e30613"],
+  "Klon Babimost": ["#dc143c", "#ffff00"],
+  "Polonia Nowe Kramsko": ["#0000ff", "#ffffff"],
 };
 
 // Słowa-kolory w nazwie → barwa (gdy klubu nie ma w słowniku). Sprawdzane po kolei.

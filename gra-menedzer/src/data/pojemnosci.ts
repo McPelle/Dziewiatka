@@ -950,6 +950,24 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Pogoń Kraków": 400,
   "Pogoń II Skotniki": 400,
   "Zjednoczeni Branice": 120,
+  // Lubuskie — Zielona Góra (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Tęcza Krosno Odrzańskie": 2000,
+  "Unia Kunice Żary": 900,
+  "Pogoń II Świebodzin": 3500,
+  "ZAP Syrena Zbąszynek": 1000,
+  "MKS Nowe Miasteczko": 9000,
+  "Lech Sulechów": 1000,
+  "Piast Czerwieńsk": 950,
+  "Carina II Gubin": 2000,
+  "Fadom Nowogród Bobrzański": 2000,
+  "Budowlani Gozdnica": 750,
+  "Tęcza II Krosno Odrzańskie": 2000,
+  "Korona II Kożuchów": 1000,
+  "Kormoran Sława": 1000,
+  "MKS II Nowe Miasteczko": 9000,
+  "Sprotavia II Szprotawa": 1500,
+  "Klon Babimost": 1000,
+  "Polonia Nowe Kramsko": 500,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

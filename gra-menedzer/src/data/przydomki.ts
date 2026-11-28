@@ -167,6 +167,14 @@ export const PRZYDOMKI: Record<string, string> = {
   "Start Namysłów": "Startowcy",
   "Unia Krapkowice": "Władcy Krapkowic",
   "Włókniarz Kietrz": "Trójkolorowi",
+  // Lubuskie — Zielona Góra (runda 2) — przydomki potwierdzone w źródłach
+  "Tęcza Krosno Odrzańskie": "Tęczowi",
+  "ZAP Syrena Zbąszynek": "Kolejarze",
+  "MKS Nowe Miasteczko": "Meblarz",
+  "Lech Sulechów": "Sulechowscy Rycerze",
+  "Fadom Nowogród Bobrzański": "Betonowcy",
+  "Klon Babimost": "Lotnicy",
+  "Polonia Nowe Kramsko": "Lotnicy",
 };
 
 export function przydomek(nazwa: string): string | undefined {

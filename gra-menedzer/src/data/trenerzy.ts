@@ -200,6 +200,19 @@ export const TRENERZY: Record<string, TrenerReal> = {
   "Orkan Niedźwiedź": { imie: "Piotr", nazwisko: "Kaczor" }, // małopolskie Klasa okręgowa (Limanowa-Podhale); https://limanowa.in/sport/orkan-niedzwiedz-pisze-swoja-historie/51033 (10.08.202
   "Sokół Maszkienice": { imie: "Tomasz", nazwisko: "Świerczek", od: 2026, odMiesiac: "sierpień" }, // małopolskie Klasa okręgowa (Bochnia-Brzesko); https://futmal.pl/news/swierczek-trenerem-sokola (19.08.2026)
   "Ikar Odporyszów": { imie: "Marcin", nazwisko: "Zając", od: 2025, odMiesiac: "czerwiec" }, // małopolskie Klasa okręgowa (Żabno-Tarnów); https://futmal.pl/news/zmiana-trenera-w-odporyszowie (26.06.2026)
+  "Tęcza Krosno Odrzańskie": { imie: "Mateusz", nazwisko: "Hałambiec" }, // Lubuskie — Zielona Góra; zachod.pl (2026-11-17)
+  "Zorza Ochla": { imie: "Maciej", nazwisko: "Wysocki" }, // Lubuskie — Zielona Góra; wzielonej.pl (2026-11-14)
+  "Czarni Drągowina": { imie: "Karol", nazwisko: "Madej" }, // Lubuskie — Zielona Góra; wzielonej.pl (2026-10-10)
+  "TS Przylep": { imie: "Konrad", nazwisko: "Szymański" }, // Lubuskie — Zielona Góra; wzielonej.pl (2026-09-05)
+  "KP Świdnica": { imie: "Michał", nazwisko: "Grzelczyk" }, // Lubuskie — Zielona Góra; zachod.pl (2026-11-20)
+  "Pogoń Wężyska": { imie: "Łukasz", nazwisko: "Czyżyk" }, // Lubuskie — Zielona Góra; zachod.pl (2026-07-27)
+  "Cargovia Kargowa": { imie: "Andrzej", nazwisko: "Kołodziej" }, // Lubuskie — Zielona Góra; zachod.pl (2026-07-01)
+  "Zjednoczeni Brody": { imie: "Tomasz", nazwisko: "Bahyrycz" }, // Lubuskie — Zielona Góra; zachod.pl (2026-09-12)
+  "Błękitni Ołobok": { imie: "Daniel", nazwisko: "Lisowski" }, // Lubuskie — Zielona Góra; zachod.pl (2026-10-26)
+  "Bóbr Bobrowice": { imie: "Karol", nazwisko: "Widerowski" }, // Lubuskie — Zielona Góra; zachod.pl (2026-11-26)
+  "Sparta Łężyca": { imie: "Szymon", nazwisko: "Czarny" }, // Lubuskie — Zielona Góra; wzielonej.pl (2026-10-16)
+  "Kora Niedoradz": { imie: "Mieczysław", nazwisko: "Sobczak" }, // Lubuskie — Zielona Góra; zachod.pl (2026-08-16)
+  "TKKF Chynowianka Zielona Góra": { imie: "Kamil", nazwisko: "Konopacki" }, // Lubuskie — Zielona Góra; zachod.pl (2026-06-29)
 };
 
 /** Licencja UEFA właściwa dla szczebla (realia PZPN: im wyżej, tym wyższy wymóg). */
