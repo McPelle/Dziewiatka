@@ -13,7 +13,8 @@ const KLUB_DEMO = { id: "demo", nazwa: "Dziewiątka", pojemnosc: 9000, poziom: 2
 import { CZCIONKA, cien, G, K, web } from "./styl";
 import { useEffect, useState } from "react";
 import { losowaCiekawostka } from "../data/ciekawostki";
-import { dzwiekiWlaczone, muzykaWlaczona, startMuzyki, stopMuzyki, ustawDzwieki, ustawMuzyke } from "./muzyka";
+import { dzwiekiWlaczone, muzykaWlaczona, startMuzyki, ustawDzwieki, ustawMuzyke } from "./muzyka";
+import { Odtwarzacz } from "./Odtwarzacz";
 
 // Ekran tytułowy „DZIEWIĄTKA" — wektorowa scena stadionowa w tle, herb, nazwa i przyciski.
 export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj, naSzybki, naWyzwania }: { stan: StanGry | null; meta?: { nazwa: string; herb?: string; liga: string; sezon: number } | null; czeka?: boolean; naKontynuuj: () => void; naNowa: () => void; naWczytaj: () => void; naSzybki?: () => void; naWyzwania?: () => void }) {
@@ -24,12 +25,13 @@ export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj, 
   const [ciek, setCiek] = useState(losowaCiekawostka);
   const [muz, setMuz] = useState(muzykaWlaczona);
   const [dzw, setDzw] = useState(dzwiekiWlaczone);
+  const [odtw, setOdtw] = useState(false);
   const [biuro, setBiuro] = useState(() => typeof window !== "undefined" && window.localStorage?.getItem("dz_biuro") !== "0");
   useEffect(() => { // muzyka startuje po pierwszym dotknięciu (zasady autoodtwarzania przeglądarek), gaśnie po wyjściu z menu
     if (Platform.OS !== "web") return;
     const go = () => startMuzyki(); window.addEventListener("pointerdown", go, { once: true });
     const t = setInterval(() => setCiek(losowaCiekawostka()), 12000);
-    return () => { window.removeEventListener("pointerdown", go); clearInterval(t); stopMuzyki(); };
+    return () => { window.removeEventListener("pointerdown", go); clearInterval(t); }; // muzyka gra dalej w karierze
   }, []);
 
   return (
@@ -116,9 +118,11 @@ export function MenuGlowne({ stan, meta, czeka, naKontynuuj, naNowa, naWczytaj, 
         </View>
         {Platform.OS === "web" && <View style={{ flexDirection: "row", gap: 8, marginTop: 10, justifyContent: "center" }}>
           <Pressable onPress={() => { ustawMuzyke(!muz); setMuz(!muz); }} style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14, borderWidth: 1, borderColor: K.liniaMocna }}><Text style={{ color: K.szary, fontSize: 12, fontFamily: CZCIONKA }}>{muz ? "🎵 Muzyka: wł." : "🔇 Muzyka: wył."}</Text></Pressable>
+          <Pressable onPress={() => setOdtw(!odtw)} style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14, borderWidth: 1, borderColor: K.akcent }}><Text style={{ color: K.akcent, fontSize: 12, fontFamily: CZCIONKA }}>🎧 Soundtrack</Text></Pressable>
           {stan && <Pressable onPress={() => { const n = !biuro; window.localStorage?.setItem("dz_biuro", n ? "1" : "0"); setBiuro(n); }} style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14, borderWidth: 1, borderColor: K.liniaMocna }}><Text style={{ color: K.szary, fontSize: 12, fontFamily: CZCIONKA }}>{biuro ? "🗄 Tło: biuro" : "🏟 Tło: stadion"}</Text></Pressable>}
           <Pressable onPress={() => { ustawDzwieki(!dzw); setDzw(!dzw); }} style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14, borderWidth: 1, borderColor: K.liniaMocna }}><Text style={{ color: K.szary, fontSize: 12, fontFamily: CZCIONKA }}>{dzw ? "🔔 Dźwięki: wł." : "🔕 Dźwięki: wył."}</Text></Pressable>
         </View>}
+        {odtw && <View style={{ marginTop: 10 }}><Odtwarzacz kompakt /></View>}
 
         {stan && <Text style={{ color: K.szary, fontSize: 11, textAlign: "center", marginTop: 12, opacity: 0.8, fontFamily: CZCIONKA }}>Nowa kariera nadpisze obecny autozapis (zapisy w „Wczytaj grę" zostają).</Text>}
         <Text style={{ color: K.szary, fontSize: 10.5, textAlign: "center", marginTop: 22, opacity: 0.55, fontFamily: CZCIONKA }}>

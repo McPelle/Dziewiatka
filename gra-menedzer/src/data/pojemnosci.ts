@@ -1316,6 +1316,8 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   "Pogranicze Mokre": 250,
   "Fortuna Chomiąża": 250,
   "Żądło Sucha Psina": 250,
+  // Opolskie (runda 7) (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Racławia Racławice Śląskie": 200,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */

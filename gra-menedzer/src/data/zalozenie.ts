@@ -1449,6 +1449,19 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Polonia Domaszowice": 1992,
   "Pogoń Łosiów": 1947,
   "Polonia Przylesie": 1945,
+  // Opolskie (runda 7) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "Union Ujazd": 1983,
+  "Polonia Prószków": 1946,
+  "LZS Raszowa": 1953,
+  "Zryw Wysoka": 1957,
+  "Plon Błotnica Strzelecka": 1955,
+  "Metalowiec Łambinowice": 1949,
+  "Sudety Burgrabice": 1987,
+  "Sokół Leśnica": 1947,
+  "LKS Obrowiec": 1950,
+  "LZS Kujawy": 1935,
+  "Polonia Ściborzyce Wielkie": 2004,
+  "Pogoń Wojnowice": 1984,
 };
 
 /** Rok założenia klubu (jeśli znany). */

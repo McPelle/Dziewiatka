@@ -1,3 +1,4 @@
+import { wycisz as wyciszMuzyke } from "./muzyka";
 import { useEffect, useMemo, useState } from "react";
 import { Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import Svg, { Circle, Line, Rect } from "react-native-svg";
@@ -73,6 +74,7 @@ function zapiszMecz(s: StanGry, para: [string, string], m: MeczLive) {
 }
 
 export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry; para: [string, string]; puchar?: { nazwa: string; dogrywka: boolean; neutralny: boolean; remis?: boolean; bilans?: { d: number; g: number } }; onKoniec: (m: MeczLive) => void; onAnuluj: () => void }) {
+  useEffect(() => { wyciszMuzyke(true); return () => wyciszMuzyke(false); }, []); // soundtrack cichnie na czas transmisji
   const [m] = useState<MeczLive>(() => {
     const z = zapisanyMecz(s, para);
     if (z) { for (const [id, k] of Object.entries(z.kond)) if (s.zawodnicy[id]) s.zawodnicy[id].kondycja = k; z.m.komentarz.unshift({ min: `${z.m.min}'`, typ: "info", tekst: "▶ Wznowiono zapisany mecz." }); return z.m; }

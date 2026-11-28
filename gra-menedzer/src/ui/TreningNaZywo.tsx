@@ -1,5 +1,6 @@
 // Trening na żywo (dla chętnych): ok. 2 godziny zajęć w 2–3 minuty. Boisko 3D, cały sztab, program ćwiczeń,
 // intensywność, pochwały / upomnienia, indywidualna praca z zawodnikiem i zdarzenia z decyzjami trenera.
+import { wycisz } from "./muzyka";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { fmtData, type Dzien } from "../engine/dzien";
@@ -17,6 +18,7 @@ import { gwizdek } from "./three/dzwiek";
 const CZAS_BLOKU = 26; // sekund na ćwiczenie przy 1× (cały trening ≈ 2–2,5 min)
 
 export function TreningNaZywo({ s, dzien, onKoniec, onAnuluj }: { s: StanGry; dzien: Dzien; onKoniec: (ses: SesjaTreningu) => void; onAnuluj: () => void }) {
+  useEffect(() => { wycisz(true); return () => wycisz(false); }, []); // soundtrack cichnie na czas transmisji
   const klub = s.kluby[s.mojKlub];
   const fokus: Trening = dzien.akt?.rodzaj === "trening" && dzien.akt.fokus ? dzien.akt.fokus : s.trening;
   const [ses] = useState<SesjaTreningu>(() => ({ klucz: kluczDnia(dzien.data), intens: (dzien.akt?.intens ?? s.treningIntensywnosc ?? "normalny") as Intensywnosc, bloki: programDnia(fokus), wyroznieni: [], zdjeci: [], wpisy: [] }));
