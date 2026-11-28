@@ -1570,6 +1570,8 @@ export const POJEMNOSC_KLUBOW: Record<string, number> = {
   // Opolskie (runda 8) (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
   "OKS II Olesno": 528,
   "Sparta Dębie": 100,
+  // Lubuskie (runda 8) (runda 2) — pojemność (stadiony.net / pl.wikipedia / regiowyniki.pl)
+  "Czarni II Żagań": 2060,
 };
 
 /** Prawdziwa pojemność stadionu klubu (jeśli udokumentowana). */
