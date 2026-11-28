@@ -1,6 +1,7 @@
 import { useRef, useState, type ReactNode } from "react";
 import { FlatList, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SCIEZKI } from "../data/sciezki";
+import { sciezkaDlaKlubu } from "../engine/regiony";
 import { nowaGra, silaKlubu } from "../engine/swiat";
 import { rozpocznijKariere } from "../engine/sezon";
 import type { StanGry } from "../engine/types";
@@ -119,7 +120,16 @@ export function NowaGra({ onStart }: { onStart: (s: StanGry) => void }) {
     return cache.current.get(key)!;
   };
   const otworzKluby = (sciezkaId: string, idx: number, tytul: string, powrot: Widok) => setWidok({ typ: "kluby", sciezkaId, idx, tytul, powrot });
-  const wybierz = (sciezkaId: string, klubId: string) => {
+  const wybierz = (sciezkaId0: string, klubId0: string) => {
+    // Ścieżka zawsze zgodna z województwem i podokręgiem wybranego klubu (spadki tylko do JEGO grup).
+    let sciezkaId = sciezkaId0, klubId = klubId0;
+    const k0 = budujSwiat(sciezkaId0).kluby[klubId0];
+    const sc = k0 ? sciezkaDlaKlubu(k0, k0.poziom - 1) : null;
+    if (k0 && sc && sc.id !== sciezkaId0) {
+      const nowy = budujSwiat(sc.id);
+      const id = Object.values(nowy.kluby).find((x) => x.nazwa === k0.nazwa)?.id;
+      if (id) { sciezkaId = sc.id; klubId = id; }
+    }
     const sw = budujSwiat(sciezkaId);
     sw.trener = trener.trim() || "Trener";
     rozpocznijKariere(sw, klubId);

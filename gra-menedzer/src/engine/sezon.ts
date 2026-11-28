@@ -15,7 +15,7 @@ import { czasNaKadre, przerwaNaKadre } from "./reprezentacje";
 import { utrudnieniaMeczu } from "./budowy";
 import { los, losInt, szansa, tasuj, wybierz, wybierzWazone, zl } from "./losuj";
 import { AFILIACJE, PRZYJAZNIE } from "../data/derby";
-import { klubyLigiZDanych, rodzenstwo, trafiaDo } from "./regiony";
+import { klubyLigiZDanych, rodzenstwo, trafiaDo, wojKlubu, wojLigi } from "./regiony";
 import { rozliczObietnice } from "./rozmowy";
 import { rozpocznijOkres } from "./okres";
 import { realizujUmowyWstepne, wykupZWypozyczenia } from "./transfery";
@@ -1745,8 +1745,14 @@ export function nowySezon(s: StanGry) {
     const nazwaG = s.ligi[i].nazwa, nazwaD = s.ligi[i + 1].nazwa;
     const doDolnej: string[] = [];
     for (const id of spadaja) {
-      if (id === s.mojKlub || trafiaDo(s.kluby[id], nazwaG, nazwaD)) doDolnej.push(id);
-      else wychodza.push(id);
+      if (trafiaDo(s.kluby[id], nazwaG, nazwaD)) doDolnej.push(id);
+      else if (id === s.mojKlub && !wojLigi(nazwaD)) doDolnej.push(id); // liga centralna niżej — każdy klub
+      else if (id === s.mojKlub) {
+        // Twój klub spada do ligi INNEGO województwa/podokręgu niż ta w grze — nigdy nie trafia do obcej grupy.
+        // Gra w swoim województwie (poza symulacją), a trener kończy pracę i szuka nowego klubu.
+        s.kluby[id].pozaPiramida = true;
+        s.wypadlZPiramidy = `${s.kluby[id].nazwa} spada do rozgrywek swojego województwa${wojKlubu(s.kluby[id]) ? ` (woj. ${wojKlubu(s.kluby[id])})` : ""} — nie do ${nazwaD}`;
+      } else wychodza.push(id);
     }
     zGory[i + 1] = doDolnej;
     nowe[i] = nowe[i].filter((id) => !spadaja.includes(id)).concat(awansuja, wirtualni);
@@ -2264,7 +2270,15 @@ export function nowySezon(s: StanGry) {
   if (kwalEuropa) wiadomosc(s, `🌍 Zakwalifikowaliście się do ${kwalEuropa === "LM" ? "Ligi Mistrzów" : kwalEuropa === "LE" ? "Ligi Europy" : "Ligi Konferencji Europy"}! Europejskie mecze czekają w tym sezonie.`);
   polaczRezerwy(s);
   const wygaslKontrakt = s.trenerKontraktDo != null && s.sezon > s.trenerKontraktDo;
-  if (s.zarzad <= 5 || wygaslKontrakt) {
+  if (s.wypadlZPiramidy) {
+    const o = trenerOtwarty(s); if (o) o.do = s.sezon - 1;
+    s.zwolniony = true;
+    s.powodWolny = "wygasl";
+    wiadomosc(s, `🗺 ${s.wypadlZPiramidy}. Rozgrywki tego województwa/podokręgu nie są prowadzone w grze — Twoja praca w klubie dobiega końca. Sprawdź oferty pracy.`);
+    s.wypadlZPiramidy = undefined;
+    s.propozycjaTrenera = undefined;
+    ofertyPoWygasnieciu(s);
+  } else if (s.zarzad <= 5 || wygaslKontrakt) {
     const o = trenerOtwarty(s); if (o) o.do = s.sezon - 1; // zamknij etap na ostatnim prowadzonym sezonie
     s.zwolniony = true;
     s.powodWolny = s.zarzad <= 5 ? "zwolniony" : "wygasl";

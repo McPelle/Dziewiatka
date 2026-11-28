@@ -440,6 +440,7 @@ export interface StanGry {
   trenerPensja?: number; // wartość kontraktu trenera (zł/sezon)
   trenerAgent?: string; // agent trenera — negocjuje kontrakt i załatwia kluby
   trenerLicencja?: "C" | "B" | "A" | "PRO"; // licencja trenerska UEFA (rośnie z doświadczeniem)
+  wypadlZPiramidy?: string; // Twój klub spadł do ligi województwa spoza gry (opis)
   powodWolny?: "zwolniony" | "wygasl"; // dlaczego trener jest bez klubu
   ofertyTrenera?: { klubId: string; sezon: number; pensja: number; lata?: number; obecny?: boolean }[];
   kwalifikacjaPP?: number; // sezon, w którym klub gracza (zdobywca PP na szczeblu ZPN) startuje w 1/32 STS Pucharu Polski

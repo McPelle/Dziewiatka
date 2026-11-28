@@ -99,7 +99,10 @@ export function grupaSpadku(k: Pick<Klub, "nazwa" | "miasto">, gorna: string): s
   const klucz = `${k.nazwa}|${k.miasto}|${gorna}`;
   if (_grupa.has(klucz)) return _grupa.get(klucz)!;
   const woj = wojKlubu(k);
-  const dz = [...(drzewo().get(gorna)?.dzieci ?? [])].filter((n) => { const x = wojLigi(n); return !x || (!!woj && x.includes(woj)); });
+  const dz0 = [...(drzewo().get(gorna)?.dzieci ?? [])].filter((n) => { const x = wojLigi(n); return !x || (!!woj && x.includes(woj)); });
+  // grupy przypisane do województwa klubu mają pierwszeństwo przed ligami bez przypisania (np. losowy region)
+  const wlasne = dz0.filter((n) => !!wojLigi(n));
+  const dz = wlasne.length ? wlasne : dz0;
   let wynik: string | null = null;
   if (dz.length === 1) wynik = dz[0];
   else if (dz.length > 1) {
@@ -133,6 +136,24 @@ export function trafiaDo(k: Pick<Klub, "nazwa" | "miasto">, gorna: string, dolna
     return grupaSpadku(k, gorna) === dolna;
   }
   return true; // liga centralna niżej — każdy klub
+}
+/** Ścieżka (województwo + podokręg) zgodna z regionem klubu wybranego na poziomie `idx` (0 = Ekstraklasa): każdy spadek
+ *  niżej musi trafiać do grupy JEGO województwa i podokręgu. null — klub z województwa, którego rozgrywek regionalnych nie ma w grze. */
+export function sciezkaDlaKlubu(k: Pick<Klub, "nazwa" | "miasto">, idx: number): (typeof SCIEZKI)[number] | null {
+  const woj = wojKlubu(k);
+  if (!woj) return null;
+  for (const sc of SCIEZKI) {
+    if (wojSciezki(sc.nazwa) !== woj) continue; // tylko ścieżka JEGO województwa
+    if (!sc.ligi[idx]?.kluby?.some((x) => x.nazwa === k.nazwa)) continue;
+    let ok = true;
+    for (let j = idx; j < sc.ligi.length - 1 && ok; j++) {
+      const wd = wojLigi(sc.ligi[j + 1].nazwa);
+      if (!wd) continue;
+      if (!wd.includes(woj) || grupaSpadku(k, sc.ligi[j].nazwa) !== sc.ligi[j + 1].nazwa) ok = false;
+    }
+    if (ok) return sc;
+  }
+  return null;
 }
 /** Grupy-rodzeństwo ligi `dolna` (inne podgrupy tej samej ligi nadrzędnej) — źródło awansów spoza symulowanej piramidy. */
 export function rodzenstwo(gorna: string, dolna: string): string[] {
