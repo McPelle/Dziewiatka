@@ -1429,6 +1429,9 @@ export const ZALOZENIE_KLUBOW: Record<string, number> = {
   "Liwno Zabór": 1994,
   "Kormoran Sława": 2025,
   "Perła Cybinka": 2009,
+  // Opolskie (runda 3) (runda 2) — rok założenia (regiowyniki.pl / pl.wikipedia)
+  "LZS Strzeleczki": 1950,
+  "Cukrownik Baborów": 1946,
 };
 
 /** Rok założenia klubu (jeśli znany). */
