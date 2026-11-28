@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
-import { IKONA_TYPU, OPIS_TYPU, sezonyTransferow, transferyKlubu, type TypTransferu, type WpisTransferu } from "../engine/rejestrTransferow";
+import { IKONA_TYPU, ileTransferow, OPIS_TYPU, sezonyTransferow, transferyKlubu, type TypTransferu, type WpisTransferu } from "../engine/rejestrTransferow";
 import type { Klub, StanGry } from "../engine/types";
 import { Herb } from "./Herb";
 import { K, st } from "./styl";
@@ -17,7 +17,7 @@ const pasuje = (f: Filtr, t: TypTransferu) =>
         : !["kupno", "klauzula", "ekwiwalent", "wypozyczenie", "powrot"].includes(t);
 
 export function HistoriaTransferow({ s, klub, onZawodnik }: { s: StanGry; klub: Klub; onZawodnik?: (id: string) => void }) {
-  const sezony = useMemo(() => { const x = sezonyTransferow(s, klub.nazwa); return x.length ? x : [s.sezon]; }, [s, klub.nazwa, s.rejestrTransferow?.length]);
+  const sezony = useMemo(() => { const x = sezonyTransferow(s, klub.nazwa); return x.length ? x : [s.sezon]; }, [s, klub.nazwa, ileTransferow(s)]);
   const [sezon, setSezon] = useState<number>(sezony[0]);
   const [okno, setOkno] = useState<"oba" | "L" | "Z">("oba");
   const [filtr, setFiltr] = useState<Filtr>("wszystko");
@@ -47,7 +47,7 @@ export function HistoriaTransferow({ s, klub, onZawodnik }: { s: StanGry; klub: 
           </View>
         </View>
         <Text style={{ color: w.k ? (kierunek === "in" ? K.czerwony : K.zielony) : K.szary, fontWeight: "800", fontSize: 12.5, minWidth: 64, textAlign: "right" }}>
-          {w.k ? `${kierunek === "in" ? "−" : "+"}${zl(w.k)}` : w.t === "wypozyczenie" || w.t === "powrot" ? "—" : "0 zł"}
+          {w.k ? `${kierunek === "in" ? "−" : "+"}${zl(w.k)}` : ["wolny", "bosman", "koniec", "umowaWstepna", "akademia", "testy", "wyroznienie", "skauting", "nowy", "rozwiazanie"].includes(w.t) ? "0 zł" : "—"}
         </Text>
       </Pressable>
     );
@@ -76,6 +76,7 @@ export function HistoriaTransferow({ s, klub, onZawodnik }: { s: StanGry; klub: 
       <View style={[st.karta, { marginHorizontal: 0, marginTop: 8 }]}>
         <Text style={[st.maly, { fontWeight: "800", color: K.tekst }]}>Bilans {etykieta}: przyszło {przyszli.length} · odeszło {odeszli.length}</Text>
         <Text style={st.maly}>Wydatki na transfery: <Text style={{ color: K.czerwony, fontWeight: "800" }}>{zl(wydane)}</Text> · wpływy: <Text style={{ color: K.zielony, fontWeight: "800" }}>{zl(zarobione)}</Text> · saldo: <Text style={{ color: zarobione - wydane >= 0 ? K.zielony : K.czerwony, fontWeight: "800" }}>{zarobione - wydane >= 0 ? "+" : "−"}{zl(Math.abs(zarobione - wydane))}</Text></Text>
+        {[...przyszli, ...odeszli].some((x) => x.t === "transfer") && <Text style={st.maly}>➡️ Prawdziwe transfery z okna przed startem gry — kwoty nieujawnione (w bilansie liczone są tylko transfery z Twojej kariery).</Text>}
         <Text style={st.maly}>Wypożyczeni: do klubu {przyszli.filter((x) => x.t === "wypozyczenie").length} · z klubu {odeszli.filter((x) => x.t === "wypozyczenie").length} · wychowankowie z akademii: {przyszli.filter((x) => x.t === "akademia").length}</Text>
       </View>
 
@@ -83,7 +84,7 @@ export function HistoriaTransferow({ s, klub, onZawodnik }: { s: StanGry; klub: 
       {P.length ? P.map((w, i) => <Wiersz key={`p${i}`} w={w} kierunek="in" />) : <Text style={[st.maly, { marginTop: 4 }]}>Brak przyjść w tym okresie.</Text>}
       <Text style={[st.maly, { color: K.czerwony, fontWeight: "800", marginTop: 12, letterSpacing: 0.5 }]}>⬆ ODESZLI ({O.length})</Text>
       {O.length ? O.map((w, i) => <Wiersz key={`o${i}`} w={w} kierunek="out" />) : <Text style={[st.maly, { marginTop: 4 }]}>Brak odejść w tym okresie.</Text>}
-      {!(s.rejestrTransferow ?? []).length && <Text style={[st.maly, { marginTop: 8 }]}>Historia transferów jest zapisywana od tej wersji gry — pierwsze wpisy pojawią się przy najbliższych ruchach kadrowych.</Text>}
+      {!ileTransferow(s) && <Text style={[st.maly, { marginTop: 8 }]}>Historia transferów jest zapisywana od tej wersji gry — pierwsze wpisy pojawią się przy najbliższych ruchach kadrowych.</Text>}
     </View>
   );
 }
