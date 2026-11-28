@@ -10,7 +10,8 @@ import { moznaPuchar } from "./puchar";
 import { ileKolejek, kontekstTreningu, rozwojTreningowy, zagrajKolejke } from "./sezon";
 import { ETYKIETA_ATRYB } from "./atrybuty";
 import { dataOkresu, dzienOkresu, nazwaDnia, rozpocznijOkres } from "./okres";
-import { przetworzNegocjacje } from "./transfery";
+import { czekaNaCiebie, przetworzNegocjacje } from "./transfery";
+import { meczPucharuGracza } from "./puchar";
 import { mnoznikSesji } from "./treningLive";
 import type { StanGry, Zawodnik } from "./types";
 
@@ -150,4 +151,66 @@ export function doMeczu(s: StanGry) {
   let g = 0;
   if (s.okres) { while (s.okres && g++ < 200) dalejDzien(s); return; }
   while (dzisiaj(s).typ !== "mecz" && g++ < 8) dalejDzien(s);
+}
+
+// ——— Przewijanie kalendarza (wiele dni naraz) — z inteligentnym zatrzymaniem na ważnych wydarzeniach ———
+export interface OpcjePrzewijania {
+  dni: number;                 // ile dni maksymalnie przewinąć
+  mecze: boolean;              // true = mecze rozgrywane automatycznie (symulacja); false = stop w dniu Twojego meczu
+  stopKontuzja: boolean;       // nowa kontuzja w Twojej kadrze
+  stopOferta: boolean;         // nowa oferta za Twojego zawodnika / oferta pracy dla trenera
+  stopNegocjacje: boolean;     // negocjacje czekają na Twoją decyzję
+  stopOkres: boolean;          // początek/koniec okresu przygotowawczego (start rozgrywek, przerwa zimowa)
+}
+export const DOMYSLNE_PRZEWIJANIE: OpcjePrzewijania = { dni: 7, mecze: false, stopKontuzja: true, stopOferta: true, stopNegocjacje: true, stopOkres: true };
+export interface WynikPrzewijania { dni: number; mecze: number; powod?: string; dzienne: { data: string; tytul: string; ikona: string }[]; wiadomosci: string[] }
+
+/** Data „dzisiaj" w kalendarzu (sezon albo okres przygotowawczy). */
+export function dataBiezaca(s: StanGry): Date { return s.okres ? dataOkresu(s) : dzisiaj(s).data; }
+
+/** Ile dni do wskazanej daty (≥0). */
+export function dniDo(s: StanGry, cel: Date): number {
+  const a = dataBiezaca(s); const d0 = new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime();
+  const d1 = new Date(cel.getFullYear(), cel.getMonth(), cel.getDate()).getTime();
+  return Math.max(0, Math.round((d1 - d0) / 86400000));
+}
+/** Ile dni do najbliższego meczu Twojej drużyny (ligowego lub pucharowego). */
+export function dniDoMeczu(s: StanGry): number | null {
+  if (s.okres) return null;
+  const plan = planTygodnia(s); const d = dzisiaj(s);
+  for (const p of plan) if (p.idx >= d.idx && (p.typ === "mecz" || (p.typ === "puchar" && meczPucharuGracza(s)))) return p.idx - d.idx;
+  return null;
+}
+
+/** Przewiń kalendarz o kilka dni. Każdy dzień wykonuje się normalnie (treningi wg planu, regeneracja, negocjacje, budowy),
+ *  a przewijanie zatrzymuje się, gdy wydarzy się coś, co wymaga Twojej decyzji. */
+export function przewin(s: StanGry, o: OpcjePrzewijania): WynikPrzewijania {
+  const w: WynikPrzewijania = { dni: 0, mecze: 0, dzienne: [], wiadomosci: [] };
+  const mojaKadra = () => s.kluby[s.mojKlub]?.zawodnicy ?? [];
+  const kontuzjowani = () => new Set(mojaKadra().filter((id) => (s.zawodnicy[id]?.kontuzja ?? 0) > 0));
+  const czekajace = () => (s.negocjacje ?? []).filter((n) => czekaNaCiebie(n, s)).length;
+  const wiad0 = s.wiadomosci.length;
+  for (let i = 0; i < Math.min(o.dni, 120); i++) {
+    if (s.koniecSezonu) { w.powod = "🏁 Koniec sezonu — podsumowanie i awanse/spadki czekają na pulpicie."; break; }
+    if (s.zwolniony) { w.powod = "🚪 Jesteś bez klubu — przewijanie zatrzymane."; break; }
+    if (!s.okres) {
+      const d = dzisiaj(s);
+      if (!o.mecze && d.typ === "mecz") { w.powod = "⚽ Dzień meczu — zagraj na żywo albo rozegraj sam."; break; }
+      if (!o.mecze && d.typ === "puchar" && meczPucharuGracza(s) && !s.meczLivePuchar) { w.powod = "🏆 Mecz pucharowy Twojej drużyny — zagraj na żywo albo przejdź dalej."; break; }
+    }
+    const k0 = kontuzjowani(), of0 = s.oferty.length, ot0 = (s.ofertyTrenera ?? []).length, n0 = czekajace(), okres0 = !!s.okres;
+    const dzien = s.okres ? null : dzisiaj(s);
+    const mecz = dalejDzien(s);
+    w.dni++; if (mecz) w.mecze++;
+    const r = s.raportyDni?.[0]; if (r) w.dzienne.push({ data: r.data, tytul: r.tytul, ikona: r.ikona });
+    if (o.stopKontuzja) { const nowe = [...kontuzjowani()].filter((id) => !k0.has(id)); if (nowe.length) { w.powod = `🤕 Kontuzja: ${nowe.map((id) => `${s.zawodnicy[id].imie} ${s.zawodnicy[id].nazwisko} (${s.zawodnicy[id].kontuzja} kol.)`).join(", ")}.`; break; } }
+    if (o.stopOferta && s.oferty.length > of0) { w.powod = "💰 Nowa oferta za Twojego zawodnika — sprawdź Transfery."; break; }
+    if (o.stopOferta && (s.ofertyTrenera ?? []).length > ot0) { w.powod = "📞 Oferta pracy dla Ciebie od innego klubu."; break; }
+    if (o.stopNegocjacje && czekajace() > n0) { w.powod = "✉️ Negocjacje czekają na Twoją decyzję."; break; }
+    if (o.stopOkres && okres0 !== !!s.okres) { w.powod = s.okres ? "❄️ Przerwa w rozgrywkach — zaczyna się okres przygotowawczy." : "🏟 Koniec przygotowań — startują rozgrywki!"; break; }
+    if (mecz && !o.mecze) break;
+    void dzien;
+  }
+  w.wiadomosci = s.wiadomosci.slice(0, Math.max(0, s.wiadomosci.length - wiad0)).map((x) => x.tekst).slice(0, 12);
+  return w;
 }

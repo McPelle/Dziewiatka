@@ -1,3 +1,4 @@
+import { PrzyciskPrzewijania } from "./Przewijanie";
 import { PrzejscieDnia, type DzienKarty } from "./PrzejscieDnia";
 import { useState } from "react";
 import { Alert, Platform, Pressable, Text, View } from "react-native";
@@ -136,6 +137,7 @@ export function PanelOkresu({ s, odswiez }: { s: StanGry; odswiez: () => void })
           <Text style={[st.przyciskMalyTekst, { color: K.niebieski }]}>{o.dzien < o.dniUrlopu ? "⏩ Koniec urlopu" : "⏩ Do startu rozgrywek"}</Text>
         </Pressable>
       </View>
+      <View style={{ marginTop: 8 }}><PrzyciskPrzewijania s={s} odswiez={odswiez} /></View>
     </View>
   );
 }

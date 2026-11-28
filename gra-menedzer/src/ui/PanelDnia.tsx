@@ -1,3 +1,4 @@
+import { PrzyciskPrzewijania } from "./Przewijanie";
 import { PrzejscieDnia, type DzienKarty } from "./PrzejscieDnia";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -86,6 +87,9 @@ export function PanelDnia({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () =
             <Text style={[st.przyciskMalyTekst, { color: K.niebieski }]}>⏩ Do meczu</Text>
           </Pressable>
         )}
+      </View>
+      <View style={[st.wiersz, { gap: 8, marginTop: 8 }]}>
+        <View style={{ flex: 1 }}><PrzyciskPrzewijania s={s} odswiez={odswiez} onMecz={pokazMecz} /></View>
       </View>
       <KalendarzMiesiac s={s} widoczny={miesiac} onClose={() => setMiesiac(false)} />
       {karta !== null && <KartaDnia s={s} data={plan[karta]?.data ?? null} dzis={d.data} odswiez={odswiez}
