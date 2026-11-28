@@ -17,6 +17,7 @@ import { bledySpalonego } from "./obsadaSedziowska";
 import { formacjaAI } from "./sezon";
 import type { Nastawienie, Pozycja, StanGry, Zawodnik } from "./types";
 import { szczebelRegionalny, zpnSciezki } from "./zpn";
+import { liczySieJakoMlodziezowiec, wymogMlodziezowca } from "./swiat";
 
 export interface ZasadyZmian { limit: number; okna: number | null; powrotne: boolean; lawka: number; opis: string }
 export function zasadyZmian(s: StanGry): ZasadyZmian {
@@ -416,7 +417,7 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
   if (m.reakcjaAI != null && m.min >= m.reakcjaAI) { // reakcja trenera AI na Twoją zmianę taktyki
     m.reakcjaAI = undefined;
     const ja = m.moja === "dom" ? m.dom : m.gosc, fj = FORMACJE[ja.formacja], fa = FORMACJE[ai.formacja];
-    const tr = `${s.kluby[ai.klubId].trenerNazwisko ? `Trener ${s.kluby[ai.klubId].trenerNazwisko}` : `Trener ${s.kluby[ai.klubId].nazwa}`}`;
+    const tr = `${s.kluby[ai.klubId].trenerNazwisko ? `Trener ${s.kluby[ai.klubId].trenerNazwisko}` : `Trener drużyny ${s.kluby[ai.klubId].nazwa}`}`;
     let t: string | null = null;
     if (fj && fa && fj.NAP >= 3 && fa.OBR < 5) { ai.formacja = fa.NAP >= 2 ? "5-3-2" : "5-4-1"; t = `📋 ${tr} reaguje na Twoich trzech napastników — dokłada obrońcę, przechodzi na ${ai.formacja}.`; }
     else if (ja.nastawienie === "ofensywne" && ai.nastawienie !== "obronne" && roznicaAI >= 0) { ai.nastawienie = "obronne"; t = `📋 ${tr} widzi, że ruszyliście do przodu — cofa linię i czeka na kontry.`; }
@@ -596,6 +597,11 @@ export function zmianaGracza(s: StanGry, m: MeczLive, schodzi: string, wchodzi: 
   if (z.zmiany >= m.zasady.limit) return `Wykorzystano limit zmian (${m.zasady.limit}).`;
   if (m.zasady.okna !== null && !przerwa(m) && z.oknaZmian.length >= m.zasady.okna && !z.oknaZmian.includes(m.min)) return `Wykorzystano ${m.zasady.okna} przerwy w grze na zmiany — przepisy nie pozwalają na kolejną (poza przerwą między połowami).`;
   if (!m.zasady.powrotne && m.zmianyLog.some((x) => x.schodzi === wchodzi && x.klubId === z.klubId)) return "Zawodnik zmieniony nie może wrócić na boisko (w tej klasie nie ma zmian powrotnych).";
+  { // przepis o młodzieżowcu: musi grać cały mecz — zejść może tylko za innego młodzieżowca
+    const k = s.kluby[z.klubId]; const pz = k.poziom; const wym = m.puchar ? 0 : wymogMlodziezowca(pz, s.sciezka, s.ligi[pz - 1]?.nazwa);
+    const mlody = (id: string) => !!s.zawodnicy[id] && liczySieJakoMlodziezowiec(s.zawodnicy[id], pz, s.sciezka);
+    if (wym > 0 && mlody(schodzi) && !mlody(wchodzi) && z.naBoisku.filter(mlody).length <= wym) return `Przepis PZPN: młodzieżowiec musi grać cały mecz — zmień go tylko na innego młodzieżowca (wymagani: ${wym}).`;
+  }
   wykonajZmiane(s, m, z, schodzi, wchodzi, "taktyczna");
   return null;
 }

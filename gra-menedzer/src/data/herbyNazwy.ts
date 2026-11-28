@@ -2,6 +2,16 @@
 // Dzięki temu oryginalny herb pokazuje się w KAŻDEJ karierze i na każdej liście (nie tylko tam, gdzie dane klubu mają pole `herb`).
 // Kluby bez pliku herbu (brak w nadesłanych herbach) dostają generowany emblemat w barwach klubu.
 export const HERB_PO_NAZWIE: Record<string, string> = {
+  "Warmianka Bęsia": "nowy-warmianka-besia",
+  "Szansa Reszel": "nowy-szansa-reszel",
+  "Iskra Smykówko": "nowy-iskra-smykowko",
+  "Wilczek Wilkowo": "nowy-wilczek-wilkowo",
+  "Leśna Białystok": "nowy-lesna-bialystok",
+  "Lider Łomża": "nowy-lider-lomza",
+  "Klonowa Suwałki": "nowy-klonowa-suwalki",
+  "Szerszeń Parleza Wielka": "nowy-szerszen-parleza-wielka",
+  "Granica Bezledy": "nowy-granica-bezledy",
+  "Start Kozłowo": "nowy-start-kozlowo",
   "LZS Zamek Szymbark": "nowy-wm-lzs-zamek-szymbark",
   "Orzeł Ulnowo": "nowy-wm-orzel-ulnowo",
   "PFT Sampława": "nowy-wm-pft-samplawa",

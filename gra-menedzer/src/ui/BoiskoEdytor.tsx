@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Modal, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { FORMACJE, FORMACJE_SLOTY, przydzielSloty, silaSkladu } from "../engine/mecz";
-import { jestMlodziezowcem, wymogMlodziezowca } from "../engine/swiat";
+import { jestMlodziezowcem, liczySieJakoMlodziezowiec, wymogMlodziezowca } from "../engine/swiat";
 import { KAT_POZ, SKROT_POZ, dopasowanieDoSlotu, opisDopasowania } from "../data/pozycje";
 import type { Pozycja, PozycjaSzczegolowa, StanGry, Zawodnik } from "../engine/types";
 import { CZCIONKA, cien, K, st } from "./styl";
@@ -40,8 +40,8 @@ export function BoiskoEdytor({ s, widoczny, onClose, odswiez }: { s: StanGry; wi
   const komplet = naBoisku.length === ustaw.length;
   const silaRaw = silaSkladu(s, komplet ? (ustaw as string[]) : naBoisku, formacja, komplet);
   const sila = Math.round((silaRaw.atak + silaRaw.obrona) / 2);
-  const wymog = wymogMlodziezowca(klub.poziom);
-  const mlodzi = naBoisku.filter((id) => jestMlodziezowcem(s.zawodnicy[id])).length;
+  const wymog = wymogMlodziezowca(klub.poziom, s.sciezka, s.ligi[klub.poziom - 1]?.nazwa);
+  const mlodzi = naBoisku.filter((id) => s.zawodnicy[id] && liczySieJakoMlodziezowiec(s.zawodnicy[id], klub.poziom, s.sciezka)).length;
 
   const zapisz = (next: (string | null)[]) => {
     setUstaw(next);
@@ -174,7 +174,7 @@ export function BoiskoEdytor({ s, widoczny, onClose, odswiez }: { s: StanGry; wi
           </View>
           <View style={[st.wiersz, { justifyContent: "space-between", alignItems: "center", marginTop: 6 }]}>
             <Text style={{ color: mlodzi >= wymog ? K.szary : K.czerwony, fontSize: 11.5, fontFamily: CZCIONKA, flex: 1 }}>
-              {mlodzi >= wymog ? "✓" : "⚠"} Młodzieżowcy (U-21): {mlodzi}/{wymog} wymagane.
+              {mlodzi >= wymog ? "✓" : "⚠"} Młodzieżowcy (rocznik 2006+): {mlodzi}/{wymog} wymagane.
             </Text>
             {wybrany?.from != null && (
               <Pressable onPress={zejdzNaLawke} style={({ pressed }) => [{ backgroundColor: K.karta2, borderWidth: 1, borderColor: K.czerwony, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 7, opacity: pressed ? 0.8 : 1 }]}>

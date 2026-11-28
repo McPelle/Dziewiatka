@@ -1,5 +1,7 @@
 // Rejestr wojewódzkich związków piłki nożnej (ZPN) dostępnych w grze — jedno miejsce na regulaminy i nazwy,
 // z którego korzystają puchar regionalny, baraże, limity zmian, zgłoszenia, sędziowie, juniorzy, logo i mapa.
+// Przepisy meczowe 2026/27 (młodzieżowiec, cudzoziemcy, zmiany): regulaminy rozgrywek seniorów ZPN — POM art. 15/18/28,
+// K-PZPN § 16–17/26, ZZPN § 7–8/13/15, MZPN § 7/9–10/14/16, WMZPN § 35–36/45, Podlaski ZPN § 12–13/20.
 // Rozpoznanie po nazwie ścieżki (np. „Kujawsko-Pomorskie — Toruń I") albo po nazwach lig świata gry.
 import type { StanGry } from "./types";
 
@@ -16,6 +18,12 @@ export interface DaneZpn {
   przymiotnik: string;         // do nazw lig juniorów: „Pomorska Liga Juniorów"
   pucharKrotki: string;        // potoczna nazwa pucharu wojewódzkiego
   okregi: string[];            // podokręgi / kolegia sędziowskie
+  /** Wymagana liczba młodzieżowców (rocznik 2006 i młodsi w 2026/27) przez cały mecz — regulaminy ZPN 2026/27. */
+  mlodziezowcy: { IV: number; OKR: number; A: number; B: number };
+  /** Młodzieżowiec musi być obywatelem polskim. */
+  mlodziezowiecPolak?: boolean;
+  /** Limit zawodników spoza UE/EOG jednocześnie na boisku (99 = bez limitu; Ukraińcy nie są liczeni). */
+  spozaUE: { IV: number; OKR: number; A: number; B: number };
   /** Limit zmian wg szczebla (99 = zmiany powrotne bez limitu). */
   zmiany: { IV: number; OKR: number; A: number; B: number };
   /** Dogrywka w pucharze wojewódzkim: każdy mecz / od 1/8 finału / tylko finał. */
@@ -30,36 +38,36 @@ export const ZPN: Record<KodZpn, DaneZpn> = {
   ZZPN: {
     kod: "ZZPN", region: "zachodniopomorskie", woj: "zachodniopomorskie", prefiksy: ["Zachodniopomorskie"], wzorLigi: /zachodniopomor/i,
     mian: "Zachodniopomorski ZPN", dop: "Zachodniopomorskiego ZPN", skrot: "ZZPN", przymiotnik: "Zachodniopomorska", pucharKrotki: "Puchar Zachodniopomorski",
-    okregi: ["Szczecin", "Koszalin", "Stargard", "Kołobrzeg"], zmiany: { IV: 7, OKR: 7, A: 7, B: 99 }, dogrywkaPuchar: "final", dogrywkaBaraz: false,
+    okregi: ["Szczecin", "Koszalin", "Stargard", "Kołobrzeg"], mlodziezowcy: { IV: 2, OKR: 1, A: 0, B: 0 }, mlodziezowiecPolak: true, spozaUE: { IV: 2, OKR: 2, A: 2, B: 2 }, zmiany: { IV: 7, OKR: 7, A: 7, B: 99 }, dogrywkaPuchar: "final", dogrywkaBaraz: false,
   },
   KP: {
     kod: "KP", region: "kujawsko-pomorskie", woj: "kujawsko-pomorskie", prefiksy: ["Kujawsko-Pomorskie"], wzorLigi: /kujawsko/i,
     mian: "Kujawsko-Pomorski ZPN", dop: "Kujawsko-Pomorskiego ZPN", skrot: "K-PZPN", przymiotnik: "Kujawsko-Pomorska", pucharKrotki: "Puchar Kujawsko-Pomorski",
-    okregi: ["Bydgoszcz", "Toruń", "Włocławek", "Grudziądz"], zmiany: { IV: 5, OKR: 5, A: 5, B: 7 }, dogrywkaPuchar: "od18", dogrywkaBaraz: true,
+    okregi: ["Bydgoszcz", "Toruń", "Włocławek", "Grudziądz"], mlodziezowcy: { IV: 1, OKR: 1, A: 0, B: 0 }, spozaUE: { IV: 2, OKR: 2, A: 2, B: 2 }, zmiany: { IV: 5, OKR: 7, A: 7, B: 7 }, dogrywkaPuchar: "od18", dogrywkaBaraz: true,
   },
   WM: {
     kod: "WM", region: "warminsko-mazurskie", woj: "warmińsko-mazurskie", prefiksy: ["Warmińsko-Mazurskie"], wzorLigi: /warmi[ńn]sko/i,
     mian: "Warmińsko-Mazurski ZPN", dop: "Warmińsko-Mazurskiego ZPN", skrot: "WMZPN", przymiotnik: "Warmińsko-Mazurska", pucharKrotki: "Wojewódzki Puchar Polski WMZPN",
     // regulamin WMZPN 2026/27: IV liga 7 zmian, okręgowa i A klasa 9, B klasa — zmiany powrotne; WPP: rundy I, II i 1/16 od razu karne,
     // od 1/8 dogrywka; baraże (mecz i rewanż) — dogrywka i karne
-    okregi: ["Olsztyn", "Elbląg", "Ełk"], zmiany: { IV: 7, OKR: 9, A: 9, B: 99 }, dogrywkaPuchar: "od18", dogrywkaBaraz: true, barazDwumecz: true,
+    okregi: ["Olsztyn", "Elbląg", "Ełk"], mlodziezowcy: { IV: 2, OKR: 2, A: 1, B: 0 }, spozaUE: { IV: 2, OKR: 2, A: 2, B: 2 }, zmiany: { IV: 7, OKR: 9, A: 9, B: 99 }, dogrywkaPuchar: "od18", dogrywkaBaraz: true, barazDwumecz: true,
   },
   POD: {
     kod: "POD", region: "podlaskie", woj: "podlaskie", prefiksy: ["Podlaskie"], wzorLigi: /podlask/i,
     mian: "Podlaski ZPN", dop: "Podlaskiego ZPN", skrot: "PZPN Białystok", przymiotnik: "Podlaska", pucharKrotki: "Wojewódzki Puchar Polski Podlaskiego ZPN",
     // regulamin Podlaskiego ZPN 2026/27: IV liga 5 zmian, okręgowa i A klasa 6 (bez zmian powrotnych); puchar — dogrywka i karne
     // w każdej rundzie; baraże (dwumecz) — dogrywka i karne. Brak klasy B.
-    okregi: ["Białystok", "Łomża", "Suwałki"], zmiany: { IV: 5, OKR: 6, A: 6, B: 6 }, dogrywkaPuchar: "zawsze", dogrywkaBaraz: true, barazDwumecz: true,
+    okregi: ["Białystok", "Łomża", "Suwałki"], mlodziezowcy: { IV: 2, OKR: 2, A: 1, B: 0 }, spozaUE: { IV: 3, OKR: 3, A: 3, B: 3 }, zmiany: { IV: 5, OKR: 6, A: 6, B: 6 }, dogrywkaPuchar: "zawsze", dogrywkaBaraz: true, barazDwumecz: true,
   },
   POM: {
     kod: "POM", region: "pomorskie", woj: "pomorskie", prefiksy: ["Pomorskie"], wzorLigi: /pomor/i,
     mian: "Pomorski ZPN", dop: "Pomorskiego ZPN", skrot: "Pomorski ZPN", przymiotnik: "Pomorska", pucharKrotki: "Puchar Pomorski",
-    okregi: ["Gdańsk", "Słupsk", "Malbork", "Gdynia"], zmiany: { IV: 5, OKR: 5, A: 5, B: 6 }, dogrywkaPuchar: "zawsze", dogrywkaBaraz: false,
+    okregi: ["Gdańsk", "Słupsk", "Malbork", "Gdynia"], mlodziezowcy: { IV: 2, OKR: 1, A: 0, B: 0 }, spozaUE: { IV: 1, OKR: 1, A: 1, B: 1 }, zmiany: { IV: 5, OKR: 5, A: 5, B: 7 }, dogrywkaPuchar: "zawsze", dogrywkaBaraz: false,
   },
   MZPN: {
     kod: "MZPN", region: "malopolskie", woj: "małopolskie", prefiksy: ["Małopolska"], wzorLigi: /ma[łl]opol/i,
     mian: "Małopolski ZPN", dop: "Małopolskiego ZPN", skrot: "MZPN", przymiotnik: "Małopolska", pucharKrotki: "Puchar Małopolski",
-    okregi: ["Kraków", "Tarnów", "Nowy Sącz", "Wadowice"], zmiany: { IV: 5, OKR: 7, A: 7, B: 7 }, dogrywkaPuchar: "final", dogrywkaBaraz: false,
+    okregi: ["Kraków", "Tarnów", "Nowy Sącz", "Wadowice"], mlodziezowcy: { IV: 1, OKR: 0, A: 0, B: 0 }, spozaUE: { IV: 3, OKR: 3, A: 99, B: 99 }, zmiany: { IV: 7, OKR: 7, A: 7, B: 7 }, dogrywkaPuchar: "final", dogrywkaBaraz: false,
   },
 };
 

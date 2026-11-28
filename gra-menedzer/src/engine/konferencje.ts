@@ -64,7 +64,7 @@ export function konferencjaPrzed(s: StanGry, rywalId: string, puchar: boolean): 
     { tekst: "Musi się szybciej uczyć, inaczej będzie problem.", morale: -1, zarzad: 1, zawodnik: { id: obcy.id, morale: -5 }, odzew: `Presja na ${obcy.nazwisko} — w szatni cisza.` } ] });
   // trener rywala z zagranicy
   const rk = s.kluby[rywalId];
-  if (rk?.trenerKraj && szansa(0.4)) pyt.push({ kontekst: "Trener rywala", pytanie: `Trener ${R}, ${rk.trenerImie} ${rk.trenerNazwisko} (${rk.trenerKraj}), mówi, że polska liga jest „fizyczna i chaotyczna”. Co na to?`, opcje: [
+  if (rk?.trenerKraj && szansa(0.4)) pyt.push({ kontekst: "Trener rywala", pytanie: `Trener drużyny ${R}, ${rk.trenerImie} ${rk.trenerNazwisko} (${rk.trenerKraj}), mówi, że polska liga jest „fizyczna i chaotyczna”. Co na to?`, opcje: [
     { tekst: "Zapraszam na boisko — sprawdzimy, kto jest chaotyczny.", morale: 2, zarzad: 0, kibice: 2, motywacja: 0.02, odzew: "Wojna słowna! Nagłówki gotowe." },
     { tekst: "Każdy ma prawo do opinii. My robimy swoje.", morale: 1, zarzad: 1, odzew: "Spokój i klasa." } ] });
   // Ogólne — zawsze coś na koniec
@@ -75,7 +75,7 @@ export function konferencjaPrzed(s: StanGry, rywalId: string, puchar: boolean): 
     { kontekst: "Kibice", pytanie: "Kibice apelują o więcej ofensywnej gry. Słyszysz ich?", opcje: [
       { tekst: "Słyszę — dziś zagramy odważnie.", morale: 1, zarzad: 0, kibice: 3, motywacja: 0.01, odzew: "Trybuny zachwycone zapowiedzią." },
       { tekst: "Najważniejszy jest wynik, nie styl.", morale: 0, zarzad: 2, kibice: -2, odzew: "Pragmatyzm nie porwał kibiców." } ] },
-    { kontekst: "Rywal", pytanie: `Trener ${R} mówi, że jesteście w ich zasięgu. Komentarz?`, opcje: [
+    { kontekst: "Rywal", pytanie: `Trener drużyny ${R} mówi, że jesteście w ich zasięgu. Komentarz?`, opcje: [
       { tekst: "Szanujemy rywala, odpowiemy na boisku.", morale: 1, zarzad: 1, motywacja: 0.01, odzew: "Klasa." },
       { tekst: "Niech mówią — my gramy swoje.", morale: 2, zarzad: 0, motywacja: 0.01, odzew: "Pewność siebie udzieliła się szatni." },
       { tekst: "Zobaczymy, czy będzie taki pewny po meczu.", morale: 2, zarzad: -1, kibice: 2, motywacja: 0.02, odzew: "Wojna słowna! Media mają nagłówek." } ] },

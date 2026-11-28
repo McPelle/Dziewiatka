@@ -2,6 +2,16 @@
 import type { ImageSourcePropType } from "react-native";
 
 export const HERBY: Record<string, ImageSourcePropType> = {
+  "nowy-warmianka-besia": require("../../assets/herby/nowy-warmianka-besia.png"),
+  "nowy-szansa-reszel": require("../../assets/herby/nowy-szansa-reszel.png"),
+  "nowy-iskra-smykowko": require("../../assets/herby/nowy-iskra-smykowko.png"),
+  "nowy-wilczek-wilkowo": require("../../assets/herby/nowy-wilczek-wilkowo.png"),
+  "nowy-lesna-bialystok": require("../../assets/herby/nowy-lesna-bialystok.png"),
+  "nowy-lider-lomza": require("../../assets/herby/nowy-lider-lomza.png"),
+  "nowy-klonowa-suwalki": require("../../assets/herby/nowy-klonowa-suwalki.png"),
+  "nowy-szerszen-parleza-wielka": require("../../assets/herby/nowy-szerszen-parleza-wielka.png"),
+  "nowy-granica-bezledy": require("../../assets/herby/nowy-granica-bezledy.png"),
+  "nowy-start-kozlowo": require("../../assets/herby/nowy-start-kozlowo.png"),
   "nowy-wm-lzs-zamek-szymbark": require("../../assets/herby/nowy-wm-lzs-zamek-szymbark.png"),
   "nowy-wm-orzel-ulnowo": require("../../assets/herby/nowy-wm-orzel-ulnowo.png"),
   "nowy-wm-pft-samplawa": require("../../assets/herby/nowy-wm-pft-samplawa.png"),

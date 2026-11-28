@@ -5,7 +5,7 @@ import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { zl } from "../engine/losuj";
 import { autoSklad, FORMACJE, POZYCJE, przydzielSloty, silaSkladu } from "../engine/mecz";
 import { SKROT_POZ, ETYKIETA_POZ, opisDopasowania } from "../data/pozycje";
-import { dataKontraktu, jestMlodziezowcem, NAZWA_KONTRAKTU, wymogMlodziezowca } from "../engine/swiat";
+import { dataKontraktu, jestMlodziezowcem, liczySieJakoMlodziezowiec, NAZWA_KONTRAKTU, wymogMlodziezowca } from "../engine/swiat";
 import { domyslnyWykonawca, poziomAkademii, treningiMoje, ustawWykonawca, wicekapitanowie, wykonawca, zwolnijZawodnika } from "../engine/sezon";
 import type { Nastawienie, StanGry, Zawodnik } from "../engine/types";
 import { Akademia } from "./Akademia";
@@ -31,7 +31,7 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
     .map((id) => s.zawodnicy[id]).filter(Boolean)
     .sort((a, b) => POZYCJE.indexOf(a.poz) - POZYCJE.indexOf(b.poz) || b.umiej - a.umiej);
   const sila = silaSkladu(s, t.sklad, t.formacja, !!t.reczneSloty);
-  const maMlodziezowca = t.sklad.some((id) => s.zawodnicy[id] && jestMlodziezowcem(s.zawodnicy[id]));
+  const pozM = s.kluby[s.mojKlub].poziom; const wymM = wymogMlodziezowca(pozM, s.sciezka, s.ligi[pozM - 1]?.nazwa); const ileM = t.sklad.filter((id) => s.zawodnicy[id] && liczySieJakoMlodziezowiec(s.zawodnicy[id], pozM, s.sciezka)).length; const maMlodziezowca = ileM >= wymM;
   const f = FORMACJE[t.formacja];
   const wSkladzie = (poz: string) => t.sklad.filter((id) => s.zawodnicy[id]?.poz === poz).length;
 
@@ -194,9 +194,9 @@ export function Sklad({ s, odswiez }: { s: StanGry; odswiez: () => void }) {
           Potrzeba: {POZYCJE.map((p) => `${p} ${wSkladzie(p)}/${f[p]}`).join(" · ")}. Dotknij zawodnika, żeby go wstawić lub zdjąć
           (wyłącza auto skład).
         </Text>
-        {wymogMlodziezowca(s.kluby[s.mojKlub].poziom) > 0 && (
+        {wymM > 0 && (
           <Text style={[st.maly, { marginTop: 6, color: maMlodziezowca ? K.zielony : K.czerwony, fontWeight: "700" }]}>
-            {maMlodziezowca ? "🟢 Młodzieżowiec (U-21) w składzie — OK" : "⚠ Brak młodzieżowca (U-21)! Bez niego walkower 0:3 (przepis PZPN)."}
+            {maMlodziezowca ? `🟢 Młodzieżowcy (rocznik 2006 i młodsi) w składzie: ${ileM}/${wymM} — OK` : `⚠ Młodzieżowcy w składzie: ${ileM}/${wymM}! Muszą grać cały mecz — inaczej walkower 0:3 (przepis PZPN).`}
             {s.mlodziezoweWystepy != null ? `  ·  wystąpień U-21 w sezonie: ${s.mlodziezoweWystepy}` : ""}
           </Text>
         )}

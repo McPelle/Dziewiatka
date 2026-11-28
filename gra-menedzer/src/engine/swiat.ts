@@ -65,6 +65,7 @@ import { generujAtrybuty, overall, rozwinAtrybuty } from "./atrybuty";
 import { KAT_POZ, POZ_WAGI } from "../data/pozycje";
 import { losujNarodowosc } from "../data/narodowosci";
 import type { Cecha, Klub, KontraktTyp, Liga, Pozycja, PozycjaSzczegolowa, StanGry, WpisKariery, Zawodnik } from "./types";
+import { szczebelRegionalny, zpnSciezki } from "./zpn";
 
 export const LICZBA_POZIOMOW = LIGI_NAZWY.length;
 
@@ -640,19 +641,27 @@ export function polaczRezerwy(s: StanGry) {
 }
 
 // ——— Przepisy PZPN: młodzieżowiec ———
-/** Młodzieżowiec = zawodnik do 21 lat (U-21), zgodnie z przepisami PZPN. */
-export const WIEK_MLODZIEZOWCA = 21;
+/** Młodzieżowiec w sezonie 2026/27 = rocznik 2006 i młodsi (wiek ≤ 20 na starcie sezonu) — uchwała PZPN VI/78 art. 5 ust. 4
+ *  i regulaminy wszystkich 6 ZPN. Musi przebywać na boisku przez cały mecz (zmiana tylko na innego młodzieżowca). */
+export const WIEK_MLODZIEZOWCA = 20;
 export function jestMlodziezowcem(z: Zawodnik): boolean {
   return z.wiek <= WIEK_MLODZIEZOWCA;
 }
-/** Wymagana liczba młodzieżowców na boisku wg poziomu (III liga i niżej — 1; ligi zawodowe — 0). */
-export function wymogMlodziezowca(poziom: number): number {
-  // Przepisy PZPN 2025/26+: Ekstraklasa — bez nakazu (Pro Junior System: zachęta finansowa);
-  // I liga — 1; II i III liga — 2; IV liga i niżej (regulaminy ZPN) — min. 1.
+/** Czy zawodnik spełnia wymóg młodzieżowca na danym szczeblu (1. Liga i ZZPN — tylko obywatele polscy). */
+export function liczySieJakoMlodziezowiec(z: Zawodnik, poziom: number, sciezka?: string): boolean {
+  if (!jestMlodziezowcem(z)) return false;
+  const polak = !z.kraj || z.kraj === "Polska";
+  if (poziom === 2 && !polak) return false;
+  if (poziom >= 5 && zpnSciezki(sciezka).mlodziezowiecPolak && !polak) return false;
+  return true;
+}
+/** Wymagana liczba młodzieżowców na boisku (2026/27): Ekstraklasa 0 (program „Młodzieżowiec 2.0” — tylko nagrody),
+ *  Betclic 1. Liga 1, 2. i 3. Liga 2 (uchwała PZPN VI/78); IV liga i niżej — wg regulaminu właściwego ZPN. */
+export function wymogMlodziezowca(poziom: number, sciezka?: string, nazwaLigi = ""): number {
   if (poziom <= 1) return 0;
   if (poziom === 2) return 1;
-  if (poziom === 3 || poziom === 4) return 2;
-  return 1;
+  if (poziom <= 4) return 2;
+  return zpnSciezki(sciezka).mlodziezowcy[szczebelRegionalny(nazwaLigi, poziom)];
 }
 
 export function uzupelnijWolnych(s: StanGry) {

@@ -1,6 +1,6 @@
 import { bonusTrudnosci } from "./osiagniecia";
 import { los, losInt, poisson, szansa, wybierz, wybierzWazone } from "./losuj";
-import { jestMlodziezowcem, wymogMlodziezowca } from "./swiat";
+import { jestMlodziezowcem, wymogMlodziezowca, liczySieJakoMlodziezowiec } from "./swiat";
 import { narodowoscKraju } from "../data/narodowosci";
 import { IMIONA, NAZWISKA } from "../data/nazwy";
 import { dopasowanieDoKategorii, dopasowanieDoSlotu, KAT_POZ } from "../data/pozycje";
@@ -19,19 +19,22 @@ function naturalnyW(z: Zawodnik, poz: Pozycja): boolean {
 }
 import { modKontuzja, modZmeczenie, poziomSztabu, skrocenieKontuzji } from "./sztab";
 import type { Nastawienie, Pozycja, PozycjaSzczegolowa, StanGry, Wynik, Zawodnik, Zdarzenie } from "./types";
+import { szczebelRegionalny, zpnSciezki } from "./zpn";
 
 /** Czy zawodnik jest Polakiem lub obywatelem UE/EOG (brak limitu). */
 export function czyUE(z: Zawodnik): boolean {
   return !z.kraj || (narodowoscKraju(z.kraj)?.ue ?? true);
 }
-/** Limit zawodników SPOZA UE na boisku wg poziomu (przepisy PZPN): Ekstraklasa — bez limitu;
- *  I–III liga — 2; IV liga i niżej — 1. */
-export function limitSpozaUE(poziom: number): number {
-  return poziom <= 1 ? 99 : poziom <= 4 ? 2 : 1;
+/** Limit zawodników SPOZA UE/EOG jednocześnie na boisku (2026/27): Ekstraklasa — bez limitu (uchwała VI/77 art. 9.3);
+ *  Betclic 1.–3. Liga — 2 (VI/78 art. 6); IV liga i niżej — wg regulaminu ZPN (Ukraińcy nie są liczeni do limitu). */
+export function limitSpozaUE(poziom: number, sciezka?: string, nazwaLigi = ""): number {
+  if (poziom <= 1) return 99;
+  if (poziom <= 4) return 2;
+  return zpnSciezki(sciezka).spozaUE[szczebelRegionalny(nazwaLigi, poziom)];
 }
-/** Liczba zawodników spoza UE wśród podanych id. */
-export function ileSpozaUE(s: StanGry, ids: string[]): number {
-  return ids.filter((id) => s.zawodnicy[id] && !czyUE(s.zawodnicy[id])).length;
+/** Liczba zawodników spoza UE wśród podanych id (na szczeblu regionalnym obywatele Ukrainy nie są wliczani). */
+export function ileSpozaUE(s: StanGry, ids: string[], poziom = 1): number {
+  return ids.filter((id) => s.zawodnicy[id] && !czyUE(s.zawodnicy[id]) && !(poziom >= 5 && s.zawodnicy[id].kraj === "Ukraina")).length;
 }
 
 export const FORMACJE: Record<string, Record<Pozycja, number>> = {
@@ -133,16 +136,16 @@ export function autoSklad(s: StanGry, klubId: string, formacja: string, dodatkow
   const uzyci = new Set<string>();
   for (const p of pary) { if (sklad[p.i] || uzyci.has(p.z.id)) continue; sklad[p.i] = p.z.id; uzyci.add(p.z.id); }
   // Przepis PZPN: wymagana LICZBA młodzieżowców (U-21) na boisku wg szczebla — wymiana z najmniejszą stratą.
-  const wymog = wymogMlodziezowca(s.kluby[klubId].poziom);
-  const ile = () => sklad.filter((id) => id && jestMlodziezowcem(s.zawodnicy[id])).length;
+  const pz = s.kluby[klubId].poziom; const wymog = wymogMlodziezowca(pz, s.sciezka, s.ligi[pz - 1]?.nazwa);
+  const ile = () => sklad.filter((id) => id && liczySieJakoMlodziezowiec(s.zawodnicy[id], pz, s.sciezka)).length;
   while (ile() < wymog) {
     let best: { i: number; z: Zawodnik; strata: number } | null = null;
     for (const z of kadra) {
-      if (uzyci.has(z.id) || !jestMlodziezowcem(z)) continue;
+      if (uzyci.has(z.id) || !liczySieJakoMlodziezowiec(z, pz, s.sciezka)) continue;
       sklad.forEach((id, i) => {
         if (!id || sloty[i] === "BR") return;
         const obecny = s.zawodnicy[id];
-        if (jestMlodziezowcem(obecny)) return;
+        if (liczySieJakoMlodziezowiec(obecny, pz, s.sciezka)) return;
         const strata = wart(obecny, sloty[i]) - wart(z, sloty[i]);
         if (!best || strata < best.strata) best = { i, z, strata };
       });
@@ -152,8 +155,8 @@ export function autoSklad(s: StanGry, klubId: string, formacja: string, dodatkow
     uzyci.delete(sklad[b.i]!); sklad[b.i] = b.z.id; uzyci.add(b.z.id);
   }
   // Przepis PZPN o cudzoziemcach: nie więcej niż limit zawodników spoza UE na boisku.
-  const limit = limitSpozaUE(s.kluby[klubId].poziom);
-  const spoza = () => sklad.filter((id) => id && !czyUE(s.zawodnicy[id])).length;
+  const limit = limitSpozaUE(pz, s.sciezka, s.ligi[pz - 1]?.nazwa);
+  const spoza = () => sklad.filter((id) => id && !czyUE(s.zawodnicy[id]) && !(pz >= 5 && s.zawodnicy[id].kraj === "Ukraina")).length;
   while (spoza() > limit) {
     let best: { i: number; z: Zawodnik; strata: number } | null = null;
     for (const z of kadra) {
