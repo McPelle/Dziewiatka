@@ -512,7 +512,7 @@ export interface StanGry {
 
 /** Role w sztabie szkoleniowym. */
 /** Jeden sędzia w kadrze świata: imię/nazwisko, klasa uprawnień (szczebel PZPN), region kolegium, odznaka FIFA. */
-export interface SedziaOsoba { imie: string; nazwisko: string; klasa: string; region: "centralny" | "pomorskie" | "malopolskie" | "zachodniopomorskie" | "kujawsko-pomorskie" | "warminsko-mazurskie" | "podlaskie"; fifa?: boolean; }
+export interface SedziaOsoba { imie: string; nazwisko: string; klasa: string; region: "centralny" | "pomorskie" | "malopolskie" | "zachodniopomorskie" | "kujawsko-pomorskie" | "warminsko-mazurskie" | "podlaskie" | "lubuskie" | "opolskie"; fifa?: boolean; }
 /** Kadra sędziowska świata. Szczebel centralny = realni (Ekstraklasa/I/II liga + Puchar Polski); region = generowani (III liga→B klasa + puchary wojewódzkie). */
 export interface Sedziowie {
   ekstraklasa: SedziaOsoba[]; // sędziowie główni Ekstraklasy (realni)

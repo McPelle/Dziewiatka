@@ -1,5 +1,5 @@
 // Oficjalne nazwy rozgrywek 2026/27 (z nazwami sponsorów tytularnych i oznaczeniami grup wg komunikatów ZPN:
-// pomorski-zpn.pl, kpzpn.pl, zzpn.pl, malopolskizpn.pl, wmzpn.pl, podlaskizpn.org; Betclic 3. Liga — PZPN).
+// pomorski-zpn.pl, kpzpn.pl, zzpn.pl, malopolskizpn.pl, wmzpn.pl, podlaskizpn.org, lubuskizpn.pl; Betclic 3. Liga — PZPN).
 // Wewnętrzne nazwy lig w danych gry pozostają unikalne (te same „Klasa A Grupa 1” są w kilku województwach, a silnik
 // rozpoznaje po nazwie szczebel i województwo) — gracz widzi nazwę oficjalną przez nazwaLigi().
 export const NAZWY_OFICJALNE: Record<string, string> = {
@@ -45,6 +45,24 @@ export const NAZWY_OFICJALNE: Record<string, string> = {
  "Klasa B (Myślenice)": "Klasa B Myślenice",
  "Klasa B (Nowy Sącz)": "Klasa B Nowy Sącz",
  "Klasa B (Żabno)": "Klasa B Tarnów III (Żabno)",
+ // Lubuski ZPN 2026/27 (lubuskizpn.pl; sponsor tytularny KEEZA: IV liga, okręgówka, klasa B)
+ "IV liga lubuska": "KEEZA IV liga lubuska",
+ "Klasa okręgowa — lubuska (Gorzów Wlkp.)": "KEEZA Klasa Okręgowa Grupa Nr 2 – Gorzów Wlkp.",
+ "Klasa okręgowa — lubuska (Zielona Góra)": "KEEZA Klasa Okręgowa Grupa Nr 1 – Zielona Góra",
+ "Klasa A — lubuska (Gorzów Wlkp. 1)": "Klasa A Gorzów Wlkp. Grupa I (LZPN)",
+ "Klasa A — lubuska (Gorzów Wlkp. 2)": "Klasa A Gorzów Wlkp. Grupa II (LZPN)",
+ "Klasa A — lubuska (Zielona Góra 1)": "Klasa A Zielona Góra Grupa I (LZPN)",
+ "Klasa A — lubuska (Zielona Góra 2)": "Klasa A Zielona Góra Grupa II (LZPN)",
+ "Klasa A — lubuska (Zielona Góra 3)": "Klasa A Zielona Góra Grupa III (LZPN)",
+ "Klasa B — lubuska (Gorzów Wlkp. 1)": "KEEZA Klasa B Gorzów Wlkp. Grupa I",
+ "Klasa B — lubuska (Gorzów Wlkp. 2)": "KEEZA Klasa B Gorzów Wlkp. Grupa II",
+ "Klasa B — lubuska (Gorzów Wlkp. 3)": "KEEZA Klasa B Gorzów Wlkp. Grupa III",
+ "Klasa B — lubuska (Zielona Góra Krosno Odrzańskie)": "KEEZA Klasa B Zielona Góra – grupa Krosno Odrzańskie",
+ "Klasa B — lubuska (Zielona Góra Nowa Sól)": "KEEZA Klasa B Zielona Góra – grupa Nowa Sól",
+ "Klasa B — lubuska (Zielona Góra Świebodzin)": "KEEZA Klasa B Zielona Góra – grupa Świebodzin",
+ "Klasa B — lubuska (Zielona Góra Żagań)": "KEEZA Klasa B Zielona Góra – grupa Żagań",
+ "Klasa B — lubuska (Zielona Góra Żary)": "KEEZA Klasa B Zielona Góra – grupa Żary",
+ "Klasa B — lubuska (Zielona Góra Zielona Góra)": "KEEZA Klasa B Zielona Góra – grupa Zielona Góra",
  "IV liga podlaska": "IV Liga Bank Spółdzielczy Bielsk Podlaski",
  "Klasa okręgowa — podlaska": "Klasa okręgowa (Podlaski ZPN)",
  "Klasa A — podlaska gr. 1": "Klasa A Grupa 1 (Podlaski ZPN)",

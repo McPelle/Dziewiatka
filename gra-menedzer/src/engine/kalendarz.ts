@@ -106,6 +106,11 @@ const KAL: { re: RegExp; k: KalSzczebla }[] = [
   { re: /iv liga warmińsko|okręgowa — warmińsko/i, k: { startJesien: [8, 1], startWiosna: [3, 6], urlopLato: 21, urlopZima: 60, przygLato: 28, przygZima: 51 } },
   { re: /klasa a — warmińsko/i, k: { startJesien: [8, 15], startWiosna: [3, 20], urlopLato: 35, urlopZima: 77, przygLato: 28, przygZima: 48 } },
   { re: /klasa b — warmińsko/i, k: { startJesien: [8, 15], startWiosna: [4, 3], urlopLato: 35, urlopZima: 118, przygLato: 28, przygZima: 42 } },
+  // Lubuski ZPN — terminarz jesień 2026 (lubuskizpn.pl): IV liga 1.08 → 21.11 (17 kolejek), okręgówka 8.08 → 14.11,
+  // klasa A 15–16.08 → 15.11, klasa B 23.08 → 8.11 (wiosna 2027 jeszcze nieopublikowana — typowy rytm szczebla).
+  { re: /iv liga lubuska|okręgowa — lubuska/i, k: { startJesien: [8, 1], startWiosna: [3, 7], urlopLato: 21, urlopZima: 56, przygLato: 28, przygZima: 50 } },
+  { re: /klasa a — lubuska/i, k: { startJesien: [8, 15], startWiosna: [3, 21], urlopLato: 35, urlopZima: 74, przygLato: 28, przygZima: 47 } },
+  { re: /klasa b — lubuska/i, k: { startJesien: [8, 23], startWiosna: [3, 28], urlopLato: 42, urlopZima: 98, przygLato: 28, przygZima: 42 } },
   // Podlaski ZPN — terminarz jesień 2026 (podlaskizpn.org): IV liga i okręgówka od 8–9.08 do 14–15.11; klasa A od 29–30.08
   // (wiosna 2027 jeszcze nieopublikowana — przyjęty typowy rytm szczebla).
   { re: /iv liga podlaska|okręgowa — podlaska/i, k: { startJesien: [8, 8], startWiosna: [3, 7], urlopLato: 26, urlopZima: 60, przygLato: 30, przygZima: 52 } },

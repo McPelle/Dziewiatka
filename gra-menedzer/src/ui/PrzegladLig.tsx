@@ -17,8 +17,8 @@ import { nazwaLigi } from "../data/nazwyLigOficjalne";
 // Pozostałe grupy/województwa: lista klubów z herbami i podgląd kadry (bez symulacji wyników — gra liczy tylko Twoją piramidę).
 
 type LigaKat = { nazwa: string; poziom: number; kluby: KlubDane[] };
-const WOJ = ["Małopolska", "Pomorskie", "Zachodniopomorskie", "Kujawsko-Pomorskie", "Warmińsko-Mazurskie", "Podlaskie"];
-const WOJ_ETYK: Record<string, string> = { "Małopolska": "Małopolskie", "Pomorskie": "Pomorskie", "Zachodniopomorskie": "Zachodniopomorskie", "Kujawsko-Pomorskie": "Kujawsko-pomorskie", "Warmińsko-Mazurskie": "Warmińsko-mazurskie", "Podlaskie": "Podlaskie" };
+const WOJ = ["Małopolska", "Pomorskie", "Zachodniopomorskie", "Kujawsko-Pomorskie", "Warmińsko-Mazurskie", "Podlaskie", "Lubuskie", "Opolskie"];
+const WOJ_ETYK: Record<string, string> = { "Małopolska": "Małopolskie", "Pomorskie": "Pomorskie", "Zachodniopomorskie": "Zachodniopomorskie", "Kujawsko-Pomorskie": "Kujawsko-pomorskie", "Warmińsko-Mazurskie": "Warmińsko-mazurskie", "Podlaskie": "Podlaskie", "Lubuskie": "Lubuskie", "Opolskie": "Opolskie" };
 
 /** Katalog wszystkich lig w danych gry (bez duplikatów). */
 function katalog() {

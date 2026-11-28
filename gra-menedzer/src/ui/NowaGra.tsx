@@ -44,7 +44,7 @@ const najnizsza = (label: string) => (label === "Podlaskie" ? "klasa A" : "klasa
 const PREF = (n: string) => n.split(" — ")[0].trim();
 const WOJ_LABEL: Record<string, string> = {
   "Małopolska": "Małopolskie", "Pomorskie": "Pomorskie", "Zachodniopomorskie": "Zachodniopomorskie", "Kujawsko-Pomorskie": "Kujawsko-pomorskie",
-  "Warmińsko-Mazurskie": "Warmińsko-mazurskie", "Podlaskie": "Podlaskie",
+  "Warmińsko-Mazurskie": "Warmińsko-mazurskie", "Podlaskie": "Podlaskie", "Lubuskie": "Lubuskie", "Opolskie": "Opolskie",
 };
 // Województwa (alfabetycznie) → ich ścieżki.
 const WOJEWODZTWA = (() => {

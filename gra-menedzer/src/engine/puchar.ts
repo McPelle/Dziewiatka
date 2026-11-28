@@ -71,7 +71,7 @@ export function wejscieDoPucharu(s: StanGry, klubId: string): number {
 const RUNDY_OKREGOWE = ["I runda (klasa B, drużyny spoza lig)", "II runda — wchodzi klasa A", "III runda — wchodzą klasa okręgowa i V liga", "IV runda — wchodzi IV liga", "Finał etapu okręgowego — wchodzi III liga"];
 function wstepneDla(s: StanGry): string[] {
   const w = wejscieDoPucharu(s, s.mojKlub);
-  const ok = okregPomorski(s) || okregMalopolski(s) || okregKujawski(s) || (/^(Warmińsko|Podlaskie)/.test(s.sciezka ?? "") ? podokregSciezki(s.sciezka) : "");
+  const ok = okregPomorski(s) || okregMalopolski(s) || okregKujawski(s) || (/^(Warmińsko|Podlaskie|Lubuskie|Opolskie)/.test(s.sciezka ?? "") ? podokregSciezki(s.sciezka) : "");
   return RUNDY_OKREGOWE.slice(Math.min(w, 4)).map((r) => (ok ? `${r} — okręg ${ok}` : r));
 }
 /** Ile rund fazy okręgowej ma przed sobą klub gracza. */

@@ -30,6 +30,10 @@ const WOJ_MIASTA: Record<string, Woj> = {
   "Suwałki": "podlaskie", "Zambrów": "podlaskie", "Łomża": "podlaskie", "Elbląg": "warmińsko-mazurskie", "Lidzbark Warmiński": "warmińsko-mazurskie",
   "Olsztyn": "warmińsko-mazurskie", "Nowy Dwór Mazowiecki": "mazowieckie", "Mińsk Mazowiecki": "mazowieckie", "Ząbki": "mazowieckie", "Troszyn": "mazowieckie",
   "Mława": "mazowieckie", "Sieradz": "łódzkie", "Łowicz": "łódzkie", "Tomaszów Mazowiecki": "łódzkie",
+  // III liga gr. III (2026/27)
+  "Sosnowiec": "śląskie", "Bytom Odrzański": "lubuskie", "Polkowice": "dolnośląskie", "Rybnik": "śląskie", "Sułów": "dolnośląskie",
+  "Goczałkowice-Zdrój": "śląskie", "Jelenia Góra": "dolnośląskie", "Kluczbork": "opolskie", "Brzeg": "opolskie", "Gorzów Wielkopolski": "lubuskie",
+  "Gubin": "lubuskie", "Nysa": "opolskie",
   "Środa Wielkopolska": "wielkopolskie", "Świdnik": "lubelskie", "Świecie": "kujawsko-pomorskie", "Świnoujście": "zachodniopomorskie",
 };
 // Grupy III ligi (PZPN): województwa przypisane do grup.
@@ -39,7 +43,7 @@ const GRUPY_III: { re: RegExp; woj: Woj[] }[] = [
   { re: /gr(upa)?\.?\s*III\b/i, woj: ["dolnośląskie", "lubuskie", "opolskie", "śląskie"] },
   { re: /gr(upa)?\.?\s*IV\b/i, woj: ["małopolskie", "świętokrzyskie", "podkarpackie", "lubelskie"] },
 ];
-const PREFIKS_WOJ: [string, Woj][] = [["Zachodniopomorskie", "zachodniopomorskie"], ["Kujawsko-Pomorskie", "kujawsko-pomorskie"], ["Pomorskie", "pomorskie"], ["Warmińsko-Mazurskie", "warmińsko-mazurskie"], ["Podlaskie", "podlaskie"], ["Małopolska", "małopolskie"]];
+const PREFIKS_WOJ: [string, Woj][] = [["Zachodniopomorskie", "zachodniopomorskie"], ["Kujawsko-Pomorskie", "kujawsko-pomorskie"], ["Pomorskie", "pomorskie"], ["Warmińsko-Mazurskie", "warmińsko-mazurskie"], ["Podlaskie", "podlaskie"], ["Lubuskie", "lubuskie"], ["Opolskie", "opolskie"], ["Małopolska", "małopolskie"]];
 const wojSciezki = (nazwa: string): Woj | undefined => PREFIKS_WOJ.find(([p]) => nazwa.startsWith(p))?.[1];
 
 // ——— Drzewo lig z danych (wszystkie ścieżki 4 województw) ———

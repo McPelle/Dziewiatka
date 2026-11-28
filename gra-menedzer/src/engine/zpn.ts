@@ -5,8 +5,8 @@
 // Rozpoznanie po nazwie ścieżki (np. „Kujawsko-Pomorskie — Toruń I") albo po nazwach lig świata gry.
 import type { StanGry } from "./types";
 
-export type KodZpn = "MZPN" | "POM" | "ZZPN" | "KP" | "WM" | "POD";
-export type RegionZpn = "malopolskie" | "pomorskie" | "zachodniopomorskie" | "kujawsko-pomorskie" | "warminsko-mazurskie" | "podlaskie";
+export type KodZpn = "MZPN" | "POM" | "ZZPN" | "KP" | "WM" | "POD" | "LUB";
+export type RegionZpn = "malopolskie" | "pomorskie" | "zachodniopomorskie" | "kujawsko-pomorskie" | "warminsko-mazurskie" | "podlaskie" | "lubuskie" | "opolskie";
 
 export interface DaneZpn {
   kod: KodZpn;
@@ -59,6 +59,14 @@ export const ZPN: Record<KodZpn, DaneZpn> = {
     // w każdej rundzie; baraże (dwumecz) — dogrywka i karne. Brak klasy B.
     okregi: ["Białystok", "Łomża", "Suwałki"], mlodziezowcy: { IV: 2, OKR: 2, A: 1, B: 0 }, spozaUE: { IV: 3, OKR: 3, A: 3, B: 3 }, zmiany: { IV: 5, OKR: 6, A: 6, B: 6 }, dogrywkaPuchar: "zawsze", dogrywkaBaraz: true, barazDwumecz: true,
   },
+  LUB: {
+    kod: "LUB", region: "lubuskie", woj: "lubuskie", prefiksy: ["Lubuskie"], wzorLigi: /lubusk/i,
+    mian: "Lubuski ZPN", dop: "Lubuskiego ZPN", skrot: "LZPN", przymiotnik: "Lubuska", pucharKrotki: "Puchar Polski na szczeblu Lubuskiego ZPN",
+    // regulamin LZPN 2026/27 (Uchwała 26/2026): młodzieżowiec (rocznik 2006+, obywatel polski) tylko w IV lidze — art. 7 § 9 ust. 1;
+    // spoza UE maks. 3 na boisku (Ukraińcy nie liczeni) — art. 7 § 10 ust. 9–10; zmiany: 6, klasa B — powrotne — art. 13 § 16 ust. 18;
+    // puchar (Uchwała 3/2026): runda wstępna i I — od razu karne, od 1/8 dogrywka 2×15 i karne; baraże o III ligę — uchwała PZPN VI/85.
+    okregi: ["Gorzów Wlkp.", "Zielona Góra", "Krosno Odrzańskie", "Nowa Sól", "Świebodzin", "Żagań", "Żary"], mlodziezowcy: { IV: 1, OKR: 0, A: 0, B: 0 }, mlodziezowiecPolak: true, spozaUE: { IV: 3, OKR: 3, A: 3, B: 3 }, zmiany: { IV: 6, OKR: 6, A: 6, B: 99 }, dogrywkaPuchar: "od18", dogrywkaBaraz: false,
+  },
   POM: {
     kod: "POM", region: "pomorskie", woj: "pomorskie", prefiksy: ["Pomorskie"], wzorLigi: /pomor/i,
     mian: "Pomorski ZPN", dop: "Pomorskiego ZPN", skrot: "Pomorski ZPN", przymiotnik: "Pomorska", pucharKrotki: "Puchar Pomorski",
@@ -72,7 +80,7 @@ export const ZPN: Record<KodZpn, DaneZpn> = {
 };
 
 // Kolejność sprawdzania ważna: „Zachodniopomorskie" i „Kujawsko-Pomorskie" zawierają „pomor".
-const KOLEJNOSC: KodZpn[] = ["ZZPN", "KP", "WM", "POD", "POM", "MZPN"];
+const KOLEJNOSC: KodZpn[] = ["ZZPN", "KP", "WM", "POD", "LUB", "POM", "MZPN"];
 
 /** ZPN po nazwie ścieżki (regionu gracza). Domyślnie Małopolski (zachowanie sprzed rejestru). */
 export function zpnSciezki(sciezka: string | undefined): DaneZpn {
