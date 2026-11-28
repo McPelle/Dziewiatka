@@ -60,7 +60,7 @@ export interface MeczLive {
   reakcjaAI?: number; // minuta, w której trener rywala zareaguje na Twoją zmianę taktyki
   skroty?: { min: string; tekst: string; sek: PunktAkcji[]; gol: boolean }[]; // najważniejsze akcje do skrótu meczu
   /** Mecz pucharowy: przy remisie dogrywka (2×15) albo od razu rzuty karne — wg regulaminu ZPN / PZPN. */
-  puchar?: { nazwa: string; dogrywka: boolean };
+  puchar?: { nazwa: string; dogrywka: boolean; remis?: boolean; bilans?: { d: number; g: number } }; // remis: 1. mecz dwumeczu (remis dozwolony); bilans: wynik 1. meczu z perspektywy gospodarza rewanżu
   /** Przedmecz: wybrana mowa w szatni i rozgrzewka (gotowe = można wyjść z tunelu). */
   przedmecz?: { mowa?: import("./przedmecz").MowaPrzed; rozgrzewka?: import("./przedmecz").Rozgrzewka; gotowe?: boolean };
   /** Wejście w mecz po rozgrzewce: mnożnik siły ataku mojej drużyny do danej minuty. */
@@ -442,7 +442,7 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
     for (const z of [m.dom, m.gosc]) for (const id of z.naBoisku) { const p = s.zawodnicy[id]; if (p) p.kondycja = Math.min(100, p.kondycja + 3); }
     m.sekwencja = [{ x: 50, y: 50 }]; m.pilka = { x: 50, y: 50, strona: "gosc" };
     m.wazne = { typ: "przerwa", tekst: "Przerwa — mowa w szatni" };
-  } else if (m.polowa === 2 && m.min >= kon2 && m.puchar && m.gd === m.gg) {
+  } else if (m.polowa === 2 && m.min >= kon2 && m.puchar && !m.puchar.remis && m.gd + (m.puchar.bilans?.d ?? 0) === m.gg + (m.puchar.bilans?.g ?? 0)) {
     // puchar: remis po 90 minutach — dogrywka albo od razu rzuty karne (regulamin związku)
     m.min = 90;
     if (m.puchar.dogrywka) {
@@ -457,13 +457,14 @@ export function krokMinuty(s: StanGry, m: MeczLive): boolean {
     m.polowa = 4; m.min = 105;
     m.komentarz.unshift({ min: "105'", typ: "info", tekst: `🔄 Zmiana stron w dogrywce. ${m.gd}:${m.gg}.` });
     m.sekwencja = [{ x: 50, y: 50 }]; m.pilka = { x: 50, y: 50, strona: "gosc" };
-  } else if (m.polowa === 4 && m.min >= 120 && m.gd === m.gg) {
+  } else if (m.polowa === 4 && m.min >= 120 && m.gd + (m.puchar?.bilans?.d ?? 0) === m.gg + (m.puchar?.bilans?.g ?? 0)) {
     m.min = 120; startKarnych(s, m, "Dogrywka nie przyniosła rozstrzygnięcia.");
   } else if ((m.polowa === 2 && m.min >= kon2) || (m.polowa === 4 && m.min >= 120)) {
     if (m.polowa === 4) m.min = 120;
     m.koniec = true;
-    const wyn = m.gd > m.gg ? s.kluby[m.dom.klubId].nazwa : m.gg > m.gd ? s.kluby[m.gosc.klubId].nazwa : null;
-    m.komentarz.unshift({ min: "FT", typ: "info", tekst: `🏁 Koniec meczu${m.polowa === 4 ? " po dogrywce" : ""}! ${s.kluby[m.dom.klubId].nazwa} ${m.gd}:${m.gg} ${s.kluby[m.gosc.klubId].nazwa}. ${m.puchar ? `Awans: ${wyn}!` : wyn ? `Trzy punkty dla ${wyn}.` : "Podział punktów."}` });
+    const sd = m.gd + (m.puchar?.bilans?.d ?? 0), sg = m.gg + (m.puchar?.bilans?.g ?? 0); // dwumecz: liczy się bilans obu meczów
+    const wyn = m.puchar?.remis ? null : sd > sg ? s.kluby[m.dom.klubId].nazwa : sg > sd ? s.kluby[m.gosc.klubId].nazwa : null;
+    m.komentarz.unshift({ min: "FT", typ: "info", tekst: `🏁 Koniec meczu${m.polowa === 4 ? " po dogrywce" : ""}! ${s.kluby[m.dom.klubId].nazwa} ${m.gd}:${m.gg} ${s.kluby[m.gosc.klubId].nazwa}. ${m.puchar?.remis ? "Rozstrzygnięcie w rewanżu." : m.puchar ? `${m.puchar.bilans ? `Dwumecz ${sd}:${sg} — ` : ""}Awans: ${wyn}!` : wyn ? `Trzy punkty dla ${wyn}.` : "Podział punktów."}` });
     ocenyKoncowe(s, m);
     m.wazne = { typ: "koniec", tekst: "Koniec meczu" };
   }

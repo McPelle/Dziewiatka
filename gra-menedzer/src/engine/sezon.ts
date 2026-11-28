@@ -1637,6 +1637,8 @@ function granicaIIiIII(s: StanGry, gorna: string[], dolnaE: string[]): { awans: 
   if (!wice || gorna.length < 16) return { awans, wirt, spadaja };
   const moj = (id?: string) => !!id && id === s.mojKlub;
   const sV = () => silaWirtualna(s, dolnaE.slice(1, 5));
+  const bg = s.barazeGracza?.sezon === s.sezon && s.barazeGracza.format === "IIiIII" ? s.barazeGracza : null;
+  if (bg) return granicaIIiIIIGracz(s, bg, gorna, dolnaE, awans, wirt, spadaja, sV);
   // I etap: 4 wicemistrzów (Twój + 3 z grup spoza symulacji), losowanie par i gospodarzy
   type U = { id?: string; sila: number };
   const uczestnicy: U[] = tasuj([{ id: wice, sila: silaKlubu(s, wice) }, { sila: sV() }, { sila: sV() }, { sila: sV() }]);
@@ -1670,6 +1672,36 @@ function granicaIIiIII(s: StanGry, gorna: string[], dolnaE: string[]): { awans: 
   return { awans, wirt, spadaja };
 }
 
+
+/** II↔III liga, gdy grałeś baraże (jako wicemistrz III ligi albo 13./14. drużyna II ligi) — wyniki z Twoich meczów,
+ *  reszta drabinki symulowana. */
+function granicaIIiIIIGracz(s: StanGry, bg: NonNullable<StanGry["barazeGracza"]>, gorna: string[], dolnaE: string[], awans: string[], wirt: string[], spadaja: string[], sV: () => number) {
+  const g13 = gorna[gorna.length - 6], g14 = gorna[gorna.length - 5];
+  const zwDwumeczu = bg.mecze.find((m) => m.noga === 2)?.zwyc;
+  const etap1 = bg.mecze.find((m) => m.runda === "I etap");
+  const gdzieII = bg.rywalII ?? (bg.rola === "II" ? s.mojKlub : undefined);
+  // Twój dwumecz (jeśli doszedł do skutku)
+  if (gdzieII && zwDwumeczu) {
+    const III = bg.mecze.find((m) => m.noga === 1)!.dom === gdzieII ? bg.mecze.find((m) => m.noga === 1)!.gosc : bg.mecze.find((m) => m.noga === 1)!.dom;
+    if (zwDwumeczu !== gdzieII) { spadaja.push(gdzieII); if (III === s.mojKlub) awans.push(III); else { s.kluby[III].pozaPiramida = false; wirt.push(III); } }
+  }
+  // drugi dwumecz: pozostała drużyna II ligi vs zwycięzca drugiej pary I etapu
+  const inny2L = gdzieII === g13 ? g14 : gdzieII === g14 ? g13 : (bg.rola === "III" && etap1?.zwyc !== s.mojKlub ? (szansa(0.5) ? g13 : g14) : undefined);
+  const lista2L = gdzieII ? [inny2L] : [g13, g14];
+  // gdy przegrałeś I etap: Twój rywal z I etapu gra dwumecz z jedną z drużyn II ligi
+  const zwyciezcyI: { id?: string; sila: number }[] = [];
+  if (bg.rola === "III" && etap1?.zwyc && etap1.zwyc !== s.mojKlub) zwyciezcyI.push({ id: etap1.zwyc, sila: silaKlubu(s, etap1.zwyc) });
+  if (bg.rola === "II") { const wice = dolnaE[1]; if (wice) { const r = rozstrzygnij(silaKlubu(s, wice), sV(), { dogrywka: true }); zwyciezcyI.push(r.zwyciezca === "dom" ? { id: wice, sila: silaKlubu(s, wice) } : { sila: sV() }); } }
+  while (zwyciezcyI.length < lista2L.filter(Boolean).length) zwyciezcyI.push({ sila: sV() });
+  lista2L.filter(Boolean).forEach((g, i) => {
+    const u = zwyciezcyI[i]; const d = dwumecz(u.sila, silaKlubu(s, g!));
+    if (!d.zwyciezcaA) return;
+    spadaja.push(g!);
+    if (u.id) { if (u.id !== dolnaE[1]) s.kluby[u.id].pozaPiramida = false; (u.id === dolnaE[1] ? awans : wirt).push(u.id); }
+    else { const id = klubZGrupy(s, rodzenstwo(s.ligi[2].nazwa, s.ligi[3].nazwa), 3); if (id) wirt.push(id); }
+  });
+  return { awans, wirt, spadaja };
+}
 /** III liga ↔ IV liga (uchwała VI/85, art. 5–6): w grupie III ligi awansują mistrzowie IV lig wszystkich jej województw
  *  oraz zwycięzca baraży ich wicemistrzów (półfinały i finał — jeden mecz, pary i gospodarze losowani). */
 function granicaIIIiIV(s: StanGry, dolnaE: string[]): { awans: string[]; wirt: string[] } {
@@ -1682,6 +1714,20 @@ function granicaIIIiIV(s: StanGry, dolnaE: string[]): { awans: string[]; wirt: s
   // mistrzowie IV lig pozostałych województw grupy
   for (const w of wojGrupy) { const id = klubZWojewodztwa(s, w, 4, zrodlaWoj(w)); if (id) wirt.push(id); }
   if (!wice) return { awans, wirt };
+  const bg = s.barazeGracza?.sezon === s.sezon && s.barazeGracza.format === "IIIiIV" ? s.barazeGracza : null;
+  if (bg) { // Twoje baraże rozegrane (na żywo/symulacja) — rozstrzygnięcie z ich wyników
+    const fin = bg.mecze.find((m) => m.runda === "Finał");
+    const zw = fin?.zwyc ?? bg.mecze.find((m) => m.runda === "Półfinał" && m.zwyc && m.zwyc !== s.mojKlub)?.zwyc;
+    let zwyciezca = fin?.zwyc;
+    if (!zwyciezca && zw) { // przegrałeś półfinał — rywal gra finał z wirtualnym zwycięzcą drugiego półfinału
+      const r = rozstrzygnij(silaKlubu(s, zw), silaWirtualna(s, dolnaE.slice(1, 4)), { dogrywka: true });
+      zwyciezca = r.zwyciezca === "dom" ? zw : undefined;
+    }
+    if (zwyciezca === s.mojKlub) awans.push(s.mojKlub);
+    else if (zwyciezca) { s.kluby[zwyciezca].pozaPiramida = false; wirt.push(zwyciezca); }
+    else { const w = wojGrupy[losInt(0, Math.max(0, wojGrupy.length - 1))]; const id = w ? klubZWojewodztwa(s, w, 4, zrodlaWoj(w)) : null; if (id) wirt.push(id); }
+    return { awans, wirt };
+  }
   // baraż wicemistrzów: Twój + 3 z pozostałych województw grupy
   type U = { id?: string; sila: number; woj?: string };
   const sV = () => silaWirtualna(s, dolnaE.slice(1, 4));
@@ -1964,6 +2010,8 @@ export function nowySezon(s: StanGry) {
     }
   }
   for (const id of wychodza) opuscPiramide(s, id);
+  // rywale z baraży spoza symulacji, którzy nie awansowali — wracają do swoich rozgrywek (kadra nie jest już potrzebna)
+  for (const id of s.barazeGracza?.sezon === s.sezon ? s.barazeGracza.tymczasowi ?? [] : []) if (s.kluby[id]?.pozaPiramida) opuscPiramide(s, id);
   aktualizujTypyKontraktow(s); // awans: amatorzy → półprofesjonaliści → zawodowcy (wg szczebla, PZPN)
   const nowyPoziom = s.kluby[s.mojKlub].poziom;
   const stara = s.ligi[mojPoziom - 1].nazwa;
@@ -3746,6 +3794,7 @@ export function wolneKlubyDlaZwolnionego(s: StanGry): string[] {
 export function przygotujBarazeGracza(s: StanGry) {
   const k = s.kluby[s.mojKlub]; if (!k || s.barazeGracza?.sezon === s.sezon) return;
   const p = k.poziom; const tab = (lv: number) => (s.ligi[lv - 1] ? tabelaLigi(s, s.ligi[lv - 1]).map((w) => w.klubId) : []);
+  if (przygotujBarazePZPN(s, p, tab)) return;
   let pula: string[] = [], kontekst: "awans" | "utrzymanie" = "awans", nazwa = "";
   if (p >= 2) { // baraż o awans: moja liga = dolna, wyższa liga = poziom p-1
     const i = p - 2, n = s.wymiana[i] ?? 0; const dolna = tab(p);
@@ -3767,6 +3816,45 @@ export function przygotujBarazeGracza(s: StanGry) {
   const moj = mecze.find((m) => m.dom === s.mojKlub || m.gosc === s.mojKlub)!;
   wiadomosc(s, `⚔️ ${nazwa}! ${moj.runda}: ${s.kluby[moj.dom].nazwa} — ${s.kluby[moj.gosc].nazwa} (${moj.dom === s.mojKlub ? "u siebie" : "na wyjeździe"}). Jeden mecz, przy remisie ${s.barazeGracza.dogrywka ? "dogrywka i rzuty karne" : "od razu rzuty karne (regulamin ZPN)"}. Zagraj na żywo z pulpitu albo zasymuluj.`);
 }
+
+/** Baraże w formacie PZPN 2026/27 dla Twojego klubu (granie na żywo): I etap wicemistrzów III ligi + dwumecz z II ligą,
+ *  dwumecz 13./14. drużyny II ligi z III ligą, półfinał/finał wicemistrzów IV lig. Rywale z grup spoza symulacji to
+ *  prawdziwe kluby z danych (dołączają do gry tylko na czas baraży, a przy awansie — na stałe). */
+function przygotujBarazePZPN(s: StanGry, p: number, tab: (lv: number) => string[]): boolean {
+  const moj = s.mojKlub;
+  const bezRez = (lista: string[], doPoziomu: number) => lista.filter((id) => { const kk = s.kluby[id]; return !(kk.rezerwaDla && doPoziomu <= (s.kluby[kk.rezerwaDla]?.poziom ?? 99)); });
+  const tymczasowy = (id: string | null) => { if (id) s.kluby[id].pozaPiramida = true; return id; };
+  // wicemistrz grupy III ligi → I etap
+  if (p === 4 && /3\.? ?Liga|III liga/i.test(s.ligi[3]?.nazwa ?? "") && bezRez(tab(4), 3)[1] === moj) {
+    const r = tymczasowy(klubZGrupy(s, rodzenstwo(s.ligi[2].nazwa, s.ligi[3].nazwa), 4)); if (!r) return false;
+    const [dom, gosc] = szansa(0.5) ? [moj, r] : [r, moj];
+    s.barazeGracza = { sezon: s.sezon, kontekst: "awans", nazwa: "Baraże o II ligę (PZPN)", format: "IIiIII", rola: "III", tymczasowi: [r], dogrywka: true, mecze: [{ runda: "I etap", dom, gosc }] };
+    wiadomosc(s, `⚔️ Wicemistrzostwo grupy = baraże o II ligę! I etap (losowanie): ${s.kluby[dom].nazwa} — ${s.kluby[gosc].nazwa} (wicemistrz innej grupy III ligi). Jeden mecz, przy remisie dogrywka i karne. Zwycięzca gra dwumecz z 13. albo 14. drużyną II ligi.`);
+    return true;
+  }
+  // 13./14. miejsce w II lidze → dwumecz z wicemistrzem III ligi (pierwszy mecz u rywala)
+  const t3 = tab(3);
+  if (p === 3 && /2\.? ?Liga|II liga/i.test(s.ligi[2]?.nazwa ?? "") && t3.length >= 16 && (t3[t3.length - 6] === moj || t3[t3.length - 5] === moj)) {
+    const r = tymczasowy(klubZGrupy(s, rodzenstwo(s.ligi[2].nazwa, s.ligi[3].nazwa), 4)); if (!r) return false;
+    s.barazeGracza = { sezon: s.sezon, kontekst: "utrzymanie", nazwa: "Baraż o utrzymanie w II lidze (dwumecz)", format: "IIiIII", rola: "II", tymczasowi: [r], dogrywka: true,
+      mecze: [{ runda: "1. mecz", dom: r, gosc: moj, noga: 1 }, { runda: "Rewanż", dom: moj, gosc: r, noga: 2 }] };
+    wiadomosc(s, `⚔️ ${t3.indexOf(moj) + 1}. miejsce = baraż o utrzymanie! Dwumecz z ${s.kluby[r].nazwa} (zwycięzca I etapu baraży III ligi). Pierwszy mecz na wyjeździe, rewanż u siebie; przy remisie w dwumeczu dogrywka i karne.`);
+    return true;
+  }
+  // wicemistrz IV ligi → półfinał baraży wicemistrzów IV lig grupy III ligi
+  if (p === 5 && /3\.? ?Liga|III liga/i.test(s.ligi[3]?.nazwa ?? "") && bezRez(tab(5), 4)[1] === moj) {
+    const mojeWoj = wojLigi(s.ligi[4].nazwa)?.[0];
+    const inne = (wojLigi(s.ligi[3].nazwa) ?? []).filter((w) => w !== mojeWoj);
+    const w = inne[losInt(0, Math.max(0, inne.length - 1))]; if (!w) return false;
+    const zr: string[] = []; for (const g of rodzenstwo(s.ligi[3].nazwa, s.ligi[4].nazwa)) if ((wojLigi(g) ?? []).includes(w as never)) zr.push(g);
+    const r = tymczasowy(klubZWojewodztwa(s, w, 5, zr)); if (!r) return false;
+    const [dom, gosc] = szansa(0.5) ? [moj, r] : [r, moj];
+    s.barazeGracza = { sezon: s.sezon, kontekst: "awans", nazwa: "Baraże o III ligę (wicemistrzowie IV lig)", format: "IIIiIV", rola: "IV", tymczasowi: [r], dogrywka: dogrywkaWBarazu(s, 4), mecze: [{ runda: "Półfinał", dom, gosc }] };
+    wiadomosc(s, `⚔️ Wicemistrzostwo IV ligi = baraże o III ligę! Półfinał (losowanie): ${s.kluby[dom].nazwa} — ${s.kluby[gosc].nazwa} (wicemistrz IV ligi, woj. ${w}). Zwycięzca finału awansuje do III ligi.`);
+    return true;
+  }
+  return false;
+}
 function rozegrajBarazAI(s: StanGry, m: { dom: string; gosc: string; wynik?: string; zwyc?: string }) {
   const r = rozstrzygnij(silaKlubu(s, m.dom), silaKlubu(s, m.gosc), { dogrywka: s.barazeGracza?.dogrywka ?? true });
   m.wynik = r.tekst; m.zwyc = r.zwyciezca === "dom" ? m.dom : m.gosc;
@@ -3774,11 +3862,12 @@ function rozegrajBarazAI(s: StanGry, m: { dom: string; gosc: string; wynik?: str
 /** Najbliższy Twój mecz barażowy do rozegrania. */
 export function barazDoRozegrania(s: StanGry) {
   const b = s.barazeGracza; if (!b || b.sezon !== s.sezon) return null;
-  return b.mecze.find((m) => !m.zwyc && (m.dom === s.mojKlub || m.gosc === s.mojKlub)) ?? null;
+  return b.mecze.find((m) => !m.zwyc && !m.rozegrany && (m.dom === s.mojKlub || m.gosc === s.mojKlub)) ?? null;
 }
 /** Zapis wyniku Twojego meczu barażowego (z meczu na żywo albo symulacji) i ewentualne utworzenie finału. */
 export function zapiszBaraz(s: StanGry, gd: number, gg: number, dogrywka: boolean, karne?: [number, number]) {
   const b = s.barazeGracza, m = barazDoRozegrania(s); if (!b || !m) return;
+  if (b.format) { zapiszBarazPZPN(s, b, m, gd, gg, dogrywka, karne); return; }
   m.wynik = opisWyniku(gd, gg, dogrywka, karne);
   m.zwyc = karne ? (karne[0] > karne[1] ? m.dom : m.gosc) : gd > gg ? m.dom : m.gosc;
   const wygral = m.zwyc === s.mojKlub;
@@ -3796,9 +3885,54 @@ export function zapiszBaraz(s: StanGry, gd: number, gg: number, dogrywka: boolea
     }
   }
 }
+type MeczBG = NonNullable<StanGry["barazeGracza"]>["mecze"][number];
+/** Zapis meczu baraży w formacie PZPN (jednomeczowe etapy i dwumecze) + kolejne etapy drabinki. */
+function zapiszBarazPZPN(s: StanGry, b: NonNullable<StanGry["barazeGracza"]>, m: MeczBG, gd: number, gg: number, dogrywka: boolean, karne?: [number, number]) {
+  const moj = s.mojKlub, N = (id: string) => s.kluby[id].nazwa;
+  m.gd = gd; m.gg = gg; m.wynik = opisWyniku(gd, gg, dogrywka, karne); m.rozegrany = true;
+  if (m.noga === 1) { wiadomosc(s, `⚽ ${b.nazwa} — 1. mecz: ${N(m.dom)} ${m.wynik} ${N(m.gosc)}. Rozstrzygnięcie w rewanżu.`); return; }
+  if (m.noga === 2) {
+    const n1 = b.mecze.find((x) => x.noga === 1)!; const sd = gd + (n1.gg ?? 0), sg = gg + (n1.gd ?? 0);
+    m.zwyc = karne ? (karne[0] > karne[1] ? m.dom : m.gosc) : sd > sg ? m.dom : m.gosc;
+    const wygral = m.zwyc === moj;
+    wiadomosc(s, `${wygral ? "🎉" : "💔"} Rewanż: ${N(m.dom)} ${m.wynik} ${N(m.gosc)} — dwumecz ${sd}:${sg}${karne ? " (karne)" : ""}. ${wygral ? (b.rola === "II" ? "UTRZYMANIE w II lidze!" : "AWANS do II ligi!") : (b.rola === "II" ? "Spadek do III ligi." : "Koniec marzeń o II lidze.")}`);
+    b.koniec = true; return;
+  }
+  m.zwyc = karne ? (karne[0] > karne[1] ? m.dom : m.gosc) : gd > gg ? m.dom : m.gosc;
+  const wygral = m.zwyc === moj;
+  if (b.format === "IIiIII" && m.runda === "I etap") {
+    if (!wygral) { wiadomosc(s, `💔 Baraże o II ligę — I etap: ${N(m.dom)} ${m.wynik} ${N(m.gosc)}. Koniec marzeń o awansie.`); b.koniec = true; return; }
+    const t3 = tabelaLigi(s, s.ligi[2]).map((w) => w.klubId); const g = szansa(0.5) ? t3[t3.length - 6] : t3[t3.length - 5];
+    b.rywalII = g;
+    b.mecze.push({ runda: "II etap — 1. mecz", dom: moj, gosc: g, noga: 1 }, { runda: "II etap — rewanż", dom: g, gosc: moj, noga: 2 });
+    wiadomosc(s, `🎉 I etap wygrany (${m.wynik})! Losowanie II etapu: dwumecz z ${N(g)} (${t3.indexOf(g) + 1}. miejsce w II lidze). Pierwszy mecz u Was, rewanż na wyjeździe.`);
+    return;
+  }
+  if (b.format === "IIIiIV" && m.runda === "Półfinał") {
+    if (!wygral) { wiadomosc(s, `💔 Baraże o III ligę — półfinał: ${N(m.dom)} ${m.wynik} ${N(m.gosc)}. Koniec marzeń o awansie.`); b.koniec = true; return; }
+    const mojeWoj = wojLigi(s.ligi[4].nazwa)?.[0]; const rywalSF = m.dom === moj ? m.gosc : m.dom;
+    const inne = (wojLigi(s.ligi[3].nazwa) ?? []).filter((w) => w !== mojeWoj && w !== wojKlubu(s.kluby[rywalSF]));
+    const w = inne[losInt(0, Math.max(0, inne.length - 1))];
+    const zr: string[] = []; if (w) for (const g of rodzenstwo(s.ligi[3].nazwa, s.ligi[4].nazwa)) if ((wojLigi(g) ?? []).includes(w as never)) zr.push(g);
+    const r = w ? klubZWojewodztwa(s, w, 5, zr) : null;
+    if (!r) { m.zwyc = moj; b.mecze.push({ runda: "Finał", dom: moj, gosc: rywalSF, zwyc: moj, wynik: "wolny los", rozegrany: true }); b.koniec = true; return; }
+    s.kluby[r].pozaPiramida = true; (b.tymczasowi ??= []).push(r);
+    const [dom, gosc] = szansa(0.5) ? [moj, r] : [r, moj];
+    b.mecze.push({ runda: "Finał", dom, gosc });
+    wiadomosc(s, `🎉 Półfinał wygrany (${m.wynik})! Finał baraży o III ligę (losowanie gospodarza): ${N(dom)} — ${N(gosc)}.`);
+    return;
+  }
+  if (b.format === "IIIiIV" && m.runda === "Finał") {
+    wiadomosc(s, wygral ? `🎉 Finał baraży: ${N(m.dom)} ${m.wynik} ${N(m.gosc)} — AWANS do III ligi!` : `💔 Finał baraży: ${N(m.dom)} ${m.wynik} ${N(m.gosc)} — tym razem bez awansu.`);
+    b.koniec = true;
+  }
+}
+
 /** Symulacja Twojego meczu barażowego (90' → dogrywka → karne). */
 export function symulujBarazGracza(s: StanGry) {
   const m = barazDoRozegrania(s); if (!m) return;
+  if (m.noga === 1) { const r = rozstrzygnij(silaKlubu(s, m.dom), silaKlubu(s, m.gosc), { dogrywka: false, wymagaZwyciezcy: false }); zapiszBaraz(s, r.gd, r.gg, false); return; }
+  if (m.noga === 2) { const n1 = s.barazeGracza!.mecze.find((x) => x.noga === 1)!; const r = rozstrzygnij(silaKlubu(s, m.dom), silaKlubu(s, m.gosc), { dogrywka: true, startD: n1.gg ?? 0, startG: n1.gd ?? 0 }); zapiszBaraz(s, r.gd, r.gg, r.dogrywka, r.karne); return; }
   const r = rozstrzygnij(silaKlubu(s, m.dom), silaKlubu(s, m.gosc), { dogrywka: s.barazeGracza?.dogrywka ?? true });
   zapiszBaraz(s, r.gd, r.gg, r.dogrywka, r.karne);
 }

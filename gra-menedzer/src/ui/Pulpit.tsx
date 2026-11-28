@@ -324,13 +324,14 @@ export function Pulpit({ s, odswiez, pokazMecz }: { s: StanGry; odswiez: () => v
               <Text style={{ color: m.zwyc ? (m.zwyc === s.mojKlub ? K.zielony : moj ? K.czerwony : K.tekst) : K.akcent, fontWeight: "800", fontSize: 12, minWidth: 54, textAlign: "right" }}>{m.wynik ?? "—"}</Text>
             </View>); })}
           {nast ? (<>
-            <Text style={[st.maly, { marginTop: 6 }]}>Jeden mecz u wyżej sklasyfikowanego · przy remisie {b.dogrywka === false ? "od razu rzuty karne (regulamin ZPN)" : "dogrywka 2×15 i rzuty karne (regulamin PZPN)"}.</Text>
+            <Text style={[st.maly, { marginTop: 6 }]}>{nast.noga === 1 ? "Pierwszy mecz dwumeczu — remis możliwy, rozstrzygnięcie w rewanżu." : nast.noga === 2 ? "Rewanż — liczy się bilans dwumeczu; przy remisie dogrywka 2×15 i rzuty karne (regulamin PZPN)." : b.format ? `Jeden mecz, gospodarz z losowania · przy remisie ${b.dogrywka === false ? "od razu rzuty karne" : "dogrywka 2×15 i rzuty karne"}.` : `Jeden mecz u wyżej sklasyfikowanego · przy remisie ${b.dogrywka === false ? "od razu rzuty karne (regulamin ZPN)" : "dogrywka 2×15 i rzuty karne (regulamin PZPN)"}.`}</Text>
             <View style={[st.wiersz, { gap: 8, marginTop: 8 }]}>
               <Pressable style={[st.przycisk, { flex: 1, marginHorizontal: 0, marginTop: 0 }]} onPress={() => setBarazLive([nast.dom, nast.gosc])}><Text style={st.przyciskTekst}>📺 Na żywo</Text></Pressable>
               <Pressable style={[st.przyciskMaly, { flex: 1, justifyContent: "center" }]} onPress={() => { symulujBarazGracza(s); odswiez(); }}><Text style={st.przyciskMalyTekst}>⏩ Symuluj</Text></Pressable>
-            </View></>) : <Text style={[st.maly, { marginTop: 6 }]}>Baraże zakończone — rozstrzygnięcie wejdzie w życie przy zakończeniu sezonu.</Text>}
+            </View></>) : <Text style={[st.maly, { marginTop: 6 }]}>Twoje baraże zakończone — rozstrzygnięcie (także pozostałych par) wejdzie w życie przy zakończeniu sezonu.</Text>}
         </View>); })()}
-      {barazLive && (() => { const nast = barazDoRozegrania(s); return <MeczNaZywo s={s} para={barazLive} puchar={{ nazwa: `${s.barazeGracza?.nazwa ?? "Baraż"} — ${nast?.runda ?? ""}`, dogrywka: s.barazeGracza?.dogrywka ?? true, neutralny: false }} onAnuluj={() => setBarazLive(null)}
+      {barazLive && (() => { const nast = barazDoRozegrania(s); return <MeczNaZywo s={s} para={barazLive} puchar={{ nazwa: `${s.barazeGracza?.nazwa ?? "Baraż"} — ${nast?.runda ?? ""}`, dogrywka: nast?.noga === 1 ? false : s.barazeGracza?.dogrywka ?? true, neutralny: false,
+          remis: nast?.noga === 1, bilans: nast?.noga === 2 ? (() => { const n1 = s.barazeGracza!.mecze.find((x) => x.noga === 1)!; return { d: n1.gg ?? 0, g: n1.gd ?? 0 }; })() : undefined }} onAnuluj={() => setBarazLive(null)}
         onKoniec={(m) => { setBarazLive(null); zapiszBaraz(s, m.gd, m.gg, m.polowa >= 3, m.karne?.zwyciezca ? [m.karne.d.filter(Boolean).length, m.karne.g.filter(Boolean).length] : undefined); odswiez(); }} />; })()}
       {s.koniecSezonu && <Pressable style={[st.przyciskMaly, { marginHorizontal: 12, marginTop: 10 }]} onPress={() => setMagazyn(true)}><Text style={st.przyciskMalyTekst}>📺 Magazyn — podsumowanie sezonu</Text></Pressable>}
       {s.koniecSezonu ? (

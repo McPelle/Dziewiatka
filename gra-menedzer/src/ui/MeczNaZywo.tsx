@@ -72,7 +72,7 @@ function zapiszMecz(s: StanGry, para: [string, string], m: MeczLive) {
   } catch { /* brak miejsca — mecz i tak trwa */ }
 }
 
-export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry; para: [string, string]; puchar?: { nazwa: string; dogrywka: boolean; neutralny: boolean }; onKoniec: (m: MeczLive) => void; onAnuluj: () => void }) {
+export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry; para: [string, string]; puchar?: { nazwa: string; dogrywka: boolean; neutralny: boolean; remis?: boolean; bilans?: { d: number; g: number } }; onKoniec: (m: MeczLive) => void; onAnuluj: () => void }) {
   const [m] = useState<MeczLive>(() => {
     const z = zapisanyMecz(s, para);
     if (z) { for (const [id, k] of Object.entries(z.kond)) if (s.zawodnicy[id]) s.zawodnicy[id].kondycja = k; z.m.komentarz.unshift({ min: `${z.m.min}'`, typ: "info", tekst: "▶ Wznowiono zapisany mecz." }); return z.m; }
@@ -123,9 +123,9 @@ export function MeczNaZywo({ s, para, puchar, onKoniec, onAnuluj }: { s: StanGry
       if (plan) nm.komentarz.unshift({ min: "0'", typ: "info", tekst: plan.masowa ? `🛡 Zabezpieczenie: ${plan.ochroniarze} stewardów, ${plan.koordynatorzy} koordynatorów${plan.zgodne ? "" : " (PONIŻEJ minimum z ustawy!)"} · policja z urzędu: ${plan.policja} funkcjonariuszy${plan.podwyzszoneRyzyko ? " — mecz podwyższonego ryzyka" : ""} · karetka na stadionie.` : `🛡 Porządek zapewnia ${plan.ochroniarze} porządkowych klubu (to nie jest impreza masowa).` });
     }
     if (puchar) {
-      nm.puchar = { nazwa: puchar.nazwa, dogrywka: puchar.dogrywka };
+      nm.puchar = { nazwa: puchar.nazwa, dogrywka: puchar.dogrywka, remis: puchar.remis, bilans: puchar.bilans };
       if (puchar.neutralny) nm.atut = 1;
-      nm.komentarz.unshift({ min: "0'", typ: "info", tekst: `🏆 ${puchar.nazwa}. Mecz o wszystko — przy remisie ${puchar.dogrywka ? "dogrywka 2×15 min, a potem rzuty karne" : "od razu rzuty karne (regulamin związku)"}.${puchar.neutralny ? " Neutralny obiekt — bez atutu własnego boiska." : ""}` });
+      nm.komentarz.unshift({ min: "0'", typ: "info", tekst: `🏆 ${puchar.nazwa}. ${puchar.remis ? "Pierwszy mecz dwumeczu — remis możliwy, rozstrzygnięcie w rewanżu." : puchar.bilans ? `Rewanż — pierwszy mecz ${puchar.bilans.g}:${puchar.bilans.d} dla gości; przy remisie w dwumeczu dogrywka 2×15 min i rzuty karne.` : `Mecz o wszystko — przy remisie ${puchar.dogrywka ? "dogrywka 2×15 min, a potem rzuty karne" : "od razu rzuty karne (regulamin związku)"}.`}${puchar.neutralny ? " Neutralny obiekt — bez atutu własnego boiska." : ""}` });
     }
     return nm;
   });
