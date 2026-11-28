@@ -121,7 +121,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Odra Opole",
    "Raków Częstochowa",
    "Stomil Olsztyn",
-   "Lechia Gdańsk"
+   "Lechia Gdańsk",
+   "Chemik Kędzierzyn-Koźle"
   ]
  },
  "Jagiellonia Białystok": {
@@ -369,7 +370,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Stomil Olsztyn",
    "Pelikan Łowicz",
    "Polonia Bytom",
-   "Polonia Iłowo"
+   "Polonia Iłowo",
+   "Odra Opole"
   ]
  },
  "Zagłębie Lubin": {
@@ -419,7 +421,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Widzew Łódź",
    "Ruch Chorzów",
    "Chrobry Głogów",
-   "Elana Toruń"
+   "Elana Toruń",
+   "Stilon Gorzów Wielkopolski",
+   "Promień Żary"
   ]
  },
  "Wisła Płock": {
@@ -490,7 +494,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Zagłębie Sosnowiec",
    "Lechia Gdańsk",
    "Gryf Słupsk",
-   "Gwardia Koszalin"
+   "Gwardia Koszalin",
+   "Stilon Gorzów Wielkopolski",
+   "Odra Opole"
   ]
  },
  "Radomiak Radom": {
@@ -612,7 +618,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Podlasie Biała Podlaska",
    "Pogoń Siedlce",
    "Radomiak Radom",
-   "Stal Rzeszów"
+   "Stal Rzeszów",
+   "Odra Opole"
   ]
  },
  "Cracovia": {
@@ -769,7 +776,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Włocłavia Włocławek",
    "Zagłębie Lubin",
    "Olimpia Elbląg",
-   "Stomil Olsztyn"
+   "Stomil Olsztyn",
+   "Odra Opole"
   ]
  },
  "Piast Gliwice": {
@@ -799,7 +807,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Zagłębie Sosnowiec",
    "Polonia Bytom",
    "ROW Rybnik",
-   "Raków Częstochowa"
+   "Raków Częstochowa",
+   "Odra Opole"
   ]
  },
  "Wisła Kraków": {
@@ -890,7 +899,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Włocłavia Włocławek",
    "Zagłębie Lubin",
    "Zawisza Bydgoszcz",
-   "ŁKS Łódź"
+   "ŁKS Łódź",
+   "Stilon Gorzów Wielkopolski",
+   "Odra Opole"
   ]
  },
  "Śląsk Wrocław": {
@@ -1013,7 +1024,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Miedź Legnica",
    "Śląsk Wrocław",
    "Górnik Wałbrzych",
-   "Falubaz Zielona Góra"
+   "Falubaz Zielona Góra",
+   "Carina Gubin",
+   "Dozamet Nowa Sól",
+   "Promień Żary",
+   "Odra Opole"
   ]
  },
  "ŁKS Łódź": {
@@ -1093,7 +1108,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Wisła Płock",
    "Znicz Pruszków",
    "Mazovia Mińsk Mazowiecki",
-   "Świt Nowy Dwór Mazowiecki"
+   "Świt Nowy Dwór Mazowiecki",
+   "Odra Opole"
   ]
  },
  "Ruch Chorzów": {
@@ -1157,7 +1173,10 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Zagłębie Lubin",
    "Zawisza Bydgoszcz",
    "ŁKS Łódź",
-   "Olimpia Elbląg"
+   "Olimpia Elbląg",
+   "Odra Opole",
+   "Chemik Kędzierzyn-Koźle",
+   "Włókniarz Kietrz"
   ]
  },
  "Miedź Legnica": {
@@ -1192,7 +1211,11 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Wisła Kraków",
    "Unia Tarnów",
    "Ruch Chorzów",
-   "Elana Toruń"
+   "Elana Toruń",
+   "Stilon Gorzów Wielkopolski",
+   "Czarni Żagań",
+   "Dozamet Nowa Sól",
+   "Polmo Kożuchów"
   ]
  },
  "Puszcza Niepołomice": {
@@ -1236,7 +1259,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Piast Gliwice",
    "Ruch Chorzów",
    "Lechia Gdańsk",
-   "Legia Warszawa"
+   "Legia Warszawa",
+   "Stilon Gorzów Wielkopolski",
+   "Chemik Kędzierzyn-Koźle"
   ]
  },
  "Pogoń Grodzisk Mazowiecki": {
@@ -1307,7 +1332,31 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Chemik Kędzierzyn-Koźle",
    "GKS Katowice",
    "Zagłębie Sosnowiec",
-   "Miedź Legnica"
+   "Miedź Legnica",
+   "Stilon Gorzów Wielkopolski",
+   "BKS Stal Bielsko-Biała",
+   "Chojniczanka Chojnice",
+   "Chrobry Głogów",
+   "Elana Toruń",
+   "GKS Jastrzębie",
+   "Lechia Gdańsk",
+   "Legia Warszawa",
+   "Motor Lublin",
+   "Piast Gliwice",
+   "Podbeskidzie Bielsko-Biała",
+   "Pogoń Szczecin",
+   "Polonia Nysa",
+   "Polonia Warszawa",
+   "Ruch Chorzów",
+   "Ruch Radzionków",
+   "Ruch Zdzieszowice",
+   "Stal Brzeg",
+   "Stal Stalowa Wola",
+   "Start Namysłów",
+   "Stomil Olsztyn",
+   "Widzew Łódź",
+   "Wisła Kraków",
+   "Włókniarz Kietrz"
   ]
  },
  "Stal Rzeszów": {
@@ -1463,7 +1512,9 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Polonia Bytom",
    "GKS Katowice",
    "Górnik Zabrze",
-   "Zatoka Braniewo"
+   "Zatoka Braniewo",
+   "Stilon Gorzów Wielkopolski",
+   "Odra Opole"
   ]
  },
  "Arka Gdynia": {
@@ -1602,7 +1653,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "kosy": [
    "Zagłębie Sosnowiec",
    "BKS Stal Bielsko-Biała",
-   "Znicz Pruszków"
+   "Znicz Pruszków",
+   "Odra Opole"
   ]
  },
  "Olimpia Grudziądz": {
@@ -1695,7 +1747,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Arka Gdynia",
    "Olimpia Grudziądz",
    "Pogoń Lębork",
-   "Stolem Gniewino"
+   "Stolem Gniewino",
+   "Odra Opole"
   ]
  },
  "Stal Stalowa Wola": {
@@ -1737,7 +1790,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Hetman Zamość",
    "JKS 1909 Jarosław",
    "Resovia",
-   "Wisłoka Dębica"
+   "Wisłoka Dębica",
+   "Odra Opole"
   ]
  },
  "Hutnik Kraków": {
@@ -1998,7 +2052,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Chełminianka Chełmno",
    "Victoria Koronowo",
    "Gopło Kruszwica",
-   "Unia Janikowo"
+   "Unia Janikowo",
+   "Odra Opole"
   ]
  },
  "Bałtyk Gdynia": {
@@ -2055,7 +2110,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Flota Świnoujście",
    "Gryf Wejherowo",
    "Gwardia Koszalin",
-   "Noteć Inowrocław"
+   "Noteć Inowrocław",
+   "Stilon Gorzów Wielkopolski"
   ]
  },
  "Unia Tarnów": {
@@ -2111,7 +2167,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Pogoń Szczecin",
    "Sokół Karlino",
    "Spójnia Świdwin",
-   "Darłovia Darłowo"
+   "Darłovia Darłowo",
+   "Stilon Gorzów Wielkopolski"
   ]
  },
  "Pogoń Lębork": {
@@ -2263,7 +2320,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Błękitni Stargard",
    "Flota Świnoujście",
    "Gwardia Koszalin",
-   "Olimp Złocieniec"
+   "Olimp Złocieniec",
+   "Stilon Gorzów Wielkopolski"
   ]
  },
  "Sparta Brodnica": {
@@ -2453,7 +2511,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "kosy": [
    "Flota Świnoujście",
    "Gwardia Koszalin",
-   "Olimp Złocieniec"
+   "Olimp Złocieniec",
+   "Stilon Gorzów Wielkopolski"
   ]
  },
  "Apator Toruń": {
@@ -2589,7 +2648,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Olimp Złocieniec",
-   "Osadnik Myślibórz"
+   "Osadnik Myślibórz",
+   "Stilon Gorzów Wielkopolski"
   ]
  },
  "Pogoń Barlinek": {
@@ -2603,7 +2663,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Olimp Złocieniec",
-   "Osadnik Myślibórz"
+   "Osadnik Myślibórz",
+   "Stilon Gorzów Wielkopolski"
   ]
  },
  "Rega Trzebiatów": {
@@ -3027,7 +3088,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Granica Kętrzyn",
    "MKS Mazur Ełk",
    "Błękitni Orneta",
-   "Zatoka Braniewo"
+   "Zatoka Braniewo",
+   "Odra Opole"
   ],
   "fanklub": [
    "FANKLUB Barczewo",
@@ -3740,6 +3802,412 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Dąbrovia Dąbrowa Tarnowska",
    "Tuchovia Tuchów",
    "Polan Żabno"
+  ]
+ },
+ "Stilon Gorzów Wielkopolski": {
+  "ultras": [
+   "PKS - Prawdziwi Kibice Stilonu",
+   "Młody Stilon",
+   "Stilon Alkohools'98",
+   "Wiecznie Spóźnieni",
+   "Ultras Stilon Tasmanian Devils",
+   "Stilonowcy",
+   "Stilon Fighters'06",
+   "Ultras Stilon Tasmanian Devils'07"
+  ],
+  "zgody": [
+   "Chrobry Głogów",
+   "Sporting Charleroi",
+   "Chrobry Głogów",
+   "Sporting Charleroi"
+  ],
+  "kosy": [
+   "Dozamet Nowa Sól",
+   "Dąb Dębno",
+   "Energetyk Gryfino",
+   "Flota Świnoujście",
+   "Gwardia Koszalin",
+   "Górnik Konin",
+   "Karkonosze Jelenia Góra",
+   "Kotwica Kołobrzeg",
+   "Lechia Gdańsk",
+   "Miedź Legnica",
+   "Odra Chojna",
+   "Odra Opole",
+   "Odra Wodzisław Śląski",
+   "Pogoń Barlinek",
+   "Pogoń Szczecin",
+   "Pogoń Świebodzin",
+   "Polmo Kożuchów",
+   "Polonia Bytom",
+   "Wisła Kraków",
+   "Zagłębie Lubin",
+   "Dozamet Nowa Sól",
+   "Pogoń Świebodzin",
+   "Polmo Kożuchów",
+   "Odra Opole",
+   "Dąb Dębno",
+   "Energetyk Gryfino",
+   "Flota Świnoujście",
+   "Gwardia Koszalin",
+   "Górnik Konin",
+   "Karkonosze Jelenia Góra",
+   "Kotwica Kołobrzeg",
+   "Lechia Gdańsk",
+   "Miedź Legnica",
+   "Odra Chojna",
+   "Odra Wodzisław Śląski",
+   "Pogoń Barlinek",
+   "Pogoń Szczecin",
+   "Polonia Bytom",
+   "Wisła Kraków",
+   "Zagłębie Lubin"
+  ]
+ },
+ "Carina Gubin": {
+  "ultras": [
+   "Ultras Obuwnicy",
+   "Carina On Tour"
+  ],
+  "kosy": [
+   "Chrobry Głogów",
+   "Karkonosze Jelenia Góra",
+   "Lechia Zielona Góra",
+   "Lechia Zielona Góra",
+   "Chrobry Głogów",
+   "Karkonosze Jelenia Góra"
+  ]
+ },
+ "Celuloza Kostrzyn": {
+  "ultras": [
+   "Full Service",
+   "KKP Celuloza Kostrzyn 26'"
+  ],
+  "kosy": [
+   "Ilanka Rzepin",
+   "Ilanka Rzepin"
+  ]
+ },
+ "Czarni Żagań": {
+  "ultras": [
+   "CF'09 - Czarni Fans",
+   "Fanatycy"
+  ],
+  "kosy": [
+   "Dozamet Nowa Sól",
+   "Górnik Wałbrzych",
+   "Miedź Legnica",
+   "Polmo Kożuchów",
+   "Promień Żary",
+   "Dozamet Nowa Sól",
+   "Polmo Kożuchów",
+   "Promień Żary",
+   "Miedź Legnica",
+   "Górnik Wałbrzych"
+  ]
+ },
+ "Dozamet Nowa Sól": {
+  "ultras": [
+   "Młoda Wiara",
+   "Stary Dozamet",
+   "Ultras Dozamet",
+   "Dozamet On Tour"
+  ],
+  "kosy": [
+   "Stilon Gorzów Wielkopolski",
+   "Czarni Żagań",
+   "Chrobry Głogów",
+   "Czarni Żagań",
+   "Karkonosze Jelenia Góra",
+   "Miedź Legnica",
+   "Pogoń Świebodzin",
+   "Promień Żary",
+   "Stal Jasień",
+   "Stilon Gorzów Wielkopolski",
+   "Pogoń Świebodzin",
+   "Promień Żary",
+   "Stal Jasień",
+   "Chrobry Głogów",
+   "Karkonosze Jelenia Góra",
+   "Miedź Legnica"
+  ]
+ },
+ "Lubniewiczanka Lubniewice": {
+  "ultras": [
+   "Ultras Lubniewice KS",
+   "Zawsze Wierni"
+  ],
+  "kosy": [
+   "KS Glisno",
+   "KS Glisno"
+  ]
+ },
+ "Lubuszanin Drezdenko": {
+  "ultras": [
+   "Ultras Lubuszanin",
+   "Zawsze Wierni"
+  ],
+  "kosy": [
+   "Łucznik Strzelce Krajeńskie",
+   "Łucznik Strzelce Krajeńskie"
+  ]
+ },
+ "Orzeł Międzyrzecz": {
+  "ultras": [
+   "Ultras Orzeł",
+   "Młodzi Fanatycy",
+   "Orle Gniazdo"
+  ],
+  "kosy": [
+   "Ilanka Rzepin",
+   "Ilanka Rzepin"
+  ]
+ },
+ "Pogoń Skwierzyna": {
+  "ultras": [
+   "UFS'10",
+   "Pogoń To My"
+  ],
+  "kosy": [
+   "Budowlani Murzynowo",
+   "Warta Gorzów Wielkopolski",
+   "Budowlani Murzynowo",
+   "Warta Gorzów Wielkopolski"
+  ]
+ },
+ "Pogoń Świebodzin": {
+  "ultras": [
+   "Fanatics Pogoń",
+   "Forever Pogoń",
+   "Pogoń Fans",
+   "Nasze Miasto Nasza Duma"
+  ],
+  "kosy": [
+   "Stilon Gorzów Wielkopolski",
+   "Dozamet Nowa Sól",
+   "Dozamet Nowa Sól",
+   "Rokita Brzeg Dolny",
+   "Stilon Gorzów Wielkopolski",
+   "Rokita Brzeg Dolny"
+  ]
+ },
+ "Polmo Kożuchów": {
+  "ultras": [
+   "Ultras Polmo"
+  ],
+  "zgody": [
+   "BKS Bolesławiec",
+   "Chojnowianka Chojnów",
+   "Stal Chocianów",
+   "Stal Chocianów",
+   "BKS Bolesławiec",
+   "Chojnowianka Chojnów"
+  ],
+  "kosy": [
+   "Stilon Gorzów Wielkopolski",
+   "Czarni Żagań",
+   "Czarni Żagań",
+   "Meblarz Nowe Miasteczko",
+   "Miedź Legnica",
+   "Promień Żary",
+   "Sprotavia Szprotawa",
+   "Stal Jasień",
+   "Stilon Gorzów Wielkopolski",
+   "Promień Żary",
+   "Stal Jasień",
+   "Meblarz Nowe Miasteczko",
+   "Sprotavia Szprotawa",
+   "Miedź Legnica"
+  ]
+ },
+ "Polonia Słubice": {
+  "ultras": [
+   "Fanatycy Znad Zachodniej Granicy",
+   "Młoda Polonia",
+   "UPS'25 - Ultras Polonia Słubice"
+  ],
+  "kosy": [
+   "Ilanka Rzepin",
+   "Ilanka Rzepin"
+  ]
+ },
+ "Promień Żary": {
+  "ultras": [
+   "Ultras Promień Żary",
+   "Sekcja Sportowa",
+   "Promień On Tour",
+   "Tylko Promień"
+  ],
+  "zgody": [
+   "Miedź Legnica",
+   "Stal Jasień",
+   "Stal Jasień",
+   "Miedź Legnica"
+  ],
+  "kosy": [
+   "Czarni Żagań",
+   "Dozamet Nowa Sól",
+   "Polmo Kożuchów",
+   "Chrobry Głogów",
+   "Czarni Żagań",
+   "Dozamet Nowa Sól",
+   "Górnik Wałbrzych",
+   "Polmo Kożuchów",
+   "Polonia Świdnica",
+   "Unia Kunice Żary",
+   "Zagłębie Lubin",
+   "Unia Kunice Żary",
+   "Chrobry Głogów",
+   "Zagłębie Lubin",
+   "Górnik Wałbrzych",
+   "Polonia Świdnica"
+  ]
+ },
+ "Stal Jasień": {
+  "ultras": [
+   "Stalowcy"
+  ],
+  "zgody": [
+   "Promień Żary",
+   "Promień Żary"
+  ],
+  "kosy": [
+   "Dozamet Nowa Sól",
+   "Polmo Kożuchów",
+   "Dozamet Nowa Sól",
+   "Polmo Kożuchów"
+  ]
+ },
+ "Ilanka Rzepin": {
+  "ultras": [
+   "Beer Drinkers"
+  ],
+  "kosy": [
+   "Celuloza Kostrzyn",
+   "Orzeł Międzyrzecz",
+   "Polonia Słubice",
+   "Celuloza Kostrzyn",
+   "Orzeł Międzyrzecz",
+   "Polonia Słubice"
+  ]
+ },
+ "Chemik Kędzierzyn-Koźle": {
+  "ultras": [
+   "ChB - Chemical Brothers",
+   "Ultras Chemik",
+   "Piłkarscy Fanatycy",
+   "Chemicy On Tour"
+  ],
+  "zgody": [
+   "Raków Częstochowa",
+   "Raków Częstochowa"
+  ],
+  "kosy": [
+   "Odra Opole",
+   "Górnik Zabrze",
+   "Odra Opole",
+   "Polonia Bytom",
+   "ROW Rybnik",
+   "Ruch Chorzów",
+   "Polonia Bytom",
+   "Górnik Zabrze",
+   "Ruch Chorzów",
+   "ROW Rybnik"
+  ]
+ },
+ "MKS Kluczbork": {
+  "ultras": [
+   "Fanatico Ragazzi'09",
+   "Kluczborscy Fanatycy'25",
+   "Kluczborscy Rezydenci",
+   "Wyjazdowicze"
+  ],
+  "kosy": [
+   "Ruch Zdzieszowice",
+   "Ruch Zdzieszowice"
+  ]
+ },
+ "Polonia Nysa": {
+  "ultras": [
+   "Młoda Nysa"
+  ],
+  "kosy": [
+   "Odra Opole",
+   "Odra Opole"
+  ]
+ },
+ "Ruch Zdzieszowice": {
+  "ultras": [
+   "Fanatycy z Koksu Stolicy",
+   "Wierni i Oddani"
+  ],
+  "kosy": [
+   "Odra Opole",
+   "MKS Kluczbork",
+   "LZS Leśnica",
+   "MKS Kluczbork",
+   "Odra Opole",
+   "LZS Leśnica"
+  ]
+ },
+ "Stal Brzeg": {
+  "ultras": [
+   "Młoda Stal Brzeg",
+   "Stalowcy 1967 On Tour"
+  ],
+  "zgody": [
+   "Fortuna Głogówek",
+   "Włókniarz Pabianice",
+   "Fortuna Głogówek",
+   "Włókniarz Pabianice"
+  ],
+  "kosy": [
+   "Odra Opole",
+   "Odra Opole",
+   "Olimpia Lewin Brzeski",
+   "Stal Chocianów",
+   "Olimpia Lewin Brzeski",
+   "Stal Chocianów"
+  ]
+ },
+ "Start Namysłów": {
+  "ultras": [
+   "USN - Ultras Start Namysłów",
+   "SNH - Start Namysłów Hooligans",
+   "MSU - Młody Start Ultras",
+   "Chłopcy z Pułaskiego"
+  ],
+  "kosy": [
+   "Odra Opole",
+   "Odra Opole"
+  ]
+ },
+ "Unia Krapkowice": {
+  "ultras": [
+   "WZK - Wariaci z Gagarina",
+   "Młoda Unia"
+  ],
+  "kosy": [
+   "Unia Tułowice",
+   "Unia Tułowice"
+  ]
+ },
+ "Włókniarz Kietrz": {
+  "ultras": [
+   "Trójkolorowi",
+   "Skiold Banda"
+  ],
+  "zgody": [
+   "Odra Wodzisław Śląski",
+   "Odra Wodzisław Śląski"
+  ],
+  "kosy": [
+   "Odra Opole",
+   "Odra Opole",
+   "Ruch Chorzów",
+   "Unia Racibórz",
+   "Ruch Chorzów",
+   "Unia Racibórz"
   ]
  }
 };

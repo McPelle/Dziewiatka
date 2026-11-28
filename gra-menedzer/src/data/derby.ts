@@ -154,6 +154,21 @@ export const DERBY: ParaDerbowa[] = [
   { a: "Avia Świdnik", b: "Motor Lublin", nazwa: "Derby Lubelszczyzny" },
   { a: "Siarka Tarnobrzeg", b: "Stal Stalowa Wola", nazwa: "Wielkie Derby Podkarpacia" },
   { a: "Odra Opole", b: "Śląsk Wrocław", nazwa: "Derby Opola i Wrocławia" },
+  // Lubuskie i opolskie (źródła: kibice.fandom.com, stadionowioprawcy.net,: pl/en.wikipedia — List of derbies in Poland, artykuły klubów)
+  { a: "Stilon Gorzów Wielkopolski", b: "Lechia Zielona Góra", nazwa: "Derby województwa lubuskiego (Lubusz Voivodeship Derby)" },
+  { a: "Stilon Gorzów Wielkopolski", b: "Warta Gorzów Wielkopolski", nazwa: "Derby Gorzowa" },
+  { a: "Carina Gubin", b: "Tęcza Krosno Odrzańskie", nazwa: "Gran Derbi / derby powiatowe (przyjazna atmosfera)" },
+  { a: "Celuloza Kostrzyn", b: "Polonia Słubice", nazwa: "Derby Ziemi Lubuskiej (Lubusz Land Derby)" },
+  { a: "Lechia Zielona Góra", b: "Stilon Gorzów Wielkopolski", nazwa: "Derby województwa lubuskiego (Lubusz Voivodeship Derby)" },
+  { a: "Polonia Słubice", b: "Ilanka Rzepin", nazwa: "derby powiatu" },
+  { a: "Polonia Słubice", b: "Celuloza Kostrzyn", nazwa: "Derby Ziemi Lubuskiej (Lubusz Land Derby)" },
+  { a: "Ilanka Rzepin", b: "Polonia Słubice", nazwa: "derby powiatu" },
+  { a: "Warta Gorzów Wielkopolski", b: "Stilon Gorzów Wielkopolski", nazwa: "Derby Gorzowa" },
+  { a: "Tęcza Krosno Odrzańskie", b: "Carina Gubin", nazwa: "Gran Derbi / derby powiatowe (przyjazna atmosfera)" },
+  { a: "Odra Opole", b: "MKS Kluczbork", nazwa: "Derby Opolszczyzny" },
+  { a: "Odra Opole", b: "Chemik Kędzierzyn-Koźle", nazwa: "Derby Opolszczyzny" },
+  { a: "Chemik Kędzierzyn-Koźle", b: "Odra Opole", nazwa: "Derby Opolszczyzny" },
+  { a: "MKS Kluczbork", b: "Odra Opole", nazwa: "Derby Opolszczyzny" },
 ];
 
 // Mecze przyjaźni (zgody kibicowskie) — kibice się przyjaźnią: świetna atmosfera, komplet, bez podwyższonego ryzyka.

@@ -111,6 +111,12 @@ const KAL: { re: RegExp; k: KalSzczebla }[] = [
   { re: /iv liga lubuska|okręgowa — lubuska/i, k: { startJesien: [8, 1], startWiosna: [3, 7], urlopLato: 21, urlopZima: 56, przygLato: 28, przygZima: 50 } },
   { re: /klasa a — lubuska/i, k: { startJesien: [8, 15], startWiosna: [3, 21], urlopLato: 35, urlopZima: 74, przygLato: 28, przygZima: 47 } },
   { re: /klasa b — lubuska/i, k: { startJesien: [8, 23], startWiosna: [3, 28], urlopLato: 42, urlopZima: 98, przygLato: 28, przygZima: 42 } },
+  // Opolski ZPN — terminarze 2026/27 (pilkaopolska.pl): IV liga 8.08 → 31.10, wiosna 13.03 → 5.06; okręgowa 8.08 → 7.11, wiosna 6.03;
+  // klasa A 16.08 → 15.11, wiosna 7.03 → 19.06; klasa B 30.08 → 15.11, wiosna 14.03 → 6.06.
+  { re: /iv liga opolska/i, k: { startJesien: [8, 8], startWiosna: [3, 13], urlopLato: 30, urlopZima: 80, przygLato: 32, przygZima: 52 } },
+  { re: /okręgowa — opolska/i, k: { startJesien: [8, 8], startWiosna: [3, 6], urlopLato: 30, urlopZima: 66, przygLato: 32, przygZima: 52 } },
+  { re: /klasa a — opolska/i, k: { startJesien: [8, 16], startWiosna: [3, 7], urlopLato: 25, urlopZima: 62, przygLato: 32, przygZima: 49 } },
+  { re: /klasa b — opolska/i, k: { startJesien: [8, 30], startWiosna: [3, 14], urlopLato: 50, urlopZima: 70, przygLato: 34, przygZima: 49 } },
   // Podlaski ZPN — terminarz jesień 2026 (podlaskizpn.org): IV liga i okręgówka od 8–9.08 do 14–15.11; klasa A od 29–30.08
   // (wiosna 2027 jeszcze nieopublikowana — przyjęty typowy rytm szczebla).
   { re: /iv liga podlaska|okręgowa — podlaska/i, k: { startJesien: [8, 8], startWiosna: [3, 7], urlopLato: 26, urlopZima: 60, przygLato: 30, przygZima: 52 } },
