@@ -7,7 +7,7 @@ import { autoSklad, silaSkladu } from "./mecz";
 import { kontekstTreningu, rozwojTreningowy } from "./sezon";
 import { generujKariere, kontraktTyp, dlugoscKontraktu, nowyZawodnik, pensjaDla, przejscieDoKlubu, KADRA } from "./swiat";
 import { okresyDlaPoziomu } from "./kalendarz";
-import { obserwujTestowanych, odswiezRynekTestow } from "./testy";
+import { mozeTesty, obserwujTestowanych, odswiezRynekTestow, wezNaTesty } from "./testy";
 import type { StanGry, Zawodnik } from "./types";
 import { opisAkt, planNa, wykonajAktywnosc } from "./planDnia";
 
@@ -144,6 +144,26 @@ export function pozyskajKandydata(s: StanGry, id: string): string | null {
   s.wolni = s.wolni.filter((x) => x !== id);
   if (s.okres) s.okres.kandydaci = (s.okres.kandydaci ?? []).filter((x) => x !== id);
   z.kariera = generujKariere(s, z, moj.nazwa); przejscieDoKlubu(s, z, moj.nazwa);
+  return null;
+}
+
+/** Odrzucenie wyróżnionego — znika z listy (zostaje wolnym zawodnikiem na rynku; może go podpisać inny klub). */
+export function odrzucKandydata(s: StanGry, id: string): void {
+  if (s.okres) s.okres.kandydaci = (s.okres.kandydaci ?? []).filter((x) => x !== id);
+}
+/** Odrzucenie wszystkich wyróżnionych naraz. */
+export function odrzucWszystkichKandydatow(s: StanGry): number {
+  const n = (s.okres?.kandydaci ?? []).filter((id) => s.zawodnicy[id] && !s.zawodnicy[id].klubId).length;
+  if (s.okres) s.okres.kandydaci = [];
+  return n;
+}
+/** Wyróżniony na testy (IV liga i niżej, otwarte okno) — zamiast podpisywać od razu, sprawdzasz go na treningach. */
+export function kandydatNaTesty(s: StanGry, id: string): string | null {
+  if (!mozeTesty(s)) return "Testy możliwe tylko w niższych ligach (IV liga i niżej) i w otwartym oknie transferowym.";
+  s.testRynek = [...new Set([...(s.testRynek ?? []), id])];
+  const b = wezNaTesty(s, id);
+  if (b) { s.testRynek = (s.testRynek ?? []).filter((x) => x !== id); return b; }
+  odrzucKandydata(s, id);
   return null;
 }
 

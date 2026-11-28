@@ -4,7 +4,7 @@ import { Alert, Platform, Pressable, Text, View } from "react-native";
 import { KalendarzMiesiac } from "./KalendarzMiesiac";
 import { zl } from "../engine/losuj";
 import { dalejDzien, doMeczu, fmtData } from "../engine/dzien";
-import { dataOkresu, dniRazem, kosztObozuPrzyg, nazwaDnia, OBOZY_PRZYG, pozyskajKandydata, rywaleSparingowi, skrocUrlop, testySzczebel, wybierzOboz, zaplanujSparing } from "../engine/okres";
+import { dataOkresu, dniRazem, kosztObozuPrzyg, nazwaDnia, OBOZY_PRZYG, kandydatNaTesty, odrzucKandydata, odrzucWszystkichKandydatow, pozyskajKandydata, rywaleSparingowi, skrocUrlop, testySzczebel, wybierzOboz, zaplanujSparing } from "../engine/okres";
 import type { StanGry } from "../engine/types";
 import { CZCIONKA, K, pasek3D, st, szklo3D } from "./styl";
 
@@ -83,12 +83,30 @@ export function PanelOkresu({ s, odswiez }: { s: StanGry; odswiez: () => void })
 
       {kand.length > 0 && (
         <>
-          <Text style={[st.naglowek, { marginTop: 12 }]}>👀 Wyróżnieni do pozyskania (za darmo)</Text>
+          <View style={[st.wiersz, { marginTop: 12, justifyContent: "space-between" }]}>
+            <Text style={[st.naglowek, { marginTop: 0, flex: 1 }]}>👀 Wyróżnieni do pozyskania (za darmo)</Text>
+            <Pressable onPress={() => { const n = odrzucWszystkichKandydatow(s); odswiez(); komunikat(`Odrzucono ${n} ${n === 1 ? "zawodnika" : "zawodników"} — lista wyczyszczona.`); }} style={[st.przyciskMaly, { borderColor: K.czerwony }]}>
+              <Text style={[st.przyciskMalyTekst, { color: K.czerwony }]}>✕ Odrzuć wszystkich</Text>
+            </Pressable>
+          </View>
+          <Text style={[st.maly, { marginTop: 2 }]}>Podpisz od razu, weź na testy (ocenisz go na treningach) albo odrzuć ✕ — odrzucony znika z listy i trafia na rynek wolnych zawodników.</Text>
           {kand.map((z) => (
-            <View key={z.id} style={[st.wiersz, { paddingVertical: 4, borderTopWidth: 1, borderTopColor: K.linia }]}>
-              <Text style={[st.tekst, { flex: 1, fontSize: 13.5 }]}>{z.imie} {z.nazwisko} · {z.poz} · {z.wiek} l. · OVR ~{Math.floor(z.umiej)}</Text>
+            <View key={z.id} style={[st.wiersz, { paddingVertical: 6, borderTopWidth: 1, borderTopColor: K.linia, gap: 6 }]}>
+              <View style={{ flex: 1 }}>
+                <Text style={[st.tekst, { fontSize: 13.5 }]}>{z.imie} {z.nazwisko}</Text>
+                <Text style={st.maly}>{z.poz} · {z.wiek} l. · OVR ~{Math.floor(z.umiej)}{z.wiek <= 21 ? " · młodzieżowiec" : ""}</Text>
+              </View>
               <Pressable style={[st.przyciskMaly, { borderColor: K.zielony }]} onPress={() => { const b = pozyskajKandydata(s, z.id); odswiez(); komunikat(b ?? `${z.imie} ${z.nazwisko} dołącza do klubu.`); }}>
                 <Text style={[st.przyciskMalyTekst, { color: K.zielony }]}>Podpisz</Text>
+              </Pressable>
+              {testySzczebel(s) && (
+                <Pressable style={[st.przyciskMaly, { borderColor: K.niebieski }]} onPress={() => { const b = kandydatNaTesty(s, z.id); odswiez(); komunikat(b ?? `${z.imie} ${z.nazwisko} na testach (Transfery → Testy).`); }}>
+                  <Text style={[st.przyciskMalyTekst, { color: K.niebieski }]}>Testy</Text>
+                </Pressable>
+              )}
+              <Pressable accessibilityLabel={`Odrzuć ${z.imie} ${z.nazwisko}`} hitSlop={8} onPress={() => { odrzucKandydata(s, z.id); odswiez(); }}
+                style={{ width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center", borderWidth: 1.5, borderColor: K.czerwony, backgroundColor: "rgba(255,90,90,0.08)" }}>
+                <Text style={{ color: K.czerwony, fontSize: 17, fontWeight: "900" }}>✕</Text>
               </Pressable>
             </View>
           ))}
