@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import { aktualizujTypyKontraktow, wartoscKontraktuTrenera } from "../engine/sezon";
 import { zarejestrujBarwy } from "../engine/wlasnyKlub";
-import { losujAgenta, maAgenta } from "../engine/swiat";
+import { losujAgenta, maAgenta, odswiezKarieryRealne } from "../engine/swiat";
 import type { StanGry } from "../engine/types";
 
 const KLUCZ = "menedzer-zapis-1";
@@ -171,6 +171,7 @@ export async function zapiszSlot(s: StanGry, opcje: { nowy?: boolean; id?: strin
 function przygotuj(s: StanGry): StanGry {
   migrujKariere(s);
   migrujTrenera(s);
+  odswiezKarieryRealne(s); // prawdziwe historie zawodników (Ekstraklasa → II liga) także w starych zapisach
   zarejestrujBarwy(s);          // barwy klubów stworzonych przez gracza
   aktualizujTypyKontraktow(s); // stare zapisy: wyrównaj kontrakty do szczebla klubu (np. amatorzy w IV/III lidze)
   return s;

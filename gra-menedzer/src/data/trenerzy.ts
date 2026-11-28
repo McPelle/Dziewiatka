@@ -213,6 +213,16 @@ export const TRENERZY: Record<string, TrenerReal> = {
   "Sparta Łężyca": { imie: "Szymon", nazwisko: "Czarny" }, // Lubuskie — Zielona Góra; wzielonej.pl (2026-10-16)
   "Kora Niedoradz": { imie: "Mieczysław", nazwisko: "Sobczak" }, // Lubuskie — Zielona Góra; zachod.pl (2026-08-16)
   "TKKF Chynowianka Zielona Góra": { imie: "Kamil", nazwisko: "Konopacki" }, // Lubuskie — Zielona Góra; zachod.pl (2026-06-29)
+  "Victoria Szczaniec": { imie: "Marcin", nazwisko: "Janik" }, // Lubuskie — Gorzów / III liga gr. III; lubuskizpn.pl (2026-11-26)
+  "Polonia Słubice": { imie: "Michał", nazwisko: "Gościak" }, // Lubuskie — Gorzów / III liga gr. III; lubuskizpn.pl (2026-11-26)
+  "Zagłębie Sosnowiec": { imie: "Tomasz", nazwisko: "Łuczywek" }, // Lubuskie — Gorzów / III liga gr. III; pl.wikipedia.org (2026-11-28 (infoboks Wikipedii, sezon 2026/2027))
+  "ROW 1964 Rybnik": { imie: "Jacek", nazwisko: "Trzeciak" }, // Lubuskie — Gorzów / III liga gr. III; row1964rybnik.com (2026-11-28 (skład na sezon 2026/2027))
+  "Barycz Sułów": { imie: "Wojciech", nazwisko: "Łuczak" }, // Lubuskie — Gorzów / III liga gr. III; baryczsulow.com (2026-11-28 (strona klubu, kadra))
+  "MKS Kluczbork": { imie: "Michał", nazwisko: "Honc" }, // Lubuskie — Gorzów / III liga gr. III; mkskluczbork.pl (2026-11-13)
+  "Ślęza Wrocław": { imie: "Grzegorz", nazwisko: "Kowalski" }, // Lubuskie — Gorzów / III liga gr. III; pilkanozna.slezawroclaw.pl (2026-11-28 (strona klubu – sztab III ligi))
+  "Stilon Gorzów Wielkopolski": { imie: "Karol", nazwisko: "Gliwiński" }, // Lubuskie — Gorzów / III liga gr. III; lubuskizpn.pl (2026-07-23)
+  "Warta Gorzów Wielkopolski": { imie: "Mariusz", nazwisko: "Łabiak" }, // Lubuskie — Gorzów / III liga gr. III; pl.wikipedia.org (2026-11-28 (infoboks Wikipedii; brak potwierdzenia w innym źródle))
+  "Polonia Nysa": { imie: "Adrian", nazwisko: "Pajączkowski" }, // Lubuskie — Gorzów / III liga gr. III; kspolonianysa.pl (2026-09-25 („Adrian Pajączkowski nowym trenerem Polonii Nysa”))
 };
 
 /** Licencja UEFA właściwa dla szczebla (realia PZPN: im wyżej, tym wyższy wymóg). */

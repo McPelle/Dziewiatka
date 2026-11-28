@@ -1029,7 +1029,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Dozamet Nowa Sól",
    "Promień Żary",
    "Odra Opole",
-   "Carina II Gubin"
+   "Carina II Gubin",
+   "Górnik Polkowice"
   ]
  },
  "ŁKS Łódź": {
@@ -2941,7 +2942,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   "zgody": [
    "Górnik Zabrze",
    "ROW Rybnik",
-   "Siarka Tarnobrzeg"
+   "Siarka Tarnobrzeg",
+   "ROW 1964 Rybnik"
   ],
   "kosy": [
    "Stal Mielec",
@@ -3823,7 +3825,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Chrobry Głogów",
    "Sporting Charleroi",
    "Chrobry Głogów",
-   "Sporting Charleroi"
+   "Sporting Charleroi",
+   "Chrobry Głogów (1985-1995 i od 2012 r.)"
   ],
   "kosy": [
    "Dozamet Nowa Sól",
@@ -3948,7 +3951,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "KS Glisno",
-   "KS Glisno"
+   "KS Glisno",
+   "Stal Gorzów Wlkp."
   ]
  },
  "Lubuszanin Drezdenko": {
@@ -3958,7 +3962,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Łucznik Strzelce Krajeńskie",
-   "Łucznik Strzelce Krajeńskie"
+   "Łucznik Strzelce Krajeńskie",
+   "Łucznik Strzelce"
   ]
  },
  "Orzeł Międzyrzecz": {
@@ -3969,7 +3974,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
   ],
   "kosy": [
    "Ilanka Rzepin",
-   "Ilanka Rzepin"
+   "Ilanka Rzepin",
+   "Stal Gorzów Wlkp."
   ]
  },
  "Pogoń Skwierzyna": {
@@ -4102,7 +4108,8 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Polonia Słubice",
    "Celuloza Kostrzyn",
    "Orzeł Międzyrzecz",
-   "Polonia Słubice"
+   "Polonia Słubice",
+   "Celuloza Kostrzyn nad Odrą"
   ]
  },
  "Chemik Kędzierzyn-Koźle": {
@@ -4273,6 +4280,85 @@ export const GRUPY_KIBICOW: Record<string, GrupyKlubu> = {
    "Sprotavia Szprotawa",
    "Stal Jasień",
    "Stilon Gorzów Wielkopolski"
+  ]
+ },
+ "Bizon Wilkowo": {
+  "ultras": [
+   "Ultras Wierni i Oddani Wilkowscy Chuligani"
+  ]
+ },
+ "Celuloza Kostrzyn nad Odrą": {
+  "ultras": [
+   "Full Service",
+   "KKP Celuloza Kostrzyn 26'"
+  ],
+  "kosy": [
+   "Ilanka Rzepin"
+  ]
+ },
+ "Zagłębie Sosnowiec": {
+  "ultras": [
+   "BB'97 - Barra Bravas",
+   "Nuovi Ultras'19",
+   "Młoda Wiara"
+  ],
+  "zgody": [
+   "Olimpia Elbląg",
+   "Legia Warszawa"
+  ],
+  "kosy": [
+   "MKS Libiąż",
+   "Odra Opole",
+   "GKS Katowice"
+  ]
+ },
+ "Górnik Polkowice": {
+  "ultras": [
+   "Faithful Young"
+  ],
+  "kosy": [
+   "Chrobry Głogów"
+  ]
+ },
+ "ROW 1964 Rybnik": {
+  "ultras": [
+   "Gladiators",
+   "Młody ROW",
+   "Verdeneri'02",
+   "SGRR - Stowarzyszenie Gladiators ROW Rybnik"
+  ],
+  "zgody": [
+   "Wisłoka Dębica"
+  ],
+  "kosy": [
+   "GKS Jastrzębie"
+  ]
+ },
+ "Barycz Sułów": {
+  "ultras": [
+   "Sułowscy Fanatycy - SF'47",
+   "Młoda Barycz - MB<nowiki>''</nowiki>26"
+  ],
+  "zgody": [
+   "PKS Wołów"
+  ],
+  "kosy": [
+   "Polonia Świdnica"
+  ]
+ },
+ "Karkonosze Jelenia Góra": {
+  "ultras": [
+   "White Hunters Brigade"
+  ],
+  "kosy": [
+   "Stilon Gorzów Wielkopolski",
+   "Carina Gubin",
+   "Dozamet Nowa Sól",
+   "Carina II Gubin",
+   "Górnik Wałbrzych"
+  ],
+  "zgody": [
+   "Olimpia Kowary"
   ]
  }
 };

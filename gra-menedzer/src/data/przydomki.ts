@@ -175,6 +175,13 @@ export const PRZYDOMKI: Record<string, string> = {
   "Fadom Nowogród Bobrzański": "Betonowcy",
   "Klon Babimost": "Lotnicy",
   "Polonia Nowe Kramsko": "Lotnicy",
+  // Lubuskie — Gorzów / III liga gr. III (runda 2) — przydomki potwierdzone w źródłach
+  "Celuloza Kostrzyn nad Odrą": "Papierowi",
+  "Zagłębie Sosnowiec": "Zagłębiacy",
+  "Górnik Polkowice": "KSG (Klub Sportowy Górnik)",
+  "ROW 1964 Rybnik": "Grubiorze",
+  "Barycz Sułów": "Kabanosy",
+  "Karkonosze Jelenia Góra": "Karki",
 };
 
 export function przydomek(nazwa: string): string | undefined {

@@ -295,6 +295,39 @@ export function karieraRealna(s: StanGry, imie: string, nazwisko: string, dataUr
   return w;
 }
 
+/** Prawdziwe występy w reprezentacjach (seniorskiej i młodzieżowych) — z tych samych źródeł co kariera. */
+export function kadryRealne(z: Zawodnik, imie: string, nazw: string, dataUr: string | undefined): void {
+  const kd = (KADRY_REALNE as unknown as Record<string, { druzyna: string; od?: number | null; do?: number | null; mecze: number; gole?: number }[]>)[`${imie} ${nazw}|${dataUr ?? ""}`];
+  if (!kd?.length) return;
+  z.kadry = kd.map((x) => ({ druzyna: x.druzyna, od: x.od ?? undefined, do: x.do ?? null, mecze: x.mecze, gole: x.gole ?? 0 }));
+  const sen = kd.filter((x) => !/U-?\d|olimp|B$/i.test(x.druzyna));
+  if (sen.length) { const g = sen[sen.length - 1]; z.kadraStat = { kraj: g.druzyna, mecze: sen.reduce((a, x) => a + x.mecze, 0), gole: sen.reduce((a, x) => a + (x.gole ?? 0), 0), ...(g.od ? { debiut: String(Math.min(...sen.map((x) => x.od ?? 9999))) } : {}) }; }
+}
+
+/** Wersja bazy prawdziwych karier — po aktualizacji danych stare zapisy dostają poprawione historie przy wczytaniu. */
+export const KARIERY_WERSJA = Object.keys(KARIERY_REALNE as object).length * 1000 + Object.keys(KADRY_REALNE as object).length;
+/** Stare zapisy: prawdziwi zawodnicy (Ekstraklasa → II liga) dostają prawdziwą historię klubów i reprezentacji sprzed startu
+ *  kariery gracza (zamiast wygenerowanej); wpisy powstałe już w grze (transfery po starcie) zostają. */
+export function odswiezKarieryRealne(s: StanGry): void {
+  if (s.karieryWersja === KARIERY_WERSJA) return;
+  const start = Math.min(s.sezon, ...(s.historia ?? []).map((h) => h.sezon));
+  const sStart = { ...s, sezon: start } as StanGry;
+  for (const z of Object.values(s.zawodnicy ?? {})) {
+    if (!z.realny || !z.dataUr) continue;
+    const pocz = karieraRealna(sStart, z.imie, z.nazwisko, z.dataUr, "");
+    if (!pocz) continue;
+    if (pocz.length && pocz[pocz.length - 1].klub === "") pocz.pop();
+    const wGrze = (z.kariera ?? []).filter((w) => w.od > start);       // transfery wykonane już w grze
+    if (wGrze.length && pocz.length) { const o = pocz[pocz.length - 1]; if (o.do === null) o.do = wGrze[0].od; }
+    z.kariera = [...pocz, ...wGrze];
+    if (!z.kariera.length) continue;
+    const ost = z.kariera[z.kariera.length - 1]; const akt = z.klubId ? s.kluby[z.klubId]?.nazwa : undefined;
+    if (akt && (ost.klub !== akt || ost.do !== null)) z.kariera.push({ klub: akt, od: s.sezon, do: null, mecze: 0, gole: 0 });
+    if (!z.kadry) kadryRealne(z, z.imie, z.nazwisko, z.dataUr);
+  }
+  s.karieryWersja = KARIERY_WERSJA;
+}
+
 export function generujKariere(s: StanGry, z: Zawodnik, aktualnyKlub: string): WpisKariery[] {
   const sezon = s.sezon;
   const lat = Math.max(0, z.wiek - losInt(16, 18)); // ile sezonów w seniorskiej piłce
@@ -579,14 +612,7 @@ export function nowaGra(trener: string, sciezka: Sciezka = SCIEZKA_DOMYSLNA): St
           if (z.klauzula) z.klauzula = Math.max(10000, Math.round((wartosc(z) * los(1.5, 2.8)) / 1000) * 1000);
           z.klubId = klub.id;
           z.kariera = karieraRealna(s, imie, nazw, dataUr, klub.nazwa) ?? [{ klub: klub.nazwa, od: s.sezon, do: null, mecze: 0, gole: 0 }];
-          { // prawdziwe występy w reprezentacjach (seniorskiej i młodzieżowych) — z tych samych źródeł co kariera
-            const kd = (KADRY_REALNE as unknown as Record<string, { druzyna: string; od?: number | null; do?: number | null; mecze: number; gole?: number }[]>)[`${imie} ${nazw}|${dataUr ?? ""}`];
-            if (kd?.length) {
-              z.kadry = kd.map((x) => ({ druzyna: x.druzyna, od: x.od ?? undefined, do: x.do ?? null, mecze: x.mecze, gole: x.gole ?? 0 }));
-              const sen = kd.filter((x) => !/U-?\d|olimp|B$/i.test(x.druzyna));
-              if (sen.length) { const g = sen[sen.length - 1]; z.kadraStat = { kraj: g.druzyna, mecze: sen.reduce((a, x) => a + x.mecze, 0), gole: sen.reduce((a, x) => a + (x.gole ?? 0), 0), ...(g.od ? { debiut: String(Math.min(...sen.map((x) => x.od ?? 9999))) } : {}) }; }
-            }
-          }
+          kadryRealne(z, imie, nazw, dataUr); // prawdziwe występy w reprezentacjach (seniorskiej i młodzieżowych)
           klub.zawodnicy.push(z.id);
         }
         const ileP = (p: Pozycja) => klub.zawodnicy.filter((id) => s.zawodnicy[id].poz === p).length;

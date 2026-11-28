@@ -469,6 +469,7 @@ export interface StanGry {
   wiadomosci: Wiadomosc[];
   oferty: Oferta[];
   historia: Historia[];
+  karieryWersja?: number; // wersja bazy prawdziwych karier, z którą zsynchronizowano zapis
   xiKolejki?: XIKolejki; // najlepsza jedenastka ostatniej kolejki (Twoja liga)
   xiHistoria?: XIKolejki[]; // archiwum jedenastek kolejek z sezonu
   konferencja?: Konferencja;

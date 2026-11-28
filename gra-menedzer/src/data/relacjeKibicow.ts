@@ -3053,5 +3053,21 @@ export const RELACJE_KIBICOW: RelacjaKibicow[] = [
  {"a": "Korona II Kożuchów", "b": "Sprotavia Szprotawa", "typ": "kosa"},
  {"a": "Korona II Kożuchów", "b": "Stal Jasień", "typ": "kosa"},
  {"a": "Korona II Kożuchów", "b": "Stilon Gorzów Wielkopolski", "typ": "kosa"},
- {"a": "Sprotavia II Szprotawa", "b": "Polmo Kożuchów", "typ": "kosa"}
+ {"a": "Sprotavia II Szprotawa", "b": "Polmo Kożuchów", "typ": "kosa"},
+ {"a": "Celuloza Kostrzyn nad Odrą", "b": "Ilanka Rzepin", "typ": "kosa"},
+ {"a": "Lubuszanin Drezdenko", "b": "Łucznik Strzelce", "typ": "kosa"},
+ {"a": "Orzeł Międzyrzecz", "b": "Stal Gorzów Wlkp.", "typ": "kosa"},
+ {"a": "Czarni Browar Witnica", "b": "Iskra Gorzów Wielkopolski", "typ": "zgoda"},
+ {"a": "Maksymilian Gorzów Wielkopolski", "b": "Iskra Gorzów Wielkopolski", "typ": "kosa"},
+ {"a": "Lubniewiczanka Lubniewice", "b": "Stal Gorzów Wlkp.", "typ": "kosa"},
+ {"a": "Zagłębie Sosnowiec", "b": "Legia Warszawa", "typ": "zgoda"},
+ {"a": "Zagłębie Sosnowiec", "b": "GKS Katowice", "typ": "kosa"},
+ {"a": "Górnik Polkowice", "b": "Chrobry Głogów", "typ": "kosa"},
+ {"a": "ROW 1964 Rybnik", "b": "Wisłoka Dębica", "typ": "zgoda"},
+ {"a": "ROW 1964 Rybnik", "b": "GKS Jastrzębie", "typ": "kosa"},
+ {"a": "Barycz Sułów", "b": "PKS Wołów", "typ": "zgoda"},
+ {"a": "Barycz Sułów", "b": "Polonia Świdnica", "typ": "kosa"},
+ {"a": "Karkonosze Jelenia Góra", "b": "Olimpia Kowary", "typ": "zgoda"},
+ {"a": "Karkonosze Jelenia Góra", "b": "Górnik Wałbrzych", "typ": "kosa"},
+ {"a": "Stilon Gorzów Wielkopolski", "b": "Chrobry Głogów (1985-1995 i od 2012 r.)", "typ": "zgoda"}
 ];
